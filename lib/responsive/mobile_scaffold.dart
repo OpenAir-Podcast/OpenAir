@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/models/feed_model.dart';
 import 'package:openair/providers/parses/feed_future_provider.dart';
 import 'package:openair/providers/podcast_provider.dart';
-import 'package:openair/views/navPages/explore_page.dart';
-import 'package:openair/views/navPages/home_page.dart';
-import 'package:openair/views/navPages/library_page.dart';
-import 'package:openair/views/navigation/app_bar.dart';
+import 'package:openair/views/navPages/featured_page.dart';
+import 'package:openair/views/navPages/trending_page.dart';
 import 'package:openair/views/navigation/app_drawer.dart';
+import 'package:openair/views/navigation/main_app_bar.dart';
+
+import '../views/navPages/categories_page.dart';
 
 bool once = false;
 
@@ -27,32 +27,41 @@ class MobileScaffold extends ConsumerWidget {
 
     final podcastRef = ref.watch(feedFutureProvider);
 
-    return Scaffold(
-      appBar: appBar(ref),
-      drawer: const AppDrawer(),
-      // TODO: Redesign this
-      body: podcastRef.when(
-        skipLoadingOnReload: true,
-        skipLoadingOnRefresh: false,
-        data: (List<FeedModel> data) {
-          final pages = List<Widget>.unmodifiable([
-            const HomePage(),
-            const ExplorePage(),
-            const LibraryPage(),
-          ]);
-
-          return pages[ref.watch(podcastProvider).navIndex];
-        },
-        error: (error, stackTrace) {
-          return Text(error.toString());
-        },
-        loading: () {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: mainAppBar(ref),
+        drawer: const AppDrawer(),
+        // TODO: Redesign this
+        // body: podcastRef.when(
+        //   skipLoadingOnReload: true,
+        //   skipLoadingOnRefresh: false,
+        //   data: (List<FeedModel> data) {
+        //     final pages = List<Widget>.unmodifiable([
+        //       const HomePage(),
+        //       const ExplorePage(),
+        //       const LibraryPage(),
+        //     ]);
+        //
+        //     return pages[ref.watch(podcastProvider).navIndex];
+        //   },
+        //   error: (error, stackTrace) {
+        //     return Text(error.toString());
+        //   },
+        //   loading: () {
+        //     return const Scaffold(
+        //       body: Center(
+        //         child: CircularProgressIndicator(),
+        //       ),
+        //     );
+        //   },
+        body: const TabBarView(
+          children: [
+            FeaturedPage(),
+            TrendingPage(),
+            CategoriesPage(),
+          ],
+        ),
       ),
     );
   }
