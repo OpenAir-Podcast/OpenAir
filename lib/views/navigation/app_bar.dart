@@ -6,11 +6,9 @@ AppBar appBar(WidgetRef ref) {
   return AppBar(
     elevation: 4.0,
     shadowColor: Colors.grey,
-    title: const Center(
-      child: Text(
-        'OpenAir',
-        textAlign: TextAlign.center,
-      ),
+    title: const Text(
+      'OpenAir',
+      textAlign: TextAlign.left,
     ),
     actions: [
       Padding(
@@ -30,7 +28,7 @@ AppBar appBar(WidgetRef ref) {
           onPressed: () {
             ref.read(podcastProvider.notifier).playerPauseButtonClicked();
           },
-          icon: const Icon(Icons.person),
+          icon: const Icon(Icons.refresh_rounded),
         ),
       ),
     ],

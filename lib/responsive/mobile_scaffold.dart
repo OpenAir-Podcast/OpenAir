@@ -7,18 +7,18 @@ import 'package:openair/views/navPages/explore_page.dart';
 import 'package:openair/views/navPages/home_page.dart';
 import 'package:openair/views/navPages/library_page.dart';
 import 'package:openair/views/navigation/app_bar.dart';
-import 'package:openair/views/navigation/main_nav_bar.dart';
-
-import 'player/banner_audio_player.dart';
+import 'package:openair/views/navigation/app_drawer.dart';
 
 bool once = false;
 
-class Home extends ConsumerWidget {
-  const Home({super.key});
+class MobileScaffold extends ConsumerWidget {
+  const MobileScaffold({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Run once to initialize the provider
     if (once == false) {
+      // Initialize the provider
       ref.read(podcastProvider).initial(
             context,
           );
@@ -29,7 +29,8 @@ class Home extends ConsumerWidget {
 
     return Scaffold(
       appBar: appBar(ref),
-      drawer: const Drawer(),
+      drawer: const AppDrawer(),
+      // TODO: Redesign this
       body: podcastRef.when(
         skipLoadingOnReload: true,
         skipLoadingOnRefresh: false,
@@ -52,18 +53,6 @@ class Home extends ConsumerWidget {
             ),
           );
         },
-      ),
-      bottomNavigationBar: SizedBox(
-        height: ref.watch(podcastProvider).isPodcastSelected ? 134.0 : 58.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            ref.watch(podcastProvider).isPodcastSelected
-                ? const BannerAudioPlayer()
-                : const SizedBox(),
-            const SizedBox(height: 58.0, child: MainNavBar()),
-          ],
-        ),
       ),
     );
   }

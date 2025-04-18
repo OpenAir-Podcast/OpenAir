@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/views/home.dart';
+import 'package:openair/responsive/desktop_scaffold.dart';
+import 'package:openair/responsive/mobile_scaffold.dart';
+import 'package:openair/responsive/responsive_layout.dart';
+import 'package:openair/responsive/tablet_scaffold.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -13,7 +16,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-  // todo fix progress bar and how on the look of the UI for the discover and episodes pages
+// todo fix progress bar and how on the look of the UI for the discover and episodes pages
 
 class _MyAppState extends State<MyApp> {
   @override
@@ -26,7 +29,12 @@ class _MyAppState extends State<MyApp> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const Home(),
+        // Check the resolution of the device then use the appropriate scaffold
+        home: const ResponsiveLayout(
+          desktopScaffold: DesktopScaffold(),
+          tabletScaffold: TabletScaffold(),
+          mobileScaffold: MobileScaffold(),
+        ),
       ),
     );
   }
