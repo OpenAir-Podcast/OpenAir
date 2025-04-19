@@ -49,7 +49,10 @@ class EpisodeCard extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10.0),
                           image: DecorationImage(
                             image: NetworkImage(
-                              ref.watch(podcastProvider).selectedPodcast!.artwork,
+                              ref
+                                  .watch(podcastProvider)
+                                  .selectedPodcast!
+                                  .artwork,
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -64,11 +67,14 @@ class EpisodeCard extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            ref.watch(podcastProvider).selectedPodcast!.title,
-                            softWrap: true,
-                            style: const TextStyle(
-                              fontSize: 14.0,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 130.0,
+                            child: Text(
+                              ref.watch(podcastProvider).selectedPodcast!.title,
+                              style: const TextStyle(
+                                fontSize: 14.0,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
                           Text(
@@ -142,7 +148,7 @@ class EpisodeCard extends ConsumerWidget {
                           ref
                               .read(podcastProvider.notifier)
                               .playerDownloadButtonClicked(episodeItem);
-        
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -162,7 +168,7 @@ class EpisodeCard extends ConsumerWidget {
                                       .read(podcastProvider.notifier)
                                       .playerRemoveDownloadButtonClicked(
                                           episodeItem);
-        
+
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(

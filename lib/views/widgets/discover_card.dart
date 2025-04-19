@@ -48,12 +48,15 @@ class DiscoverCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      podcastItem.title,
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 105.0,
+                      child: Text(
+                        podcastItem.title,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                     Text(

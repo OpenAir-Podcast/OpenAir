@@ -25,12 +25,3 @@ final feedFutureProvider = FutureProvider(
     return ref.watch(podcastProvider).feedPodcasts;
   },
 );
-
-final categoriesFutureProvider = FutureProvider(
-  (ref) async {
-    Map<String, dynamic> feed =
-        await ref.watch(apiServiceProvider).getPodcastCategories();
-
-    return feed['feeds'];
-  },
-);
