@@ -59,11 +59,14 @@ class DiscoverCard extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    Text(
-                      podcastItem.author,
-                      maxLines: 2,
-                      style: const TextStyle(
-                        overflow: TextOverflow.ellipsis,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 120.0,
+                      child: Text(
+                        podcastItem.author,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
