@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/models/feed_model.dart';
@@ -34,9 +35,7 @@ class DiscoverCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
                   image: DecorationImage(
-                    image: NetworkImage(
-                      podcastItem.artwork,
-                    ),
+                    image: CachedNetworkImageProvider(podcastItem.artwork),
                     fit: BoxFit.cover,
                   ),
                 ),
