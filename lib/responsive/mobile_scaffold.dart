@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/parses/feed_future_provider.dart';
 import 'package:openair/providers/podcast_provider.dart';
 import 'package:openair/views/navPages/featured_page.dart';
 import 'package:openair/views/navPages/trending_page.dart';
@@ -25,7 +24,7 @@ class MobileScaffold extends ConsumerWidget {
       once = true;
     }
 
-    final podcastRef = ref.watch(feedFutureProvider);
+    // final podcastRef = ref.watch(feedFutureProvider);
 
     return DefaultTabController(
       length: 3,
@@ -55,9 +54,9 @@ class MobileScaffold extends ConsumerWidget {
         //       ),
         //     );
         //   },
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            FeaturedPage(),
+            const FeaturedPage(),
             TrendingPage(),
             CategoriesPage(),
           ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/parses/feed_future_provider.dart';
+import 'package:openair/providers/parses/podcast_provider.dart';
 import 'package:openair/providers/podcast_provider.dart';
 import 'package:openair/views/widgets/discover_card.dart';
 

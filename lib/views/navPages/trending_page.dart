@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TrendingPage extends StatefulWidget {
+class TrendingPage extends ConsumerWidget {
   const TrendingPage({super.key});
 
   @override
-  State<TrendingPage> createState() => _TrendingPageState();
-}
-
-class _TrendingPageState extends State<TrendingPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const Placeholder();
   }
 }

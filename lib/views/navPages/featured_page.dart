@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FeaturedPage extends StatefulWidget {
+class FeaturedPage extends ConsumerWidget {
   const FeaturedPage({super.key});
 
   @override
-  State<FeaturedPage> createState() => _FeaturedPageState();
-}
-
-class _FeaturedPageState extends State<FeaturedPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
       child: ListView(
@@ -25,7 +21,7 @@ class _FeaturedPageState extends State<FeaturedPage> {
                   leading: const Text('Top Podcasts'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All');
+                    debugPrint('See All - Top Podcasts');
                   },
                 ),
                 SizedBox(
@@ -64,7 +60,7 @@ class _FeaturedPageState extends State<FeaturedPage> {
                   leading: const Text('Eduction'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All');
+                    debugPrint('See All - Education');
                   },
                 ),
                 SizedBox(
@@ -103,7 +99,7 @@ class _FeaturedPageState extends State<FeaturedPage> {
                   leading: const Text('Health & Fitness'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All');
+                    debugPrint('See All - Health & Fitness');
                   },
                 ),
                 SizedBox(
@@ -142,7 +138,7 @@ class _FeaturedPageState extends State<FeaturedPage> {
                   leading: const Text('Technology'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All');
+                    debugPrint('See All - Technology');
                   },
                 ),
                 SizedBox(

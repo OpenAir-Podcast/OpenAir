@@ -23,7 +23,7 @@ class ApiServiceProvider {
   ///
   /// The request is made to the API, and the response is parsed as JSON. The
   /// response is then returned as a [Map<String, dynamic>].
-  Future<Map<String, dynamic>> getPodcasts() async {
+  Future<Map<String, dynamic>> getTrendingPodcasts() async {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
@@ -49,6 +49,43 @@ class ApiServiceProvider {
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/podcasts/trending?pretty&lang=en%2C+en-US',
+        ),
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      final String xmlString = response.body;
+      return json.decode(xmlString);
+    } else {
+      throw Exception('Failed to get data from the API');
+    }
+  }
+
+  Future<Map<String, dynamic>> getPodcastCategories() async {
+    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    String newUnixTime = unixTime.toString();
+
+    var firstChunk = utf8.encode(ApiKeys.apiKey);
+    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var thirdChunk = utf8.encode(newUnixTime);
+
+    var output = AccumulatorSink<Digest>();
+    var input = sha1.startChunkedConversion(output);
+    input.add(firstChunk);
+    input.add(secondChunk);
+    input.add(thirdChunk);
+    input.close();
+    var digest = output.events.single;
+
+    Map<String, String> headers = {
+      "X-Auth-Date": newUnixTime,
+      "X-Auth-Key": ApiKeys.apiKey,
+      "Authorization": digest.toString(),
+      "User-Agent": "SomethingAwesome/1.0.1"
+    };
+
+    final response = await http.get(
+        Uri.parse(
+          'https://api.podcastindex.org/api/1.0/categories/list?pretty',
         ),
         headers: headers);
 

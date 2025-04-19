@@ -7,7 +7,7 @@ import '../apis/api_service_provider.dart';
 final feedFutureProvider = FutureProvider(
   (ref) async {
     Map<String, dynamic> feed =
-        await ref.watch(apiServiceProvider).getPodcasts();
+        await ref.watch(apiServiceProvider).getTrendingPodcasts();
 
     ref.watch(podcastProvider).feed = feed;
 
@@ -23,5 +23,14 @@ final feedFutureProvider = FutureProvider(
     }
 
     return ref.watch(podcastProvider).feedPodcasts;
+  },
+);
+
+final categoriesFutureProvider = FutureProvider(
+  (ref) async {
+    Map<String, dynamic> feed =
+        await ref.watch(apiServiceProvider).getPodcastCategories();
+
+    return feed['feeds'];
   },
 );
