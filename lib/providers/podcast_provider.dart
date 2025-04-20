@@ -4,14 +4,13 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:http/http.dart' as http;
-
-import 'package:openair/models/feed_model.dart';
 import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/feed_model.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:podcastindex_dart/src/entity/episode.dart';
 
 final podcastProvider = ChangeNotifierProvider<PodcastProvider>(
   (ref) {
@@ -21,7 +20,7 @@ final podcastProvider = ChangeNotifierProvider<PodcastProvider>(
 
 enum DownloadStatus { downloaded, downloading, notDownloaded }
 
-enum PlayingStatus { detail, buffering, playing, paused }
+enum PlayingStatus { detail, buffering, playing, paused, stop }
 
 class PodcastProvider with ChangeNotifier {
   late AudioPlayer player;
@@ -53,8 +52,11 @@ class PodcastProvider with ChangeNotifier {
 // Main api feed from PodcastIndex.org
   late Map<String, dynamic> feed;
 
-  late FeedModel? selectedPodcast;
-  late EpisodeModel? selectedEpisode;
+  late FeedModel? currentPodcast;
+  late Episode? currentEpisode;
+  late Episode? nextEpisode;
+
+  late PlayingStatus isPlaying = PlayingStatus.stop;
 
   List<FeedModel> feedPodcasts = [];
   List<EpisodeModel> episodeItems = [];
@@ -85,7 +87,7 @@ class PodcastProvider with ChangeNotifier {
     currentPlaybackPositionString = '00:00:00';
     currentPlaybackRemainingTimeString = '00:00:00';
 
-    selectedEpisode = null;
+    currentEpisode = null;
 
     audioState = 'Pause';
     loadState = 'Detail'; // Play, Load, Detail
@@ -111,8 +113,6 @@ class PodcastProvider with ChangeNotifier {
       case DownloadStatus.downloaded:
         icon = const Icon(Icons.download_done_rounded);
         break;
-      default:
-        icon = const Icon(Icons.download_rounded);
     }
 
     return icon;
@@ -130,23 +130,20 @@ class PodcastProvider with ChangeNotifier {
   void audioPlayerSheetCloseButtonClicked() {}
 
   Future<List<String>> setPodcastStream(
-    EpisodeModel episodeItem,
+    Episode episodeItem,
   ) async {
     loadState = 'Load';
 
-    selectedEpisode ??= episodeItem;
+    currentEpisode ??= episodeItem;
 
-    if (episodeItem != selectedEpisode) {
-      selectedEpisode!.setPlayingStatus = PlayingStatus.detail;
+    if (currentEpisode != episodeItem) {
+      isPlaying = PlayingStatus.buffering;
+      notifyListeners();
     }
-
-    episodeItem.setPlayingStatus = PlayingStatus.buffering;
-    notifyListeners();
 
     // TODO: Add support for multiple podcast
     String mp3Name =
-        formattedDownloadedPodcastName(episodeItem.getRssItem!.enclosure!.url!);
-    // '';
+        formattedDownloadedPodcastName(episodeItem.enclosureUrl.toString());
 
     bool isDownloaded = await isMp3FileDownloaded(mp3Name);
 
@@ -155,14 +152,16 @@ class PodcastProvider with ChangeNotifier {
     isDownloaded
         ? {
             await player.setSource(DeviceFileSource(
-              episodeItem.rssItem!.enclosure!.url!,
-              mimeType: episodeItem.rssItem!.enclosure!.type,
+              episodeItem.enclosureUrl.toString(),
+              mimeType: episodeItem.enclosureType,
             ))
           }
-        : await player.setSource(UrlSource(
-            episodeItem.rssItem!.enclosure!.url!,
-            mimeType: episodeItem.rssItem!.enclosure!.type,
-          ));
+        : await player.setSource(
+            UrlSource(
+              episodeItem.enclosureUrl.toString(),
+              mimeType: episodeItem.enclosureType,
+            ),
+          );
 
     return result;
   }
@@ -174,8 +173,9 @@ class PodcastProvider with ChangeNotifier {
   }
 
   void playerPlayButtonClicked(
-    EpisodeModel episodeItem,
+    Episode episodeItem,
   ) async {
+    nextEpisode = episodeItem;
     List<String> result = await setPodcastStream(episodeItem);
 
     isPodcastSelected = true;
@@ -189,17 +189,21 @@ class PodcastProvider with ChangeNotifier {
         player.play(DeviceFileSource(
             '/data/user/0/com.liquidhive.openair/app_flutter/downloads/${result[0]}')); // MP3 Name
       } else {
-        player.play(UrlSource(episodeItem.rssItem!.enclosure!.url!));
+        player.play(UrlSource(episodeItem.enclosureUrl.toString()));
       }
     }
 
-    episodeItem.setPlayingStatus = PlayingStatus.playing;
+    currentEpisode = episodeItem;
+    nextEpisode = currentEpisode;
+
+    if (episodeItem == currentEpisode) {
+      isPlaying = PlayingStatus.playing;
+    }
 
     audioState = 'Play';
     loadState = 'Play';
     updatePlaybackBar();
 
-    selectedEpisode = episodeItem;
     notifyListeners();
   }
 
@@ -211,7 +215,7 @@ class PodcastProvider with ChangeNotifier {
       await player.pause();
     }
 
-    selectedEpisode!.setPlayingStatus = PlayingStatus.paused;
+    isPlaying = PlayingStatus.paused;
 
     notifyListeners();
   }
@@ -233,12 +237,8 @@ class PodcastProvider with ChangeNotifier {
   }
 
   void updatePlaybackBar() {
-    // player.getDuration().then((Duration? value) {
-    //   podcastDuration = value;
-    //   notifyListeners();
-    // });
-
-    podcastDuration = selectedEpisode!.getRssItem!.itunes!.duration!;
+    podcastDuration =
+        getPodcastDurationInMilliseconds(currentEpisode!.duration!);
     notifyListeners();
 
     player.onPositionChanged.listen((Duration p) {
@@ -252,10 +252,6 @@ class PodcastProvider with ChangeNotifier {
 
       podcastCurrentPositionInMilliseconds =
           podcastPosition.inMilliseconds / podcastDuration.inMilliseconds;
-
-      // debugPrint('Podcast Position: ${podcastPosition.inMilliseconds}');
-      // debugPrint('Podcast Duration: ${podcastDuration.inMilliseconds}');
-      // debugPrint('Current Position: $podcastCurrentPositionInMilliseconds');
 
       notifyListeners();
     });
@@ -283,8 +279,32 @@ class PodcastProvider with ChangeNotifier {
     return result;
   }
 
-  String getPodcastDuration(EpisodeModel rssItem) {
-    return "${rssItem.rssItem!.itunes!.duration!.inHours != 0 ? '${rssItem.rssItem!.itunes!.duration!.inHours} hr ' : ''}${rssItem.rssItem!.itunes!.duration!.inMinutes != 0 ? '${rssItem.rssItem!.itunes!.duration!.inMinutes} min' : ''}";
+  String getPodcastPublishedDateFromEpoch(int epoch) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  String getPodcastDuration(int epoch) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+    int hours = dateTime.hour;
+    int minutes = dateTime.minute;
+    // int seconds = dateTime.second;
+
+    String result =
+        "${hours != 0 ? hours < 10 ? '0$hours hr ' : '$hours hr ' : '00 hrs '}${minutes != 0 ? minutes < 10 ? '0$minutes min ' : '$minutes min ' : '00 min '}";
+
+    // ${seconds != 0 ? seconds < 10 ? '0$seconds secs' : '$seconds' : '00 secs'}
+
+    return result;
+  }
+
+  Duration getPodcastDurationInMilliseconds(int epoch) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+
+    return Duration(
+        hours: dateTime.hour,
+        minutes: dateTime.minute,
+        seconds: dateTime.second);
   }
 
   // TODO: This is the method that needs to be called when the pause button is pressed.

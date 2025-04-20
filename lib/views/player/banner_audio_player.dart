@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/podcast_provider.dart';
 
-class BannerAudioPlayer extends ConsumerWidget {
+class BannerAudioPlayer extends ConsumerStatefulWidget {
   const BannerAudioPlayer({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  BannerAudioPlayerState createState() => BannerAudioPlayerState();
+}
+
+class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
+  @override
+  Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
         return Container(
@@ -21,24 +26,29 @@ class BannerAudioPlayer extends ConsumerWidget {
                   ref.read(podcastProvider.notifier).bannerControllerClicked();
                 },
                 // TODO: Figure out how to show the artwork
-                // leading: Container(
-                //   decoration: BoxDecoration(
-                //     borderRadius: BorderRadius.circular(10.0),
-                //     image: DecorationImage(
-                //       image: NetworkImage(
-                //         ref.watch(podcastProvider).feed.image!.url!,
-                //       ),
-                //       fit: BoxFit.cover, // Adjust fit as needed
-                //     ),
-                //   ),
-                //   width: 62.0,
-                //   height: 62.0,
-                // ),
-                title: Text(
-                  ref.watch(podcastProvider).selectedEpisode!.rssItem!.title!,
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
+                leading: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        ref.watch(podcastProvider).currentPodcast!.artwork,
+                      ),
+                      fit: BoxFit.cover, // Adjust fit as needed
+                    ),
+                  ),
+                  width: 62.0,
+                  height: 62.0,
+                ),
+                title: SizedBox(
+                  height: 42.0,
+                  child: Text(
+                    ref.watch(podcastProvider).currentEpisode!.title!,
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
                   ),
                 ),
                 trailing: IconButton(
@@ -50,7 +60,7 @@ class BannerAudioPlayer extends ConsumerWidget {
                         : ref
                             .read(podcastProvider.notifier)
                             .playerPlayButtonClicked(
-                              ref.watch(podcastProvider).selectedEpisode!,
+                              ref.watch(podcastProvider).currentEpisode!,
                             );
                   },
                   icon: ref.watch(podcastProvider).audioState == 'Play'

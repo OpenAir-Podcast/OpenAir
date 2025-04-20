@@ -17,7 +17,7 @@ class DiscoverCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        ref.read(podcastProvider.notifier).selectedPodcast = podcastItem;
+        ref.read(podcastProvider.notifier).currentPodcast = podcastItem;
 
         Navigator.of(context).push(
           MaterialPageRoute(

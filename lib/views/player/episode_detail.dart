@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/models/episode_model.dart';
 import 'package:openair/providers/podcast_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:podcastindex_dart/src/entity/episode.dart';
 
-class EpisodeDetail extends ConsumerWidget {
+class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
     super.key,
     this.episodeItem,
   });
 
-  final EpisodeModel? episodeItem;
+  final Episode? episodeItem;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  EpisodeDetailState createState() => EpisodeDetailState();
+}
+
+class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -35,7 +40,7 @@ class EpisodeDetail extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
                           image: NetworkImage(
-                            ref.watch(podcastProvider).selectedPodcast!.artwork,
+                            ref.watch(podcastProvider).currentPodcast!.artwork,
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -50,24 +55,31 @@ class EpisodeDetail extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Podcast Title
                         Text(
-                          ref.watch(podcastProvider).selectedPodcast!.title,
+                          ref.watch(podcastProvider).currentPodcast!.title,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 26.0,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
+                        // Podcast Published Date
                         Text(
-                          '${ref.watch(podcastProvider).selectedEpisode!.rssItem!.pubDate!.day}/${ref.watch(podcastProvider).selectedEpisode!.rssItem!.pubDate!.month}/${ref.watch(podcastProvider).selectedEpisode!.rssItem!.pubDate!.year}',
-                        ),
+                          ref
+                              .watch(podcastProvider)
+                              .getPodcastPublishedDateFromEpoch(ref
+                                  .watch(podcastProvider)
+                                  .currentEpisode!
+                                  .datePublished),
+                        )
                       ],
                     ),
                   ),
                 ],
               ),
               Text(
-                ref.watch(podcastProvider).selectedEpisode!.rssItem!.title!,
+                ref.watch(podcastProvider).currentEpisode!.title,
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -92,10 +104,10 @@ class EpisodeDetail extends ConsumerWidget {
                         ),
                         onPressed: () =>
                             ref.read(podcastProvider).playerPlayButtonClicked(
-                                  episodeItem!,
+                                  widget.episodeItem!,
                                 ),
                         child: PlayButtonWidget(
-                          episodeItem: episodeItem!,
+                          episodeItem: widget.episodeItem!,
                         ),
                       ),
                     ),
@@ -103,54 +115,57 @@ class EpisodeDetail extends ConsumerWidget {
                       onPressed: () {},
                       icon: const Icon(Icons.playlist_add),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        if (episodeItem!.getDownloaded ==
-                            DownloadStatus.notDownloaded) {
-                          ref
-                              .read(podcastProvider)
-                              .playerDownloadButtonClicked(episodeItem!);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Downloading \'${episodeItem!.rssItem!.title}\''),
-                            ),
-                          );
-                        } else if (episodeItem!.getDownloaded ==
-                            DownloadStatus.downloaded) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) => SizedBox(
-                              width: double.infinity,
-                              height: 50.0,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  ref
-                                      .read(podcastProvider)
-                                      .playerRemoveDownloadButtonClicked(
-                                          episodeItem!);
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Removed \'${episodeItem!.rssItem!.title}\''),
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.delete),
-                                label: const Text('Remove download'),
-                              ),
-                            ),
-                          );
-                        } else {
-                          // TODO: Add cancel download
-                        }
-                      },
-                      icon: ref
-                          .read(podcastProvider)
-                          .getDownloadIcon(episodeItem!.getDownloaded!),
-                    ),
+                    // FIXME: Add download button
+                    // Download Button
+                    // IconButton(
+                    //   onPressed: () {
+                    //     if (widget.episodeItem!.getDownloaded ==
+                    //         DownloadStatus.notDownloaded) {
+                    //       ref
+                    //           .read(podcastProvider)
+                    //           .playerDownloadButtonClicked(widget.episodeItem!);
+                    //
+                    //       ScaffoldMessenger.of(context).showSnackBar(
+                    //         SnackBar(
+                    //           content: Text(
+                    //               'Downloading \'${widget.episodeItem!.rssItem!.title}\''),
+                    //         ),
+                    //       );
+                    //     } else if (widget.episodeItem!.getDownloaded ==
+                    //         DownloadStatus.downloaded) {
+                    //       showModalBottomSheet(
+                    //         context: context,
+                    //         builder: (context) => SizedBox(
+                    //           width: double.infinity,
+                    //           height: 50.0,
+                    //           child: ElevatedButton.icon(
+                    //             onPressed: () {
+                    //               ref
+                    //                   .read(podcastProvider)
+                    //                   .playerRemoveDownloadButtonClicked(
+                    //                       widget.episodeItem!);
+                    //
+                    //               ScaffoldMessenger.of(context).showSnackBar(
+                    //                 SnackBar(
+                    //                   content: Text(
+                    //                       'Removed \'${widget.episodeItem!.rssItem!.title}\''),
+                    //                 ),
+                    //               );
+                    //             },
+                    //             icon: const Icon(Icons.delete),
+                    //             label: const Text('Remove download'),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     } else {
+                    //       // TODO: Add cancel download
+                    //     }
+                    //   },
+                    //   icon: ref
+                    //       .read(podcastProvider)
+                    //       .getDownloadIcon(widget.episodeItem!.getDownloaded!),
+                    // ),
+                    // More Button
                     IconButton(
                       onPressed: () {},
                       icon: const Icon(Icons.more_vert_outlined),
@@ -158,14 +173,11 @@ class EpisodeDetail extends ConsumerWidget {
                   ],
                 ),
               ),
+              // Episode Description
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  ref
-                      .watch(podcastProvider)
-                      .selectedEpisode!
-                      .rssItem!
-                      .description!,
+                  ref.watch(podcastProvider).currentEpisode!.description!,
                 ),
               ),
             ],

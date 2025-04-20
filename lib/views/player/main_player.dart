@@ -3,11 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/podcast_provider.dart';
 import 'package:openair/views/player/episode_detail.dart';
 
-class MainPlayer extends ConsumerWidget {
+class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  MainPlayerState createState() => MainPlayerState();
+}
+
+class MainPlayerState extends ConsumerState<MainPlayer> {
+  @override
+  Widget build(BuildContext context) {
     const double imageSize = 300.0;
 
     return Scaffold(
@@ -25,7 +30,7 @@ class MainPlayer extends ConsumerWidget {
                       MaterialPageRoute(
                         builder: (context) => EpisodeDetail(
                           episodeItem:
-                              ref.watch(podcastProvider).selectedEpisode!,
+                              ref.watch(podcastProvider).currentEpisode!,
                         ),
                       ),
                     ),
@@ -38,7 +43,7 @@ class MainPlayer extends ConsumerWidget {
                             image: NetworkImage(
                               ref
                                   .watch(podcastProvider)
-                                  .selectedPodcast!
+                                  .currentPodcast!
                                   .artwork,
                             ),
                             fit: BoxFit.cover,
@@ -49,22 +54,25 @@ class MainPlayer extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  // Podcast Title
                   Text(
-                    ref.watch(podcastProvider).selectedEpisode!.rssItem!.title!,
+                    ref.watch(podcastProvider).currentEpisode!.title,
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8.0),
+                  // Podcast Author
                   Text(
-                    ref
-                            .watch(podcastProvider)
-                            .selectedEpisode!
-                            .rssItem!
-                            .itunes!
-                            .subtitle ??
-                        '',
+                    ref.watch(podcastProvider).currentEpisode!.feedAuthor ??
+                        'Unknown',
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -139,7 +147,7 @@ class MainPlayer extends ConsumerWidget {
                               .read(podcastProvider.notifier)
                               .playerPauseButtonClicked()
                           : ref.read(podcastProvider).playerPlayButtonClicked(
-                                ref.watch(podcastProvider).selectedEpisode!,
+                                ref.watch(podcastProvider).currentEpisode!,
                               );
                     }, // Add play/pause functionality
                     icon: ref.watch(podcastProvider).audioState == 'Play'

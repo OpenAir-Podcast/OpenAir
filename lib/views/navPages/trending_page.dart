@@ -24,36 +24,39 @@ class TrendingPage extends ConsumerWidget {
 
     final podcastRef = ref.watch(feedFutureProvider);
 
-    return RefreshIndicator(
-      onRefresh: () => ref.refresh(feedFutureProvider.future),
-      child: podcastRef.when(
-        skipLoadingOnReload: true,
-        skipLoadingOnRefresh: false,
-        data: (List<FeedModel> data) {
-          return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                if (index >= data.length) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: RefreshIndicator(
+        onRefresh: () => ref.refresh(feedFutureProvider.future),
+        child: podcastRef.when(
+          skipLoadingOnReload: true,
+          skipLoadingOnRefresh: false,
+          data: (List<FeedModel> data) {
+            return ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  if (index >= data.length) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                return DiscoverCard(
-                  podcastItem: data[index],
-                );
-              });
-        },
-        error: (error, stackTrace) {
-          return Text(error.toString());
-        },
-        loading: () {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
+                  return DiscoverCard(
+                    podcastItem: data[index],
+                  );
+                });
+          },
+          error: (error, stackTrace) {
+            return Text(error.toString());
+          },
+          loading: () {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

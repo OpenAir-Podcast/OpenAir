@@ -45,6 +45,7 @@ dependencies:
   webfeed: ^0.7.0
   xml: ^5.4.1
   cached_network_image: ^3.4.1
+  podcastindex_dart: ^1.1.1
 
 dev_dependencies:
   flutter_lints: ^2.0.0

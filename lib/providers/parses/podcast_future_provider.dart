@@ -7,7 +7,7 @@ import 'package:webfeed/webfeed.dart';
 FutureProvider<List<EpisodeModel>> podcastEpisodesProvider = FutureProvider(
   (ref) async {
     final String podcastUrl =
-        ref.watch(podcastProvider.notifier).selectedPodcast!.url;
+        ref.watch(podcastProvider.notifier).currentPodcast!.url;
 
     RssFeed feed = await ref.watch(apiEpisodesProvider).getRssInfo(podcastUrl);
 

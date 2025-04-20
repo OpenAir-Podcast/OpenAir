@@ -166,27 +166,30 @@ class CategoriesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListView.separated(
-      separatorBuilder: (context, index) {
-        return const Divider();
-      },
-      itemCount: sortedCategories.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
-          child: ListTile(
-            title: Text(
-              sortedCategories[index],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ListView.separated(
+        separatorBuilder: (context, index) {
+          return const Divider();
+        },
+        itemCount: sortedCategories.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
+            child: ListTile(
+              title: Text(
+                sortedCategories[index],
+              ),
+              leading: Icon(
+                sortedIcons[index],
+              ),
+              onTap: () {
+                // TODO: Handle tap on category
+              },
             ),
-            leading: Icon(
-              sortedIcons[index],
-            ),
-            onTap: () {
-              // TODO: Handle tap on category
-            },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
