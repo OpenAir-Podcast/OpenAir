@@ -56,13 +56,30 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Podcast Title
-                        Text(
-                          ref.watch(podcastProvider).currentPodcast!.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 26.0,
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 140.0,
+                          child: Text(
+                            ref.watch(podcastProvider).currentPodcast!.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 140.0,
+                          child: Text(
+                            ref.watch(podcastProvider).currentPodcast!.author,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.0,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
                         ),
                         // Podcast Published Date
                         Text(
@@ -72,6 +89,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                   .watch(podcastProvider)
                                   .currentEpisode!
                                   .datePublished),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.0,
+                            color: Colors.grey,
+                          ),
                         )
                       ],
                     ),
@@ -83,7 +105,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
                 ),
               ),
               Padding(
@@ -158,7 +179,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     //         ),
                     //       );
                     //     } else {
-                    //       // TODO: Add cancel download
+                    // TODO: Add cancel download
                     //     }
                     //   },
                     //   icon: ref
@@ -174,6 +195,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 ),
               ),
               // Episode Description
+              // TODO: Use a rich text widget to display the description
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(

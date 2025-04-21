@@ -95,10 +95,18 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
-                          Text(podcastDate),
+                          Text(
+                            podcastDate,
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -114,6 +122,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     ),
                   ),
                 ),
+                // TODO: Use a rich text widget to display the description
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: SizedBox(
@@ -205,7 +214,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                         //     ),
                         //   );
                         // } else {
-                        //   // TODO: Add cancel download
+                        // TODO: Add cancel download
                         // }
                       },
                       // icon: ref

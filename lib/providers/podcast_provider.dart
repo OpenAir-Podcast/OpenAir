@@ -49,9 +49,6 @@ class PodcastProvider with ChangeNotifier {
 
   bool isPodcastSelected = false;
 
-// Main api feed from PodcastIndex.org
-  late Map<String, dynamic> feed;
-
   late FeedModel? currentPodcast;
   late Episode? currentEpisode;
   late Episode? nextEpisode;

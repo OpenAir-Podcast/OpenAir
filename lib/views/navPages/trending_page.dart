@@ -22,12 +22,12 @@ class TrendingPage extends ConsumerWidget {
       once = true;
     }
 
-    final podcastRef = ref.watch(feedFutureProvider);
+    final podcastRef = ref.watch(getTrendingProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: RefreshIndicator(
-        onRefresh: () => ref.refresh(feedFutureProvider.future),
+        onRefresh: () => ref.refresh(getTrendingProvider.future),
         child: podcastRef.when(
           skipLoadingOnReload: true,
           skipLoadingOnRefresh: false,

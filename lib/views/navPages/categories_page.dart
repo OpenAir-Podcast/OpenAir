@@ -175,7 +175,7 @@ class CategoriesPage extends ConsumerWidget {
         itemCount: sortedCategories.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
+            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
             child: ListTile(
               title: Text(
                 sortedCategories[index],

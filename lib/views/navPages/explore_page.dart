@@ -12,7 +12,7 @@ class ExplorePage extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: RefreshIndicator(
-        onRefresh: () => ref.refresh(feedFutureProvider.future),
+        onRefresh: () => ref.refresh(getTrendingProvider.future),
         child: ListView.builder(
           itemBuilder: (context, index) => DiscoverCard(
             podcastItem: ref.watch(podcastProvider).feedPodcasts[index],

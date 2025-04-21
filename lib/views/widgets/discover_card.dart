@@ -65,6 +65,7 @@ class DiscoverCard extends ConsumerWidget {
                         maxLines: 2,
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
+                          color: Colors.grey,
                         ),
                       ),
                     ),

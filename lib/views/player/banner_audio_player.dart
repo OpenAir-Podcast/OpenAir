@@ -25,7 +25,6 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 onTap: () {
                   ref.read(podcastProvider.notifier).bannerControllerClicked();
                 },
-                // TODO: Figure out how to show the artwork
                 leading: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
@@ -42,7 +41,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 title: SizedBox(
                   height: 42.0,
                   child: Text(
-                    ref.watch(podcastProvider).currentEpisode!.title!,
+                    ref.watch(podcastProvider).currentEpisode!.title,
                     style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,

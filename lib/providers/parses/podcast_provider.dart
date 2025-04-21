@@ -4,14 +4,30 @@ import 'package:openair/providers/podcast_provider.dart';
 
 import '../apis/api_service_provider.dart';
 
-final feedFutureProvider = FutureProvider(
+final getTrendingProvider = FutureProvider(
   (ref) async {
     Map<String, dynamic> feed =
         await ref.watch(apiServiceProvider).getTrendingPodcasts();
 
-    ref.watch(podcastProvider).feed = feed;
+    if (ref.read(podcastProvider).feedPodcasts.isEmpty) {
+      for (Map<String, dynamic> podcast in feed['feeds']) {
+        final FeedModel feedModel = FeedModel.fromJson(podcast);
 
-    // TODO Make a variable in podcastProvider that allows a or statement to clear and refresh the list
+        if (!ref.watch(podcastProvider).feedPodcasts.contains(feedModel)) {
+          ref.watch(podcastProvider).feedPodcasts.add(feedModel);
+        }
+      }
+    }
+
+    return ref.watch(podcastProvider).feedPodcasts;
+  },
+);
+
+final refreshTrendingProvider = FutureProvider(
+  (ref) async {
+    Map<String, dynamic> feed =
+        await ref.watch(apiServiceProvider).getTrendingPodcasts();
+
     if (ref.read(podcastProvider).feedPodcasts.isEmpty) {
       for (Map<String, dynamic> podcast in feed['feeds']) {
         final FeedModel feedModel = FeedModel.fromJson(podcast);
