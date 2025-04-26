@@ -17,15 +17,15 @@ OpenAir embraces open-source principles. The codebase is freely accessible, allo
 
 Clone the repository: https://github.com/LiquidHive/openair.git
 
-Read the contribution guidelines: [link to your contribution guidelines document (optional)]
+Read the contribution guidelines: [click here for contribution guidelines](https://github.com/LiquidHive/openair/blob/main/Contribution%20Guidelines.md)
 
-Join the discussion: https://github.com/LiquidHive/openair/discussions
+Join the discussion: [click ere for discussion](https://github.com/LiquidHive/openair/discussions)
 
 Getting Started
 
 Prerequisites:
 
-- Flutter development environment set up (refer to official Flutter documentation: https://docs.flutter.dev/get-started/codelab)
+- Flutter development environment set up [refer to official Flutter documentation](https://docs.flutter.dev/get-started/codelab)
 
 - Running the App:
 
