@@ -60,6 +60,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             ref
                 .watch(podcastProvider)
                 .getPodcastDuration(widget.episodeItem.enclosureLength),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       );
@@ -75,6 +76,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           ),
           Text(
             ref.watch(podcastProvider).currentPodcastTimeRemaining!,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       );

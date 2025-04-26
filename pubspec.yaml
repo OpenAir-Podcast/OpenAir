@@ -43,9 +43,10 @@ dependencies:
   path_to_regexp: ^0.4.0
   permission_handler: ^11.3.1
   webfeed: ^0.7.0
-  xml: ^5.4.1
+  xml: ^5.0.2
   cached_network_image: ^3.4.1
   podcastindex_dart: ^1.1.1
+  styled_text: ^8.1.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0

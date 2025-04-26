@@ -4,6 +4,7 @@ import 'package:openair/providers/podcast_provider.dart';
 import 'package:openair/views/player/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
+import 'package:styled_text/styled_text.dart';
 
 class EpisodeCard extends ConsumerStatefulWidget {
   final Episode episodeItem;
@@ -127,8 +128,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: SizedBox(
                     height: 88.0,
-                    child: Text(
-                      widget.episodeItem.description!,
+                    child: StyledText(
+                      text: widget.episodeItem.description!,
                       maxLines: 4,
                       style: const TextStyle(
                         overflow: TextOverflow.ellipsis,
@@ -140,8 +141,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Play button
-                    SizedBox(
-                      width: 200.0,
+                    Expanded(
+                      // width: 200.0,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           elevation: 1.0,
