@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/apis/api_service_provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class FeaturedPage extends ConsumerWidget {
   const FeaturedPage({super.key});
@@ -22,33 +25,126 @@ class FeaturedPage extends ConsumerWidget {
                   trailing: const Text('See All'),
                   onTap: () {
                     debugPrint('See All - Top Podcasts');
+                    // TODO: Navigate to Top Podcasts
                   },
                 ),
-                SizedBox(
-                  height: 200.0,
-                  width: double.infinity,
-                  child: GridView.builder(
-                    itemCount: 3,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisExtent: 180.0,
-                      // crossAxisSpacing: 5.0,
-                      // mainAxisSpacing: 5.0,
-                    ),
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        color: Colors.blue,
-                        height: 170.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                ),
+                FutureBuilder(
+                    future: ref.watch(apiServiceProvider).getTopPodcasts(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(
+                          height: 190.0,
+                          width: double.infinity,
+                          child: GridView.builder(
+                            itemCount: 3,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 180.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[400]!,
+                                        height: 130.0,
+                                        width: 100.0,
+                                      ),
+                                      Container(
+                                        color: Colors.grey[100]!,
+                                        height: 40.0,
+                                        width: 100.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 190.0,
+                        width: double.infinity,
+                        child: GridView.builder(
+                          itemCount: 3,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent: 180.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  debugPrint(
+                                      '${snapshot.data!['feeds'][index]['title']}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius:
+                                                5.0, // soften the shadow
+                                          )
+                                        ],
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          // scale: 2,
+                                          image: CachedNetworkImageProvider(
+                                            snapshot.data!['feeds'][index]
+                                                ['image'],
+                                          ),
+                                        ),
+                                      ),
+                                      height: 130.0,
+                                      width: 100.0,
+                                    ),
+                                    Container(
+                                      height: 40.0,
+                                      width: 100.0,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 5.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          snapshot.data!['feeds'][index]
+                                              ['title'],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
+          SizedBox.fromSize(size: const Size(0, 10)),
+          // Education
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -57,37 +153,131 @@ class FeaturedPage extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Text('Eduction'),
+                  leading: const Text('Education'),
                   trailing: const Text('See All'),
                   onTap: () {
                     debugPrint('See All - Education');
+                    // TODO: Navigate to Education
                   },
                 ),
-                SizedBox(
-                  height: 200.0,
-                  width: double.infinity,
-                  child: GridView.builder(
-                    itemCount: 3,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisExtent: 180.0,
-                      // crossAxisSpacing: 5.0,
-                      // mainAxisSpacing: 5.0,
-                    ),
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        color: Colors.blue,
-                        height: 170.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                ),
+                FutureBuilder(
+                    future:
+                        ref.watch(apiServiceProvider).getEducationPodcasts(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(
+                          height: 190.0,
+                          width: double.infinity,
+                          child: GridView.builder(
+                            itemCount: 3,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 180.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[400]!,
+                                        height: 130.0,
+                                        width: 100.0,
+                                      ),
+                                      Container(
+                                        color: Colors.grey[100]!,
+                                        height: 40.0,
+                                        width: 100.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 190.0,
+                        width: double.infinity,
+                        child: GridView.builder(
+                          itemCount: 3,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent: 180.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  debugPrint(
+                                      '${snapshot.data!['feeds'][index]['title']}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius:
+                                                5.0, // soften the shadow
+                                          )
+                                        ],
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          // scale: 2,
+                                          image: CachedNetworkImageProvider(
+                                            snapshot.data!['feeds'][index]
+                                                ['image'],
+                                          ),
+                                        ),
+                                      ),
+                                      height: 130.0,
+                                      width: 100.0,
+                                    ),
+                                    Container(
+                                      height: 40.0,
+                                      width: 100.0,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 5.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          snapshot.data!['feeds'][index]
+                                              ['title'],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
+          SizedBox.fromSize(size: const Size(0, 10)),
+          // Health
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -96,37 +286,130 @@ class FeaturedPage extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Text('Health & Fitness'),
+                  leading: const Text('Health'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All - Health & Fitness');
+                    debugPrint('See All - Health');
+                    // TODO: Navigate to Health
                   },
                 ),
-                SizedBox(
-                  height: 200.0,
-                  width: double.infinity,
-                  child: GridView.builder(
-                    itemCount: 3,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisExtent: 180.0,
-                      // crossAxisSpacing: 5.0,
-                      // mainAxisSpacing: 5.0,
-                    ),
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        color: Colors.blue,
-                        height: 170.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                ),
+                FutureBuilder(
+                    future: ref.watch(apiServiceProvider).getHealthPodcasts(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(
+                          height: 190.0,
+                          width: double.infinity,
+                          child: GridView.builder(
+                            itemCount: 3,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 180.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[400]!,
+                                        height: 130.0,
+                                        width: 100.0,
+                                      ),
+                                      Container(
+                                        color: Colors.grey[100]!,
+                                        height: 40.0,
+                                        width: 100.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 190.0,
+                        width: double.infinity,
+                        child: GridView.builder(
+                          itemCount: 3,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent: 180.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  debugPrint(
+                                      '${snapshot.data!['feeds'][index]['title']}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius:
+                                                5.0, // soften the shadow
+                                          )
+                                        ],
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          // scale: 2,
+                                          image: CachedNetworkImageProvider(
+                                            snapshot.data!['feeds'][index]
+                                                ['image'],
+                                          ),
+                                        ),
+                                      ),
+                                      height: 130.0,
+                                      width: 100.0,
+                                    ),
+                                    Container(
+                                      height: 40.0,
+                                      width: 100.0,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 5.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          snapshot.data!['feeds'][index]
+                                              ['title'],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
+          SizedBox.fromSize(size: const Size(0, 10)),
+          // Technology
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -139,33 +422,127 @@ class FeaturedPage extends ConsumerWidget {
                   trailing: const Text('See All'),
                   onTap: () {
                     debugPrint('See All - Technology');
+                    // TODO: Navigate to Technology
                   },
                 ),
-                SizedBox(
-                  height: 200.0,
-                  width: double.infinity,
-                  child: GridView.builder(
-                    itemCount: 3,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisExtent: 180.0,
-                      // crossAxisSpacing: 5.0,
-                      // mainAxisSpacing: 5.0,
-                    ),
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        color: Colors.blue,
-                        height: 170.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                ),
+                FutureBuilder(
+                    future:
+                        ref.watch(apiServiceProvider).getTechnologyPodcasts(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(
+                          height: 190.0,
+                          width: double.infinity,
+                          child: GridView.builder(
+                            itemCount: 3,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 180.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[400]!,
+                                        height: 130.0,
+                                        width: 100.0,
+                                      ),
+                                      Container(
+                                        color: Colors.grey[100]!,
+                                        height: 40.0,
+                                        width: 100.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 190.0,
+                        width: double.infinity,
+                        child: GridView.builder(
+                          itemCount: 3,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent: 180.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  debugPrint(
+                                      '${snapshot.data!['feeds'][index]['title']}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius:
+                                                5.0, // soften the shadow
+                                          )
+                                        ],
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          // scale: 2,
+                                          image: CachedNetworkImageProvider(
+                                            snapshot.data!['feeds'][index]
+                                                ['image'],
+                                          ),
+                                        ),
+                                      ),
+                                      height: 130.0,
+                                      width: 100.0,
+                                    ),
+                                    Container(
+                                      height: 40.0,
+                                      width: 100.0,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 5.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          snapshot.data!['feeds'][index]
+                                              ['title'],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
+          SizedBox.fromSize(size: const Size(0, 10)),
+          // Technology
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -177,31 +554,122 @@ class FeaturedPage extends ConsumerWidget {
                   leading: const Text('Sports'),
                   trailing: const Text('See All'),
                   onTap: () {
-                    debugPrint('See All');
+                    debugPrint('See All - Sports');
+                    // TODO: Navigate to Sports
                   },
                 ),
-                SizedBox(
-                  height: 200.0,
-                  width: double.infinity,
-                  child: GridView.builder(
-                    itemCount: 3,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisExtent: 180.0,
-                      // crossAxisSpacing: 5.0,
-                      // mainAxisSpacing: 5.0,
-                    ),
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        color: Colors.blue,
-                        height: 170.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                ),
+                FutureBuilder(
+                    future: ref.watch(apiServiceProvider).getSportsPodcasts(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(
+                          height: 190.0,
+                          width: double.infinity,
+                          child: GridView.builder(
+                            itemCount: 3,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 180.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[400]!,
+                                        height: 130.0,
+                                        width: 100.0,
+                                      ),
+                                      Container(
+                                        color: Colors.grey[100]!,
+                                        height: 40.0,
+                                        width: 100.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 190.0,
+                        width: double.infinity,
+                        child: GridView.builder(
+                          itemCount: 3,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent: 180.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  debugPrint(
+                                      '${snapshot.data!['feeds'][index]['title']}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius:
+                                                5.0, // soften the shadow
+                                          )
+                                        ],
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          // scale: 2,
+                                          image: CachedNetworkImageProvider(
+                                            snapshot.data!['feeds'][index]
+                                                ['image'],
+                                          ),
+                                        ),
+                                      ),
+                                      height: 130.0,
+                                      width: 100.0,
+                                    ),
+                                    Container(
+                                      height: 40.0,
+                                      width: 100.0,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                            blurRadius: 5.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          snapshot.data!['feeds'][index]
+                                              ['title'],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),

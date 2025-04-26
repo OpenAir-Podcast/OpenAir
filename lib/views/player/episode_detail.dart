@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
-import 'package:styled_text/widgets/styled_text.dart';
 
 import '../../providers/podcast_provider.dart';
 import '../widgets/play_button_widget.dart';
@@ -22,6 +22,8 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
+    debugPrint(widget.episodeItem!.description);
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -195,11 +197,31 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
               // Episode Description
               SingleChildScrollView(
                 child: Expanded(
-                  child: StyledText(
-                    text: widget.episodeItem!.description!,
-                    overflow: TextOverflow.visible,
-                    maxLines: 500,
+                  child: Html(
+                    data: widget.episodeItem!.description,
+                    extensions: [
+                      TagExtension(
+                        tagsToExtend: {"flutter"},
+                        child: const FlutterLogo(),
+                      ),
+                    ],
+                    style: {
+                      "p.fancy": Style(
+                        textAlign: TextAlign.center,
+                        backgroundColor: Colors.grey,
+                        margin: Margins(
+                            left: Margin(50, Unit.px), right: Margin.auto()),
+                        width: Width(300, Unit.px),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    },
+                    shrinkWrap: true,
                   ),
+                  // child: StyledText(
+                  //   text: widget.episodeItem!.description!,
+                  //   overflow: TextOverflow.visible,
+                  //   maxLines: 15,
+                  // ),
                 ),
               ),
             ],

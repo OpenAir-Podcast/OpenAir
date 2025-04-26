@@ -47,6 +47,8 @@ dependencies:
   cached_network_image: ^3.4.1
   podcastindex_dart: ^1.1.1
   styled_text: ^8.1.0
+  flutter_html: ^3.0.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
