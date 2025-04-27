@@ -3,22 +3,25 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:openair/api_keys.dart';
 
 final apiServiceProvider = Provider(
   (ref) => ApiServiceProvider(),
 );
 
 class ApiServiceProvider {
+  final String? podcastIndexApi = dotenv.env['PODCASTINDEX_API_KEY'];
+  final String? podcastIndexSecret = dotenv.env['PODCASTINDEX_API_SECRET'];
+
   // This method is used to get the list of podcasts from the API. Based on the category
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -31,7 +34,8 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      // "X-Auth-Key": podcastIndexApi!,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -69,8 +73,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -83,7 +87,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -107,8 +111,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -121,7 +125,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -144,8 +148,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -158,7 +162,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -181,8 +185,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -195,7 +199,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -218,8 +222,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -232,7 +236,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };
@@ -255,8 +259,8 @@ class ApiServiceProvider {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
-    var firstChunk = utf8.encode(ApiKeys.apiKey);
-    var secondChunk = utf8.encode(ApiKeys.apiSecret);
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
     var thirdChunk = utf8.encode(newUnixTime);
 
     var output = AccumulatorSink<Digest>();
@@ -269,7 +273,7 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": ApiKeys.apiKey,
+      "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
     };

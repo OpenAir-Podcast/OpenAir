@@ -9,7 +9,7 @@ import 'package:podcastindex_dart/src/service/episode_service.dart';
 import 'package:podcastindex_dart/src/service/feed_service.dart';
 
 class EpisodesPage extends ConsumerStatefulWidget {
-  const EpisodesPage({Key? key}) : super(key: key);
+  const EpisodesPage({super.key});
 
   @override
   ConsumerState<EpisodesPage> createState() => _EpisodesPageState();

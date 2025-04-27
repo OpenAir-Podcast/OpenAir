@@ -80,9 +80,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref
-                                .watch(openAirProvider)
-                                .currentPodcast!['author'],
+                            ref.watch(openAirProvider).currentPodcast['author'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
