@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 AppBar mainAppBar(WidgetRef ref) {
   return AppBar(
@@ -16,7 +16,7 @@ AppBar mainAppBar(WidgetRef ref) {
         child: IconButton(
           tooltip: 'Remove all downloaded podcasts',
           onPressed: () {
-            ref.read(podcastProvider).removeAllDownloadedPodcasts();
+            ref.read(openAirProvider).removeAllDownloadedPodcasts();
           },
           icon: const Icon(Icons.search),
         ),
@@ -26,7 +26,7 @@ AppBar mainAppBar(WidgetRef ref) {
         child: IconButton(
           tooltip: 'Pause player',
           onPressed: () {
-            ref.read(podcastProvider.notifier).playerPauseButtonClicked();
+            ref.read(openAirProvider.notifier).playerPauseButtonClicked();
           },
           icon: const Icon(Icons.refresh_rounded),
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/episode_detail.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
@@ -30,7 +30,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       MaterialPageRoute(
                         builder: (context) => EpisodeDetail(
                           episodeItem:
-                              ref.watch(podcastProvider).currentEpisode!,
+                              ref.watch(openAirProvider).currentEpisode!,
                         ),
                       ),
                     ),
@@ -42,9 +42,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           image: DecorationImage(
                             image: NetworkImage(
                               ref
-                                  .watch(podcastProvider)
-                                  .currentPodcast!
-                                  .artwork,
+                                  .watch(openAirProvider)
+                                  .currentPodcast['artwork'],
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -56,7 +55,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   // Podcast Title
                   Text(
-                    ref.watch(podcastProvider).currentEpisode!.title,
+                    ref.watch(openAirProvider).currentEpisode!.title,
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -66,7 +65,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   const SizedBox(height: 8.0),
                   // Podcast Author
                   Text(
-                    ref.watch(podcastProvider).currentEpisode!.feedAuthor ??
+                    ref.watch(openAirProvider).currentEpisode!.feedAuthor ??
                         'Unknown',
                     style: const TextStyle(
                       fontSize: 14.0,
@@ -83,10 +82,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 children: [
                   Slider(
                     value: ref
-                        .watch(podcastProvider.notifier)
+                        .watch(openAirProvider.notifier)
                         .podcastCurrentPositionInMilliseconds,
                     onChanged: (value) => ref
-                        .watch(podcastProvider.notifier)
+                        .watch(openAirProvider.notifier)
                         .mainPlayerSliderClicked(value),
                   ),
                   Padding(
@@ -96,11 +95,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       children: [
                         Text(
                           ref
-                              .read(podcastProvider.notifier)
+                              .read(openAirProvider.notifier)
                               .currentPlaybackPositionString,
                         ),
                         Text(
-                          '-${ref.read(podcastProvider.notifier).currentPlaybackRemainingTimeString}',
+                          '-${ref.read(openAirProvider.notifier).currentPlaybackRemainingTimeString}',
                         ),
                       ],
                     ),
@@ -120,7 +119,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Rewind button
                   IconButton(
                     onPressed: () => ref
-                        .read(podcastProvider.notifier)
+                        .read(openAirProvider.notifier)
                         .rewindButtonClicked(),
                     icon: const SizedBox(
                       width: 52.0,
@@ -142,15 +141,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.watch(podcastProvider).audioState == 'Play'
+                      ref.watch(openAirProvider).audioState == 'Play'
                           ? ref
-                              .read(podcastProvider.notifier)
+                              .read(openAirProvider.notifier)
                               .playerPauseButtonClicked()
-                          : ref.read(podcastProvider).playerPlayButtonClicked(
-                                ref.watch(podcastProvider).currentEpisode!,
+                          : ref.read(openAirProvider).playerPlayButtonClicked(
+                                ref.watch(openAirProvider).currentEpisode!,
                               );
                     }, // Add play/pause functionality
-                    icon: ref.watch(podcastProvider).audioState == 'Play'
+                    icon: ref.watch(openAirProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
                         : const Icon(Icons.play_arrow_rounded),
                     iconSize: 48.0,
@@ -158,7 +157,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Fast forward button
                   IconButton(
                     onPressed: () => ref
-                        .read(podcastProvider.notifier)
+                        .read(openAirProvider.notifier)
                         .fastForwardButtonClicked(),
                     icon: const SizedBox(
                       width: 52.0,
@@ -189,10 +188,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Playback speed
                   TextButton(
                     onPressed: () => ref
-                        .read(podcastProvider.notifier)
+                        .read(openAirProvider.notifier)
                         .audioSpeedButtonClicked(),
                     child: Text(
-                      ref.watch(podcastProvider).audioSpeedButtonLabel,
+                      ref.watch(openAirProvider).audioSpeedButtonLabel,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

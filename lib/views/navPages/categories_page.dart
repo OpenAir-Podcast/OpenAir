@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'category_page.dart';
+
 class CategoriesPage extends ConsumerWidget {
   CategoriesPage({super.key});
 
@@ -185,6 +187,13 @@ class CategoriesPage extends ConsumerWidget {
               ),
               onTap: () {
                 // TODO: Handle tap on category
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CategoryPage(
+                      category: sortedCategories[index],
+                    ),
+                  ),
+                );
               },
             ),
           );

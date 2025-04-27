@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/navigation/app_bar.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card.dart';
@@ -27,7 +27,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
   }
 
   Future<void> _refreshEpisodes() async {
-    final podcastUrl = ref.read(podcastProvider.notifier).currentPodcast?.url;
+    final podcastUrl = ref.read(openAirProvider.notifier).currentPodcast['url'];
     if (podcastUrl != null) {
       setState(() {
         _episodeFuture = episodeFeed(podcastUrl); // Create a new Future
@@ -44,7 +44,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final podcastUrl = ref.watch(podcastProvider.notifier).currentPodcast?.url;
+    final podcastUrl =
+        ref.watch(openAirProvider.notifier).currentPodcast['url'];
 
     if (podcastUrl == null) {
       return const Scaffold(
@@ -84,8 +85,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
         },
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(podcastProvider).isPodcastSelected ? 80.0 : 0.0,
-        child: ref.watch(podcastProvider).isPodcastSelected
+        height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
+        child: ref.watch(openAirProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

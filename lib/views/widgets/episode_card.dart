@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
@@ -24,7 +24,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
-        .watch(podcastProvider)
+        .watch(openAirProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem.datePublished);
 
     return GestureDetector(
@@ -60,9 +60,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                           image: DecorationImage(
                             image: NetworkImage(
                               ref
-                                  .watch(podcastProvider)
-                                  .currentPodcast!
-                                  .artwork,
+                                  .watch(openAirProvider)
+                                  .currentPodcast['artwork'],
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -81,7 +80,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              ref.watch(podcastProvider).currentPodcast!.title,
+                              ref
+                                  .watch(openAirProvider)
+                                  .currentPodcast['title'],
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -92,7 +93,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              ref.watch(podcastProvider).currentPodcast!.author,
+                              ref
+                                  .watch(openAirProvider)
+                                  .currentPodcast['author'],
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -153,10 +156,10 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                           ),
                         ),
                         onPressed: () {
-                          if (ref.read(podcastProvider).currentEpisode !=
+                          if (ref.read(openAirProvider).currentEpisode !=
                               widget.episodeItem) {
                             ref
-                                .read(podcastProvider.notifier)
+                                .read(openAirProvider.notifier)
                                 .playerPlayButtonClicked(
                                   widget.episodeItem,
                                 );

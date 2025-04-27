@@ -4,17 +4,14 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:openair/models/episode_model.dart';
-import 'package:openair/models/feed_model.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
 
-final podcastProvider = ChangeNotifierProvider<PodcastProvider>(
+final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) {
-    return PodcastProvider();
+    return OpenAirProvider();
   },
 );
 
@@ -22,7 +19,7 @@ enum DownloadStatus { downloaded, downloading, notDownloaded }
 
 enum PlayingStatus { detail, buffering, playing, paused, stop }
 
-class PodcastProvider with ChangeNotifier {
+class OpenAirProvider with ChangeNotifier {
   late AudioPlayer player;
   late StreamSubscription? mPlayerSubscription;
 
@@ -49,14 +46,13 @@ class PodcastProvider with ChangeNotifier {
 
   bool isPodcastSelected = false;
 
-  late FeedModel? currentPodcast;
+  late Map<String, dynamic> currentPodcast;
   late Episode? currentEpisode;
   late Episode? nextEpisode;
 
-  late PlayingStatus isPlaying = PlayingStatus.stop;
+  late String selectedCategory;
 
-  List<FeedModel> feedPodcasts = [];
-  List<EpisodeModel> episodeItems = [];
+  late PlayingStatus isPlaying = PlayingStatus.stop;
 
   List<String> downloadingPodcasts = [];
 
@@ -396,52 +392,52 @@ class PodcastProvider with ChangeNotifier {
   }
 
   // TODO: Needs to be multithreaded
-  void playerDownloadButtonClicked(EpisodeModel item) async {
-    item.setDownloaded = DownloadStatus.downloading;
-    downloadingPodcasts.add(item.rssItem!.guid!);
-
-    notifyListeners();
-
-    final response = await http.get(Uri.parse(item.rssItem!.enclosure!.url!));
-
-    if (response.statusCode == 200) {
-      String filename =
-          formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
-
-      final file = File(await getDownloadsPath(filename));
-
-      await file.writeAsBytes(response.bodyBytes).whenComplete(
-        () {
-          item.setDownloaded = DownloadStatus.downloaded;
-          downloadingPodcasts.remove(item..rssItem!.guid);
-          notifyListeners();
-        },
-      );
-    } else {
-      throw Exception(
-          'Failed to download podcast (Status Code: ${response.statusCode})');
-    }
+  void playerDownloadButtonClicked(Map<String, dynamic> item) async {
+    // item.setDownloaded = DownloadStatus.downloading;
+    // downloadingPodcasts.add(item.rssItem!.guid!);
+    //
+    // notifyListeners();
+    //
+    // final response = await http.get(Uri.parse(item.rssItem!.enclosure!.url!));
+    //
+    // if (response.statusCode == 200) {
+    //   String filename =
+    //       formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
+    //
+    //   final file = File(await getDownloadsPath(filename));
+    //
+    //   await file.writeAsBytes(response.bodyBytes).whenComplete(
+    //     () {
+    //       item.setDownloaded = DownloadStatus.downloaded;
+    //       downloadingPodcasts.remove(item..rssItem!.guid);
+    //       notifyListeners();
+    //     },
+    //   );
+    // } else {
+    //   throw Exception(
+    //       'Failed to download podcast (Status Code: ${response.statusCode})');
+    // }
   }
 
-  void playerRemoveDownloadButtonClicked(EpisodeModel item) async {
-    Directory downloadsDirectory =
-        Directory('/data/user/0/com.liquidhive.openair/app_flutter/downloads');
-    List<FileSystemEntity> files = downloadsDirectory.listSync();
-
-    String filename =
-        formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
-
-    for (FileSystemEntity file in files) {
-      if (path.basename(file.path) == filename) {
-        file.deleteSync();
-        break;
-      }
-    }
-
-    item.downloaded = DownloadStatus.notDownloaded;
-
-    Navigator.pop(context);
-    notifyListeners();
+  void playerRemoveDownloadButtonClicked(Map<String, dynamic> item) async {
+    // Directory downloadsDirectory =
+    //     Directory('/data/user/0/com.liquidhive.openair/app_flutter/downloads');
+    // List<FileSystemEntity> files = downloadsDirectory.listSync();
+    //
+    // String filename =
+    //     formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
+    //
+    // for (FileSystemEntity file in files) {
+    //   if (path.basename(file.path) == filename) {
+    //     file.deleteSync();
+    //     break;
+    //   }
+    // }
+    //
+    // item.downloaded = DownloadStatus.notDownloaded;
+    //
+    // Navigator.pop(context);
+    // notifyListeners();
   }
 
   // Update the main player slider position based on the slider value.

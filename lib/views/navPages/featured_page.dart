@@ -1,14 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/apis/api_service_provider.dart';
+import 'package:openair/providers/api_service_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:shimmer/shimmer.dart';
+
+bool once = false;
 
 class FeaturedPage extends ConsumerWidget {
   const FeaturedPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Run once to initialize the provider
+    if (once == false) {
+      // Initialize the provider
+      ref.read(openAirProvider).initial(
+            context,
+          );
+      once = true;
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
       child: ListView(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 class BannerAudioPlayer extends ConsumerStatefulWidget {
   const BannerAudioPlayer({
@@ -23,14 +23,14 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               ListTile(
                 minTileHeight: 70.0,
                 onTap: () {
-                  ref.read(podcastProvider.notifier).bannerControllerClicked();
+                  ref.read(openAirProvider.notifier).bannerControllerClicked();
                 },
                 leading: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
                     image: DecorationImage(
                       image: NetworkImage(
-                        ref.watch(podcastProvider).currentPodcast!.artwork,
+                        ref.watch(openAirProvider).currentPodcast['artwork'],
                       ),
                       fit: BoxFit.cover, // Adjust fit as needed
                     ),
@@ -41,7 +41,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 title: SizedBox(
                   height: 42.0,
                   child: Text(
-                    ref.watch(podcastProvider).currentEpisode!.title,
+                    ref.watch(openAirProvider).currentEpisode!.title,
                     style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
@@ -52,24 +52,24 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 ),
                 trailing: IconButton(
                   onPressed: () {
-                    ref.watch(podcastProvider).audioState == 'Play'
+                    ref.watch(openAirProvider).audioState == 'Play'
                         ? ref
-                            .read(podcastProvider.notifier)
+                            .read(openAirProvider.notifier)
                             .playerPauseButtonClicked()
                         : ref
-                            .read(podcastProvider.notifier)
+                            .read(openAirProvider.notifier)
                             .playerPlayButtonClicked(
-                              ref.watch(podcastProvider).currentEpisode!,
+                              ref.watch(openAirProvider).currentEpisode!,
                             );
                   },
-                  icon: ref.watch(podcastProvider).audioState == 'Play'
+                  icon: ref.watch(openAirProvider).audioState == 'Play'
                       ? const Icon(Icons.pause_rounded)
                       : const Icon(Icons.play_arrow_rounded),
                 ),
               ),
               LinearProgressIndicator(
                 value: ref
-                    .read(podcastProvider.notifier)
+                    .read(openAirProvider.notifier)
                     .podcastCurrentPositionInMilliseconds,
               ),
             ],

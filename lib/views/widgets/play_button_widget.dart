@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
 
 class PlayButtonWidget extends ConsumerStatefulWidget {
@@ -22,26 +22,26 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
   Widget build(BuildContext context) {
     const double paddingSpace = 8.0;
 
-    if (widget.episodeItem != ref.watch(podcastProvider).currentEpisode) {
-      if (ref.watch(podcastProvider).isPlaying == PlayingStatus.playing) {
+    if (widget.episodeItem != ref.watch(openAirProvider).currentEpisode) {
+      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
-      } else if (ref.watch(podcastProvider).isPlaying ==
+      } else if (ref.watch(openAirProvider).isPlaying ==
               PlayingStatus.buffering &&
-          ref.watch(podcastProvider).nextEpisode == widget.episodeItem) {
+          ref.watch(openAirProvider).nextEpisode == widget.episodeItem) {
         playStatus = PlayingStatus.buffering;
-      } else if (ref.watch(podcastProvider).isPlaying ==
+      } else if (ref.watch(openAirProvider).isPlaying ==
               PlayingStatus.buffering &&
-          ref.watch(podcastProvider).currentEpisode == null &&
-          ref.watch(podcastProvider).nextEpisode == null) {
+          ref.watch(openAirProvider).currentEpisode == null &&
+          ref.watch(openAirProvider).nextEpisode == null) {
         playStatus = PlayingStatus.buffering;
       }
     }
     // EpisodeItem is the same as currentEpisode
     else {
-      if (ref.watch(podcastProvider).isPlaying == PlayingStatus.playing) {
+      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
       }
-      if (ref.watch(podcastProvider).isPlaying == PlayingStatus.paused) {
+      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.paused) {
         playStatus = PlayingStatus.paused;
       }
     }
@@ -58,7 +58,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           ),
           Text(
             ref
-                .watch(podcastProvider)
+                .watch(openAirProvider)
                 .getPodcastDuration(widget.episodeItem.enclosureLength),
             overflow: TextOverflow.ellipsis,
           ),
@@ -75,7 +75,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             child: Icon(Icons.timelapse_rounded),
           ),
           Text(
-            ref.watch(podcastProvider).currentPodcastTimeRemaining!,
+            ref.watch(openAirProvider).currentPodcastTimeRemaining!,
             overflow: TextOverflow.ellipsis,
           ),
         ],

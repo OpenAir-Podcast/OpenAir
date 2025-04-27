@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 class MainNavBar extends ConsumerWidget {
   const MainNavBar({
@@ -10,7 +10,7 @@ class MainNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return BottomNavigationBar(
-      currentIndex: ref.watch(podcastProvider).navIndex,
+      currentIndex: ref.watch(openAirProvider).navIndex,
       elevation: 8.0,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
@@ -29,13 +29,13 @@ class MainNavBar extends ConsumerWidget {
       onTap: (value) {
         switch (value) {
           case 0:
-            ref.read(podcastProvider.notifier).setNavIndex(0);
+            ref.read(openAirProvider.notifier).setNavIndex(0);
             break;
           case 1:
-            ref.read(podcastProvider.notifier).setNavIndex(1);
+            ref.read(openAirProvider.notifier).setNavIndex(1);
             break;
           case 2:
-            ref.read(podcastProvider.notifier).setNavIndex(2);
+            ref.read(openAirProvider.notifier).setNavIndex(2);
             break;
           default:
         }

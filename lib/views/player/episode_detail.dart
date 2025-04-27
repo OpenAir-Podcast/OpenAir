@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:podcastindex_dart/src/entity/episode.dart';
 
-import '../../providers/podcast_provider.dart';
-import '../widgets/play_button_widget.dart';
 import 'banner_audio_player.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
@@ -44,7 +44,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
                           image: NetworkImage(
-                            ref.watch(podcastProvider).currentPodcast!.artwork,
+                            ref
+                                .watch(openAirProvider)
+                                .currentPodcast['artwork'],
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -66,7 +68,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(podcastProvider).currentPodcast!.title,
+                            ref.watch(openAirProvider).currentPodcast['title'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -78,7 +80,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(podcastProvider).currentPodcast!.author,
+                            ref
+                                .watch(openAirProvider)
+                                .currentPodcast!['author'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -91,7 +95,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         // Podcast Published Date
                         Text(
                           ref
-                              .watch(podcastProvider)
+                              .watch(openAirProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!.datePublished),
                           style: const TextStyle(
@@ -128,7 +132,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           ),
                         ),
                         onPressed: () =>
-                            ref.read(podcastProvider).playerPlayButtonClicked(
+                            ref.read(openAirProvider).playerPlayButtonClicked(
                                   widget.episodeItem!,
                                 ),
                         child: PlayButtonWidget(
@@ -229,8 +233,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(podcastProvider).isPodcastSelected ? 75.0 : 0.0,
-        child: ref.watch(podcastProvider).isPodcastSelected
+        height: ref.watch(openAirProvider).isPodcastSelected ? 75.0 : 0.0,
+        child: ref.watch(openAirProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),
