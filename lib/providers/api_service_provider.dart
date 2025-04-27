@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:openair/api_keys.dart';
@@ -35,11 +36,14 @@ class ApiServiceProvider {
       "User-Agent": "SomethingAwesome/1.0.1"
     };
 
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$category&lang=en&pretty',
-        ),
-        headers: headers);
+    String cat = category.replaceAll(' ', '%20');
+
+    String url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
+
+    debugPrint(url);
+
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {
       final String xmlString = response.body;
@@ -84,11 +88,12 @@ class ApiServiceProvider {
       "User-Agent": "SomethingAwesome/1.0.1"
     };
 
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty',
-        ),
-        headers: headers);
+    String url =
+        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
+
+    debugPrint(url);
+
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {
       final String xmlString = response.body;

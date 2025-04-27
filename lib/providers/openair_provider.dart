@@ -50,8 +50,6 @@ class OpenAirProvider with ChangeNotifier {
   late Episode? currentEpisode;
   late Episode? nextEpisode;
 
-  late String selectedCategory;
-
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
   List<String> downloadingPodcasts = [];

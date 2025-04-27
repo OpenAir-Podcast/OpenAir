@@ -34,7 +34,7 @@ class DiscoverCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
                   image: DecorationImage(
-                    image: CachedNetworkImageProvider(podcastItem['artwork']),
+                    image: CachedNetworkImageProvider(podcastItem['image']),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -60,7 +60,7 @@ class DiscoverCard extends ConsumerWidget {
                     SizedBox(
                       width: MediaQuery.of(context).size.width - 120.0,
                       child: Text(
-                        podcastItem['author'],
+                        podcastItem['author'] ?? 'Unknown',
                         maxLines: 2,
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,

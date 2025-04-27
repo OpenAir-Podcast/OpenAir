@@ -43,9 +43,8 @@ class CategoriesPage extends ConsumerWidget {
     'History',
     'Hobbies',
     'Home',
-    'How-To',
-    'Inprov',
-    'Interview',
+    'How To',
+    'Interviews',
     'Investing',
     'Islam',
     'Judaism',
@@ -73,14 +72,14 @@ class CategoriesPage extends ConsumerWidget {
     'Politics',
     'Religion',
     'Science',
-    'Self-Improvement',
+    'Self Improvement',
     'Sexuality',
     'Social',
     'Spirituality',
     'Sports',
     'Stand-Up',
     'Stories',
-    'Video-Games',
+    'Video Games',
     'Visual',
     'True Crime',
     'TV',
@@ -124,7 +123,6 @@ class CategoriesPage extends ConsumerWidget {
     Icons.extension_rounded, // Hobbies
     Icons.home_rounded, // Home
     Icons.how_to_reg_rounded, // How-To
-    Icons.mic_rounded, // Inprov
     Icons.record_voice_over_rounded, // Interview
     Icons.trending_up_rounded, // Investing
     Icons.mosque_rounded, // Islam
@@ -186,7 +184,6 @@ class CategoriesPage extends ConsumerWidget {
                 sortedIcons[index],
               ),
               onTap: () {
-                // TODO: Handle tap on category
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CategoryPage(
