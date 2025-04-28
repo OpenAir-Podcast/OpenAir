@@ -2,12 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/episodes_page.dart';
+import 'package:openair/views/navPages/category_episodes_page.dart';
 
-class DiscoverCard extends ConsumerWidget {
+class CategoryCard extends ConsumerWidget {
   final Map<String, dynamic> podcastItem;
 
-  const DiscoverCard({
+  const CategoryCard({
     super.key,
     required this.podcastItem,
   });
@@ -20,7 +20,9 @@ class DiscoverCard extends ConsumerWidget {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const EpisodesPage(),
+            builder: (context) => CategoryEpisodesPage(
+              episode: podcastItem,
+            ),
           ),
         );
       },

@@ -15,6 +15,47 @@ class ApiServiceProvider {
   final String? podcastIndexApi = dotenv.env['PODCASTINDEX_API_KEY'];
   final String? podcastIndexSecret = dotenv.env['PODCASTINDEX_API_SECRET'];
 
+  Future<Map<String, dynamic>> getPodcastsByFeedUrl(
+      String podcastFeedUrl) async {
+    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    String newUnixTime = unixTime.toString();
+
+    var firstChunk = utf8.encode(podcastIndexApi!);
+    var secondChunk = utf8.encode(podcastIndexSecret!);
+    var thirdChunk = utf8.encode(newUnixTime);
+
+    var output = AccumulatorSink<Digest>();
+    var input = sha1.startChunkedConversion(output);
+    input.add(firstChunk);
+    input.add(secondChunk);
+    input.add(thirdChunk);
+    input.close();
+    var digest = output.events.single;
+
+    Map<String, String> headers = {
+      "X-Auth-Date": newUnixTime,
+      "X-Auth-Key": podcastIndexApi!,
+      "Authorization": digest.toString(),
+      "User-Agent": "SomethingAwesome/1.0.1"
+    };
+
+    String cat = podcastFeedUrl.replaceAll(' ', '%20');
+
+    String url =
+        'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
+
+    debugPrint(url);
+
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      final String xmlString = response.body;
+      return json.decode(xmlString);
+    } else {
+      throw Exception('Failed to get data from the API');
+    }
+  }
+
   // This method is used to get the list of podcasts from the API. Based on the category
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();

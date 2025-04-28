@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
-import 'package:openair/views/widgets/discover_card.dart';
+import 'package:openair/views/widgets/category_card.dart';
 
 class CategoryPage extends ConsumerStatefulWidget {
   const CategoryPage({
@@ -41,7 +41,7 @@ class CategoryPageState extends ConsumerState<CategoryPage> {
             child: ListView.builder(
               itemCount: snapshot.data!['count'],
               itemBuilder: (context, index) {
-                return DiscoverCard(
+                return CategoryCard(
                   podcastItem: snapshot.data!['feeds'][index],
                 );
               },

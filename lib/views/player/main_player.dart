@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/episode_detail.dart';
+import 'package:openair/views/navPages/trending_episode_detail.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
@@ -28,7 +28,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => EpisodeDetail(
+                        builder: (context) => TrendingEpisodeDetail(
                           episodeItem:
                               ref.watch(openAirProvider).currentEpisode!,
                         ),
@@ -43,7 +43,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             image: NetworkImage(
                               ref
                                   .watch(openAirProvider)
-                                  .currentPodcast['artwork'],
+                                  .currentPodcast!['image'],
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -55,7 +55,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   // Podcast Title
                   Text(
-                    ref.watch(openAirProvider).currentEpisode!.title,
+                    ref.watch(openAirProvider).currentEpisode!['title'],
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -65,7 +65,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   const SizedBox(height: 8.0),
                   // Podcast Author
                   Text(
-                    ref.watch(openAirProvider).currentEpisode!.feedAuthor ??
+                    ref.watch(openAirProvider).currentEpisode!['feedAuthor'] ??
                         'Unknown',
                     style: const TextStyle(
                       fontSize: 14.0,

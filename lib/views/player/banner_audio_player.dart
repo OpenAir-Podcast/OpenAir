@@ -30,7 +30,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                     borderRadius: BorderRadius.circular(10.0),
                     image: DecorationImage(
                       image: NetworkImage(
-                        ref.watch(openAirProvider).currentPodcast['artwork'],
+                        ref.watch(openAirProvider).currentPodcast!['image'],
                       ),
                       fit: BoxFit.cover, // Adjust fit as needed
                     ),
@@ -41,7 +41,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 title: SizedBox(
                   height: 42.0,
                   child: Text(
-                    ref.watch(openAirProvider).currentEpisode!.title,
+                    ref.watch(openAirProvider).currentEpisode!['title'],
                     style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,

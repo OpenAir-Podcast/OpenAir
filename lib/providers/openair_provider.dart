@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:podcastindex_dart/src/entity/episode.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) {
@@ -46,9 +45,9 @@ class OpenAirProvider with ChangeNotifier {
 
   bool isPodcastSelected = false;
 
-  late Map<String, dynamic> currentPodcast;
-  late Episode? currentEpisode;
-  late Episode? nextEpisode;
+  late Map<String, dynamic>? currentPodcast;
+  late Map<String, dynamic>? currentEpisode;
+  late Map<String, dynamic>? nextEpisode;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -78,7 +77,7 @@ class OpenAirProvider with ChangeNotifier {
     currentPlaybackPositionString = '00:00:00';
     currentPlaybackRemainingTimeString = '00:00:00';
 
-    currentEpisode = null;
+    currentEpisode = {};
 
     audioState = 'Pause';
     loadState = 'Detail'; // Play, Load, Detail
@@ -121,7 +120,7 @@ class OpenAirProvider with ChangeNotifier {
   void audioPlayerSheetCloseButtonClicked() {}
 
   Future<List<String>> setPodcastStream(
-    Episode episodeItem,
+    Map<String, dynamic> episodeItem,
   ) async {
     loadState = 'Load';
 
@@ -134,23 +133,24 @@ class OpenAirProvider with ChangeNotifier {
 
     // TODO: Add support for multiple podcast
     String mp3Name =
-        formattedDownloadedPodcastName(episodeItem.enclosureUrl.toString());
+        formattedDownloadedPodcastName(episodeItem['enclosureUrl']);
 
     bool isDownloaded = await isMp3FileDownloaded(mp3Name);
 
     List<String> result = [mp3Name, isDownloaded.toString()];
 
+    // TODO:Add support for downloading podcasts
     isDownloaded
         ? {
             await player.setSource(DeviceFileSource(
-              episodeItem.enclosureUrl.toString(),
-              mimeType: episodeItem.enclosureType,
+              episodeItem['enclosureUrl'],
+              mimeType: episodeItem['enclosureType'],
             ))
           }
         : await player.setSource(
             UrlSource(
-              episodeItem.enclosureUrl.toString(),
-              mimeType: episodeItem.enclosureType,
+              episodeItem['enclosureUrl'],
+              mimeType: episodeItem['enclosureType'],
             ),
           );
 
@@ -164,7 +164,7 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void playerPlayButtonClicked(
-    Episode episodeItem,
+    Map<String, dynamic> episodeItem,
   ) async {
     nextEpisode = episodeItem;
     List<String> result = await setPodcastStream(episodeItem);
@@ -180,7 +180,11 @@ class OpenAirProvider with ChangeNotifier {
         player.play(DeviceFileSource(
             '/data/user/0/com.liquidhive.openair/app_flutter/downloads/${result[0]}')); // MP3 Name
       } else {
-        player.play(UrlSource(episodeItem.enclosureUrl.toString()));
+        player.play(
+          UrlSource(
+            episodeItem['enclosureUrl'],
+          ),
+        );
       }
     }
 
@@ -229,7 +233,7 @@ class OpenAirProvider with ChangeNotifier {
 
   void updatePlaybackBar() {
     podcastDuration =
-        getPodcastDurationInMilliseconds(currentEpisode!.duration!);
+        getPodcastDurationInMilliseconds(currentEpisode!['enclosureLength']);
     notifyListeners();
 
     player.onPositionChanged.listen((Duration p) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:podcastindex_dart/src/entity/episode.dart';
 
 class PlayButtonWidget extends ConsumerStatefulWidget {
   const PlayButtonWidget({
@@ -9,7 +8,7 @@ class PlayButtonWidget extends ConsumerStatefulWidget {
     required this.episodeItem,
   });
 
-  final Episode episodeItem;
+  final Map<String, dynamic> episodeItem;
 
   @override
   PlayButtonWidgetState createState() => PlayButtonWidgetState();
@@ -59,7 +58,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           Text(
             ref
                 .watch(openAirProvider)
-                .getPodcastDuration(widget.episodeItem.enclosureLength),
+                .getPodcastDuration(widget.episodeItem['enclosureLength']),
             overflow: TextOverflow.ellipsis,
           ),
         ],

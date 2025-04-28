@@ -3,26 +3,25 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
-import 'package:podcastindex_dart/src/entity/episode.dart';
 
-import 'banner_audio_player.dart';
+import '../player/banner_audio_player.dart';
 
-class EpisodeDetail extends ConsumerStatefulWidget {
-  const EpisodeDetail({
+class CategoryEpisodeDetail extends ConsumerStatefulWidget {
+  const CategoryEpisodeDetail({
     super.key,
     this.episodeItem,
   });
 
-  final Episode? episodeItem;
+  final Map<String, dynamic>? episodeItem;
 
   @override
   EpisodeDetailState createState() => EpisodeDetailState();
 }
 
-class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
+class EpisodeDetailState extends ConsumerState<CategoryEpisodeDetail> {
   @override
   Widget build(BuildContext context) {
-    debugPrint(widget.episodeItem!.description);
+    debugPrint(widget.episodeItem!['description']);
 
     return Scaffold(
       appBar: AppBar(),
@@ -44,9 +43,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
                           image: NetworkImage(
-                            ref
-                                .watch(openAirProvider)
-                                .currentPodcast['artwork'],
+                            ref.watch(openAirProvider).currentPodcast!['image'],
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -68,7 +65,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(openAirProvider).currentPodcast['title'],
+                            ref.watch(openAirProvider).currentPodcast!['title'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -80,7 +77,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(openAirProvider).currentPodcast['author'],
+                            ref
+                                    .watch(openAirProvider)
+                                    .currentPodcast!['author'] ??
+                                'Unknown',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -95,7 +95,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           ref
                               .watch(openAirProvider)
                               .getPodcastPublishedDateFromEpoch(
-                                  widget.episodeItem!.datePublished),
+                                  widget.episodeItem!['datePublished']),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14.0,
@@ -108,7 +108,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 ],
               ),
               Text(
-                widget.episodeItem!.title,
+                widget.episodeItem!['title'],
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -186,7 +186,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         //   );
                         // } else {}
                       },
-                      icon: const Icon(Icons.download_for_offline_rounded),
+                      icon: const Icon(Icons.download_rounded),
                     ),
                     // More Button
                     IconButton(
@@ -200,7 +200,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
               SingleChildScrollView(
                 child: Expanded(
                   child: Html(
-                    data: widget.episodeItem!.description,
+                    data: widget.episodeItem!['description'],
                     extensions: [
                       TagExtension(
                         tagsToExtend: {"flutter"},

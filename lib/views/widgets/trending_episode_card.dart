@@ -1,37 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/episode_detail.dart';
+import 'package:openair/views/navPages/trending_episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
-import 'package:podcastindex_dart/src/entity/episode.dart';
 import 'package:styled_text/styled_text.dart';
 
-class EpisodeCard extends ConsumerStatefulWidget {
-  final Episode episodeItem;
+class TrendingEpisodeCard extends ConsumerStatefulWidget {
+  final Map<String, dynamic> episodeItem;
 
-  const EpisodeCard({
+  const TrendingEpisodeCard({
     super.key,
     required this.episodeItem,
   });
 
   @override
-  ConsumerState<EpisodeCard> createState() => _EpisodeCardState();
+  ConsumerState<TrendingEpisodeCard> createState() => _EpisodeCardState();
 }
 
-class _EpisodeCardState extends ConsumerState<EpisodeCard> {
+class _EpisodeCardState extends ConsumerState<TrendingEpisodeCard> {
   String podcastDate = "";
 
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
         .watch(openAirProvider)
-        .getPodcastPublishedDateFromEpoch(widget.episodeItem.datePublished);
+        .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => EpisodeDetail(
+            builder: (context) => TrendingEpisodeDetail(
               episodeItem: widget.episodeItem,
             ),
           ),
@@ -61,7 +60,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             image: NetworkImage(
                               ref
                                   .watch(openAirProvider)
-                                  .currentPodcast['artwork'],
+                                  .currentPodcast!['artwork'],
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -80,9 +79,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              ref
-                                  .watch(openAirProvider)
-                                  .currentPodcast['title'],
+                              widget.episodeItem['title'],
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -95,7 +92,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             child: Text(
                               ref
                                   .watch(openAirProvider)
-                                  .currentPodcast['author'],
+                                  .currentPodcast!['author'],
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -119,7 +116,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                 SizedBox(
                   height: 40.0,
                   child: Text(
-                    widget.episodeItem.title,
+                    widget.episodeItem['title'],
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
@@ -132,7 +129,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   child: SizedBox(
                     height: 88.0,
                     child: StyledText(
-                      text: widget.episodeItem.description!,
+                      text: widget.episodeItem['description'],
                       maxLines: 4,
                       style: const TextStyle(
                         overflow: TextOverflow.ellipsis,
