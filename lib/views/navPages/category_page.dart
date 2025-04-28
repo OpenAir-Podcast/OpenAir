@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/category_card.dart';
 
-class CategoryPage extends ConsumerStatefulWidget {
+// Create a FutureProvider to fetch the podcast data
+final podcastDataByCategoryProvider =
+    FutureProvider.family<Map<String, dynamic>, String>((ref, category) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await ref
+      .watch(apiServiceProvider)
+      .getPodcastsByCategory(category.toLowerCase());
+});
+
+class CategoryPage extends ConsumerWidget {
   const CategoryPage({
     super.key,
     required this.category,
@@ -12,40 +23,39 @@ class CategoryPage extends ConsumerStatefulWidget {
   final String category;
 
   @override
-  CategoryPageState createState() => CategoryPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final podcastDataAsyncValue =
+        ref.watch(podcastDataByCategoryProvider(category));
 
-class CategoryPageState extends ConsumerState<CategoryPage> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: ref
-          .watch(apiServiceProvider)
-          .getPodcastsByCategory(widget.category.toLowerCase()),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
+    return podcastDataAsyncValue.when(
+      loading: () => Scaffold(
+        appBar: AppBar(),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stackTrace) => Text('Error: $error'),
+      data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(widget.category),
+            title: Text(category),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListView.builder(
-              itemCount: snapshot.data!['count'],
+              itemCount: snapshot['count'],
               itemBuilder: (context, index) {
                 return CategoryCard(
-                  podcastItem: snapshot.data!['feeds'][index],
+                  podcastItem: snapshot['feeds'][index],
                 );
               },
             ),
+          ),
+          bottomNavigationBar: SizedBox(
+            height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
+            child: ref.watch(openAirProvider).isPodcastSelected
+                ? const BannerAudioPlayer()
+                : const SizedBox(),
           ),
         );
       },

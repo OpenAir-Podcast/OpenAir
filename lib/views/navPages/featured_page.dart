@@ -7,6 +7,37 @@ import 'package:shimmer/shimmer.dart';
 
 bool once = false;
 
+final podcastDataByTopProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getTopPodcasts();
+});
+
+// Create a FutureProvider to fetch the podcast data
+final podcastDataByEducationProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getEducationPodcasts();
+});
+
+final podcastDataByHealthProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getHealthPodcasts();
+});
+
+final podcastDataByTechnologyProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getTechnologyPodcasts();
+});
+
+final podcastDataBySportsProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getSportsPodcasts();
+});
+
 class FeaturedPage extends ConsumerWidget {
   const FeaturedPage({super.key});
 
@@ -21,10 +52,23 @@ class FeaturedPage extends ConsumerWidget {
       once = true;
     }
 
+    final podcastDataAsyncTopValue = ref.watch(podcastDataByTopProvider);
+
+    final podcastDataAsyncEducationValue =
+        ref.watch(podcastDataByEducationProvider);
+
+    final podcastDataAsyncHealthValue = ref.watch(podcastDataByHealthProvider);
+
+    final podcastDataAsyncTechnologyValue =
+        ref.watch(podcastDataByTechnologyProvider);
+
+    final podcastDataAsyncSportsValue = ref.watch(podcastDataBySportsProvider);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
       child: ListView(
         children: [
+          // Top Podcasts
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -40,11 +84,8 @@ class FeaturedPage extends ConsumerWidget {
                     // TODO: Navigate to Top Podcasts
                   },
                 ),
-                FutureBuilder(
-                    future: ref.watch(apiServiceProvider).getTopPodcasts(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
+                podcastDataAsyncTopValue.when(
+                    loading: () => SizedBox(
                           height: 190.0,
                           width: double.infinity,
                           child: GridView.builder(
@@ -78,9 +119,9 @@ class FeaturedPage extends ConsumerWidget {
                               );
                             },
                           ),
-                        );
-                      }
-
+                        ),
+                    error: (error, stackTrace) => Text('Error: $error'),
+                    data: (snapshot) {
                       return SizedBox(
                         height: 190.0,
                         width: double.infinity,
@@ -97,7 +138,7 @@ class FeaturedPage extends ConsumerWidget {
                               child: GestureDetector(
                                 onTap: () {
                                   debugPrint(
-                                      '${snapshot.data!['feeds'][index]['title']}');
+                                      '${snapshot['feeds'][index]['title']}');
                                 },
                                 child: Column(
                                   children: [
@@ -114,8 +155,7 @@ class FeaturedPage extends ConsumerWidget {
                                           fit: BoxFit.fill,
                                           // scale: 2,
                                           image: CachedNetworkImageProvider(
-                                            snapshot.data!['feeds'][index]
-                                                ['image'],
+                                            snapshot['feeds'][index]['image'],
                                           ),
                                         ),
                                       ),
@@ -137,8 +177,7 @@ class FeaturedPage extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          snapshot.data!['feeds'][index]
-                                              ['title'],
+                                          snapshot['feeds'][index]['title'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -172,12 +211,8 @@ class FeaturedPage extends ConsumerWidget {
                     // TODO: Navigate to Education
                   },
                 ),
-                FutureBuilder(
-                    future:
-                        ref.watch(apiServiceProvider).getEducationPodcasts(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
+                podcastDataAsyncEducationValue.when(
+                    loading: () => SizedBox(
                           height: 190.0,
                           width: double.infinity,
                           child: GridView.builder(
@@ -211,9 +246,9 @@ class FeaturedPage extends ConsumerWidget {
                               );
                             },
                           ),
-                        );
-                      }
-
+                        ),
+                    error: (error, stackTrace) => Text('Error: $error'),
+                    data: (snapshot) {
                       return SizedBox(
                         height: 190.0,
                         width: double.infinity,
@@ -230,7 +265,7 @@ class FeaturedPage extends ConsumerWidget {
                               child: GestureDetector(
                                 onTap: () {
                                   debugPrint(
-                                      '${snapshot.data!['feeds'][index]['title']}');
+                                      '${snapshot['feeds'][index]['title']}');
                                 },
                                 child: Column(
                                   children: [
@@ -247,8 +282,7 @@ class FeaturedPage extends ConsumerWidget {
                                           fit: BoxFit.fill,
                                           // scale: 2,
                                           image: CachedNetworkImageProvider(
-                                            snapshot.data!['feeds'][index]
-                                                ['image'],
+                                            snapshot['feeds'][index]['image'],
                                           ),
                                         ),
                                       ),
@@ -270,8 +304,7 @@ class FeaturedPage extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          snapshot.data!['feeds'][index]
-                                              ['title'],
+                                          snapshot['feeds'][index]['title'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -305,11 +338,8 @@ class FeaturedPage extends ConsumerWidget {
                     // TODO: Navigate to Health
                   },
                 ),
-                FutureBuilder(
-                    future: ref.watch(apiServiceProvider).getHealthPodcasts(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
+                podcastDataAsyncHealthValue.when(
+                    loading: () => SizedBox(
                           height: 190.0,
                           width: double.infinity,
                           child: GridView.builder(
@@ -343,9 +373,9 @@ class FeaturedPage extends ConsumerWidget {
                               );
                             },
                           ),
-                        );
-                      }
-
+                        ),
+                    error: (error, stackTrace) => Text('Error: $error'),
+                    data: (snapshot) {
                       return SizedBox(
                         height: 190.0,
                         width: double.infinity,
@@ -362,7 +392,7 @@ class FeaturedPage extends ConsumerWidget {
                               child: GestureDetector(
                                 onTap: () {
                                   debugPrint(
-                                      '${snapshot.data!['feeds'][index]['title']}');
+                                      '${snapshot['feeds'][index]['title']}');
                                 },
                                 child: Column(
                                   children: [
@@ -379,8 +409,7 @@ class FeaturedPage extends ConsumerWidget {
                                           fit: BoxFit.fill,
                                           // scale: 2,
                                           image: CachedNetworkImageProvider(
-                                            snapshot.data!['feeds'][index]
-                                                ['image'],
+                                            snapshot['feeds'][index]['image'],
                                           ),
                                         ),
                                       ),
@@ -402,8 +431,7 @@ class FeaturedPage extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          snapshot.data!['feeds'][index]
-                                              ['title'],
+                                          snapshot['feeds'][index]['title'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -437,12 +465,8 @@ class FeaturedPage extends ConsumerWidget {
                     // TODO: Navigate to Technology
                   },
                 ),
-                FutureBuilder(
-                    future:
-                        ref.watch(apiServiceProvider).getTechnologyPodcasts(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
+                podcastDataAsyncTechnologyValue.when(
+                    loading: () => SizedBox(
                           height: 190.0,
                           width: double.infinity,
                           child: GridView.builder(
@@ -476,9 +500,9 @@ class FeaturedPage extends ConsumerWidget {
                               );
                             },
                           ),
-                        );
-                      }
-
+                        ),
+                    error: (error, stackTrace) => Text('Error: $error'),
+                    data: (snapshot) {
                       return SizedBox(
                         height: 190.0,
                         width: double.infinity,
@@ -495,7 +519,7 @@ class FeaturedPage extends ConsumerWidget {
                               child: GestureDetector(
                                 onTap: () {
                                   debugPrint(
-                                      '${snapshot.data!['feeds'][index]['title']}');
+                                      '${snapshot['feeds'][index]['title']}');
                                 },
                                 child: Column(
                                   children: [
@@ -512,8 +536,7 @@ class FeaturedPage extends ConsumerWidget {
                                           fit: BoxFit.fill,
                                           // scale: 2,
                                           image: CachedNetworkImageProvider(
-                                            snapshot.data!['feeds'][index]
-                                                ['image'],
+                                            snapshot['feeds'][index]['image'],
                                           ),
                                         ),
                                       ),
@@ -535,8 +558,7 @@ class FeaturedPage extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          snapshot.data!['feeds'][index]
-                                              ['title'],
+                                          snapshot['feeds'][index]['title'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -554,7 +576,7 @@ class FeaturedPage extends ConsumerWidget {
             ),
           ),
           SizedBox.fromSize(size: const Size(0, 10)),
-          // Technology
+          // Sports
           Card(
             elevation: 5.0,
             shape: RoundedRectangleBorder(
@@ -570,11 +592,8 @@ class FeaturedPage extends ConsumerWidget {
                     // TODO: Navigate to Sports
                   },
                 ),
-                FutureBuilder(
-                    future: ref.watch(apiServiceProvider).getSportsPodcasts(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
+                podcastDataAsyncSportsValue.when(
+                    loading: () => SizedBox(
                           height: 190.0,
                           width: double.infinity,
                           child: GridView.builder(
@@ -608,9 +627,9 @@ class FeaturedPage extends ConsumerWidget {
                               );
                             },
                           ),
-                        );
-                      }
-
+                        ),
+                    error: (error, stackTrace) => Text('Error: $error'),
+                    data: (snapshot) {
                       return SizedBox(
                         height: 190.0,
                         width: double.infinity,
@@ -627,7 +646,7 @@ class FeaturedPage extends ConsumerWidget {
                               child: GestureDetector(
                                 onTap: () {
                                   debugPrint(
-                                      '${snapshot.data!['feeds'][index]['title']}');
+                                      '${snapshot['feeds'][index]['title']}');
                                 },
                                 child: Column(
                                   children: [
@@ -644,8 +663,7 @@ class FeaturedPage extends ConsumerWidget {
                                           fit: BoxFit.fill,
                                           // scale: 2,
                                           image: CachedNetworkImageProvider(
-                                            snapshot.data!['feeds'][index]
-                                                ['image'],
+                                            snapshot['feeds'][index]['image'],
                                           ),
                                         ),
                                       ),
@@ -667,8 +685,7 @@ class FeaturedPage extends ConsumerWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          snapshot.data!['feeds'][index]
-                                              ['title'],
+                                          snapshot['feeds'][index]['title'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),

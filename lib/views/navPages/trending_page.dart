@@ -3,34 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
 import 'package:openair/views/widgets/trending_card.dart';
 
-class TrendingPage extends ConsumerStatefulWidget {
+final podcastDataByTrendingProvider = FutureProvider((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getTrendingPodcasts();
+});
+
+class TrendingPage extends ConsumerWidget {
   const TrendingPage({super.key});
 
   @override
-  TrendingPageState createState() => TrendingPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final podcastDataAsyncTrendingValue =
+        ref.watch(podcastDataByTrendingProvider);
 
-class TrendingPageState extends ConsumerState<TrendingPage> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: ref.watch(apiServiceProvider).getTrendingPodcasts(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Scaffold(
+    return podcastDataAsyncTrendingValue.when(
+        loading: () => const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
-            );
-          }
-
+            ),
+        error: (error, stackTrace) => Center(child: Text(error.toString())),
+        data: (snapshot) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListView.builder(
-              itemCount: snapshot.data!['count'],
+              itemCount: snapshot['count'],
               itemBuilder: (context, index) {
                 return TrendingCard(
-                  podcastItem: snapshot.data!['feeds'][index],
+                  podcastItem: snapshot['feeds'][index],
                 );
               },
             ),

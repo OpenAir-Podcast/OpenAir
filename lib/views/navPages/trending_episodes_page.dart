@@ -5,6 +5,13 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/trending_episode_card.dart';
 
+final podcastDataByUrlProvider =
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, podcastUrl) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getPodcastsByFeedUrl(podcastUrl);
+});
+
 class TrendingEpisodesPage extends ConsumerStatefulWidget {
   const TrendingEpisodesPage({super.key});
 
@@ -18,35 +25,28 @@ class _EpisodesPageState extends ConsumerState<TrendingEpisodesPage> {
     final podcastUrl =
         ref.watch(openAirProvider.notifier).currentPodcast!['url'];
 
+    final podcastDataAsyncValue =
+        ref.watch(podcastDataByUrlProvider(podcastUrl));
+
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder(
-        future: ref.watch(apiServiceProvider).getPodcastsByFeedUrl(podcastUrl),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          } else if (snapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await ref
-                      .watch(apiServiceProvider)
-                      .getPodcastsByFeedUrl(podcastUrl);
-                },
-                child: ListView.builder(
-                  itemCount: snapshot.data!['count'],
-                  itemBuilder: (context, index) => TrendingEpisodeCard(
-                    episodeItem: snapshot.data!['items'][index],
-                  ),
+      body: podcastDataAsyncValue.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(child: Text(error.toString())),
+        data: (snapshot) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RefreshIndicator(
+              onRefresh: () async =>
+                  ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
+              child: ListView.builder(
+                itemCount: snapshot['count'],
+                itemBuilder: (context, index) => TrendingEpisodeCard(
+                  episodeItem: snapshot['items'][index],
                 ),
               ),
-            );
-          } else {
-            return const Center(child: Text('No data available'));
-          }
+            ),
+          );
         },
       ),
       bottomNavigationBar: SizedBox(

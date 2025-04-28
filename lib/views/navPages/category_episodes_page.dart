@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navigation/app_bar.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/category_card.dart';
 import 'package:openair/views/widgets/category_episode_card.dart';
 
-class CategoryEpisodesPage extends ConsumerStatefulWidget {
+// Create a FutureProvider to fetch the podcast data
+final podcastDataByUrlProvider =
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, podcastUrl) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return await apiService.getPodcastsByFeedUrl(podcastUrl);
+});
+
+class CategoryEpisodesPage extends ConsumerWidget {
   const CategoryEpisodesPage({
     super.key,
     required this.episode,
@@ -16,54 +22,33 @@ class CategoryEpisodesPage extends ConsumerStatefulWidget {
   final Map<String, dynamic> episode;
 
   @override
-  ConsumerState<CategoryEpisodesPage> createState() => _EpisodesPageState();
-}
-
-class _EpisodesPageState extends ConsumerState<CategoryEpisodesPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final podcastUrl =
         ref.watch(openAirProvider.notifier).currentPodcast!['url'];
 
-    if (podcastUrl == null) {
-      return const Scaffold(
-        body: Center(
-          child: Text('No podcast selected'),
-        ),
-      );
-    }
+    final podcastDataAsyncValue =
+        ref.watch(podcastDataByUrlProvider(podcastUrl));
 
     return Scaffold(
       appBar: AppBar(),
-      body: FutureBuilder(
-        future: ref.watch(apiServiceProvider).getPodcastsByFeedUrl(podcastUrl),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          } else if (snapshot.hasData) {
+      body: podcastDataAsyncValue.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(child: Text(error.toString())),
+          data: (snapshot) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: RefreshIndicator(
-                onRefresh: () async {
-                  await ref
-                      .watch(apiServiceProvider)
-                      .getPodcastsByFeedUrl(podcastUrl);
-                },
+                onRefresh: () async =>
+                    ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
                 child: ListView.builder(
-                  itemCount: snapshot.data!['count'],
+                  itemCount: snapshot['count'],
                   itemBuilder: (context, index) => CategoryEpisodeCard(
-                    episodeItem: snapshot.data!['items'][index],
+                    episodeItem: snapshot['items'][index],
                   ),
                 ),
               ),
             );
-          } else {
-            return const Center(child: Text('No data available'));
-          }
-        },
-      ),
+          }),
       bottomNavigationBar: SizedBox(
         height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
         child: ref.watch(openAirProvider).isPodcastSelected

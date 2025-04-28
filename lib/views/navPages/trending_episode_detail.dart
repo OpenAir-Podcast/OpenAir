@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
-
-import '../player/banner_audio_player.dart';
 
 class TrendingEpisodeDetail extends ConsumerStatefulWidget {
   const TrendingEpisodeDetail({
@@ -21,8 +20,6 @@ class TrendingEpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<TrendingEpisodeDetail> {
   @override
   Widget build(BuildContext context) {
-    debugPrint(widget.episodeItem!['description']);
-
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -201,12 +198,6 @@ class EpisodeDetailState extends ConsumerState<TrendingEpisodeDetail> {
                 child: Expanded(
                   child: Html(
                     data: widget.episodeItem!['description'],
-                    extensions: [
-                      TagExtension(
-                        tagsToExtend: {"flutter"},
-                        child: const FlutterLogo(),
-                      ),
-                    ],
                     style: {
                       "p.fancy": Style(
                         textAlign: TextAlign.center,
