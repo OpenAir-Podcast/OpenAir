@@ -34,7 +34,7 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/LiquidHive/openair.git](https://github.com/LiquidHive/openair.git)
+    git clone https://github.com/LiquidHive/openair.git
     ```
 2.  **Navigate to the project directory:**
     ```bash
