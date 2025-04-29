@@ -24,24 +24,19 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
     if (widget.episodeItem != ref.watch(openAirProvider).currentEpisode) {
       if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
-      } else if (ref.watch(openAirProvider).isPlaying ==
-              PlayingStatus.buffering &&
-          ref.watch(openAirProvider).nextEpisode == widget.episodeItem) {
-        playStatus = PlayingStatus.buffering;
-      } else if (ref.watch(openAirProvider).isPlaying ==
-              PlayingStatus.buffering &&
-          ref.watch(openAirProvider).currentEpisode == null &&
-          ref.watch(openAirProvider).nextEpisode == null) {
-        playStatus = PlayingStatus.buffering;
       }
     }
     // EpisodeItem is the same as currentEpisode
     else {
       if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
-      }
-      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.paused) {
+      } else if (ref.watch(openAirProvider).isPlaying == PlayingStatus.paused) {
         playStatus = PlayingStatus.paused;
+      } else if (ref.watch(openAirProvider).isPlaying == PlayingStatus.stop) {
+        playStatus = PlayingStatus.detail;
+      } else if (ref.watch(openAirProvider).isPlaying ==
+          PlayingStatus.buffering) {
+        playStatus = PlayingStatus.buffering;
       }
     }
 

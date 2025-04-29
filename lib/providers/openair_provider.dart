@@ -46,7 +46,7 @@ class OpenAirProvider with ChangeNotifier {
 
   late Map<String, dynamic>? currentPodcast;
   late Map<String, dynamic>? currentEpisode;
-  late Map<String, dynamic>? nextEpisode;
+  Map<String, dynamic>? nextEpisode;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -184,7 +184,6 @@ class OpenAirProvider with ChangeNotifier {
     loadState = 'Play';
     nextEpisode = currentEpisode;
     updatePlaybackBar();
-
     notifyListeners();
   }
 
@@ -241,8 +240,8 @@ class OpenAirProvider with ChangeNotifier {
     player.onPlayerStateChanged.listen((PlayerState playerState) {
       // TODO: Add marking podcast as completed automatically here
       if (playerState == PlayerState.completed) {
-        debugPrint('Completed');
         audioState = 'Stop';
+        isPlaying = PlayingStatus.stop;
       }
     });
 
