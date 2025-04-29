@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/views/player/main_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -108,32 +107,19 @@ class OpenAirProvider with ChangeNotifier {
     return icon;
   }
 
-  Future<void> bannerControllerClicked() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const MainPlayer(),
-      ),
-    );
-  }
-
   void audioPlayerSheetCloseButtonClicked() {}
 
   Future<List<String>> setPodcastStream(
-    Map<String, dynamic> episodeItem,
+    Map<String, dynamic> currentEpisode,
   ) async {
     loadState = 'Load';
 
-    currentEpisode ??= episodeItem;
-
-    if (currentEpisode != episodeItem) {
-      isPlaying = PlayingStatus.buffering;
-      notifyListeners();
-    }
+    isPlaying = PlayingStatus.buffering;
+    notifyListeners();
 
     // TODO: Add support for multiple podcast
     String mp3Name =
-        formattedDownloadedPodcastName(episodeItem['enclosureUrl']);
+        formattedDownloadedPodcastName(currentEpisode['enclosureUrl']);
 
     bool isDownloaded = await isMp3FileDownloaded(mp3Name);
 
@@ -143,14 +129,14 @@ class OpenAirProvider with ChangeNotifier {
     isDownloaded
         ? {
             await player.setSource(DeviceFileSource(
-              episodeItem['enclosureUrl'],
-              mimeType: episodeItem['enclosureType'],
+              currentEpisode['enclosureUrl'],
+              mimeType: currentEpisode['enclosureType'],
             ))
           }
         : await player.setSource(
             UrlSource(
-              episodeItem['enclosureUrl'],
-              mimeType: episodeItem['enclosureType'],
+              currentEpisode['enclosureUrl'],
+              mimeType: currentEpisode['enclosureType'],
             ),
           );
 
@@ -166,15 +152,17 @@ class OpenAirProvider with ChangeNotifier {
   void playerPlayButtonClicked(
     Map<String, dynamic> episodeItem,
   ) async {
-    nextEpisode = episodeItem;
-    List<String> result = await setPodcastStream(episodeItem);
+    currentEpisode = episodeItem;
+    List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
+    notifyListeners();
 
     if (player.state == PlayerState.paused ||
         player.state == PlayerState.stopped) {
       player.resume();
-    } else if (player.state == PlayerState.completed) {
+    } else if (player.state == PlayerState.completed ||
+        player.state == PlayerState.playing) {
       // Download status
       if (result[1] == 'true') {
         player.play(DeviceFileSource(
@@ -182,14 +170,11 @@ class OpenAirProvider with ChangeNotifier {
       } else {
         player.play(
           UrlSource(
-            episodeItem['enclosureUrl'],
+            currentEpisode!['enclosureUrl'],
           ),
         );
       }
     }
-
-    currentEpisode = episodeItem;
-    nextEpisode = currentEpisode;
 
     if (episodeItem == currentEpisode) {
       isPlaying = PlayingStatus.playing;
@@ -197,6 +182,7 @@ class OpenAirProvider with ChangeNotifier {
 
     audioState = 'Play';
     loadState = 'Play';
+    nextEpisode = currentEpisode;
     updatePlaybackBar();
 
     notifyListeners();
@@ -232,9 +218,10 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void updatePlaybackBar() {
-    podcastDuration =
-        getPodcastDurationInMilliseconds(currentEpisode!['enclosureLength']);
-    notifyListeners();
+    player.getDuration().then((Duration? value) {
+      podcastDuration = value!;
+      notifyListeners();
+    });
 
     player.onPositionChanged.listen((Duration p) {
       podcastPosition = p;
@@ -293,16 +280,6 @@ class OpenAirProvider with ChangeNotifier {
     return result;
   }
 
-  Duration getPodcastDurationInMilliseconds(int epoch) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-
-    return Duration(
-        hours: dateTime.hour,
-        minutes: dateTime.minute,
-        seconds: dateTime.second);
-  }
-
-  // TODO: This is the method that needs to be called when the pause button is pressed.
   String formatCurrentPlaybackRemainingTime(
     Duration timelinePosition,
     Duration timelineDuration,
@@ -444,11 +421,14 @@ class OpenAirProvider with ChangeNotifier {
 
   // Update the main player slider position based on the slider value.
   void mainPlayerSliderClicked(double sliderValue) {
-    player.seek(
-      Duration(
-        milliseconds: (sliderValue * podcastDuration.inMilliseconds).toInt(),
-      ),
-    );
+    Duration duration = Duration(
+        milliseconds: (sliderValue * podcastDuration.inMilliseconds).toInt());
+
+    podcastCurrentPositionInMilliseconds =
+        ((sliderValue * podcastDuration.inMilliseconds) /
+            podcastDuration.inMilliseconds);
+
+    player.seek(duration);
     notifyListeners();
   }
 

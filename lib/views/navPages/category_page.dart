@@ -8,7 +8,6 @@ import 'package:openair/views/widgets/category_card.dart';
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, category) async {
-  final apiService = ref.watch(apiServiceProvider);
   return await ref
       .watch(apiServiceProvider)
       .getPodcastsByCategory(category.toLowerCase());
