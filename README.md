@@ -21,21 +21,42 @@ Read the contribution guidelines: [click here for contribution guidelines](https
 
 Join the discussion: [click ere for discussion](https://github.com/LiquidHive/openair/discussions)
 
-Getting Started
+## Getting Started
 
-Prerequisites:
+OpenAir fetches podcast information from the [PodcastIndex API](https://podcastindex.org/). To run OpenAir, you will need to obtain your own API credentials from PodcastIndex.
 
-- Flutter development environment set up [refer to official Flutter documentation](https://docs.flutter.dev/get-started/codelab)
+**Prerequisites:**
 
-- Running the App:
+- Flutter development environment set up ([refer to official Flutter documentation](https://docs.flutter.dev/get-started/codelab))
+- A **PodcastIndex API Key** and **API Secret**. You can get these by creating a free account at [https://api.podcastindex.org/developer_home](https://api.podcastindex.org/developer_home).
 
-- Clone the repository: git clone https://github.com/LiquidHive/openair.git
-- Navigate to the project directory: cd OpenAir
-- Install dependencies: flutter pub get
-- Run the app on your device or emulator: flutter run
-- Contributing
+**Running the App:**
 
-OpenAir current fetches podcast information from PodcastIndex. You will need to create an account on PodcastIndex at [https://api.podcastindex.org/developer_home] and get a apiKey and apiSecret to use OpenAir.
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/LiquidHive/openair.git](https://github.com/LiquidHive/openair.git)
+    ```
+2.  **Navigate to the project directory:**
+    ```bash
+    cd OpenAir
+    ```
+3.  **Create a `.env` file** in the root of the `OpenAir` project directory.
+4.  **Add your PodcastIndex API credentials to the `.env` file:**
+    ```env
+    PODCASTINDEX_API_KEY=YOUR_API_KEY_HERE
+    PODCASTINDEX_API_SECRET=YOUR_API_SECRET_HERE
+    ```
+    **Important:** Replace `YOUR_API_KEY_HERE` and `YOUR_API_SECRET_HERE` with your actual API key and secret from the PodcastIndex developer portal.
+5.  **Install dependencies:**
+    ```bash
+    flutter pub get
+    ```
+6.  **Run the app on your device or emulator:**
+    ```bash
+    flutter run
+    ```
+
+## Contributing
 
 We welcome contributions of all kinds! Please refer to the contribution guidelines document (link above) for details on how to get started.
 
