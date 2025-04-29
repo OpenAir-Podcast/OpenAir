@@ -232,7 +232,8 @@ class OpenAirProvider with ChangeNotifier {
           formatCurrentPlaybackRemainingTime(podcastPosition, podcastDuration);
 
       podcastCurrentPositionInMilliseconds =
-          podcastPosition.inMilliseconds / podcastDuration.inMilliseconds;
+          (podcastPosition.inMilliseconds / podcastDuration.inMilliseconds)
+              .clamp(0.0, 1.0);
 
       notifyListeners();
     });
@@ -425,7 +426,8 @@ class OpenAirProvider with ChangeNotifier {
 
     podcastCurrentPositionInMilliseconds =
         ((sliderValue * podcastDuration.inMilliseconds) /
-            podcastDuration.inMilliseconds);
+                podcastDuration.inMilliseconds)
+            .clamp(0.0, 1.0);
 
     player.seek(duration);
     notifyListeners();
