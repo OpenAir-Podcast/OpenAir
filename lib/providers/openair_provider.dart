@@ -241,6 +241,7 @@ class OpenAirProvider with ChangeNotifier {
     player.onPlayerStateChanged.listen((PlayerState playerState) {
       // TODO: Add marking podcast as completed automatically here
       if (playerState == PlayerState.completed) {
+        isPodcastSelected = false;
         audioState = 'Stop';
         isPlaying = PlayingStatus.stop;
       }
@@ -295,7 +296,7 @@ class OpenAirProvider with ChangeNotifier {
         Duration(seconds: remainingSeconds).inSeconds % 60;
 
     currentPodcastTimeRemaining =
-        "${remainingHours != 0 ? '$remainingHours hr ' : ''}${remainingMinutes != 0 ? '$remainingMinutes min' : ''} left";
+        "${remainingHours != 0 ? '$remainingHours hr ' : ''}${remainingMinutes != 0 ? '$remainingMinutes min' : '< 1 min'} left";
 
     String result =
         "${remainingHours != 0 ? remainingHours < 10 ? '0$remainingHours:' : '$remainingHours:' : '00:'}${remainingMinutes != 0 ? remainingMinutes < 10 ? '0$remainingMinutes:' : '$remainingMinutes:' : '00:'}${remainingSecondsAdjusted != 0 ? remainingSecondsAdjusted < 10 ? '0$remainingSecondsAdjusted' : '$remainingSecondsAdjusted' : '00'}";
