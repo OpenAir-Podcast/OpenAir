@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'category_page.dart';
+import 'package:openair/views/navPages/category_page.dart';
 
 class CategoriesPage extends ConsumerWidget {
   CategoriesPage({super.key});

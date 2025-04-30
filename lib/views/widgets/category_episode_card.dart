@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/category_episode_detail.dart';
-import 'package:openair/views/navPages/trending_episode_detail.dart';
+import 'package:openair/views/navPages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
@@ -31,7 +30,7 @@ class _EpisodeCardState extends ConsumerState<CategoryEpisodeCard> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => CategoryEpisodeDetail(
+            builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
             ),
           ),

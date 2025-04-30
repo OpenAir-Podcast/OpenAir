@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/trending_episode_detail.dart';
+import 'package:openair/views/navPages/episode_detail.dart';
+import 'package:openair/views/navPages/episodes_page.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
@@ -29,7 +30,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => TrendingEpisodeDetail(
+                        builder: (context) => EpisodeDetail(
                           episodeItem:
                               ref.watch(openAirProvider).currentEpisode!,
                         ),
@@ -67,14 +68,21 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   const SizedBox(height: 8.0),
                   // Podcast Author
-                  Text(
-                    ref.watch(openAirProvider).currentEpisode!['feedAuthor'] ??
-                        'Unknown',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => EpisodesPage(),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
+                    child: Text(
+                      ref.watch(openAirProvider).currentEpisode!['author'] ??
+                          'Unknown',
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

@@ -5,8 +5,8 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 
-class CategoryEpisodeDetail extends ConsumerStatefulWidget {
-  const CategoryEpisodeDetail({
+class EpisodeDetail extends ConsumerStatefulWidget {
+  const EpisodeDetail({
     super.key,
     this.episodeItem,
   });
@@ -17,7 +17,7 @@ class CategoryEpisodeDetail extends ConsumerStatefulWidget {
   EpisodeDetailState createState() => EpisodeDetailState();
 }
 
-class EpisodeDetailState extends ConsumerState<CategoryEpisodeDetail> {
+class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
     debugPrint(widget.episodeItem!['description']);

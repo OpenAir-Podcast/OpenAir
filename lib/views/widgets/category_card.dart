@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/category_episodes_page.dart';
+import 'package:openair/views/navPages/episodes_page.dart';
 
 class CategoryCard extends ConsumerWidget {
   final Map<String, dynamic> podcastItem;
@@ -20,9 +20,7 @@ class CategoryCard extends ConsumerWidget {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => CategoryEpisodesPage(
-              episode: podcastItem,
-            ),
+            builder: (context) => EpisodesPage(),
           ),
         );
       },

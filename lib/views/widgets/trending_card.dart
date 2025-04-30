@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/trending_episodes_page.dart';
+import 'package:openair/views/navPages/episodes_page.dart';
 
 class TrendingCard extends ConsumerWidget {
   final Map<String, dynamic> podcastItem;
@@ -20,7 +20,7 @@ class TrendingCard extends ConsumerWidget {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const TrendingEpisodesPage(),
+            builder: (context) => const EpisodesPage(),
           ),
         );
       },

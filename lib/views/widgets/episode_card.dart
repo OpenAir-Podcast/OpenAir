@@ -5,19 +5,19 @@ import 'package:openair/views/navPages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
-class TrendingEpisodeCard extends ConsumerStatefulWidget {
+class EpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
 
-  const TrendingEpisodeCard({
+  const EpisodeCard({
     super.key,
     required this.episodeItem,
   });
 
   @override
-  ConsumerState<TrendingEpisodeCard> createState() => _EpisodeCardState();
+  ConsumerState<EpisodeCard> createState() => _EpisodeCardState();
 }
 
-class _EpisodeCardState extends ConsumerState<TrendingEpisodeCard> {
+class _EpisodeCardState extends ConsumerState<EpisodeCard> {
   String podcastDate = "";
 
   @override
@@ -60,7 +60,7 @@ class _EpisodeCardState extends ConsumerState<TrendingEpisodeCard> {
                             image: NetworkImage(
                               ref
                                   .watch(openAirProvider)
-                                  .currentPodcast!['artwork'],
+                                  .currentPodcast!['image'],
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -91,8 +91,9 @@ class _EpisodeCardState extends ConsumerState<TrendingEpisodeCard> {
                             // Podcast title
                             child: Text(
                               ref
-                                  .watch(openAirProvider)
-                                  .currentPodcast!['author'],
+                                      .watch(openAirProvider)
+                                      .currentPodcast!['author'] ??
+                                  "Unknown",
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
