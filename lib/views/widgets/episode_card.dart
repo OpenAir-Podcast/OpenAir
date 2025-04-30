@@ -38,9 +38,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(width: 1.0),
+        child: Card(
+          color: Colors.blueGrey[100],
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Padding(
@@ -69,53 +69,54 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                         height: 62.0,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width - 130.0,
-                            // Podcast title
-                            child: Text(
-                              widget.episodeItem['title'],
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 130.0,
+                              // Podcast title
+                              child: Text(
+                                widget.episodeItem['title'],
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width - 130.0,
-                            // Podcast title
-                            child: Text(
-                              ref
-                                      .watch(openAirProvider)
-                                      .currentPodcast!['author'] ??
-                                  "Unknown",
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 130.0,
+                              // Podcast title
+                              child: Text(
+                                ref
+                                        .watch(openAirProvider)
+                                        .currentPodcast!['author'] ??
+                                    "Unknown",
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  overflow: TextOverflow.ellipsis,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              podcastDate,
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
                                 color: Colors.grey,
                               ),
                             ),
-                          ),
-                          Text(
-                            podcastDate,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: 40.0,
                   child: Text(
                     widget.episodeItem['title'] ?? "Unknown",
                     textAlign: TextAlign.start,

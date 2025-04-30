@@ -68,7 +68,7 @@ class FeaturedPage extends ConsumerWidget {
     final podcastDataAsyncSportsValue = ref.watch(podcastDataBySportsProvider);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
       child: ListView(
         children: [
           // Top Podcasts
@@ -104,7 +104,7 @@ class TopPodcastsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: Colors.white,
+      color: Colors.blueGrey[100],
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -272,7 +272,7 @@ class EducationCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: Colors.white,
+      color: Colors.blueGrey[100],
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -441,7 +441,7 @@ class HealthCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: Colors.white,
+      color: Colors.blueGrey[100],
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -610,7 +610,7 @@ class TechnologyCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: Colors.white,
+      color: Colors.blueGrey[100],
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -779,7 +779,7 @@ class SportsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: Colors.white,
+      color: Colors.blueGrey[100],
       elevation: 5.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),

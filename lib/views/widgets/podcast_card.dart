@@ -25,10 +25,12 @@ class PodcastCard extends ConsumerWidget {
         );
       },
       child: Card(
+        color: Colors.blueGrey[100],
+        elevation: 2.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 decoration: BoxDecoration(
@@ -41,34 +43,47 @@ class PodcastCard extends ConsumerWidget {
                 width: 62.0,
                 height: 62.0,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 105.0,
-                      child: Text(
-                        podcastItem['title'],
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: SizedBox(
+                  width: 500.0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 105.0,
+                          child: Text(
+                            podcastItem['title'],
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 120.0,
-                      child: Text(
-                        podcastItem['author'] ?? 'Unknown',
-                        maxLines: 2,
-                        style: const TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: Colors.grey,
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 120.0,
+                          child: Text(
+                            podcastItem['author'] ?? 'Unknown',
+                            maxLines: 2,
+                            style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
+                ),
+              ),
+              Center(
+                child: IconButton(
+                  onPressed: () {
+                    // TODO: Implement subscription
+                  },
+                  icon: const Icon(Icons.add),
                 ),
               ),
             ],

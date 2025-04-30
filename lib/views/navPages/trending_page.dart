@@ -25,7 +25,7 @@ class TrendingPage extends ConsumerWidget {
         error: (error, stackTrace) => Center(child: Text(error.toString())),
         data: (snapshot) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
               itemCount: snapshot['count'],
               itemBuilder: (context, index) {
