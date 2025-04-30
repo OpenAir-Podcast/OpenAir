@@ -8,8 +8,8 @@ final podcastDataByTrendingProvider = FutureProvider((ref) async {
   return await apiService.getTrendingPodcasts();
 });
 
-class TrendingPage extends ConsumerWidget {
-  const TrendingPage({super.key});
+class TopPodcastsPage extends ConsumerWidget {
+  const TopPodcastsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,14 +17,18 @@ class TrendingPage extends ConsumerWidget {
         ref.watch(podcastDataByTrendingProvider);
 
     return podcastDataAsyncTrendingValue.when(
-        loading: () => const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-        error: (error, stackTrace) => Center(child: Text(error.toString())),
-        data: (snapshot) {
-          return Padding(
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stackTrace) => Center(child: Text(error.toString())),
+      data: (snapshot) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Top Podcasts'),
+          ),
+          body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListView.builder(
               itemCount: snapshot['count'],
@@ -34,7 +38,9 @@ class TrendingPage extends ConsumerWidget {
                 );
               },
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

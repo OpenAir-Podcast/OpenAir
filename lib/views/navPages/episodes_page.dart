@@ -29,7 +29,10 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
         ref.watch(podcastDataByUrlProvider(podcastUrl));
 
     return podcastDataAsyncValue.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (snapshot) {
         return Scaffold(

@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/navPages/episodes_page.dart';
 
-class TrendingCard extends ConsumerWidget {
+class PodcastCard extends ConsumerWidget {
   final Map<String, dynamic> podcastItem;
 
-  const TrendingCard({
+  const PodcastCard({
     super.key,
     required this.podcastItem,
   });
@@ -60,7 +60,7 @@ class TrendingCard extends ConsumerWidget {
                     SizedBox(
                       width: MediaQuery.of(context).size.width - 120.0,
                       child: Text(
-                        podcastItem['author'],
+                        podcastItem['author'] ?? 'Unknown',
                         maxLines: 2,
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,

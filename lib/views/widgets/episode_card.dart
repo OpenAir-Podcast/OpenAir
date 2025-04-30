@@ -117,7 +117,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                 SizedBox(
                   height: 40.0,
                   child: Text(
-                    widget.episodeItem['title'],
+                    widget.episodeItem['title'] ?? "Unknown",
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,

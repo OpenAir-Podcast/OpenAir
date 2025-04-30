@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/category_card.dart';
+import 'package:openair/views/widgets/podcast_card.dart';
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider =
@@ -44,7 +44,7 @@ class CategoryPage extends ConsumerWidget {
             child: ListView.builder(
               itemCount: snapshot['count'],
               itemBuilder: (context, index) {
-                return CategoryCard(
+                return PodcastCard(
                   podcastItem: snapshot['feeds'][index],
                 );
               },

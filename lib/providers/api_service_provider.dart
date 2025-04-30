@@ -58,6 +58,7 @@ class ApiServiceProvider {
 
   // This method is used to get the list of podcasts from the API. Based on the category
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
+    debugPrint(category);
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
@@ -75,7 +76,6 @@ class ApiServiceProvider {
 
     Map<String, String> headers = {
       "X-Auth-Date": newUnixTime,
-      // "X-Auth-Key": podcastIndexApi!,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": "SomethingAwesome/1.0.1"
@@ -173,7 +173,7 @@ class ApiServiceProvider {
 
     final response = await http.get(
         Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&lang=en&pretty',
+          'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty',
         ),
         headers: headers);
 
