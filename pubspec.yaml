@@ -48,7 +48,8 @@ dependencies:
   styled_text: ^8.1.0
   flutter_html: ^3.0.0
   shimmer: ^3.0.0
-  flutter_dotenv: ^5.2.0 # Use the latest version
+  flutter_dotenv: ^5.2.0
+  sqlite3: ^2.7.5
 
 dev_dependencies:
   flutter_lints: ^5.0.0

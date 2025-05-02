@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/episodes_page.dart';
+import 'package:openair/views/main_pages/episodes_page.dart';
 
 class PodcastCard extends ConsumerWidget {
   final Map<String, dynamic> podcastItem;
@@ -80,9 +80,9 @@ class PodcastCard extends ConsumerWidget {
               ),
               Center(
                 child: IconButton(
-                  onPressed: () {
-                    // TODO: Implement subscription
-                  },
+                  // TODO: Implement subscription
+                  tooltip: 'Add podcast',
+                  onPressed: () {},
                   icon: const Icon(Icons.add),
                 ),
               ),

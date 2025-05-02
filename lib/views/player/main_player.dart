@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/episode_detail.dart';
-import 'package:openair/views/navPages/episodes_page.dart';
+import 'package:openair/views/main_pages/episode_detail.dart';
+import 'package:openair/views/main_pages/episodes_page.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
@@ -27,8 +27,25 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).push(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(35.0),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            ref.watch(openAirProvider).currentPodcast!['image'],
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      width: imageSize,
+                      height: imageSize,
+                    ),
+                  ),
+                  // Podcast Title
+                  TextButton(
+                    onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => EpisodeDetail(
                           episodeItem:
@@ -36,40 +53,21 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         ),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(35.0),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              ref
-                                  .watch(openAirProvider)
-                                  .currentPodcast!['image'],
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        width: imageSize,
-                        height: imageSize,
+                    child: Text(
+                      ref.watch(openAirProvider).currentEpisode!['title'],
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  // Podcast Title
-                  Text(
-                    ref.watch(openAirProvider).currentEpisode!['title'],
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8.0),
                   // Podcast Author
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).push(
+                  TextButton(
+                    onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => EpisodesPage(),
                       ),
@@ -84,6 +82,22 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  // GestureDetector(
+                  //   onTap: () => Navigator.of(context).push(
+                  //     MaterialPageRoute(
+                  //       builder: (context) => EpisodesPage(),
+                  //     ),
+                  //   ),
+                  //   child: Text(
+                  //     ref.watch(openAirProvider).currentEpisode!['author'] ??
+                  //         'Unknown',
+                  //     style: const TextStyle(
+                  //       fontSize: 14.0,
+                  //       color: Colors.grey,
+                  //     ),
+                  //     textAlign: TextAlign.center,
+                  //   ),
+                  // ),
                 ],
               ),
             ),

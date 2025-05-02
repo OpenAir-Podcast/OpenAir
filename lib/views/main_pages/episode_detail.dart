@@ -20,8 +20,6 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
-    debugPrint(widget.episodeItem!['description']);
-
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

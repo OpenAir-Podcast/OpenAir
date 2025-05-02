@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/categories_page.dart';
-import 'package:openair/views/navPages/featured_page.dart';
-import 'package:openair/views/navPages/trending_page.dart';
+import 'package:openair/views/main_pages/categories_page.dart';
+import 'package:openair/views/main_pages/featured_page.dart';
+import 'package:openair/views/main_pages/trending_page.dart';
 import 'package:openair/views/navigation/app_drawer.dart';
 import 'package:openair/views/navigation/main_app_bar.dart';
 import 'package:openair/views/player/banner_audio_player.dart';

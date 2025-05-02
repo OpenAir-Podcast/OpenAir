@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/api_service_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/category_page.dart';
-import 'package:openair/views/navPages/episodes_page.dart';
-import 'package:openair/views/navPages/top_podcasts_page.dart';
+import 'package:openair/views/main_pages/category_page.dart';
+import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/main_pages/top_podcasts_page.dart';
 import 'package:shimmer/shimmer.dart';
 
 bool once = false;

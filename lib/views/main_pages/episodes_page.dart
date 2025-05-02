@@ -39,6 +39,13 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
           appBar: AppBar(
             title: Text(ref.watch(openAirProvider).currentPodcast!['author'] ??
                 'Unknown'),
+            actions: [
+              IconButton(
+                tooltip: 'Add podcast',
+                onPressed: () {},
+                icon: const Icon(Icons.add),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

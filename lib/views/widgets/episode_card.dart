@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/navPages/episode_detail.dart';
+import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
