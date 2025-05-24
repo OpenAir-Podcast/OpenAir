@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
@@ -58,6 +59,8 @@ class OpenAirProvider with ChangeNotifier {
 
   List<String> audioSpeedOptions = ['0.5x', '1.0x', '1.5x', '2.0x'];
 
+  late bool hasConnection;
+
   Future<void> initial(
     BuildContext context,
   ) async {
@@ -82,6 +85,43 @@ class OpenAirProvider with ChangeNotifier {
     loadState = 'Detail'; // Play, Load, Detail
 
     directory = await getApplicationDocumentsDirectory();
+
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        hasConnection = false;
+      } else {
+        hasConnection = true;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      hasConnection = false;
+    }
+  }
+
+  Future<bool> getConnectionStatus() async {
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  void getConnectionStatusTriggered() {
+    getConnectionStatus().then((value) {
+      hasConnection = value;
+      notifyListeners();
+    });
   }
 
   void setNavIndex(int navIndex) {
@@ -240,6 +280,7 @@ class OpenAirProvider with ChangeNotifier {
 
     player.onPlayerStateChanged.listen((PlayerState playerState) {
       // TODO: Add marking podcast as completed automatically here
+      // TODO: Autoplay next podcast here
       if (playerState == PlayerState.completed) {
         isPodcastSelected = false;
         audioState = 'Stop';

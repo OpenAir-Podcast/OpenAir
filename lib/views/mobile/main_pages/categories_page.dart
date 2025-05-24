@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/views/main_pages/category_page.dart';
+import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/main_pages/category_page.dart';
+import 'package:openair/views/mobile/widgets/no_connection.dart';
 
 class CategoriesPage extends ConsumerWidget {
   CategoriesPage({super.key});
+
+  final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
+    final apiService = ref.watch(openAirProvider);
+    return await apiService.getConnectionStatus();
+  });
 
   final List<String> sortedCategories = [
     'Animals',
@@ -165,35 +172,51 @@ class CategoriesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListView.separated(
-        separatorBuilder: (context, index) {
-          return const Divider();
-        },
-        itemCount: sortedCategories.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
-            child: ListTile(
-              title: Text(
-                sortedCategories[index],
-              ),
-              leading: Icon(
-                sortedIcons[index],
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CategoryPage(
-                      category: sortedCategories[index],
-                    ),
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
+
+    return getConnectionStatusValue.when(
+      data: (data) {
+        if (data == false) {
+          return NoConnection();
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: ListView.separated(
+            separatorBuilder: (context, index) {
+              return const Divider();
+            },
+            itemCount: sortedCategories.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
+                child: ListTile(
+                  title: Text(
+                    sortedCategories[index],
                   ),
-                );
-              },
-            ),
-          );
-        },
+                  leading: Icon(
+                    sortedIcons[index],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CategoryPage(
+                          category: sortedCategories[index],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      },
+      error: (error, stackTrace) => Center(child: Text(error.toString())),
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

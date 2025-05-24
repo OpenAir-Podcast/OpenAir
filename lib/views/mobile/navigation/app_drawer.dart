@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:openair/views/nav_pages/add_podcast.dart';
-import 'package:openair/views/nav_pages/downloads.dart';
-import 'package:openair/views/nav_pages/feeds.dart';
-import 'package:openair/views/nav_pages/history.dart';
-import 'package:openair/views/nav_pages/queue.dart';
-import 'package:openair/views/nav_pages/settings.dart';
-import 'package:openair/views/nav_pages/subscriptions.dart';
+import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
+import 'package:openair/views/mobile/nav_pages/downloads.dart';
+import 'package:openair/views/mobile/nav_pages/feeds.dart';
+import 'package:openair/views/mobile/nav_pages/history.dart';
+import 'package:openair/views/mobile/nav_pages/queue.dart';
+import 'package:openair/views/mobile/nav_pages/settings.dart';
+import 'package:openair/views/mobile/nav_pages/sign_in.dart';
+import 'package:openair/views/mobile/nav_pages/subscriptions.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -28,13 +29,16 @@ class AppDrawer extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.person_rounded),
-                          iconSize: 80.0,
-                          onPressed: () {},
-                        ),
+                        Icon(Icons.person_rounded, size: 80.0),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const SignIn(),
+                              ),
+                            );
+                          },
                           child: const Text('Login'),
                         ),
                       ],

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/main_pages/categories_page.dart';
-import 'package:openair/views/main_pages/featured_page.dart';
-import 'package:openair/views/main_pages/trending_page.dart';
-import 'package:openair/views/navigation/app_drawer.dart';
-import 'package:openair/views/navigation/main_app_bar.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/main_pages/categories_page.dart';
+import 'package:openair/views/mobile/main_pages/featured_page.dart';
+import 'package:openair/views/mobile/main_pages/trending_page.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
+import 'package:openair/views/mobile/navigation/main_app_bar.dart';
+import 'package:openair/views/mobile/player/banner_audio_player.dart';
 
 class MobileScaffold extends ConsumerWidget {
   const MobileScaffold({super.key});
@@ -26,6 +26,7 @@ class MobileScaffold extends ConsumerWidget {
           ],
         ),
         bottomNavigationBar: SizedBox(
+          // Checks if a podcast is playing then displays the banner player
           height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
           child: ref.watch(openAirProvider).isPodcastSelected
               ? const BannerAudioPlayer()

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/api_service_provider.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/episode_card.dart';
+import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/widgets/episode_card.dart';
 
 final podcastDataByUrlProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
         (ref, podcastUrl) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getPodcastsByFeedUrl(podcastUrl);
 });
 

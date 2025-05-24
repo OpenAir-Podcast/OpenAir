@@ -1,44 +1,50 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/api_service_provider.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/main_pages/category_page.dart';
-import 'package:openair/views/main_pages/episodes_page.dart';
-import 'package:openair/views/main_pages/top_podcasts_page.dart';
+import 'package:openair/views/mobile/main_pages/category_page.dart';
+import 'package:openair/views/mobile/main_pages/episodes_page.dart';
+import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
+import 'package:openair/views/mobile/widgets/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 
 bool once = false;
 
 final podcastDataByTopProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getTopPodcasts();
 });
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByEducationProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getEducationPodcasts();
 });
 
 final podcastDataByHealthProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getHealthPodcasts();
 });
 
 final podcastDataByTechnologyProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getTechnologyPodcasts();
 });
 
 final podcastDataBySportsProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getSportsPodcasts();
+});
+
+final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
+  final apiService = ref.watch(openAirProvider);
+  return await apiService.getConnectionStatus();
 });
 
 class FeaturedPage extends ConsumerWidget {
@@ -52,42 +58,67 @@ class FeaturedPage extends ConsumerWidget {
       ref.read(openAirProvider).initial(
             context,
           );
+
       once = true;
     }
 
-    final podcastDataAsyncTopValue = ref.watch(podcastDataByTopProvider);
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
-    final podcastDataAsyncEducationValue =
-        ref.watch(podcastDataByEducationProvider);
+    return getConnectionStatusValue.when(
+      data: (data) {
+        if (data == false) {
+          return NoConnection();
+        }
 
-    final podcastDataAsyncHealthValue = ref.watch(podcastDataByHealthProvider);
+        final podcastDataAsyncTopValue = ref.watch(podcastDataByTopProvider);
 
-    final podcastDataAsyncTechnologyValue =
-        ref.watch(podcastDataByTechnologyProvider);
+        final podcastDataAsyncEducationValue =
+            ref.watch(podcastDataByEducationProvider);
 
-    final podcastDataAsyncSportsValue = ref.watch(podcastDataBySportsProvider);
+        final podcastDataAsyncHealthValue =
+            ref.watch(podcastDataByHealthProvider);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
-      child: ListView(
-        children: [
-          // Top Podcasts
-          TopPodcastsCard(podcastDataAsyncTopValue: podcastDataAsyncTopValue),
-          SizedBox.fromSize(size: const Size(0, 10)),
-          // Education
-          EducationCard(
-              podcastDataAsyncEducationValue: podcastDataAsyncEducationValue),
-          SizedBox.fromSize(size: const Size(0, 10)),
-          // Health
-          HealthCard(podcastDataAsyncHealthValue: podcastDataAsyncHealthValue),
-          SizedBox.fromSize(size: const Size(0, 10)),
-          // Technology
-          TechnologyCard(
-              podcastDataAsyncTechnologyValue: podcastDataAsyncTechnologyValue),
-          SizedBox.fromSize(size: const Size(0, 10)),
-          // Sports
-          SportsCard(podcastDataAsyncSportsValue: podcastDataAsyncSportsValue),
-        ],
+        final podcastDataAsyncTechnologyValue =
+            ref.watch(podcastDataByTechnologyProvider);
+
+        final podcastDataAsyncSportsValue =
+            ref.watch(podcastDataBySportsProvider);
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
+          child: ListView(
+            children: [
+              // Top Podcasts
+              TopPodcastsCard(
+                  podcastDataAsyncTopValue: podcastDataAsyncTopValue),
+              SizedBox.fromSize(size: const Size(0, 10)),
+              // Education
+              EducationCard(
+                  podcastDataAsyncEducationValue:
+                      podcastDataAsyncEducationValue),
+              SizedBox.fromSize(size: const Size(0, 10)),
+              // Health
+              HealthCard(
+                  podcastDataAsyncHealthValue: podcastDataAsyncHealthValue),
+              SizedBox.fromSize(size: const Size(0, 10)),
+              // Technology
+              TechnologyCard(
+                  podcastDataAsyncTechnologyValue:
+                      podcastDataAsyncTechnologyValue),
+              SizedBox.fromSize(size: const Size(0, 10)),
+              // Sports
+              SportsCard(
+                  podcastDataAsyncSportsValue: podcastDataAsyncSportsValue),
+            ],
+          ),
+        );
+      },
+      error: (error, stackTrace) => Center(child: Text(error.toString())),
+      loading: () => Container(
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }
@@ -115,7 +146,6 @@ class TopPodcastsCard extends ConsumerWidget {
             ListTile(
               leading: const Text('Top Podcasts'),
               trailing: const Text('See All'),
-              onTap: () {},
             ),
             SizedBox(
               height: 190.0,

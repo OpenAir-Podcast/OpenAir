@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/database_provider.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
@@ -14,6 +15,11 @@ void main() async {
   } on FileNotFoundError catch (_, e) {
     debugPrint('Error loading .env file: $e');
   }
+
+  // Initialize the database
+  final databaseService = DatabaseService();
+  // TODO: Uncomment the following line to initialize the database
+  // databaseService.database();
 
   runApp(const ProviderScope(child: MyApp()));
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
@@ -139,7 +139,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       onPressed: () {},
                       icon: const Icon(Icons.playlist_add),
                     ),
-                    // FIXME: Add download button
+                    // TODO: Add download button
                     // Download Button
                     IconButton(
                       onPressed: () {

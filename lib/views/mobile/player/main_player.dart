@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/main_pages/episode_detail.dart';
-import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/mobile/main_pages/episode_detail.dart';
+import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});

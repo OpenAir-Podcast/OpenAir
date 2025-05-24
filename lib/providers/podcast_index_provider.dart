@@ -7,13 +7,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-final apiServiceProvider = Provider(
-  (ref) => ApiServiceProvider(),
+final podcastIndexProvider = Provider(
+  (ref) => PodcastIndexProvider(),
 );
 
-class ApiServiceProvider {
-  final String? podcastIndexApi = dotenv.env['PODCASTINDEX_API_KEY'];
-  final String? podcastIndexSecret = dotenv.env['PODCASTINDEX_API_SECRET'];
+class PodcastIndexProvider {
+  final String? podcastIndexApi = dotenv.env['PODCAST_INDEX_API_KEY'];
+  final String? podcastIndexSecret = dotenv.env['PODCAST_INDEX_API_SECRET'];
+  final String? podcastIndexUserAgent = dotenv.env['PODCAST_USER_AGENT'];
 
   Future<Map<String, dynamic>> getPodcastsByFeedUrl(
       String podcastFeedUrl) async {
@@ -36,7 +37,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     String cat = podcastFeedUrl.replaceAll(' ', '%20');
@@ -77,7 +78,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     String cat = category.replaceAll(' ', '%20');
@@ -110,6 +111,11 @@ class ApiServiceProvider {
   /// The request is made to the API, and the response is parsed as JSON. The
   /// response is then returned as a [Map<String, dynamic>].
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
+    // todo check if there is connection to the internet
+
+    // TODO if there is connection. Get info from the API else get the info from the database
+
+
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();
 
@@ -129,7 +135,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     String url =
@@ -167,7 +173,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     final response = await http.get(
@@ -204,7 +210,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     final response = await http.get(
@@ -241,7 +247,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     final response = await http.get(
@@ -278,7 +284,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     final response = await http.get(
@@ -315,7 +321,7 @@ class ApiServiceProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": "SomethingAwesome/1.0.1"
+      "User-Agent": podcastIndexUserAgent!,
     };
 
     final response = await http.get(

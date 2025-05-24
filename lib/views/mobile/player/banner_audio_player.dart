@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/main_player.dart';
+import 'package:openair/views/mobile/player/main_player.dart';
 
 class BannerAudioPlayer extends ConsumerStatefulWidget {
   const BannerAudioPlayer({

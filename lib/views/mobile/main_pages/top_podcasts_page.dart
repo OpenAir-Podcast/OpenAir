@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/api_service_provider.dart';
-import 'package:openair/views/widgets/podcast_card.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
+import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 final podcastDataByTrendingProvider = FutureProvider((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getTrendingPodcasts();
 });
 
