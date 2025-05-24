@@ -9,6 +9,8 @@
 .history
 .svn/
 migrate_working_dir/
+
+# Ignore API keys
 .env
 
 # IntelliJ related
@@ -43,5 +45,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Ignore API keys
-/lib/api_keys.dart
+# Gradle build cache
+.gradle/
+
+# Flutter build cache
+.build-cache
