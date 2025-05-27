@@ -20,7 +20,7 @@ class PodcastCard extends ConsumerWidget {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const EpisodesPage(),
+            builder: (context) => EpisodesPage(title: podcastItem['title']),
           ),
         );
       },
@@ -81,7 +81,7 @@ class PodcastCard extends ConsumerWidget {
               Center(
                 child: IconButton(
                   // TODO: Implement subscription
-                  tooltip: 'Add podcast',
+                  tooltip: 'Subscribe to podcast',
                   onPressed: () {},
                   icon: const Icon(Icons.add),
                 ),

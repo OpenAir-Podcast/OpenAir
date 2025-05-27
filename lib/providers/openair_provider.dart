@@ -166,19 +166,27 @@ class OpenAirProvider with ChangeNotifier {
     List<String> result = [mp3Name, isDownloaded.toString()];
 
     // TODO:Add support for downloading podcasts
-    isDownloaded
-        ? {
-            await player.setSource(DeviceFileSource(
-              currentEpisode['enclosureUrl'],
-              mimeType: currentEpisode['enclosureType'],
-            ))
-          }
-        : await player.setSource(
-            UrlSource(
-              currentEpisode['enclosureUrl'],
-              mimeType: currentEpisode['enclosureType'],
-            ),
-          );
+    // isDownloaded
+    //     ? {
+    //         await player.setSource(DeviceFileSource(
+    //           currentEpisode['enclosureUrl'],
+    //           mimeType: currentEpisode['enclosureType'],
+    //         ))
+    //       }
+    //     : await player.setSource(
+    //         UrlSource(
+    //           currentEpisode['enclosureUrl'],
+    //           mimeType: currentEpisode['enclosureType'],
+    //         ),
+    //       );
+
+    // TODO: Remove thiss when I implement the isDownload functionality
+    player.setSource(
+      UrlSource(
+        currentEpisode['enclosureUrl'],
+        mimeType: currentEpisode['enclosureType'],
+      ),
+    );
 
     return result;
   }
@@ -196,29 +204,20 @@ class OpenAirProvider with ChangeNotifier {
     List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
-    notifyListeners();
 
-    if (player.state == PlayerState.paused ||
-        player.state == PlayerState.stopped) {
-      player.resume();
-    } else if (player.state == PlayerState.completed ||
-        player.state == PlayerState.playing) {
-      // Download status
-      if (result[1] == 'true') {
-        player.play(DeviceFileSource(
-            '/data/user/0/com.liquidhive.openair/app_flutter/downloads/${result[0]}')); // MP3 Name
-      } else {
-        player.play(
-          UrlSource(
-            currentEpisode!['enclosureUrl'],
-          ),
-        );
-      }
+    // Checks if the episode has already been downloaded
+    if (result[1] == 'true') {
+      player.play(DeviceFileSource(
+          '/data/user/0/com.liquidhive.openair/app_flutter/downloads/${result[0]}'));
+    } else {
+      await player.play(UrlSource(currentEpisode!['enclosureUrl']));
     }
 
     if (episodeItem == currentEpisode) {
       isPlaying = PlayingStatus.playing;
     }
+
+    // TODO: Add the episode to the Episode and History Tables
 
     audioState = 'Play';
     loadState = 'Play';
@@ -241,8 +240,6 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void fastForwardButtonClicked() {
-    // TODO: Needs to check if the podcast is at the end
-
     if (podcastPosition.inSeconds + 10 < podcastDuration.inSeconds) {
       player.seek(Duration(seconds: podcastPosition.inSeconds + 10));
     }
@@ -258,7 +255,11 @@ class OpenAirProvider with ChangeNotifier {
 
   void updatePlaybackBar() {
     player.getDuration().then((Duration? value) {
-      podcastDuration = value!;
+      if (value == null) {
+        return;
+      }
+
+      podcastDuration = value;
       notifyListeners();
     });
 

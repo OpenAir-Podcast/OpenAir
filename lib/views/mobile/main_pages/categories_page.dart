@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
-import 'package:openair/views/mobile/widgets/no_connection.dart';
+import 'package:openair/views/mobile/main_pages/featured_page.dart';
+import 'package:openair/views/mobile/components/no_connection.dart';
 
-class CategoriesPage extends ConsumerWidget {
+class CategoriesPage extends ConsumerStatefulWidget {
   CategoriesPage({super.key});
 
   final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-    final apiService = ref.watch(openAirProvider);
+    final apiService = ref.read(openAirProvider);
     return await apiService.getConnectionStatus();
   });
 
@@ -171,7 +172,12 @@ class CategoriesPage extends ConsumerWidget {
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CategoriesPage> createState() => _CategoriesPageState();
+}
+
+class _CategoriesPageState extends ConsumerState<CategoriesPage> {
+  @override
+  Widget build(BuildContext context) {
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return getConnectionStatusValue.when(
@@ -186,22 +192,22 @@ class CategoriesPage extends ConsumerWidget {
             separatorBuilder: (context, index) {
               return const Divider();
             },
-            itemCount: sortedCategories.length,
+            itemCount: widget.sortedCategories.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
                 child: ListTile(
                   title: Text(
-                    sortedCategories[index],
+                    widget.sortedCategories[index],
                   ),
                   leading: Icon(
-                    sortedIcons[index],
+                    widget.sortedIcons[index],
                   ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => CategoryPage(
-                          category: sortedCategories[index],
+                          category: widget.sortedCategories[index],
                         ),
                       ),
                     );

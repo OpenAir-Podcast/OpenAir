@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/openair_provider.dart';
 
 AppBar mainAppBar(WidgetRef ref) {
   return AppBar(
@@ -15,9 +14,8 @@ AppBar mainAppBar(WidgetRef ref) {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           tooltip: 'Remove all downloaded podcasts',
-          onPressed: () {
-            ref.read(openAirProvider).removeAllDownloadedPodcasts();
-          },
+          // TODO: Add search functionality
+          onPressed: () {},
           icon: const Icon(Icons.search),
         ),
       ),
@@ -25,9 +23,8 @@ AppBar mainAppBar(WidgetRef ref) {
         padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
         child: IconButton(
           tooltip: 'Pause player',
-          onPressed: () {
-            ref.read(openAirProvider.notifier).playerPauseButtonClicked();
-          },
+          // TODO: Refresh featured podcasts
+          onPressed: () {},
           icon: const Icon(Icons.refresh_rounded),
         ),
       ),

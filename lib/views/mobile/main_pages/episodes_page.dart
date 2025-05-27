@@ -13,7 +13,8 @@ final podcastDataByUrlProvider =
 });
 
 class EpisodesPage extends ConsumerStatefulWidget {
-  const EpisodesPage({super.key});
+  const EpisodesPage({super.key, required this.title});
+  final String title;
 
   @override
   ConsumerState<EpisodesPage> createState() => _EpisodesPageState();
@@ -37,13 +38,18 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(ref.watch(openAirProvider).currentPodcast!['author'] ??
+            title: Text(ref.watch(openAirProvider).currentPodcast!['title'] ??
                 'Unknown'),
             actions: [
-              IconButton(
-                tooltip: 'Add podcast',
-                onPressed: () {},
-                icon: const Icon(Icons.add),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: IconButton(
+                  tooltip: 'Subscribe to podcast',
+                  onPressed: () {
+                    // TODO: Add the podcast to the database
+                  },
+                  icon: const Icon(Icons.add),
+                ),
               ),
             ],
           ),
@@ -55,6 +61,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               child: ListView.builder(
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => EpisodeCard(
+                  title: widget.title,
                   episodeItem: snapshot['items'][index],
                 ),
               ),

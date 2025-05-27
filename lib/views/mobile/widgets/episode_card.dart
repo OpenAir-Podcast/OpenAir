@@ -7,10 +7,12 @@ import 'package:styled_text/styled_text.dart';
 
 class EpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
+  final String title;
 
   const EpisodeCard({
     super.key,
     required this.episodeItem,
+    required this.title,
   });
 
   @override
@@ -80,7 +82,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               width: MediaQuery.of(context).size.width - 130.0,
                               // Podcast title
                               child: Text(
-                                widget.episodeItem['title'],
+                                widget.title,
                                 style: const TextStyle(
                                   fontSize: 14.0,
                                   overflow: TextOverflow.ellipsis,
@@ -171,11 +173,13 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     ),
                     // Playlist button
                     IconButton(
+                      tooltip: "Add to queue",
                       onPressed: () {},
                       icon: const Icon(Icons.playlist_add_rounded),
                     ),
                     // Download button
                     IconButton(
+                      tooltip: "Download",
                       onPressed: () {
                         // TODO: Implement download button
                         // if (episodeItem.getDownloaded ==
@@ -227,6 +231,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                       icon: const Icon(Icons.download_rounded),
                     ),
                     IconButton(
+                      tooltip: "More",
                       onPressed: () {},
                       icon: const Icon(Icons.more_vert_rounded),
                     ),

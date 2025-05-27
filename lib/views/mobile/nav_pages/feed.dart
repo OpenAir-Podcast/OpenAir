@@ -13,10 +13,10 @@ class _FeedsState extends ConsumerState<Feeds> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Feeds'),
+        title: const Text('Feed'),
       ),
       body: const Center(
-        child: Text('Feeds'),
+        child: Text('Feed'),
       ),
     );
   }

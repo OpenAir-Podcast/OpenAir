@@ -69,7 +69,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   TextButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => EpisodesPage(),
+                        builder: (context) => EpisodesPage(
+                          title: ref
+                                  .watch(openAirProvider)
+                                  .currentEpisode!['author'] ??
+                              'Unknown',
+                        ),
                       ),
                     ),
                     child: Text(
@@ -126,11 +131,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       children: [
                         Text(
                           ref
-                              .read(openAirProvider.notifier)
+                              .watch(openAirProvider.notifier)
                               .currentPlaybackPositionString,
                         ),
                         Text(
-                          '-${ref.read(openAirProvider.notifier).currentPlaybackRemainingTimeString}',
+                          '-${ref.watch(openAirProvider.notifier).currentPlaybackRemainingTimeString}',
                         ),
                       ],
                     ),
@@ -150,7 +155,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Rewind button
                   IconButton(
                     onPressed:
-                        ref.read(openAirProvider.notifier).rewindButtonClicked,
+                        ref.watch(openAirProvider.notifier).rewindButtonClicked,
                     icon: const SizedBox(
                       width: 52.0,
                       height: 52.0,
@@ -171,11 +176,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.watch(openAirProvider).audioState == 'Play'
+                      ref.read(openAirProvider).audioState == 'Play'
                           ? ref
-                              .read(openAirProvider.notifier)
+                              .watch(openAirProvider.notifier)
                               .playerPauseButtonClicked()
-                          : ref.read(openAirProvider).playerPlayButtonClicked(
+                          : ref.watch(openAirProvider).playerPlayButtonClicked(
                                 ref.watch(openAirProvider).currentEpisode!,
                               );
                     }, // Add play/pause functionality
@@ -187,7 +192,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Fast forward button
                   IconButton(
                     onPressed: ref
-                        .read(openAirProvider.notifier)
+                        .watch(openAirProvider.notifier)
                         .fastForwardButtonClicked,
                     icon: const SizedBox(
                       width: 52.0,

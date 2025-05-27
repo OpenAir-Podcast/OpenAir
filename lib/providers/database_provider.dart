@@ -9,112 +9,124 @@ final databaseServiceProvider =
 class DatabaseService {
   Database? _database;
 
-  void database() async => _database = await initDatabase();
-
-  Future<Database> initDatabase() async {
+  Future<void> initDatabase() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final dbPath = join(documentsDirectory.path, 'openair_db');
     final db = sqlite3.open(dbPath);
+    _database = db;
     _onCreate();
-    return db;
   }
 
   // todo: Figure out how to add images to the database
   void _onCreate() {
     _database!.execute('''
-      CREATE TABLE IF NOT EXISTS Podcasts (
+      CREATE TABLE IF NOT EXISTS Subscriptions (
         id INTEGER PRIMARY KEY,
         feedUrl TEXT NOT NULL,
         title TEXT NOT NULL,
         author TEXT NOT NULL,
-        imageUrl TEXT NOT NULL,
-        category TEXT NOT NULL,
-        isSubscribed BOOLEAN NOT NULL DEFAULT (0),
+        imageUrl TEXT NOT NULL
       );
     ''');
 
     _database!.execute('''
       CREATE TABLE IF NOT EXISTS Episodes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        podcastGuid TEXT NOT NULL,
+        guid TEXT PRIMARY KEY NOT NULL,
+        imageUrl TEXT NOT NULL,
         title TEXT NOT NULL,
+        author TEXT NOT NULL,
+        datePublished TEXT NOT NULL,
         description TEXT NOT NULL,
         feedUrl TEXT NOT NULL,
-        imageUrl TEXT NOT NULL,
-        author TEXT NOT NULL,
         duration TEXT NOT NULL,
-        datePublished TEXT NOT NULL,
         size TEXT,
+        podcastId TEXT NOT NULL,
       );
+    ''');
+
+    _database!.execute('''
+      CREATE TABLE IF NOT EXISTS Feed (
+        guid TEXT PRIMARY KEY NOT NULL,
+        FOREIGN KEY (guid) REFERENCES Episodes(guid)
+      );
+    ''');
+
+    _database!.execute('''
+      CREATE TABLE IF NOT EXISTS Queue (
+        guid TEXT PRIMARY KEY NOT NULL,
+        pos INTEGER NOT NULL,
+        FOREIGN KEY (guid) REFERENCES Episodes(guid)
+      );
+    ''');
+
+    _database!.execute('''
+      CREATE TABLE IF NOT EXISTS Downloads (
+        guid TEXT PRIMARY KEY NOT NULL,
+        FOREIGN KEY (guid) REFERENCES Episodes(guid)
+        );
+    ''');
+
+    _database!.execute('''
+      CREATE TABLE IF NOT EXISTS History (
+        guid TEXT PRIMARY KEY NOT NULL,
+        FOREIGN KEY (guid) REFERENCES Episodes(guid)
+        );
     ''');
 
     _database!.execute('''
       CREATE TABLE IF NOT EXISTS CompletedEpisodes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        guid TEXT NOT NULL,
+        guid TEXT PRIMARY KEY NOT NULL,
         FOREIGN KEY (guid) REFERENCES Episodes(guid)
       );
       ''');
-
-    _database!.execute('''
-      CREATE TABLE IF NOT EXISTS Queue (
-        guid TEXT PRIMARY KEY,
-        index INTEGER NOT NULL,
-        FOREIGN KEY (guid) REFERENCES Episodes(guid)
-      );
-    ''');
   }
 
   // Podcast Operations:
-  void insertPodcast(
-      String guid, String feedUrl, String title, String imageUrl) async {
+  void subscribePodcast(
+      String id, String feedUrl, String title, String author, String imageUrl) {
     _database!.execute('''
-      INSERT INTO Podcasts
-      (guid, feedUrl, title, imageUrl, isSubscribed)
+      INSERT INTO Subscriptions
+      (id, feedUrl, title, author, imageUrl)
       VALUES (
-      $guid,
+      $id,
       '$feedUrl',
       '$title,
-      '$imageUrl',
-      False
+      '$author',
+      '$imageUrl'
       );
       ''');
   }
 
-  void subscribePodcast(int guid) async {
+  void unsubscribePodcast(String podcastGuid) {
     _database!.execute('''
-        UPDATE Podcasts
-        SET isSubscribed = True
-        WHERE guid = '$guid';
+        DELETE FROM Subscriptions
+        WHERE id = '$podcastGuid';
         ''');
   }
 
-  void unsubscribePodcast(int guid) async {
-    _database!.execute('''
-        UPDATE Podcasts
-        SET isSubscribed = False
-        WHERE guid = '$guid';
-        ''');
-  }
-
-  Future<ResultSet> getSubscribedPodcasts() async {
+  ResultSet getSubscribedPodcasts() {
     return _database!.select('''
         SELECT *
-        FROM Podcasts
-        WHERE isSubscribe = True;
+        FROM Subscriptions;
         ''');
   }
 
-  Future<ResultSet> getAllPodcasts(String feedUrl) async {
-    return _database!.select('''
-        SELECT *
-        FROM Podcasts;
+  void deleteSubscribedPodcasts() {
+    _database!.execute('''
+        DELETE FROM Subscriptions;
+        ''');
+  }
+
+  void deleteSubscribedPodcast(int id) {
+    _database!.execute('''
+        DELETE FROM Subscriptions
+        WHERE id = $id;
         ''');
   }
 
   // Episode Operations:
   void insertEpisode(
-    String podcastGuid,
+    String guid,
     String title,
     String description,
     String feedUrl,
@@ -123,11 +135,22 @@ class DatabaseService {
     String duration,
     String datePublished,
     String size,
-  ) async {
+    String podcastId,
+  ) {
     _database!.execute('''
-      INSERT INTO Episodes (podcastGuid, title, description, feedUrl, imageUrl, author, duration, datePublished, size)
+      INSERT INTO Episodes (
+      guid,
+      title,
+      description,
+      feedUrl,
+      imageUrl,
+      author,
+      duration,
+      datePublished,
+      size,
+      podcastId)
       VALUES (
-      $podcastGuid,
+      $guid,
       $title,
       $description,
       $feedUrl,
@@ -136,33 +159,169 @@ class DatabaseService {
       $duration,
       $datePublished,
       $size,
+      $podcastId
       );
     ''');
   }
 
-  Future<ResultSet?> getEpisodesForPodcast(String podcastFeedUrl) async {
-    return _database!.select('''
+  void deleteEpisode(String guid) {
+    _database!.execute('''
+      DELETE FROM Episodes
+      WHERE guid = $guid;
     ''');
   }
 
-  void markEpisodeAsDownloaded(int episodeId) async {}
+  ResultSet? getEpisodesForPodcast(String podcastId) {
+    return _database!.select('''
+      SELECT *
+      FROM Episodes
+      WHERE podcastId = $podcastId;
+    ''');
+  }
 
-  void markEpisodeAsNotDownloaded(int episodeId) async {}
+  ResultSet? getEpisode(String guid) {
+    return _database!.select('''
+      SELECT *
+      FROM Episodes
+      WHERE guid = $guid;
+    ''');
+  }
 
-  Future<ResultSet?> getEpisode(int episodeId) async {
-    return null;
+  // Feed Operations:
+  void addToFeed(String episodeGuid) {
+    _database!.execute('''
+      INSERT INTO Feed (guid)
+      VALUES ('$episodeGuid');
+    ''');
+  }
+
+  ResultSet? getFeed() {
+    return _database!.select('''
+      SELECT *
+      FROM Feed;
+    ''');
+  }
+
+  void deleteFeed() {
+    _database!.execute('''
+      DELETE FROM Feed;
+    ''');
+  }
+
+  void deleteFromFeed(String episodeGuid) {
+    _database!.execute('''
+      DELETE FROM Feed
+      WHERE guid = '$episodeGuid';
+    ''');
   }
 
   // Queue Operations:
-  void addToQueue(int episodeId) async {}
-
-  Future<ResultSet?> getQueue() async {
-    return null;
+  void addToQueue(String episodeGuid, int pos) {
+    _database!.execute('''
+      INSERT INTO Queue (guid, pos)
+      VALUES ('$episodeGuid', $pos);
+    ''');
   }
 
-  void removeFromQueue(int queueItemId) async {}
+  ResultSet? getQueue() {
+    return _database!.select('''
+      SELECT *
+      FROM Queue
+      ORDER BY pos ASC;
+    ''');
+  }
 
-  Future<void> clearQueue() async {}
+  void removeFromQueue(String episodeGuid) {
+    _database!.execute('''
+      DELETE FROM Queue
+      WHERE guid = '$episodeGuid';
+    ''');
+  }
 
-  Future<void> reorderQueue(List<int> episodeIds) async {}
+  void clearQueue() {
+    _database!.execute('''
+      DELETE FROM Queue;
+    ''');
+  }
+
+  // TODO: Implement a reorderQueue method that tightly couple the pos together
+  // This should get the fetch the list then sort it in ASC order
+  void reorderQueue() {}
+
+  // Download Operations:
+  void addToDownloadedEpisodes(String episodeGuid) {
+    _database!.execute('''
+      INSERT INTO Downloads (guid)
+      VALUES ('$episodeGuid');
+    ''');
+  }
+
+  ResultSet? getDownloadedEpisodes() {
+    return _database!.select('''
+      SELECT *
+      FROM Downloads;
+    ''');
+  }
+
+  void deleteDownloadedEpisodes() {
+    _database!.execute('''
+      DELETE FROM Downloads;
+    ''');
+  }
+
+  void deleteDownloadedEpisode(String episodeGuid) {
+    _database!.execute('''
+      DELETE FROM Downloads
+      WHERE guid = '$episodeGuid';
+    ''');
+  }
+
+  // History Operations:
+  void addToHistory(String episodeGuid) {
+    _database!.execute('''
+      INSERT INTO History (guid)
+      VALUES ('$episodeGuid');
+    ''');
+  }
+
+  ResultSet? getHistory() {
+    return _database!.select('''
+      SELECT *
+      FROM History;
+    ''');
+  }
+
+  void deleteHistory() async {
+    _database!.execute('''
+      DELETE FROM History;
+    ''');
+  }
+
+  void deleteFromHistory(String episodeGuid) {
+    _database!.execute('''
+      DELETE FROM History
+      WHERE guid = '$episodeGuid';
+    ''');
+  }
+
+  // Completed Episodes Operations:
+  void markEpisodeAsCompleted(String episodeGuid) {
+    _database!.execute('''
+      INSERT INTO CompletedEpisodes (guid)
+      VALUES ('$episodeGuid');
+    ''');
+  }
+
+  ResultSet? getCompletedEpisodes() {
+    return _database!.select('''
+      SELECT *
+      FROM CompletedEpisodes;
+    ''');
+  }
+
+  void deleteCompletedEpisodes() {
+    _database!.execute('''
+      DELETE FROM CompletedEpisodes;
+    ''');
+  }
 }

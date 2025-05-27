@@ -6,44 +6,44 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
-import 'package:openair/views/mobile/widgets/no_connection.dart';
+import 'package:openair/views/mobile/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 
 bool once = false;
 
 final podcastDataByTopProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(podcastIndexProvider);
+  final apiService = ref.read(podcastIndexProvider);
   return await apiService.getTopPodcasts();
 });
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByEducationProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(podcastIndexProvider);
+  final apiService = ref.read(podcastIndexProvider);
   return await apiService.getEducationPodcasts();
 });
 
 final podcastDataByHealthProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(podcastIndexProvider);
+  final apiService = ref.read(podcastIndexProvider);
   return await apiService.getHealthPodcasts();
 });
 
 final podcastDataByTechnologyProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(podcastIndexProvider);
+  final apiService = ref.read(podcastIndexProvider);
   return await apiService.getTechnologyPodcasts();
 });
 
 final podcastDataBySportsProvider =
     FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(podcastIndexProvider);
+  final apiService = ref.read(podcastIndexProvider);
   return await apiService.getSportsPodcasts();
 });
 
 final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-  final apiService = ref.watch(openAirProvider);
+  final apiService = ref.read(openAirProvider);
   return await apiService.getConnectionStatus();
 });
 
@@ -230,7 +230,9 @@ class TopPodcastsCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(),
+                              builder: (context) => EpisodesPage(
+                                title: snapshot['feeds'][index]['title'],
+                              ),
                             ),
                           );
                         },
@@ -399,7 +401,9 @@ class EducationCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(),
+                              builder: (context) => EpisodesPage(
+                                title: snapshot['feeds'][index]['title'],
+                              ),
                             ),
                           );
                         },
@@ -568,7 +572,9 @@ class HealthCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(),
+                              builder: (context) => EpisodesPage(
+                                title: snapshot['feeds'][index]['title'],
+                              ),
                             ),
                           );
                         },
@@ -737,7 +743,9 @@ class TechnologyCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(),
+                              builder: (context) => EpisodesPage(
+                                title: snapshot['feeds'][index]['title'],
+                              ),
                             ),
                           );
                         },
@@ -906,7 +914,9 @@ class SportsCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(),
+                              builder: (context) => EpisodesPage(
+                                title: snapshot['feeds'][index]['title'],
+                              ),
                             ),
                           );
                         },

@@ -18,8 +18,7 @@ void main() async {
 
   // Initialize the database
   final databaseService = DatabaseService();
-  // TODO: Uncomment the following line to initialize the database
-  // databaseService.database();
+  databaseService.initDatabase();
 
   runApp(const ProviderScope(child: MyApp()));
 }

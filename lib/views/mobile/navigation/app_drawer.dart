@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
-import 'package:openair/views/mobile/nav_pages/feeds.dart';
+import 'package:openair/views/mobile/nav_pages/feed.dart';
 import 'package:openair/views/mobile/nav_pages/history.dart';
 import 'package:openair/views/mobile/nav_pages/queue.dart';
 import 'package:openair/views/mobile/nav_pages/settings.dart';

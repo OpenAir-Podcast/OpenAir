@@ -136,12 +136,14 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       ),
                     ),
                     IconButton(
+                      tooltip: "Add to queue",
                       onPressed: () {},
                       icon: const Icon(Icons.playlist_add),
                     ),
                     // TODO: Add download button
                     // Download Button
                     IconButton(
+                      tooltip: "Download",
                       onPressed: () {
                         // if (widget.episodeItem!.getDownloaded ==
                         //     DownloadStatus.notDownloaded) {
@@ -187,6 +189,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     ),
                     // More Button
                     IconButton(
+                      tooltip: "More",
                       onPressed: () {},
                       icon: const Icon(Icons.more_vert_outlined),
                     ),
@@ -195,26 +198,19 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
               ),
               // Episode Description
               SingleChildScrollView(
-                child: Expanded(
-                  child: Html(
-                    data: widget.episodeItem!['description'],
-                    style: {
-                      "p.fancy": Style(
-                        textAlign: TextAlign.center,
-                        backgroundColor: Colors.grey,
-                        margin: Margins(
-                            left: Margin(50, Unit.px), right: Margin.auto()),
-                        width: Width(300, Unit.px),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    },
-                    shrinkWrap: true,
-                  ),
-                  // child: StyledText(
-                  //   text: widget.episodeItem!.description!,
-                  //   overflow: TextOverflow.visible,
-                  //   maxLines: 15,
-                  // ),
+                child: Html(
+                  data: widget.episodeItem!['description'],
+                  style: {
+                    "p.fancy": Style(
+                      textAlign: TextAlign.center,
+                      backgroundColor: Colors.grey,
+                      margin: Margins(
+                          left: Margin(50, Unit.px), right: Margin.auto()),
+                      width: Width(300, Unit.px),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  },
+                  shrinkWrap: true,
                 ),
               ),
             ],

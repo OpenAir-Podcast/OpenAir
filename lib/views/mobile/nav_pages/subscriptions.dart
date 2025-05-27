@@ -13,7 +13,16 @@ class _SubscriptionsState extends ConsumerState<Subscriptions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subscriptions'),
+        title: const Text('Subscription'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.more_vert),
+            ),
+          ),
+        ],
       ),
       body: const Center(
         child: Text('Subscriptions'),
