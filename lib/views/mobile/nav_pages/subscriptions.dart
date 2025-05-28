@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/subscription.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:sqlite3/wasm.dart';
 
-final getSubscriptionsProvider = FutureProvider<ResultSet>((ref) async {
+final getSubscriptionsProvider =
+    FutureProvider<Map<String, Subscription>>((ref) async {
   final apiService = ref.read(openAirProvider);
-  return apiService.getSubscriptions();
+  return await apiService.getSubscriptions();
 });
 
 class Subscriptions extends ConsumerStatefulWidget {
@@ -19,7 +20,7 @@ class _SubscriptionsState extends ConsumerState<Subscriptions> {
   @override
   Widget build(BuildContext context) {
     // TODO: Continue from here
-    final AsyncValue<ResultSet> getSubscriptionsValue =
+    final AsyncValue<Map<String, Subscription>> getSubscriptionsValue =
         ref.watch(getSubscriptionsProvider);
 
     return getSubscriptionsValue.when(

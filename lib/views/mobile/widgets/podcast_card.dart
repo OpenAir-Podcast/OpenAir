@@ -14,114 +14,121 @@ class PodcastCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () {
-        ref.read(openAirProvider.notifier).currentPodcast = podcastItem;
+    return FutureBuilder(
+        future: ref.watch(openAirProvider).isSubscribed(podcastItem['id']),
+        builder: (context, isSubscribed) {
+          return GestureDetector(
+            onTap: () {
+              ref.read(openAirProvider.notifier).currentPodcast = podcastItem;
 
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => EpisodesPage(
-              podcast: podcastItem,
-              id: podcastItem['id'],
-            ),
-          ),
-        );
-      },
-      child: Card(
-        color: Colors.blueGrey[100],
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(podcastItem['image']),
-                    fit: BoxFit.cover,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EpisodesPage(
+                    podcast: podcastItem,
+                    id: podcastItem['id'],
                   ),
                 ),
-                width: 62.0,
-                height: 62.0,
-              ),
-              Expanded(
-                child: SizedBox(
-                  width: 500.0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 105.0,
-                          child: Text(
-                            podcastItem['title'],
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+              );
+            },
+            child: Card(
+              color: Colors.blueGrey[100],
+              elevation: 2.0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        image: DecorationImage(
+                          image:
+                              CachedNetworkImageProvider(podcastItem['image']),
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 120.0,
-                          child: Text(
-                            podcastItem['author'] ?? 'Unknown',
-                            maxLines: 2,
-                            style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: IconButton(
-                  tooltip:
-                      ref.read(openAirProvider).isSubscribed(podcastItem['id'])
-                          ? 'Unsubscribe to podcast'
-                          : 'Subscribe to podcast',
-                  onPressed: () {
-                    if (ref
-                        .read(openAirProvider)
-                        .isSubscribed(podcastItem['id'])) {
-                      // Unsubscribe
-                      ref
-                          .read(openAirProvider.notifier)
-                          .unsubscribe(podcastItem);
-                    } else {
-                      // Subscribe
-                      ref.read(openAirProvider.notifier).subscribe(podcastItem);
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(ref
-                                .read(openAirProvider)
-                                .isSubscribed(podcastItem['id'])
-                            ? 'Subscribed to ${podcastItem['title']}'
-                            : 'Unsubscribed from ${podcastItem['title']}'),
                       ),
-                    );
+                      width: 62.0,
+                      height: 62.0,
+                    ),
+                    Expanded(
+                      child: SizedBox(
+                        width: 500.0,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width - 105.0,
+                                child: Text(
+                                  podcastItem['title'],
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width - 120.0,
+                                child: Text(
+                                  podcastItem['author'] ?? 'Unknown',
+                                  maxLines: 2,
+                                  style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: IconButton(
+                        tooltip: !isSubscribed.hasData
+                            ? 'Loading...'
+                            : isSubscribed.data!
+                                ? 'Unsubscribe to podcast'
+                                : 'Subscribe to podcast',
+                        onPressed: () {
+                          if (isSubscribed.data!) {
+                            // Unsubscribe
+                            ref
+                                .read(openAirProvider.notifier)
+                                .unsubscribe(podcastItem);
+                          } else {
+                            // Subscribe
+                            ref
+                                .read(openAirProvider.notifier)
+                                .subscribe(podcastItem);
+                          }
 
-                    ChangeNotifier();
-                  },
-                  icon:
-                      ref.watch(openAirProvider).isSubscribed(podcastItem['id'])
-                          ? const Icon(Icons.check)
-                          : const Icon(Icons.add),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(!isSubscribed.hasData
+                                  ? 'Loading...'
+                                  : isSubscribed.data!
+                                      ? 'Unsubscribed from ${podcastItem['title']}'
+                                      : 'Subscribed to ${podcastItem['title']}'),
+                            ),
+                          );
+                        },
+                        icon: !isSubscribed.hasData
+                            ? const Icon(Icons.error_outline)
+                            : isSubscribed.data!
+                                ? const Icon(Icons.check)
+                                : const Icon(Icons.add),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
@@ -15,6 +16,7 @@ void main() async {
     debugPrint('Error loading .env file: $e');
   }
 
+  await Hive.initFlutter();
   runApp(const ProviderScope(child: MyApp()));
 }
 

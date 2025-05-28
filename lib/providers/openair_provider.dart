@@ -5,10 +5,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/database_provider.dart';
+import 'package:openair/models/subscription.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/sqlite3.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) {
@@ -71,7 +71,7 @@ class OpenAirProvider with ChangeNotifier {
     BuildContext context,
   ) async {
     // Initialise db
-    ref.read(databaseServiceProvider).initDatabase();
+    ref.read(hiveServiceProvider).init();
 
     player = AudioPlayer();
 
@@ -189,7 +189,7 @@ class OpenAirProvider with ChangeNotifier {
     //         ),
     //       );
 
-    // TODO: Remove thiss when I implement the isDownload functionality
+    // TODO: Remove this when I implement the isDownload functionality
     player.setSource(
       UrlSource(
         currentEpisode['enclosureUrl'],
@@ -497,50 +497,14 @@ class OpenAirProvider with ChangeNotifier {
 
   void mainPlayerMoreOptionsClicked() {}
 
-  void unsubscribe(Map<String, dynamic> podcast) {
-    ResultSet resultSet =
-        ref.read(databaseServiceProvider).getSubscription(id: podcast['id']);
+  // Database Operations:
+  Future<bool> isSubscribed(int podcastId) async {
+    Map<String, Subscription> resultSet =
+        await ref.read(hiveServiceProvider).getSubscriptions();
 
     if (resultSet.isNotEmpty) {
-      ref.read(databaseServiceProvider).unsubscribe(id: podcast['id']);
-    } else {
-      ref.read(databaseServiceProvider).subscribe(
-          id: podcast['id'],
-          title: podcast['title'],
-          author: podcast['author'] ?? 'Unknown',
-          feedUrl: podcast['url'],
-          imageUrl: podcast['image']);
-    }
-
-    notifyListeners();
-  }
-
-  void subscribe(
-    Map<String, dynamic> podcast,
-  ) {
-    ResultSet isSubscribed = ref.read(databaseServiceProvider).getSubscription(
-          id: podcast['id'],
-        );
-
-    if (isSubscribed.isEmpty) {
-      ref.read(databaseServiceProvider).subscribe(
-            id: podcast['id'],
-            title: podcast['title'],
-            author: podcast['author'] ?? 'Unknown',
-            feedUrl: podcast['url'],
-            imageUrl: podcast['image'],
-          );
-
-      notifyListeners();
-    }
-  }
-
-  bool isSubscribed(int podcastId) {
-    ResultSet resultSet = ref.read(databaseServiceProvider).getSubscriptions();
-
-    if (resultSet.isNotEmpty) {
-      if (resultSet.any(
-        (element) => element['id'] == podcastId,
+      if (resultSet.values.any(
+        (element) => element.id == podcastId,
       )) {
         return true;
       }
@@ -549,7 +513,27 @@ class OpenAirProvider with ChangeNotifier {
     return false;
   }
 
-  ResultSet getSubscriptions() {
-    return ref.read(databaseServiceProvider).getSubscriptions();
+  Future<Map<String, Subscription>> getSubscriptions() {
+    return ref.read(hiveServiceProvider).getSubscriptions();
+  }
+
+  void subscribe(
+    Map<String, dynamic> podcast,
+  ) async {
+    Subscription subscription = Subscription(
+      id: podcast['id'],
+      title: podcast['title'],
+      author: podcast['author'] ?? 'Unknown',
+      feedUrl: podcast['url'],
+      imageUrl: podcast['image'],
+    );
+
+    ref.read(hiveServiceProvider).subscribe(subscription);
+    notifyListeners();
+  }
+
+  void unsubscribe(Map<String, dynamic> podcast) async {
+    ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
+    notifyListeners();
   }
 }
