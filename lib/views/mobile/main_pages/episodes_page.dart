@@ -13,8 +13,9 @@ final podcastDataByUrlProvider =
 });
 
 class EpisodesPage extends ConsumerStatefulWidget {
-  const EpisodesPage({super.key, required this.title});
-  final String title;
+  const EpisodesPage({super.key, required this.podcast, required this.id});
+  final Map<String, dynamic> podcast;
+  final int id;
 
   @override
   ConsumerState<EpisodesPage> createState() => _EpisodesPageState();
@@ -44,11 +45,39 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: IconButton(
-                  tooltip: 'Subscribe to podcast',
+                  tooltip: ref.read(openAirProvider).isSubscribed(widget.id)
+                      ? 'Unsubscribe to podcast'
+                      : 'Subscribe to podcast',
                   onPressed: () {
-                    // TODO: Add the podcast to the database
+                    if (ref.read(openAirProvider).isSubscribed(widget.id)) {
+                      // Unsubscribe
+                      ref
+                          .read(openAirProvider.notifier)
+                          .unsubscribe(widget.podcast);
+                    } else {
+                      // Subscribe
+                      ref
+                          .read(openAirProvider.notifier)
+                          .subscribe(widget.podcast);
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          ref.read(openAirProvider).isSubscribed(widget.id)
+                              ? 'Subscribed to ${widget.podcast['title']}'
+                              : 'Unsubscribed from ${widget.podcast['title']}',
+                        ),
+                      ),
+                    );
+
+                    ChangeNotifier();
                   },
-                  icon: const Icon(Icons.add),
+                  icon: ref.watch(openAirProvider).isSubscribed(
+                            widget.id,
+                          )
+                      ? const Icon(Icons.check)
+                      : const Icon(Icons.add),
                 ),
               ),
             ],
@@ -61,7 +90,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               child: ListView.builder(
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => EpisodeCard(
-                  title: widget.title,
+                  title: snapshot['items'][index]['title'],
                   episodeItem: snapshot['items'][index],
                 ),
               ),

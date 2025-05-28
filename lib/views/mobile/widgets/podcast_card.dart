@@ -20,7 +20,10 @@ class PodcastCard extends ConsumerWidget {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => EpisodesPage(title: podcastItem['title']),
+            builder: (context) => EpisodesPage(
+              podcast: podcastItem,
+              id: podcastItem['id'],
+            ),
           ),
         );
       },
@@ -80,10 +83,39 @@ class PodcastCard extends ConsumerWidget {
               ),
               Center(
                 child: IconButton(
-                  // TODO: Implement subscription
-                  tooltip: 'Subscribe to podcast',
-                  onPressed: () {},
-                  icon: const Icon(Icons.add),
+                  tooltip:
+                      ref.read(openAirProvider).isSubscribed(podcastItem['id'])
+                          ? 'Unsubscribe to podcast'
+                          : 'Subscribe to podcast',
+                  onPressed: () {
+                    if (ref
+                        .read(openAirProvider)
+                        .isSubscribed(podcastItem['id'])) {
+                      // Unsubscribe
+                      ref
+                          .read(openAirProvider.notifier)
+                          .unsubscribe(podcastItem);
+                    } else {
+                      // Subscribe
+                      ref.read(openAirProvider.notifier).subscribe(podcastItem);
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(ref
+                                .read(openAirProvider)
+                                .isSubscribed(podcastItem['id'])
+                            ? 'Subscribed to ${podcastItem['title']}'
+                            : 'Unsubscribed from ${podcastItem['title']}'),
+                      ),
+                    );
+
+                    ChangeNotifier();
+                  },
+                  icon:
+                      ref.watch(openAirProvider).isSubscribed(podcastItem['id'])
+                          ? const Icon(Icons.check)
+                          : const Icon(Icons.add),
                 ),
               ),
             ],

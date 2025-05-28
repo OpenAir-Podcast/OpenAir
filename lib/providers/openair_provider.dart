@@ -5,12 +5,14 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/database_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) {
-    return OpenAirProvider();
+    return OpenAirProvider(ref);
   },
 );
 
@@ -61,9 +63,16 @@ class OpenAirProvider with ChangeNotifier {
 
   late bool hasConnection;
 
+  final Ref<OpenAirProvider> ref;
+
+  OpenAirProvider(this.ref);
+
   Future<void> initial(
     BuildContext context,
   ) async {
+    // Initialise db
+    ref.read(databaseServiceProvider).initDatabase();
+
     player = AudioPlayer();
 
     this.context = context;
@@ -487,4 +496,60 @@ class OpenAirProvider with ChangeNotifier {
   void mainPlayerCastClicked() {}
 
   void mainPlayerMoreOptionsClicked() {}
+
+  void unsubscribe(Map<String, dynamic> podcast) {
+    ResultSet resultSet =
+        ref.read(databaseServiceProvider).getSubscription(id: podcast['id']);
+
+    if (resultSet.isNotEmpty) {
+      ref.read(databaseServiceProvider).unsubscribe(id: podcast['id']);
+    } else {
+      ref.read(databaseServiceProvider).subscribe(
+          id: podcast['id'],
+          title: podcast['title'],
+          author: podcast['author'] ?? 'Unknown',
+          feedUrl: podcast['url'],
+          imageUrl: podcast['image']);
+    }
+
+    notifyListeners();
+  }
+
+  void subscribe(
+    Map<String, dynamic> podcast,
+  ) {
+    ResultSet isSubscribed = ref.read(databaseServiceProvider).getSubscription(
+          id: podcast['id'],
+        );
+
+    if (isSubscribed.isEmpty) {
+      ref.read(databaseServiceProvider).subscribe(
+            id: podcast['id'],
+            title: podcast['title'],
+            author: podcast['author'] ?? 'Unknown',
+            feedUrl: podcast['url'],
+            imageUrl: podcast['image'],
+          );
+
+      notifyListeners();
+    }
+  }
+
+  bool isSubscribed(int podcastId) {
+    ResultSet resultSet = ref.read(databaseServiceProvider).getSubscriptions();
+
+    if (resultSet.isNotEmpty) {
+      if (resultSet.any(
+        (element) => element['id'] == podcastId,
+      )) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  ResultSet getSubscriptions() {
+    return ref.read(databaseServiceProvider).getSubscriptions();
+  }
 }

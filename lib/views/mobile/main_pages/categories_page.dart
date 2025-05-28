@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
 import 'package:openair/views/mobile/main_pages/featured_page.dart';
-import 'package:openair/views/mobile/components/no_connection.dart';
+import 'package:openair/components/no_connection.dart';
 
 class CategoriesPage extends ConsumerStatefulWidget {
   CategoriesPage({super.key});

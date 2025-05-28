@@ -6,7 +6,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
-import 'package:openair/views/mobile/components/no_connection.dart';
+import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 
 bool once = false;
@@ -231,7 +231,8 @@ class TopPodcastsCard extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                title: snapshot['feeds'][index]['title'],
+                                podcast: snapshot['feeds'][index],
+                                id: snapshot['feeds'][index]['id'],
                               ),
                             ),
                           );
@@ -402,7 +403,8 @@ class EducationCard extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                title: snapshot['feeds'][index]['title'],
+                                podcast: snapshot['feeds'][index],
+                                id: snapshot['feeds'][index]['id'],
                               ),
                             ),
                           );
@@ -573,7 +575,8 @@ class HealthCard extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                title: snapshot['feeds'][index]['title'],
+                                podcast: snapshot['feeds'][index],
+                                id: snapshot['feeds'][index]['id'],
                               ),
                             ),
                           );
@@ -744,7 +747,8 @@ class TechnologyCard extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                title: snapshot['feeds'][index]['title'],
+                                podcast: snapshot['feeds'][index],
+                                id: snapshot['feeds'][index]['id'],
                               ),
                             ),
                           );
@@ -915,7 +919,8 @@ class SportsCard extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                title: snapshot['feeds'][index]['title'],
+                                podcast: snapshot['feeds'][index],
+                                id: snapshot['feeds'][index]['id'],
                               ),
                             ),
                           );

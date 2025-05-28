@@ -48,7 +48,7 @@ dependencies:
   flutter_html: ^3.0.0
   shimmer: ^3.0.0
   flutter_dotenv: ^5.2.0
-  sqlite3: ^2.7.5
+  sqlite3: ^2.7.6
   oauth2_client: ^4.2.0
   connectivity_plus: ^6.1.4
 
