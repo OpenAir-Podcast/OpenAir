@@ -93,7 +93,7 @@ class HiveService extends ChangeNotifier {
   Future<void> subscribe(Subscription subscription) async {
     // Make return type Future<void>
     final box = await subscriptionBox;
-    await box.put(subscription.id.toString(), subscription);
+    await box.put('${subscription.id}', subscription);
     notifyListeners();
   }
 

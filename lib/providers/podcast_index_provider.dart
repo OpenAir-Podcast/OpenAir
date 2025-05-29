@@ -112,9 +112,7 @@ class PodcastIndexProvider {
   /// response is then returned as a [Map<String, dynamic>].
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
     // todo check if there is connection to the internet
-
     // TODO if there is connection. Get info from the API else get the info from the database
-
 
     var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String newUnixTime = unixTime.toString();

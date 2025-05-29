@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/components/no_connection.dart';
@@ -22,9 +23,13 @@ class TrendingPage extends ConsumerStatefulWidget {
   ConsumerState<TrendingPage> createState() => _TrendingPageState();
 }
 
-class _TrendingPageState extends ConsumerState<TrendingPage> {
+class _TrendingPageState extends ConsumerState<TrendingPage>
+    with AutomaticKeepAliveClientMixin<TrendingPage> {
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Important for AutomaticKeepAliveClientMixin
     final podcastDataAsyncTrendingValue =
         ref.watch(podcastDataByTrendingProvider);
 
@@ -47,6 +52,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView.builder(
+                  cacheExtent: cacheExtent,
                   itemCount: snapshot['count'],
                   itemBuilder: (context, index) {
                     return PodcastCard(

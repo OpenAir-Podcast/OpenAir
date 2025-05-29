@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 
-class NoConnection extends ConsumerWidget {
-  const NoConnection({
+class NoSubscription extends ConsumerWidget {
+  const NoSubscription({
     super.key,
   });
 
@@ -21,14 +21,14 @@ class NoConnection extends ConsumerWidget {
           ),
           const SizedBox(height: 20.0),
           Text(
-            'Oops, an error occurred...',
+            'Oops, looks like you have no subscription...',
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            'Please connect to network and try again',
+            'Please subscribe to a podcast and try again',
             style: TextStyle(fontSize: 16.0),
           ),
           const SizedBox(height: 20.0),

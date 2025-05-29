@@ -47,12 +47,21 @@ final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
   return await apiService.getConnectionStatus();
 });
 
-class FeaturedPage extends ConsumerWidget {
+class FeaturedPage extends ConsumerStatefulWidget {
   const FeaturedPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Run once to initialize the provider
+  ConsumerState<FeaturedPage> createState() => _FeaturedPageState();
+}
+
+class _FeaturedPageState extends ConsumerState<FeaturedPage>
+    with AutomaticKeepAliveClientMixin<FeaturedPage> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
     if (once == false) {
       // Initialize the provider
       ref.read(openAirProvider).initial(
@@ -61,7 +70,11 @@ class FeaturedPage extends ConsumerWidget {
 
       once = true;
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Important for AutomaticKeepAliveClientMixin
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return getConnectionStatusValue.when(
@@ -87,6 +100,7 @@ class FeaturedPage extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
           child: ListView(
+            cacheExtent: 1000.0,
             children: [
               // Top Podcasts
               PodcastsCard(

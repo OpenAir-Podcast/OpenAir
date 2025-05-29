@@ -38,9 +38,20 @@ class Subscription extends HiveObject {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'feedId': feedUrl,
+        'url': feedUrl,
         'title': title,
         'author': author,
-        'imageUrl': imageUrl,
+        'image': imageUrl,
       };
+
+  @override
+  String toString() {
+    return '''
+    id: $id,
+    feedUrl: $feedUrl,
+    title: $title,
+    author: $author,
+    imageUrl: $imageUrl,
+    ''';
+  }
 }

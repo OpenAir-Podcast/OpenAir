@@ -513,8 +513,8 @@ class OpenAirProvider with ChangeNotifier {
     return false;
   }
 
-  Future<Map<String, Subscription>> getSubscriptions() {
-    return ref.read(hiveServiceProvider).getSubscriptions();
+  Future<Map<String, Subscription>> getSubscriptions() async {
+    return await ref.read(hiveServiceProvider).getSubscriptions();
   }
 
   void subscribe(

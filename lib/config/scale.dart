@@ -21,6 +21,8 @@ double blurRadius = 10.0;
 int mobileCrossAxisCount = 3;
 double mobileMainAxisExtent = 500.0;
 
+double subscribedMobileMainAxisExtent = 236.0;
+
 int mobileItemCountPortrait = 3;
 int mobileItemCountLandscape = 6;
 
@@ -42,3 +44,5 @@ double cardLabelFontSize = 14.0;
 FontWeight cardLabelFontWeight = FontWeight.bold;
 int cardLabelMaxLines = 1;
 double cardLabelPadding = 8.0;
+
+double cacheExtent = 1_000_000_000.0;
