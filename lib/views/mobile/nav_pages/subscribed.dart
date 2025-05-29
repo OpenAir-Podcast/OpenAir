@@ -9,14 +9,14 @@ final getSubscriptionsProvider =
   return await apiService.getSubscriptions();
 });
 
-class Subscriptions extends ConsumerStatefulWidget {
-  const Subscriptions({super.key});
+class Subscribed extends ConsumerStatefulWidget {
+  const Subscribed({super.key});
 
   @override
   ConsumerState createState() => _SubscriptionsState();
 }
 
-class _SubscriptionsState extends ConsumerState<Subscriptions> {
+class _SubscriptionsState extends ConsumerState<Subscribed> {
   @override
   Widget build(BuildContext context) {
     // TODO: Continue from here
@@ -27,7 +27,7 @@ class _SubscriptionsState extends ConsumerState<Subscriptions> {
       data: (data) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Subscription'),
+            title: const Text('Subscribed'),
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),

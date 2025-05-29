@@ -37,9 +37,10 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
       ),
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (snapshot) {
-        return FutureBuilder(
-            future: ref.watch(openAirProvider).isSubscribed(widget.id),
-            builder: (context, isSubscribed) {
+        return StreamBuilder<bool>(
+            stream:
+                ref.watch(openAirProvider).isSubscribed(widget.id).asStream(),
+            builder: (context, subscribed) {
               return Scaffold(
                 appBar: AppBar(
                   title: Text(
@@ -49,41 +50,37 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: IconButton(
-                        tooltip: !isSubscribed.hasData
-                            ? 'Loading...'
-                            : isSubscribed.data!
-                                ? 'Unsubscribe to podcast'
-                                : 'Subscribe to podcast',
-                        onPressed: () {
-                          if (isSubscribed.data!) {
-                            // Unsubscribe
-                            ref
-                                .read(openAirProvider.notifier)
-                                .unsubscribe(widget.podcast);
-                          } else {
-                            // Subscribe
-                            ref
-                                .read(openAirProvider.notifier)
-                                .subscribe(widget.podcast);
-                          }
+                        tooltip: subscribed.hasData && subscribed.data!
+                            ? 'Unsubscribe to podcast'
+                            : 'Subscribe to podcast',
+                        onPressed: () async {
+                          setState(() {
+                            if (subscribed.hasData && subscribed.data!) {
+                              // Unsubscribe
+                              ref
+                                  .read(openAirProvider.notifier)
+                                  .unsubscribe(widget.podcast);
+                            } else {
+                              // Subscribe
+                              ref
+                                  .read(openAirProvider.notifier)
+                                  .subscribe(widget.podcast);
+                            }
+                          });
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                !isSubscribed.hasData
-                                    ? 'Loading...'
-                                    : isSubscribed.data!
-                                        ? 'Unsubscribed from ${widget.podcast['title']}'
-                                        : 'Subscribed to ${widget.podcast['title']}',
+                                subscribed.hasData && subscribed.data!
+                                    ? 'Unsubscribed from ${widget.podcast['title']}'
+                                    : 'Subscribed to ${widget.podcast['title']}',
                               ),
                             ),
                           );
                         },
-                        icon: !isSubscribed.hasData
-                            ? const Icon(Icons.error_outline)
-                            : isSubscribed.data!
-                                ? const Icon(Icons.check)
-                                : const Icon(Icons.add),
+                        icon: subscribed.hasData && subscribed.data!
+                            ? const Icon(Icons.check)
+                            : const Icon(Icons.add),
                       ),
                     ),
                   ],

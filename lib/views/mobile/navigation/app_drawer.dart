@@ -6,7 +6,7 @@ import 'package:openair/views/mobile/nav_pages/history.dart';
 import 'package:openair/views/mobile/nav_pages/queue.dart';
 import 'package:openair/views/mobile/nav_pages/settings.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in.dart';
-import 'package:openair/views/mobile/nav_pages/subscriptions.dart';
+import 'package:openair/views/mobile/nav_pages/subscribed.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -55,12 +55,12 @@ class AppDrawer extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.subscriptions_rounded),
-                  title: const Text('Subscriptions'),
+                  title: const Text('Subscribed'),
                   trailing: const Text('0'),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Subscriptions()),
+                      MaterialPageRoute(builder: (context) => Subscribed()),
                     );
                   },
                 ),

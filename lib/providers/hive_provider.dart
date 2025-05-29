@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/models/completed_episode.dart';
@@ -24,7 +25,7 @@ final subscriptionsStreamProvider =
   yield await box.getAllValues();
 });
 
-class HiveService {
+class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
   late final Future<CollectionBox<Subscription>> subscriptionBox;
   late final Future<CollectionBox<Episode>> episodeBox;
@@ -93,12 +94,14 @@ class HiveService {
     // Make return type Future<void>
     final box = await subscriptionBox;
     await box.put(subscription.id.toString(), subscription);
+    notifyListeners();
   }
 
   Future<void> unsubscribe(String id) async {
     // Make return type Future<void>
     final box = await subscriptionBox;
     await box.delete(id);
+    notifyListeners();
   }
 
   Future<Map<String, Subscription>> getSubscriptions() async {

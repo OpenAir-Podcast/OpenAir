@@ -15,11 +15,16 @@ final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
   return await apiService.getConnectionStatus();
 });
 
-class TrendingPage extends ConsumerWidget {
+class TrendingPage extends ConsumerStatefulWidget {
   const TrendingPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TrendingPage> createState() => _TrendingPageState();
+}
+
+class _TrendingPageState extends ConsumerState<TrendingPage> {
+  @override
+  Widget build(BuildContext context) {
     final podcastDataAsyncTrendingValue =
         ref.watch(podcastDataByTrendingProvider);
 
