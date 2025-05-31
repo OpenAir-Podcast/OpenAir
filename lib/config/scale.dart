@@ -16,6 +16,13 @@ Color cardLabelShadow = Colors.brown;
 Color cardLabelBackground = Colors.white;
 Color cardLabelTextColor = Colors.black;
 
+Color subscriptionCountBoxColor = Colors.red;
+Color subscriptionCountBoxTextColor = Colors.white;
+
+double subscriptionCountBoxSize = 38.0;
+double subscriptionCountBoxFontSize = 18.0;
+FontWeight subscriptionCountBoxFontWeight = FontWeight.normal;
+
 double blurRadius = 10.0;
 
 int mobileCrossAxisCount = 3;

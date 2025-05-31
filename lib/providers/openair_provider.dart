@@ -499,15 +499,12 @@ class OpenAirProvider with ChangeNotifier {
 
   // Database Operations:
   Future<bool> isSubscribed(int podcastId) async {
-    Map<String, Subscription> resultSet =
-        await ref.read(hiveServiceProvider).getSubscriptions();
+    Subscription? resultSet = await ref
+        .read(hiveServiceProvider)
+        .getSubscription(podcastId.toString());
 
-    if (resultSet.isNotEmpty) {
-      if (resultSet.values.any(
-        (element) => element.id == podcastId,
-      )) {
-        return true;
-      }
+    if (resultSet != null) {
+      return true;
     }
 
     return false;
@@ -515,6 +512,11 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<Map<String, Subscription>> getSubscriptions() async {
     return await ref.read(hiveServiceProvider).getSubscriptions();
+  }
+
+  String getSubscriptionsCount() {
+    // return ref.read(hiveServiceProvider).getSubscriptionsCount();
+    return '0';
   }
 
   void subscribe(
@@ -529,11 +531,13 @@ class OpenAirProvider with ChangeNotifier {
     );
 
     ref.read(hiveServiceProvider).subscribe(subscription);
+    ref.invalidate(subscriptionsProvider);
     notifyListeners();
   }
 
   void unsubscribe(Map<String, dynamic> podcast) async {
     ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
+    ref.invalidate(subscriptionsProvider);
     notifyListeners();
   }
 }

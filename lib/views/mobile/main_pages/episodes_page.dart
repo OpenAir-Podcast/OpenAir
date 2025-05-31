@@ -22,6 +22,12 @@ class EpisodesPage extends ConsumerStatefulWidget {
 }
 
 class _EpisodesPageState extends ConsumerState<EpisodesPage> {
+  Future<bool> getSub() async {
+    return await ref.watch(openAirProvider).isSubscribed(widget.id);
+  }
+
+  bool once = false;
+
   @override
   Widget build(BuildContext context) {
     final podcastUrl =
@@ -37,77 +43,81 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
       ),
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (snapshot) {
-        return StreamBuilder<bool>(
-            stream:
-                ref.watch(openAirProvider).isSubscribed(widget.id).asStream(),
-            builder: (context, subscribed) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                      ref.watch(openAirProvider).currentPodcast!['title'] ??
-                          'Unknown'),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: IconButton(
-                        tooltip: subscribed.hasData && subscribed.data!
-                            ? 'Unsubscribe to podcast'
-                            : 'Subscribe to podcast',
-                        onPressed: () async {
-                          setState(() {
-                            if (subscribed.hasData && subscribed.data!) {
-                              // Unsubscribe
-                              ref
-                                  .read(openAirProvider.notifier)
-                                  .unsubscribe(widget.podcast);
-                            } else {
-                              // Subscribe
-                              ref
-                                  .read(openAirProvider.notifier)
-                                  .subscribe(widget.podcast);
-                            }
-                          });
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(ref.watch(openAirProvider).currentPodcast!['title'] ??
+                'Unknown'),
+            actions: [
+              FutureBuilder(
+                future: ref.watch(openAirProvider).isSubscribed(widget.id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting &&
+                      !once) {
+                    once = true;
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                subscribed.hasData && subscribed.data!
-                                    ? 'Unsubscribed from ${widget.podcast['title']}'
-                                    : 'Subscribed to ${widget.podcast['title']}',
-                              ),
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text('...'),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: IconButton(
+                      tooltip: snapshot.data!
+                          ? 'Unsubscribe to podcast'
+                          : 'Subscribe to podcast',
+                      onPressed: () async {
+                        snapshot.data!
+                            ? ref
+                                .read(openAirProvider)
+                                .unsubscribe(widget.podcast)
+                            : ref
+                                .read(openAirProvider)
+                                .subscribe(widget.podcast);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              snapshot.data!
+                                  ? 'Unsubscribed from ${widget.podcast['title']}'
+                                  : 'Subscribed to ${widget.podcast['title']}',
                             ),
-                          );
-                        },
-                        icon: subscribed.hasData && subscribed.data!
-                            ? const Icon(Icons.check)
-                            : const Icon(Icons.add),
-                      ),
+                          ),
+                        );
+
+                        ref.invalidate(podcastDataByUrlProvider(podcastUrl));
+                      },
+                      icon: snapshot.data!
+                          ? const Icon(Icons.check)
+                          : const Icon(Icons.add),
                     ),
-                  ],
+                  );
+                },
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RefreshIndicator(
+              onRefresh: () async =>
+                  ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
+              child: ListView.builder(
+                itemCount: snapshot['count'],
+                itemBuilder: (context, index) => EpisodeCard(
+                  title: snapshot['items'][index]['title'],
+                  episodeItem: snapshot['items'][index],
                 ),
-                body: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: RefreshIndicator(
-                    onRefresh: () async =>
-                        ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-                    child: ListView.builder(
-                      itemCount: snapshot['count'],
-                      itemBuilder: (context, index) => EpisodeCard(
-                        title: snapshot['items'][index]['title'],
-                        episodeItem: snapshot['items'][index],
-                      ),
-                    ),
-                  ),
-                ),
-                bottomNavigationBar: SizedBox(
-                  height:
-                      ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-                  child: ref.watch(openAirProvider).isPodcastSelected
-                      ? const BannerAudioPlayer()
-                      : const SizedBox(),
-                ),
-              );
-            });
+              ),
+            ),
+          ),
+          bottomNavigationBar: SizedBox(
+            height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
+            child: ref.watch(openAirProvider).isPodcastSelected
+                ? const BannerAudioPlayer()
+                : const SizedBox(),
+          ),
+        );
       },
     );
   }

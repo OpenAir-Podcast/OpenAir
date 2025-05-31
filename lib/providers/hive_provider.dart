@@ -16,7 +16,7 @@ final hiveServiceProvider = Provider<HiveService>((ref) {
 });
 
 // StreamProvider for Subscriptions
-final subscriptionsStreamProvider =
+final subscriptionsProvider =
     StreamProvider<Map<String, Subscription>>((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
@@ -91,14 +91,12 @@ class HiveService extends ChangeNotifier {
 
   // Subscription Operations:
   Future<void> subscribe(Subscription subscription) async {
-    // Make return type Future<void>
     final box = await subscriptionBox;
     await box.put('${subscription.id}', subscription);
     notifyListeners();
   }
 
   Future<void> unsubscribe(String id) async {
-    // Make return type Future<void>
     final box = await subscriptionBox;
     await box.delete(id);
     notifyListeners();
