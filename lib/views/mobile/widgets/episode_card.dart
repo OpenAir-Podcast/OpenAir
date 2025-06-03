@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
@@ -56,19 +58,22 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              ref
-                                  .watch(openAirProvider)
-                                  .currentPodcast!['image'],
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
                         width: 62.0,
                         height: 62.0,
+                        decoration: BoxDecoration(
+                          color: cardImageShadow,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: ref
+                              .watch(openAirProvider)
+                              .currentPodcast!['image'],
+                          fit: BoxFit.fill,
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.error,
+                            size: 56.0,
+                          ),
+                        ),
                       ),
                     ),
                     Expanded(

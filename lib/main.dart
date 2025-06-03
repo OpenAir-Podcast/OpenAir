@@ -16,7 +16,7 @@ void main() async {
     debugPrint('Error loading .env file: $e');
   }
 
-  await Hive.initFlutter();
+  await Hive.initFlutter('OpenAir');
   runApp(const ProviderScope(child: MyApp()));
 }
 

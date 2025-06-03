@@ -3,10 +3,13 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/episode.dart';
 import 'package:openair/models/subscription.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -41,7 +44,7 @@ class OpenAirProvider with ChangeNotifier {
 
   final String storagePath = 'openair/downloads';
 
-  late Directory directory;
+  Directory? directory;
 
   int navIndex = 1;
 
@@ -70,8 +73,12 @@ class OpenAirProvider with ChangeNotifier {
   Future<void> initial(
     BuildContext context,
   ) async {
+    if (!kIsWeb) {
+      directory = await getApplicationDocumentsDirectory();
+    }
+
     // Initialise db
-    ref.read(hiveServiceProvider).init();
+    await ref.read(hiveServiceProvider).init();
 
     player = AudioPlayer();
 
@@ -92,8 +99,6 @@ class OpenAirProvider with ChangeNotifier {
 
     audioState = 'Pause';
     loadState = 'Detail'; // Play, Load, Detail
-
-    directory = await getApplicationDocumentsDirectory();
 
     try {
       final List<ConnectivityResult> connectivityResult =
@@ -366,7 +371,7 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<bool> isMp3FileDownloaded(String filename) async {
-    final filePath = '${directory.path}/downloads/$filename';
+    final filePath = '${directory!.path}/downloads/$filename';
     final file = File(filePath);
     return file.exists();
   }
@@ -375,10 +380,10 @@ class OpenAirProvider with ChangeNotifier {
     const storagePath = 'downloads'; // Assuming a downloads subdirectory
 
     // Create the downloads directory if it doesn't exist
-    await Directory(path.join(directory.path, storagePath))
+    await Directory(path.join(directory!.path, storagePath))
         .create(recursive: true);
 
-    final absolutePath = path.joinAll([directory.path, storagePath, filename]);
+    final absolutePath = path.joinAll([directory!.path, storagePath, filename]);
 
     return absolutePath;
   }
@@ -497,6 +502,24 @@ class OpenAirProvider with ChangeNotifier {
 
   void mainPlayerMoreOptionsClicked() {}
 
+  String getEpisodeSize(int size) {
+    // Check if size is in bytes, kilobytes, or megabytes
+    if (size < 1024) {
+      return '$size Bytes';
+    } else if (size < 1024 * 1024) {
+      double sizeKB = size / 1024;
+      return '${sizeKB.toStringAsFixed(2)} KB';
+    } else {
+      double sizeMB = size / (1024 * 1024);
+      if (sizeMB < 1024) {
+        return '${sizeMB.toStringAsFixed(2)} MB';
+      } else {
+        double sizeGB = sizeMB / 1024;
+        return '${sizeGB.toStringAsFixed(2)} GB';
+      }
+    }
+  }
+
   // Database Operations:
   Future<bool> isSubscribed(int podcastId) async {
     Subscription? resultSet = await ref
@@ -514,23 +537,39 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).getSubscriptions();
   }
 
-  String getSubscriptionsCount() {
-    // return ref.read(hiveServiceProvider).getSubscriptionsCount();
-    return '0';
+  Future<String> getSubscriptionsCount(int podcastId) async {
+    int currentSubEpCount =
+        await ref.read(hiveServiceProvider).podcastSubscribeEpisodes(podcastId);
+
+    int podcastEpisodeCount = await ref
+        .watch(podcastIndexProvider)
+        .getPodcastEpisodeCountByPodcastId(podcastId);
+
+    int result = podcastEpisodeCount - currentSubEpCount;
+
+    return result.toString();
   }
 
   void subscribe(
     Map<String, dynamic> podcast,
   ) async {
+    int podcastEpisodeCount = await ref
+        .watch(podcastIndexProvider)
+        .getPodcastEpisodeCountByPodcastId(podcast['id']);
+
     Subscription subscription = Subscription(
       id: podcast['id'],
       title: podcast['title'],
       author: podcast['author'] ?? 'Unknown',
       feedUrl: podcast['url'],
       imageUrl: podcast['image'],
+      episodeCount: podcastEpisodeCount,
     );
 
     ref.read(hiveServiceProvider).subscribe(subscription);
+
+    addPodcastEpisodes(podcast);
+
     ref.invalidate(subscriptionsProvider);
     notifyListeners();
   }
@@ -538,6 +577,51 @@ class OpenAirProvider with ChangeNotifier {
   void unsubscribe(Map<String, dynamic> podcast) async {
     ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
     ref.invalidate(subscriptionsProvider);
+    notifyListeners();
+  }
+
+  void addPodcastEpisodes(Map<String, dynamic> podcast) async {
+    final apiService = ref.watch(podcastIndexProvider);
+    Map<String, dynamic> episodes =
+        await apiService.getEpisodesByFeedUrl(podcast['url']);
+
+    Episode episode;
+
+    for (int i = 0; i < episodes['count']; i++) {
+      String podcastDate = getPodcastPublishedDateFromEpoch(
+          episodes['items'][i]['datePublished']);
+
+      String duration =
+          getPodcastDuration(episodes['items'][i]['enclosureLength']);
+
+      String size = getEpisodeSize(episodes['items'][i]['enclosureLength']);
+
+      episode = Episode(
+        podcastId: podcast['id'].toString(),
+        guid: episodes['items'][i]['guid'],
+        title: episodes['items'][i]['title'],
+        author: podcast['author'] ?? 'Unknown',
+        imageUrl: podcast['image'],
+        datePublished: podcastDate,
+        description: episodes['items'][i]['description'],
+        feedUrl: episodes['items'][i]['feedUrl'],
+        duration: duration,
+        size: size,
+      );
+
+      ref.read(hiveServiceProvider).insertEpisode(
+            episode,
+            episode.guid,
+          );
+
+      ref.invalidate(episodesProvider);
+      notifyListeners();
+    }
+  }
+
+  void removePodcastEpisodes(Map<String, dynamic> podcast) async {
+    ref.read(hiveServiceProvider).deleteEpisodes(podcast['id'].toString());
+    ref.invalidate(episodesProvider);
     notifyListeners();
   }
 }

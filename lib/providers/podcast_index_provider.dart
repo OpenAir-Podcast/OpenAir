@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
@@ -16,86 +17,42 @@ class PodcastIndexProvider {
   final String? podcastIndexSecret = dotenv.env['PODCAST_INDEX_API_SECRET'];
   final String? podcastIndexUserAgent = dotenv.env['PODCAST_USER_AGENT'];
 
-  Future<Map<String, dynamic>> getPodcastsByFeedUrl(
-      String podcastFeedUrl) async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
+  late int unixTime;
+  late String newUnixTime;
 
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
+  late Uint8List firstChunk;
+  late Uint8List secondChunk;
+  late Uint8List thirdChunk;
 
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
+  late AccumulatorSink<Digest> output;
+  late ByteConversionSink input;
+
+  late Digest digest;
+  late Map<String, String> headers;
+
+  PodcastIndexProvider() {
+    unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    newUnixTime = unixTime.toString();
+
+    firstChunk = utf8.encode(podcastIndexApi!);
+    secondChunk = utf8.encode(podcastIndexSecret!);
+    thirdChunk = utf8.encode(newUnixTime);
+
+    output = AccumulatorSink<Digest>();
+    input = sha1.startChunkedConversion(output);
     input.add(firstChunk);
     input.add(secondChunk);
     input.add(thirdChunk);
     input.close();
-    var digest = output.events.single;
 
-    Map<String, String> headers = {
+    digest = output.events.single;
+
+    headers = {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
       "User-Agent": podcastIndexUserAgent!,
     };
-
-    String cat = podcastFeedUrl.replaceAll(' ', '%20');
-
-    String url =
-        'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
-
-    debugPrint(url);
-
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
-    }
-  }
-
-  // This method is used to get the list of podcasts from the API. Based on the category
-  Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
-    String cat = category.replaceAll(' ', '%20');
-
-    String url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
-
-    debugPrint(url);
-
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
-    }
   }
 
   /// This method is used to get the list of podcasts from the API.
@@ -110,36 +67,63 @@ class PodcastIndexProvider {
   ///
   /// The request is made to the API, and the response is parsed as JSON. The
   /// response is then returned as a [Map<String, dynamic>].
-  Future<Map<String, dynamic>> getTrendingPodcasts() async {
-    // todo check if there is connection to the internet
-    // TODO if there is connection. Get info from the API else get the info from the database
 
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
+  Future<Map<String, dynamic>> getEpisodesByFeedUrl(
+      String podcastFeedUrl) async {
+    String cat = podcastFeedUrl.replaceAll(' ', '%20');
 
     String url =
-        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
 
-    debugPrint(url);
+    // debugPrint('Feed URL: $url');
+
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      final String xmlString = response.body;
+      return json.decode(xmlString);
+    } else {
+      throw Exception('Failed to get data from the API');
+    }
+  }
+
+  Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
+    String url =
+        'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
+
+    debugPrint('Podcast Id: $url');
+
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      final String xmlString = response.body;
+      return json.decode(xmlString)['feed']['episodeCount'];
+    } else {
+      throw Exception('Failed to get data from the API');
+    }
+  }
+
+  Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
+    String cat = category.replaceAll(' ', '%20');
+
+    String url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
+
+    debugPrint('Category URL: $url');
+
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      final String xmlString = response.body;
+      return json.decode(xmlString);
+    } else {
+      throw Exception('Failed to get data from the API');
+    }
+  }
+
+  Future<Map<String, dynamic>> getTrendingPodcasts() async {
+    String url =
+        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
     final response = await http.get(Uri.parse(url), headers: headers);
 
@@ -152,28 +136,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTopPodcasts() async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty',
@@ -189,28 +151,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getEducationPodcasts() async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty',
@@ -226,28 +166,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getHealthPodcasts() async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty',
@@ -263,28 +181,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty',
@@ -300,28 +196,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getSportsPodcasts() async {
-    var unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    String newUnixTime = unixTime.toString();
-
-    var firstChunk = utf8.encode(podcastIndexApi!);
-    var secondChunk = utf8.encode(podcastIndexSecret!);
-    var thirdChunk = utf8.encode(newUnixTime);
-
-    var output = AccumulatorSink<Digest>();
-    var input = sha1.startChunkedConversion(output);
-    input.add(firstChunk);
-    input.add(secondChunk);
-    input.add(thirdChunk);
-    input.close();
-    var digest = output.events.single;
-
-    Map<String, String> headers = {
-      "X-Auth-Date": newUnixTime,
-      "X-Auth-Key": podcastIndexApi!,
-      "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
-    };
-
     final response = await http.get(
         Uri.parse(
           'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty',

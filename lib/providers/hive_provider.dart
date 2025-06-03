@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/models/completed_episode.dart';
@@ -9,17 +11,28 @@ import 'package:openair/models/queue.dart';
 import 'package:openair/models/download.dart';
 import 'package:openair/models/history.dart';
 import 'package:openair/models/settings.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-final hiveServiceProvider = Provider<HiveService>((ref) {
-  return HiveService();
-});
+final hiveServiceProvider = ChangeNotifierProvider<HiveService>(
+  (ref) {
+    return HiveService(ref);
+  },
+);
 
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
     StreamProvider<Map<String, Subscription>>((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
+
+  // Emit the initial state
+  yield await box.getAllValues();
+});
+
+final episodesProvider = StreamProvider<Map<String, Episode>>((ref) async* {
+  final hiveService = ref.watch(hiveServiceProvider);
+  final box = await hiveService.episodeBox;
 
   // Emit the initial state
   yield await box.getAllValues();
@@ -38,6 +51,11 @@ class HiveService extends ChangeNotifier {
 
   bool _isInitialized = false;
 
+  late final Directory openAirDir;
+
+  HiveService(this.ref);
+  final Ref<HiveService> ref;
+
   Future<void> init() async {
     if (_isInitialized) return;
 
@@ -51,11 +69,21 @@ class HiveService extends ChangeNotifier {
     Hive.registerAdapter(CompletedEpisodeAdapter());
     Hive.registerAdapter(SettingsAdapter());
 
-    final appDocumentDir = await getApplicationDocumentsDirectory();
+    // Get the application documents directory
+    if (!kIsWeb) {
+      final appDocumentDir = await getApplicationDocumentsDirectory();
+
+      // Create the openair directory if it doesn't exist
+      openAirDir = Directory(join(appDocumentDir.path, 'OpenAir'));
+
+      if (!await openAirDir.exists()) {
+        await openAirDir.create(recursive: true);
+      }
+    }
 
     // Create a box collection
     collection = await BoxCollection.open(
-      'OpenAirDB',
+      '',
       {
         'subscriptions',
         'episodes',
@@ -66,7 +94,7 @@ class HiveService extends ChangeNotifier {
         'completed_episodes',
         'settings',
       },
-      path: appDocumentDir.path,
+      path: openAirDir.path,
     );
 
     subscriptionBox = collection.openBox<Subscription>('subscriptions');
@@ -123,16 +151,37 @@ class HiveService extends ChangeNotifier {
   }
 
   // Episodes Operations:
-  Future<void> insertEpisode(Episode episode) async {
+  Future<void> insertEpisode(
+    Episode episode,
+    String guid,
+  ) async {
     // Make return type Future<void>
     final box = await episodeBox;
-    await box.put(episode.guid, episode);
+    await box.put(guid, episode);
   }
 
-  Future<void> deleteEpisode({required String guid}) async {
-    // Make return type Future<void>
+  Future<void> deleteEpisode({
+    required String guid,
+  }) async {
     final box = await episodeBox;
-    await box.delete(guid);
+    box.delete(guid);
+  }
+
+  Future<void> deleteEpisodes(String podcastId) async {
+    final box = await episodeBox;
+
+    final Map<String, Episode> allEpisodes = await box.getAllValues();
+    final List<String> keysToDelete = [];
+
+    for (final entry in allEpisodes.entries) {
+      if (entry.value.podcastId == podcastId) {
+        keysToDelete.add(entry.key);
+      }
+    }
+
+    if (keysToDelete.isNotEmpty) {
+      await box.deleteAll(keysToDelete);
+    }
   }
 
   Future<Map<String, Episode>> getEpisodes() async {
@@ -297,5 +346,12 @@ class HiveService extends ChangeNotifier {
     // Make return type Future<void>
     final box = await settingsBox;
     await box.delete('settings'); // Add await
+  }
+
+  Future<int> podcastSubscribeEpisodes(int podcastId) async {
+    final box = await subscriptionBox;
+    final Subscription? allEpisodes = await box.get(podcastId.toString());
+
+    return allEpisodes!.episodeCount;
   }
 }

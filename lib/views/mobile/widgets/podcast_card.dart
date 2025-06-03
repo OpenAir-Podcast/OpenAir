@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
+import 'package:shimmer/shimmer.dart';
 
 class PodcastCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> podcastItem;
@@ -17,14 +19,69 @@ class PodcastCard extends ConsumerStatefulWidget {
 }
 
 class _PodcastCardState extends ConsumerState<PodcastCard> {
+  bool once = false;
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<bool>(
-        stream: ref
-            .watch(openAirProvider)
-            .isSubscribed(widget.podcastItem['id'])
-            .asStream(),
-        builder: (context, subscribed) {
+    final podcastDataAsyncValue =
+        ref.watch(podcastDataByUrlProvider(widget.podcastItem['url']));
+
+    return podcastDataAsyncValue.when(
+        loading: () => Shimmer.fromColors(
+              baseColor: cardBackgroundColor!,
+              highlightColor: highlightColor!,
+              child: Card(
+                color: Colors.blueGrey[100],
+                elevation: 2.0,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        width: 62.0,
+                        height: 62.0,
+                      ),
+                      Expanded(
+                        child: SizedBox(
+                          width: 500.0,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  color: Colors.white,
+                                  width:
+                                      MediaQuery.of(context).size.width - 105.0,
+                                ),
+                                Container(
+                                  color: Colors.white,
+                                  width:
+                                      MediaQuery.of(context).size.width - 120.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: IconButton(
+                          color: highlightColor2,
+                          onPressed: () async {},
+                          icon: const Icon(Icons.add),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        error: (error, stackTrace) => Text('Error: $error'),
+        data: (snapshot) {
           return GestureDetector(
             onTap: () {
               ref.read(openAirProvider.notifier).currentPodcast =
@@ -48,16 +105,22 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        image: DecorationImage(
-                          image: CachedNetworkImageProvider(
-                              widget.podcastItem['image']),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
                       width: 62.0,
                       height: 62.0,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.podcastItem['image'],
+                        fit: BoxFit.fill,
+                        errorWidget: (context, url, error) => Container(
+                          color: cardImageShadow,
+                          child: Icon(
+                            Icons.error,
+                            size: 56.0,
+                          ),
+                        ),
+                      ),
                     ),
                     Expanded(
                       child: SizedBox(
@@ -96,37 +159,57 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                         ),
                       ),
                     ),
-                    Center(
-                      child: IconButton(
-                        tooltip: subscribed.hasData && subscribed.data!
-                            ? 'Unsubscribe to podcast'
-                            : 'Subscribe to podcast',
-                        onPressed: () {
-                          if (subscribed.hasData && subscribed.data!) {
-                            // Unsubscribe
-                            ref
-                                .read(openAirProvider.notifier)
-                                .unsubscribe(widget.podcastItem);
-                          } else {
-                            // Subscribe
-                            ref
-                                .read(openAirProvider.notifier)
-                                .subscribe(widget.podcastItem);
-                          }
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(subscribed.hasData &&
-                                      subscribed.data!
-                                  ? 'Unsubscribed from ${widget.podcastItem['title']}'
-                                  : 'Subscribed to ${widget.podcastItem['title']}'),
-                            ),
+                    FutureBuilder(
+                      future: ref
+                          .watch(openAirProvider)
+                          .isSubscribed(widget.podcastItem['id']),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Text('...'),
                           );
-                        },
-                        icon: subscribed.hasData && subscribed.data!
-                            ? const Icon(Icons.check)
-                            : const Icon(Icons.add),
-                      ),
+                        } else if (snapshot.hasError) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Text('...'),
+                          );
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: IconButton(
+                            tooltip: snapshot.data!
+                                ? 'Unsubscribe to podcast'
+                                : 'Subscribe to podcast',
+                            onPressed: () async {
+                              snapshot.data!
+                                  ? ref
+                                      .read(openAirProvider)
+                                      .unsubscribe(widget.podcastItem)
+                                  : ref
+                                      .read(openAirProvider)
+                                      .subscribe(widget.podcastItem);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    snapshot.data!
+                                        ? 'Unsubscribed from ${widget.podcastItem['title']}'
+                                        : 'Subscribed to ${widget.podcastItem['title']}',
+                                  ),
+                                ),
+                              );
+
+                              ref.invalidate(podcastDataByUrlProvider(
+                                  widget.podcastItem['url']));
+                            },
+                            icon: snapshot.data!
+                                ? const Icon(Icons.check)
+                                : const Icon(Icons.add),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

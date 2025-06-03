@@ -9,7 +9,7 @@ final podcastDataByUrlProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
         (ref, podcastUrl) async {
   final apiService = ref.watch(podcastIndexProvider);
-  return await apiService.getPodcastsByFeedUrl(podcastUrl);
+  return await apiService.getEpisodesByFeedUrl(podcastUrl);
 });
 
 class EpisodesPage extends ConsumerStatefulWidget {
@@ -26,8 +26,6 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
     return await ref.watch(openAirProvider).isSubscribed(widget.id);
   }
 
-  bool once = false;
-
   @override
   Widget build(BuildContext context) {
     final podcastUrl =
@@ -35,6 +33,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
+
+    bool once = false;
 
     return podcastDataAsyncValue.when(
       loading: () => Scaffold(
@@ -51,8 +51,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               FutureBuilder(
                 future: ref.watch(openAirProvider).isSubscribed(widget.id),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting &&
-                      !once) {
+                  if (snapshot.hasData == false && !once) {
                     once = true;
 
                     return const Padding(
@@ -64,11 +63,13 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: IconButton(
-                      tooltip: snapshot.data!
-                          ? 'Unsubscribe to podcast'
-                          : 'Subscribe to podcast',
+                      tooltip: snapshot.hasData
+                          ? snapshot.data!
+                              ? 'Unsubscribe to podcast'
+                              : 'Subscribe to podcast'
+                          : '...',
                       onPressed: () async {
-                        snapshot.data!
+                        snapshot.data! && snapshot.hasData
                             ? ref
                                 .read(openAirProvider)
                                 .unsubscribe(widget.podcast)
@@ -88,8 +89,10 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
                         ref.invalidate(podcastDataByUrlProvider(podcastUrl));
                       },
-                      icon: snapshot.data!
-                          ? const Icon(Icons.check)
+                      icon: snapshot.hasData
+                          ? snapshot.data!
+                              ? const Icon(Icons.check)
+                              : const Icon(Icons.add)
                           : const Icon(Icons.add),
                     ),
                   );

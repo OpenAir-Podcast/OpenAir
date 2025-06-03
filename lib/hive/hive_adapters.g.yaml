@@ -5,11 +5,11 @@ nextTypeId: 8
 types:
   Subscription:
     typeId: 0
-    nextIndex: 5
+    nextIndex: 6
     fields:
       id:
         index: 0
-      feedId:
+      feedUrl:
         index: 1
       title:
         index: 2
@@ -17,6 +17,8 @@ types:
         index: 3
       imageUrl:
         index: 4
+      episodeCount:
+        index: 5
   Episode:
     typeId: 1
     nextIndex: 10
@@ -47,6 +49,10 @@ types:
     fields:
       guid:
         index: 0
+  Queue:
+    typeId: 3
+    nextIndex: 0
+    fields: {}
   Download:
     typeId: 4
     nextIndex: 1
@@ -73,7 +79,3 @@ types:
         index: 0
       theme:
         index: 1
-  Queue:
-    typeId: 3
-    nextIndex: 0
-    fields: {}

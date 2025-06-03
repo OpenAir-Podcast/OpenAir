@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/main_pages/category_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
 import 'package:openair/components/no_connection.dart';
@@ -240,7 +241,15 @@ class PodcastsCard extends ConsumerWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => TopPodcastsPage(),
+                      builder: (context) {
+                        if (title == 'Top Podcasts') {
+                          return TopPodcastsPage();
+                        }
+
+                        return CategoryPage(
+                          category: title,
+                        );
+                      },
                     ),
                   );
                 },
@@ -287,15 +296,17 @@ class PodcastsCard extends ConsumerWidget {
                                     blurRadius: blurRadius,
                                   )
                                 ],
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: CachedNetworkImageProvider(
-                                    snapshot['feeds'][index]['image'],
-                                  ),
-                                ),
                               ),
                               height: cardImageHeight,
                               width: cardImageWidth,
+                              child: CachedNetworkImage(
+                                imageUrl: snapshot['feeds'][index]['image'],
+                                fit: BoxFit.fill,
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.error,
+                                  size: 120.0,
+                                ),
+                              ),
                             ),
                             Container(
                               height: cardLabelHeight,

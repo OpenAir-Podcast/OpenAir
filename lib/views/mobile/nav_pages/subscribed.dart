@@ -10,7 +10,6 @@ import 'package:openair/views/mobile/main_pages/episodes_page.dart'; // Correcte
 
 final FutureProvider<Map<String, Subscription>> subscriptionsProvider =
     FutureProvider((ref) async {
-  // Use ref.watch if you want this provider to rebuild when openAirProvider changes.
   final openAir = ref.watch(openAirProvider);
   return await openAir.getSubscriptions();
 });
@@ -29,7 +28,7 @@ class _SubscribedState extends ConsumerState<Subscribed>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Important for AutomaticKeepAliveClientMixin
+    super.build(context);
     final AsyncValue<Map<String, Subscription>> getSubscriptionsValue =
         ref.watch(subscriptionsProvider);
 
@@ -40,7 +39,6 @@ class _SubscribedState extends ConsumerState<Subscribed>
             return NoSubscription();
           }
 
-          // Convert map values to a list for easier and more stable indexed access
           final List<Subscription> subs = data.values.toList();
 
           return Scaffold(
@@ -62,7 +60,7 @@ class _SubscribedState extends ConsumerState<Subscribed>
               ],
             ),
             body: GridView.builder(
-              itemCount: subs.length, // Use the length of the list
+              itemCount: subs.length,
               cacheExtent: cacheExtent,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: mobileCrossAxisCount,
@@ -128,20 +126,43 @@ class _SubscribedState extends ConsumerState<Subscribed>
                                 ),
                                 height: subscriptionCountBoxSize,
                                 width: subscriptionCountBoxSize,
-                                child: Center(
-                                  child: Text(
-                                    // TODO Get the list of episodes for a podcast then compare it to the episodes from the database
-                                    ref
-                                        .watch(openAirProvider)
-                                        .getSubscriptionsCount(),
-                                    style: TextStyle(
-                                      color: subscriptionCountBoxTextColor,
-                                      fontSize: subscriptionCountBoxFontSize,
-                                      fontWeight:
-                                          subscriptionCountBoxFontWeight,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
+                                child: FutureBuilder(
+                                  future: ref
+                                      .watch(openAirProvider)
+                                      .getSubscriptionsCount(subs[index].id),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: Text(
+                                          '...',
+                                          style: TextStyle(
+                                            color:
+                                                subscriptionCountBoxTextColor,
+                                            fontSize:
+                                                subscriptionCountBoxFontSize,
+                                            fontWeight:
+                                                subscriptionCountBoxFontWeight,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    return Center(
+                                      child: Text(
+                                        snapshot.data ?? 'Err',
+                                        style: TextStyle(
+                                          color: subscriptionCountBoxTextColor,
+                                          fontSize:
+                                              subscriptionCountBoxFontSize,
+                                          fontWeight:
+                                              subscriptionCountBoxFontWeight,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -183,7 +204,7 @@ class _SubscribedState extends ConsumerState<Subscribed>
         },
         error: (error, stackTrace) {
           debugPrint('Error loading subscriptions: $error\n$stackTrace');
-          return const NoConnection(); // Or a more specific error widget
+          return const NoConnection(); 
         },
         loading: () => Container(
           color: Colors.white,

@@ -11,6 +11,7 @@ class Subscription extends HiveObject {
     required this.title,
     required this.author,
     required this.imageUrl,
+    required this.episodeCount,
   });
 
   @HiveField(0)
@@ -28,12 +29,16 @@ class Subscription extends HiveObject {
   @HiveField(4)
   String imageUrl;
 
+  @HiveField(5)
+  int episodeCount;
+
   factory Subscription.fromJson(Map<String, dynamic> json) => Subscription(
         id: json['id'],
         feedUrl: json['feedId'],
         title: json['title'],
         author: json['author'],
         imageUrl: json['imageUrl'],
+        episodeCount: json['episodeCount'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -42,6 +47,7 @@ class Subscription extends HiveObject {
         'title': title,
         'author': author,
         'image': imageUrl,
+        'episodeCount': episodeCount,
       };
 
   @override
@@ -52,6 +58,7 @@ class Subscription extends HiveObject {
     title: $title,
     author: $author,
     imageUrl: $imageUrl,
+    episodeCount: $episodeCount,
     ''';
   }
 }

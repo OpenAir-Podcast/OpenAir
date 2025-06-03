@@ -22,13 +22,14 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       title: fields[2] as String,
       author: fields[3] as String,
       imageUrl: fields[4] as String,
+      episodeCount: (fields[5] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..writeByte(3)
       ..write(obj.author)
       ..writeByte(4)
-      ..write(obj.imageUrl);
+      ..write(obj.imageUrl)
+      ..writeByte(5)
+      ..write(obj.episodeCount);
   }
 
   @override
