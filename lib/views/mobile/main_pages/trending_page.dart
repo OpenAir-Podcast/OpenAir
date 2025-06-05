@@ -36,8 +36,8 @@ class _TrendingPageState extends ConsumerState<TrendingPage>
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return getConnectionStatusValue.when(
-      data: (data) {
-        if (data == false) {
+      data: (connectionData) {
+        if (connectionData == false) {
           return NoConnection();
         }
 
@@ -48,15 +48,15 @@ class _TrendingPageState extends ConsumerState<TrendingPage>
                   ),
                 ),
             error: (error, stackTrace) => Center(child: Text(error.toString())),
-            data: (snapshot) {
+            data: (trendingData) {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView.builder(
                   cacheExtent: cacheExtent,
-                  itemCount: snapshot['count'],
+                  itemCount: trendingData['count'],
                   itemBuilder: (context, index) {
                     return PodcastCard(
-                      podcastItem: snapshot['feeds'][index],
+                      podcastItem: trendingData['feeds'][index],
                     );
                   },
                 ),

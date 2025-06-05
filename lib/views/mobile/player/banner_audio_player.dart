@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -34,15 +35,15 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 leading: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        ref.watch(openAirProvider).currentPodcast!['image'],
-                      ),
-                      fit: BoxFit.cover, // Adjust fit as needed
-                    ),
                   ),
                   width: 62.0,
                   height: 62.0,
+                  child: CachedNetworkImage(
+                    memCacheHeight: 62,
+                    memCacheWidth: 62,
+                    imageUrl:
+                        ref.watch(openAirProvider).currentPodcast!['image'],
+                  ),
                 ),
                 title: SizedBox(
                   height: 42.0,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -32,15 +33,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(35.0),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            ref.watch(openAirProvider).currentPodcast!['image'],
-                          ),
-                          fit: BoxFit.cover,
-                        ),
                       ),
                       width: imageSize,
                       height: imageSize,
+                      child: CachedNetworkImage(
+                        memCacheHeight: imageSize.ceil(),
+                        memCacheWidth: imageSize.ceil(),
+                        imageUrl:
+                            ref.watch(openAirProvider).currentPodcast!['image'],
+                      ),
                     ),
                   ),
                   // Podcast Title

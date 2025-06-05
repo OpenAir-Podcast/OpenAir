@@ -108,15 +108,14 @@ class _SubscribedState extends ConsumerState<Subscribed>
                                     blurRadius: blurRadius,
                                   )
                                 ],
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: CachedNetworkImageProvider(
-                                    subs[index].imageUrl,
-                                  ),
-                                ),
                               ),
                               height: cardImageHeight,
                               width: cardImageWidth,
+                              child: CachedNetworkImage(
+                                memCacheHeight: cardImageHeight.ceil(),
+                                memCacheWidth: cardImageWidth.ceil(),
+                                imageUrl: subs[index].imageUrl,
+                              ),
                             ),
                             Positioned(
                               right: 0.0,
@@ -204,7 +203,7 @@ class _SubscribedState extends ConsumerState<Subscribed>
         },
         error: (error, stackTrace) {
           debugPrint('Error loading subscriptions: $error\n$stackTrace');
-          return const NoConnection(); 
+          return const NoConnection();
         },
         loading: () => Container(
           color: Colors.white,

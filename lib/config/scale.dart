@@ -52,4 +52,4 @@ FontWeight cardLabelFontWeight = FontWeight.bold;
 int cardLabelMaxLines = 1;
 double cardLabelPadding = 8.0;
 
-double cacheExtent = 1_000_000_000.0;
+double cacheExtent = 500.0;

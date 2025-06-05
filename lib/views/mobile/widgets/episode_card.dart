@@ -65,6 +65,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: CachedNetworkImage(
+                          memCacheHeight: 62,
+                          memCacheWidth: 62,
                           imageUrl: ref
                               .watch(openAirProvider)
                               .currentPodcast!['image'],
