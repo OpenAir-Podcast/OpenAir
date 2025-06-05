@@ -97,7 +97,8 @@ class PodcastIndexProvider {
 
     if (response.statusCode == 200) {
       final String xmlString = response.body;
-      return json.decode(xmlString)['feed']['episodeCount'];
+      Map<String, dynamic> data = json.decode(xmlString);
+      return data['feed']['episodeCount'];
     } else {
       throw Exception('Failed to get data from the API');
     }

@@ -255,7 +255,7 @@ class HiveService extends ChangeNotifier {
   }
 
   // TODO: Implement a reorderQueue method that tightly couple the pos together
-  // TODO: This should get the fetch the list then sort it in ASC order
+  // This should get the fetch the list then sort it in ASC order
   void reorderQueue() {}
 
   // Download Operations:

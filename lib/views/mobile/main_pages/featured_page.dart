@@ -105,38 +105,44 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage>
             children: [
               // Top Podcasts
               PodcastsCard(
-                  podcastDataAsyncValue: podcastDataAsyncTopValue,
-                  title: 'Top Podcasts'),
+                podcastDataAsyncValue: podcastDataAsyncTopValue,
+                title: 'Top Podcasts',
+                podcastDataProvider: podcastDataByTopProvider,
+              ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Education
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncEducationValue,
                 title: 'Education',
+                podcastDataProvider: podcastDataByEducationProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Health
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncHealthValue,
                 title: 'Health',
+                podcastDataProvider: podcastDataByHealthProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Technology
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncTechnologyValue,
                 title: 'Technology',
+                podcastDataProvider: podcastDataByTechnologyProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Sports
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncSportsValue,
                 title: 'Sports',
+                podcastDataProvider: podcastDataBySportsProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
             ],
           ),
         );
       },
-      error: (error, stackTrace) => Center(child: Text(error.toString())),
+      error: (error, stackTrace) => NoConnection(),
       loading: () => Container(
         color: Colors.white,
         child: const Center(
@@ -152,10 +158,12 @@ class PodcastsCard extends ConsumerWidget {
     super.key,
     required this.title,
     required this.podcastDataAsyncValue,
+    required this.podcastDataProvider,
   });
 
   final AsyncValue<Map<String, dynamic>> podcastDataAsyncValue;
   final String title;
+  final FutureProvider<Map<String, dynamic>> podcastDataProvider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -218,7 +226,50 @@ class PodcastsCard extends ConsumerWidget {
             ),
           ],
         ),
-        error: (error, stackTrace) => Text('Error: $error'),
+        error: (error, stackTrace) => Scaffold(
+          body: SizedBox(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline_rounded,
+                  size: 75.0,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 20.0),
+                Text(
+                  'Oops, an error occurred...',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$error',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                const SizedBox(height: 20.0),
+                SizedBox(
+                  width: 180.0,
+                  height: 40.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () async {
+                      ref.invalidate(podcastDataProvider);
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (snapshot) {
           return Column(
             children: [

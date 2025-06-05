@@ -41,7 +41,7 @@ class CategoryPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
-                Icons.wifi_off,
+                Icons.error_outline_rounded,
                 size: 75.0,
                 color: Colors.grey,
               ),
