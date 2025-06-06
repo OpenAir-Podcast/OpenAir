@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
 import 'package:openair/views/mobile/nav_pages/feeds.dart';
@@ -8,11 +10,22 @@ import 'package:openair/views/mobile/nav_pages/settings.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in.dart';
 import 'package:openair/views/mobile/nav_pages/subscribed.dart';
 
-class AppDrawer extends StatelessWidget {
+final FutureProvider<String> subCountProvider = FutureProvider((ref) async {
+  return await ref.watch(openAirProvider).getAccumulatedSubscriptionCount();
+});
+
+class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer({super.key});
 
   @override
+  ConsumerState<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends ConsumerState<AppDrawer> {
+  @override
   Widget build(BuildContext context) {
+    final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
+
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
@@ -53,14 +66,48 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/');
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.subscriptions_rounded),
-                  title: const Text('Subscribed'),
-                  trailing: const Text('0'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Subscribed()),
+                // Subscribed button
+                getSubCountValue.when(
+                  loading: () {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Subscribed'),
+                      trailing: const Text('...'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Subscribed()),
+                        );
+                      },
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Subscribed'),
+                      trailing: ElevatedButton(
+                        child: const Text('Retry'),
+                        onPressed: () => ref.invalidate(subCountProvider),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Subscribed()),
+                        );
+                      },
+                    );
+                  },
+                  data: (String data) {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Subscribed'),
+                      trailing: Text(data),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Subscribed()),
+                        );
+                      },
                     );
                   },
                 ),

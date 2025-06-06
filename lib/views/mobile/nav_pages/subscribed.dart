@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscription.dart';
-import 'package:openair/components/no_connection.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart'; // Corrected import path
 
 final FutureProvider<Map<String, Subscription>> subscriptionsProvider =
@@ -81,19 +81,15 @@ class _SubscribedState extends ConsumerState<Subscribed>
                       ref.read(openAirProvider.notifier).currentPodcast =
                           podcastData;
 
-                      Navigator.of(context)
-                          .push(
+                      // TODO Update subscription count in the database
+
+                      Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => EpisodesPage(
                             podcast: subs[index].toJson(),
                             id: subs[index].id,
                           ),
                         ),
-                      )
-                          .whenComplete(
-                        () {
-                          ref.invalidate(subscriptionsProvider);
-                        },
                       );
                     },
                     child: Column(
@@ -129,8 +125,8 @@ class _SubscribedState extends ConsumerState<Subscribed>
                                   future: ref
                                       .watch(openAirProvider)
                                       .getSubscriptionsCount(subs[index].id),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
+                                  builder: (context, subCountSnapshot) {
+                                    if (subCountSnapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return Center(
                                         child: Text(
@@ -148,9 +144,23 @@ class _SubscribedState extends ConsumerState<Subscribed>
                                       );
                                     }
 
+                                    if (subCountSnapshot.data == null) {
+                                      return Center(
+                                        child: IconButton(
+                                          onPressed: () => ref
+                                              .invalidate(podcastIndexProvider),
+                                          icon: Icon(
+                                            Icons.error_outline_rounded,
+                                            color: Colors.white,
+                                            size: subscriptionCountBoxSize - 12,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
                                     return Center(
                                       child: Text(
-                                        snapshot.data ?? 'Err',
+                                        subCountSnapshot.data!,
                                         style: TextStyle(
                                           color: subscriptionCountBoxTextColor,
                                           fontSize:
@@ -203,7 +213,50 @@ class _SubscribedState extends ConsumerState<Subscribed>
         },
         error: (error, stackTrace) {
           debugPrint('Error loading subscriptions: $error\n$stackTrace');
-          return const NoConnection();
+          return Scaffold(
+            body: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 75.0,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 20.0),
+                  Text(
+                    'Oops, an error occurred...',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '$error',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  const SizedBox(height: 20.0),
+                  SizedBox(
+                    width: 180.0,
+                    height: 40.0,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      onPressed: () async {
+                        ref.invalidate(subscriptionsProvider);
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
         loading: () => Container(
           color: Colors.white,

@@ -538,9 +538,11 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<String> getSubscriptionsCount(int podcastId) async {
+    // Gets episodes count from last stored index of episodes
     int currentSubEpCount =
         await ref.read(hiveServiceProvider).podcastSubscribeEpisodes(podcastId);
 
+    // Gets episodes count from PodcastIndex
     int podcastEpisodeCount = await ref
         .watch(podcastIndexProvider)
         .getPodcastEpisodeCountByPodcastId(podcastId);
@@ -548,6 +550,12 @@ class OpenAirProvider with ChangeNotifier {
     int result = podcastEpisodeCount - currentSubEpCount;
 
     return result.toString();
+  }
+
+  Future<String> getAccumulatedSubscriptionCount() async {
+    return await ref
+        .read(hiveServiceProvider)
+        .podcastAccumulatedSubscribedEpisodes();
   }
 
   void subscribe(

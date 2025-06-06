@@ -34,6 +34,9 @@ class CategoryPage extends ConsumerWidget {
         ),
       ),
       error: (error, stackTrace) => Scaffold(
+        appBar: AppBar(
+          title: Text(category),
+        ),
         body: SizedBox(
           width: double.infinity,
           child: Column(

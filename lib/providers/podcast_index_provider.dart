@@ -91,8 +91,6 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
 
-    debugPrint('Podcast Id: $url');
-
     final response = await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {

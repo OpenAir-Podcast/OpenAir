@@ -11,6 +11,7 @@ import 'package:openair/models/queue.dart';
 import 'package:openair/models/download.dart';
 import 'package:openair/models/history.dart';
 import 'package:openair/models/settings.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -353,5 +354,37 @@ class HiveService extends ChangeNotifier {
     final Subscription? allEpisodes = await box.get(podcastId.toString());
 
     return allEpisodes!.episodeCount;
+  }
+
+  Future<String> podcastAccumulatedSubscribedEpisodes() async {
+    final box = await subscriptionBox;
+    final Map<String, Subscription> allEpisodes = await box.getAllValues();
+
+    int currentEpisodeCount = 0;
+    int liveEpisodeCount = 0;
+
+    for (final entry in allEpisodes.entries) {
+      currentEpisodeCount += entry.value.episodeCount;
+
+      liveEpisodeCount += await ref
+          .watch(podcastIndexProvider)
+          .getPodcastEpisodeCountByPodcastId(entry.value.id);
+    }
+
+    int result = liveEpisodeCount - currentEpisodeCount;
+    return result.toString();
+  }
+
+  Future<int> getAccumulatedEpisodes() async {
+    final box = await subscriptionBox;
+    final Map<String, Subscription> allEpisodes = await box.getAllValues();
+
+    int episodeCount = 0;
+
+    for (final entry in allEpisodes.entries) {
+      episodeCount += entry.value.episodeCount;
+    }
+
+    return episodeCount;
   }
 }
