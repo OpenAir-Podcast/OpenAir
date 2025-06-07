@@ -6,7 +6,8 @@ import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_service_manager.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
+
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 
 final FutureProvider<Map<String, Subscription>> subscriptionsProvider =
@@ -23,7 +24,7 @@ final getSubscriptionsCountProvider =
 
   // Gets episodes count from PodcastIndex
   int podcastEpisodeCount = await ref
-      .watch(podcastServiceManagerProvider)
+      .watch(podcastIndexProvider)
       .getPodcastEpisodeCountByPodcastId(podcastId);
 
   int result = podcastEpisodeCount - currentSubEpCount;

@@ -632,4 +632,15 @@ class OpenAirProvider with ChangeNotifier {
     ref.invalidate(episodesProvider);
     notifyListeners();
   }
+
+
+  Future<bool> isEpisodeNew(String guid) async {
+    Episode? resultSet = await ref.read(hiveServiceProvider).getEpisode(guid);
+
+    if (resultSet != null) {
+      return false;
+    }
+
+    return true;
+  }
 }

@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_service_manager.dart';
+import 'package:openair/providers/podcast_index_provider.dart';
+
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/subscription_episode_card.dart';
 
 final podcastDataByUrlProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
         (ref, podcastUrl) async {
-  final apiService = ref.watch(podcastServiceManagerProvider);
+  final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getEpisodesByFeedUrl(podcastUrl);
 });
 
@@ -80,7 +81,7 @@ class _SubscriptionsEpisodesPageState
                     ),
                   ),
                   onPressed: () async {
-                    ref.invalidate(podcastServiceManagerProvider);
+                    ref.invalidate(podcastIndexProvider);
                   },
                   child: const Text('Retry'),
                 ),
