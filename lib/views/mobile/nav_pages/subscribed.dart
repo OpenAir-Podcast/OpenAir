@@ -4,14 +4,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscription.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
-import 'package:openair/views/mobile/main_pages/episodes_page.dart'; // Corrected import path
+import 'package:openair/services/podcast_service_manager.dart';
+import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 
 final FutureProvider<Map<String, Subscription>> subscriptionsProvider =
     FutureProvider((ref) async {
   final openAir = ref.watch(openAirProvider);
   return await openAir.getSubscriptions();
+});
+
+final getSubscriptionsCountProvider =
+    FutureProvider.family<String, int>((ref, podcastId) async {
+  // Gets episodes count from last stored index of episodes
+  int currentSubEpCount =
+      await ref.read(hiveServiceProvider).podcastSubscribeEpisodes(podcastId);
+
+  // Gets episodes count from PodcastIndex
+  int podcastEpisodeCount = await ref
+      .watch(podcastServiceManagerProvider)
+      .getPodcastEpisodeCountByPodcastId(podcastId);
+
+  int result = podcastEpisodeCount - currentSubEpCount;
+
+  return result.toString();
 });
 
 class Subscribed extends ConsumerStatefulWidget {
@@ -47,14 +64,19 @@ class _SubscribedState extends ConsumerState<Subscribed>
               title: Text('Subscribed'),
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO Add search functionality here
+                    // This is to search for podcast that the user has already sub to.
+                  },
                   icon: const Icon(Icons.search),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.settings),
+                    onPressed: () {
+                      // TODO Add some options here
+                    },
+                    icon: const Icon(Icons.more_vert_rounded),
                   ),
                 ),
               ],
@@ -67,6 +89,9 @@ class _SubscribedState extends ConsumerState<Subscribed>
                 mainAxisExtent: subscribedMobileMainAxisExtent,
               ),
               itemBuilder: (context, index) {
+                final subCountDataAsyncValue =
+                    ref.watch(getSubscriptionsCountProvider(subs[index].id));
+
                 return Padding(
                   padding: EdgeInsets.fromLTRB(
                     cardSidePadding,
@@ -83,13 +108,21 @@ class _SubscribedState extends ConsumerState<Subscribed>
 
                       // TODO Update subscription count in the database
 
-                      Navigator.of(context).push(
+                      Navigator.of(context)
+                          .push(
                         MaterialPageRoute(
-                          builder: (context) => EpisodesPage(
+                          builder: (context) => SubscriptionsEpisodesPage(
                             podcast: subs[index].toJson(),
                             id: subs[index].id,
                           ),
                         ),
+                      )
+                          .then(
+                        (value) {
+                          ref.invalidate(subscriptionsProvider);
+                          ref.invalidate(
+                              getSubscriptionsCountProvider(subs[index].id));
+                        },
                       );
                     },
                     child: Column(
@@ -121,46 +154,45 @@ class _SubscribedState extends ConsumerState<Subscribed>
                                 ),
                                 height: subscriptionCountBoxSize,
                                 width: subscriptionCountBoxSize,
-                                child: FutureBuilder(
-                                  future: ref
-                                      .watch(openAirProvider)
-                                      .getSubscriptionsCount(subs[index].id),
-                                  builder: (context, subCountSnapshot) {
-                                    if (subCountSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: Text(
-                                          '...',
-                                          style: TextStyle(
-                                            color:
-                                                subscriptionCountBoxTextColor,
-                                            fontSize:
-                                                subscriptionCountBoxFontSize,
-                                            fontWeight:
-                                                subscriptionCountBoxFontWeight,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                    if (subCountSnapshot.data == null) {
-                                      return Center(
-                                        child: IconButton(
-                                          onPressed: () => ref
-                                              .invalidate(podcastIndexProvider),
-                                          icon: Icon(
-                                            Icons.error_outline_rounded,
-                                            color: Colors.white,
-                                            size: subscriptionCountBoxSize - 12,
-                                          ),
-                                        ),
-                                      );
-                                    }
-
+                                child: subCountDataAsyncValue.when(
+                                  data: (data) {
                                     return Center(
                                       child: Text(
-                                        subCountSnapshot.data!,
+                                        data,
+                                        style: TextStyle(
+                                          color: subscriptionCountBoxTextColor,
+                                          fontSize:
+                                              subscriptionCountBoxFontSize,
+                                          fontWeight:
+                                              subscriptionCountBoxFontWeight,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  error: (error, stackTrace) {
+                                    return Center(
+                                      child: IconButton(
+                                        // FIXME does not work... need to reload page
+                                        onPressed: () {
+                                          ref.invalidate(subscriptionsProvider);
+
+                                          ref.invalidate(
+                                              getSubscriptionsCountProvider(
+                                                  subs[index].id));
+                                        },
+                                        icon: Icon(
+                                          Icons.error_outline_rounded,
+                                          color: Colors.white,
+                                          size: subscriptionCountBoxSize - 12,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  loading: () {
+                                    return Center(
+                                      child: Text(
+                                        '...',
                                         style: TextStyle(
                                           color: subscriptionCountBoxTextColor,
                                           fontSize:
@@ -235,7 +267,10 @@ class _SubscribedState extends ConsumerState<Subscribed>
                   ),
                   Text(
                     '$error',
-                    style: TextStyle(fontSize: 16.0),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
                   ),
                   const SizedBox(height: 20.0),
                   SizedBox(
