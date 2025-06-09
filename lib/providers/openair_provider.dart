@@ -50,8 +50,8 @@ class OpenAirProvider with ChangeNotifier {
 
   bool isPodcastSelected = false;
 
-  late Map<String, dynamic>? currentPodcast;
-  late Map<String, dynamic>? currentEpisode;
+  Map<String, dynamic>? currentPodcast;
+  Map<String, dynamic>? currentEpisode;
   Map<String, dynamic>? nextEpisode;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
@@ -539,8 +539,9 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<String> getSubscriptionsCount(int podcastId) async {
     // Gets episodes count from last stored index of episodes
-    int currentSubEpCount =
-        await ref.read(hiveServiceProvider).podcastSubscribeEpisodes(podcastId);
+    int currentSubEpCount = await ref
+        .read(hiveServiceProvider)
+        .podcastSubscribedEpisodeCount(podcastId);
 
     // Gets episodes count from PodcastIndex
     int podcastEpisodeCount = await ref
@@ -556,6 +557,10 @@ class OpenAirProvider with ChangeNotifier {
     return await ref
         .read(hiveServiceProvider)
         .podcastAccumulatedSubscribedEpisodes();
+  }
+
+  Future<String> getFeedsCount() async {
+    return await ref.read(hiveServiceProvider).feedsCount();
   }
 
   void subscribe(
@@ -584,37 +589,38 @@ class OpenAirProvider with ChangeNotifier {
 
   void unsubscribe(Map<String, dynamic> podcast) async {
     ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
+    removePodcastEpisodes(podcast);
+
     ref.invalidate(subscriptionsProvider);
     notifyListeners();
   }
 
   void addPodcastEpisodes(Map<String, dynamic> podcast) async {
     final apiService = ref.watch(podcastIndexProvider);
+
     Map<String, dynamic> episodes =
         await apiService.getEpisodesByFeedUrl(podcast['url']);
 
     Episode episode;
 
     for (int i = 0; i < episodes['count']; i++) {
-      String podcastDate = getPodcastPublishedDateFromEpoch(
-          episodes['items'][i]['datePublished']);
-
-      String duration =
-          getPodcastDuration(episodes['items'][i]['enclosureLength']);
-
-      String size = getEpisodeSize(episodes['items'][i]['enclosureLength']);
+      int enclosureLength = episodes['items'][i]['enclosureLength'];
+      String duration = getPodcastDuration(enclosureLength);
+      String size = getEpisodeSize(enclosureLength);
 
       episode = Episode(
         podcastId: podcast['id'].toString(),
         guid: episodes['items'][i]['guid'],
         title: episodes['items'][i]['title'],
         author: podcast['author'] ?? 'Unknown',
-        imageUrl: podcast['image'],
-        datePublished: podcastDate,
+        image: podcast['image'],
+        datePublished: episodes['items'][i]['datePublished'],
         description: episodes['items'][i]['description'],
         feedUrl: episodes['items'][i]['feedUrl'],
         duration: duration,
         size: size,
+        enclosureLength: enclosureLength,
+        enclosureUrl: episodes['items'][i]['enclosureUrl'],
       );
 
       ref.read(hiveServiceProvider).insertEpisode(
@@ -622,17 +628,14 @@ class OpenAirProvider with ChangeNotifier {
             episode.guid,
           );
 
-      ref.invalidate(episodesProvider);
       notifyListeners();
     }
   }
 
   void removePodcastEpisodes(Map<String, dynamic> podcast) async {
     ref.read(hiveServiceProvider).deleteEpisodes(podcast['id'].toString());
-    ref.invalidate(episodesProvider);
     notifyListeners();
   }
-
 
   Future<bool> isEpisodeNew(String guid) async {
     Episode? resultSet = await ref.read(hiveServiceProvider).getEpisode(guid);
@@ -642,5 +645,9 @@ class OpenAirProvider with ChangeNotifier {
     }
 
     return true;
+  }
+
+  Future<List<Episode>> getSubscribedEpisodes() async {
+    return ref.read(hiveServiceProvider).getEpisodes();
   }
 }

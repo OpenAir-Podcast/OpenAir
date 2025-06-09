@@ -21,11 +21,11 @@ types:
         index: 5
   Episode:
     typeId: 1
-    nextIndex: 10
+    nextIndex: 12
     fields:
       guid:
         index: 0
-      imageUrl:
+      feedImage:
         index: 1
       title:
         index: 2
@@ -43,6 +43,10 @@ types:
         index: 8
       podcastId:
         index: 9
+      enclosureLength:
+        index: 10
+      enclosureUrl:
+        index: 11
   Feed:
     typeId: 2
     nextIndex: 1

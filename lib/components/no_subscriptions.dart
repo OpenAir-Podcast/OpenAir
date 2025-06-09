@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NoSubscription extends ConsumerWidget {
-  const NoSubscription({
+class NoSubscriptions extends StatelessWidget {
+  const NoSubscriptions({
     super.key,
+    required this.title,
   });
 
+  final String title;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subscriptions'),
+        title: Text(title),
       ),
       body: Center(
         child: Column(

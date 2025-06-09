@@ -27,6 +27,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage>
     with AutomaticKeepAliveClientMixin<TrendingPage> {
   @override
   bool get wantKeepAlive => true;
+  
   @override
   Widget build(BuildContext context) {
     super.build(context); // Important for AutomaticKeepAliveClientMixin

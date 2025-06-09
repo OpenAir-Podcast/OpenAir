@@ -9,8 +9,6 @@ import 'package:openair/models/history.dart';
 import 'package:openair/models/settings.dart';
 import 'package:openair/models/subscription.dart';
 
-part 'hive_adapters.g.dart';
-
 @GenerateAdapters([
   AdapterSpec<Subscription>(),
   AdapterSpec<Episode>(),

@@ -131,7 +131,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                           ),
                         );
 
-                        ref.invalidate(podcastDataByUrlProvider(podcastUrl));
+                        ref.invalidate(podcastDataByUrlProvider);
                       },
                       icon: snapshot.hasData
                           ? snapshot.data!

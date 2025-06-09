@@ -75,7 +75,7 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
 
-    // debugPrint('Feed URL: $url');
+    debugPrint('Feed URL: $url');
 
     final response = await http.get(Uri.parse(url), headers: headers);
 

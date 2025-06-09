@@ -31,13 +31,13 @@ final subscriptionsProvider =
   yield await box.getAllValues();
 });
 
-final episodesProvider = StreamProvider<Map<String, Episode>>((ref) async* {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.episodeBox;
+// final episodesProvider = StreamProvider<Map<String, Episode>>((ref) async* {
+//   final hiveService = ref.watch(hiveServiceProvider);
+//   final box = await hiveService.episodeBox;
 
-  // Emit the initial state
-  yield await box.getAllValues();
-});
+//   // Emit the initial state
+//   yield await box.getAllValues();
+// });
 
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
@@ -185,9 +185,18 @@ class HiveService extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, Episode>> getEpisodes() async {
+  Future<List<Episode>> getEpisodes() async {
     final box = await episodeBox;
-    return box.getAllValues();
+    final Map<String, Episode> allEpisodes = await box.getAllValues();
+    final List<Episode> episodesList = [];
+
+    for (final entry in allEpisodes.entries) {
+      episodesList.add(entry.value);
+    }
+    // Sort the list by datePublished in descending order (newest first)
+    episodesList.sort((a, b) => b.datePublished.compareTo(a.datePublished));
+
+    return episodesList;
   }
 
   Future<Episode?> getEpisode(String guid) async {
@@ -349,7 +358,7 @@ class HiveService extends ChangeNotifier {
     await box.delete('settings'); // Add await
   }
 
-  Future<int> podcastSubscribeEpisodes(int podcastId) async {
+  Future<int> podcastSubscribedEpisodeCount(int podcastId) async {
     final box = await subscriptionBox;
     final Subscription? allEpisodes = await box.get(podcastId.toString());
 
@@ -372,6 +381,14 @@ class HiveService extends ChangeNotifier {
     }
 
     int result = liveEpisodeCount - currentEpisodeCount;
+    return result.toString();
+  }
+
+  Future<String> feedsCount() async {
+    final box = await episodeBox;
+    final Map<String, Episode> allEpisodes = await box.getAllValues();
+
+    int result = allEpisodes.length;
     return result.toString();
   }
 

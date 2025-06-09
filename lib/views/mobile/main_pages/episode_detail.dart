@@ -201,13 +201,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 child: Html(
                   data: widget.episodeItem!['description'],
                   style: {
-                    "p.fancy": Style(
-                      textAlign: TextAlign.center,
-                      backgroundColor: Colors.grey,
-                      margin: Margins(
-                          left: Margin(50, Unit.px), right: Margin.auto()),
-                      width: Width(300, Unit.px),
-                      fontWeight: FontWeight.bold,
+                    "br": Style(
+                      display: Display.block,
+                      backgroundColor: Colors.black,
                     ),
                   },
                   shrinkWrap: true,

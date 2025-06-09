@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
-import 'package:openair/views/mobile/nav_pages/feeds.dart';
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/history.dart';
 import 'package:openair/views/mobile/nav_pages/queue.dart';
 import 'package:openair/views/mobile/nav_pages/settings.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in.dart';
-import 'package:openair/views/mobile/nav_pages/subscribed.dart';
+import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final FutureProvider<String> subCountProvider = FutureProvider((ref) async {
   return await ref.watch(openAirProvider).getAccumulatedSubscriptionCount();
+});
+
+final FutureProvider<String> feedCountProvider = FutureProvider((ref) async {
+  return await ref.watch(openAirProvider).getFeedsCount();
 });
 
 class AppDrawer extends ConsumerStatefulWidget {
@@ -25,6 +29,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
+    final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -73,12 +78,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       leading: const Icon(Icons.subscriptions_rounded),
                       title: const Text('Subscribed'),
                       trailing: const Text('...'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Subscribed()),
-                        );
-                      },
                     );
                   },
                   error: (error, stackTrace) {
@@ -89,36 +88,54 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(subCountProvider),
                       ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Subscribed()),
-                        );
-                      },
                     );
                   },
                   data: (String data) {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscribed'),
+                      title: const Text('Subscriptions'),
                       trailing: Text(data),
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Subscribed()),
+                          MaterialPageRoute(
+                              builder: (context) => SubscriptionsPage()),
                         );
                       },
                     );
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.feed_rounded),
-                  title: const Text('Feed'),
-                  trailing: const Text('0'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Feeds()),
+                // TODO Show the total number of episodes in total.
+                // Feeds button
+                getFeedsCountValue.when(
+                  loading: () {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Feeds'),
+                      trailing: const Text('...'),
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Feeds'),
+                      trailing: ElevatedButton(
+                        child: const Text('Feeds'),
+                        onPressed: () => ref.invalidate(subCountProvider),
+                      ),
+                    );
+                  },
+                  data: (String data) {
+                    return ListTile(
+                      leading: const Icon(Icons.subscriptions_rounded),
+                      title: const Text('Feeds'),
+                      trailing: Text(data),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => FeedsPage()),
+                        );
+                      },
                     );
                   },
                 ),

@@ -7,7 +7,7 @@ part 'episode.g.dart';
 class Episode extends HiveObject {
   Episode({
     required this.guid,
-    required this.imageUrl,
+    required this.image,
     required this.title,
     required this.author,
     required this.datePublished,
@@ -16,13 +16,15 @@ class Episode extends HiveObject {
     required this.duration,
     required this.size,
     required this.podcastId,
+    required this.enclosureLength,
+    required this.enclosureUrl,
   });
 
   @HiveField(0)
   String guid;
 
   @HiveField(1)
-  String imageUrl;
+  String image;
 
   @HiveField(2)
   String title;
@@ -31,7 +33,7 @@ class Episode extends HiveObject {
   String author;
 
   @HiveField(4)
-  String datePublished;
+  int datePublished;
 
   @HiveField(5)
   String description;
@@ -48,9 +50,15 @@ class Episode extends HiveObject {
   @HiveField(9)
   String podcastId;
 
+  @HiveField(10)
+  int enclosureLength;
+
+  @HiveField(11)
+  String enclosureUrl;
+
   factory Episode.fromJson(Map<String, dynamic> json) => Episode(
         guid: json["guid"],
-        imageUrl: json["imageUrl"],
+        image: json["image"],
         title: json["title"],
         author: json["author"],
         datePublished: json["datePublished"],
@@ -59,11 +67,13 @@ class Episode extends HiveObject {
         duration: json["duration"],
         size: json["size"],
         podcastId: json["podcastId"],
+        enclosureLength: json["enclosureLength"],
+        enclosureUrl: json["enclosureUrl"],
       );
 
   Map<String, dynamic> toJson() => {
         'guid': guid,
-        'imageUrl': imageUrl,
+        'image': image,
         'title': title,
         'author': author,
         'datePublished': datePublished,
@@ -72,5 +82,7 @@ class Episode extends HiveObject {
         'duration': duration,
         'size': size,
         'podcastId': podcastId,
+        'enclosureLength': enclosureLength,
+        'enclosureUrl': enclosureUrl,
       };
 }
