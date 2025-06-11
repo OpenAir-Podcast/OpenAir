@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'episode.dart';
+part of 'queue_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class EpisodeAdapter extends TypeAdapter<Episode> {
+class QueueAdapter extends TypeAdapter<QueueModel> {
   @override
-  final typeId = 1;
+  final typeId = 3;
 
   @override
-  Episode read(BinaryReader reader) {
+  QueueModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Episode(
+    return QueueModel(
       guid: fields[0] as String,
       image: fields[1] as String,
       title: fields[2] as String,
@@ -25,17 +25,18 @@ class EpisodeAdapter extends TypeAdapter<Episode> {
       description: fields[5] as String,
       feedUrl: fields[6] as String,
       duration: fields[7] as String,
-      size: fields[8] as String,
+      downloadSize: fields[8] as String,
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
+      pos: (fields[12] as num).toInt(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, Episode obj) {
+  void write(BinaryWriter writer, QueueModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -53,13 +54,15 @@ class EpisodeAdapter extends TypeAdapter<Episode> {
       ..writeByte(7)
       ..write(obj.duration)
       ..writeByte(8)
-      ..write(obj.size)
+      ..write(obj.downloadSize)
       ..writeByte(9)
       ..write(obj.podcastId)
       ..writeByte(10)
       ..write(obj.enclosureLength)
       ..writeByte(11)
-      ..write(obj.enclosureUrl);
+      ..write(obj.enclosureUrl)
+      ..writeByte(12)
+      ..write(obj.pos);
   }
 
   @override
@@ -68,7 +71,7 @@ class EpisodeAdapter extends TypeAdapter<Episode> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EpisodeAdapter &&
+      other is QueueAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

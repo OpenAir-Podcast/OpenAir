@@ -3,21 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/scale.dart';
-import 'package:openair/models/subscription.dart';
+import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 
-final FutureProvider<Map<String, Subscription>> subscriptionsProvider =
-    FutureProvider((ref) async {
+final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
   final openAir = ref.watch(openAirProvider);
   return await openAir.getSubscriptions();
 });
 
 final getSubscriptionsCountProvider =
-    FutureProvider.family<String, int>((ref, podcastId) async {
+    FutureProvider.family.autoDispose<String, int>((ref, podcastId) async {
   // Gets episodes count from last stored index of episodes
   int currentSubEpCount = await ref
       .read(hiveServiceProvider)
@@ -40,14 +39,10 @@ class SubscriptionsPage extends ConsumerStatefulWidget {
   ConsumerState<SubscriptionsPage> createState() => _SubscriptionsPageState();
 }
 
-class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage>
-    with AutomaticKeepAliveClientMixin<SubscriptionsPage> {
+class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   @override
-  bool get wantKeepAlive => true;
-
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final AsyncValue<Map<String, Subscription>> getSubscriptionsValue =
         ref.watch(subscriptionsProvider);
 
@@ -107,24 +102,18 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage>
                     ref.read(openAirProvider.notifier).currentPodcast =
                         podcastData;
 
-                    // TODO Update subscription count in the database
-
                     Navigator.of(context)
                         .push(
-                      MaterialPageRoute(
-                        builder: (context) => SubscriptionsEpisodesPage(
-                          podcast: subs[index].toJson(),
-                          id: subs[index].id,
-                        ),
-                      ),
-                    )
+                          MaterialPageRoute(
+                            builder: (context) => SubscriptionsEpisodesPage(
+                              podcast: subs[index].toJson(),
+                              id: subs[index].id,
+                            ),
+                          ),
+                        )
                         .then(
-                      (value) {
-                        ref.invalidate(subscriptionsProvider);
-                        ref.invalidate(
-                            getSubscriptionsCountProvider(subs[index].id));
-                      },
-                    );
+                          (value) => ref.invalidate(subscriptionsProvider),
+                        );
                   },
                   child: Column(
                     children: [

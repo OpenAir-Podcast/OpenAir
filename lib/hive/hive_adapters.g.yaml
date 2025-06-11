@@ -25,7 +25,7 @@ types:
     fields:
       guid:
         index: 0
-      feedImage:
+      image:
         index: 1
       title:
         index: 2
@@ -53,22 +53,66 @@ types:
     fields:
       guid:
         index: 0
-  Queue:
-    typeId: 3
-    nextIndex: 0
-    fields: {}
   Download:
     typeId: 4
-    nextIndex: 1
+    nextIndex: 13
     fields:
       guid:
         index: 0
+      image:
+        index: 1
+      title:
+        index: 2
+      author:
+        index: 3
+      datePublished:
+        index: 4
+      description:
+        index: 5
+      feedUrl:
+        index: 6
+      duration:
+        index: 7
+      size:
+        index: 8
+      podcastId:
+        index: 9
+      enclosureLength:
+        index: 10
+      enclosureUrl:
+        index: 11
+      downloadDate:
+        index: 12
   History:
     typeId: 5
-    nextIndex: 1
+    nextIndex: 13
     fields:
       guid:
         index: 0
+      image:
+        index: 1
+      title:
+        index: 2
+      author:
+        index: 3
+      datePublished:
+        index: 4
+      description:
+        index: 5
+      feedUrl:
+        index: 6
+      duration:
+        index: 7
+      size:
+        index: 8
+      podcastId:
+        index: 9
+      enclosureLength:
+        index: 10
+      enclosureUrl:
+        index: 11
+      playDate:
+        index: 12
   CompletedEpisode:
     typeId: 6
     nextIndex: 1
@@ -83,3 +127,7 @@ types:
         index: 0
       theme:
         index: 1
+  Queue:
+    typeId: 3
+    nextIndex: 0
+    fields: {}

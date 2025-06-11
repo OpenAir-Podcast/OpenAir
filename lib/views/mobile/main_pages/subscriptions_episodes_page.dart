@@ -32,9 +32,14 @@ class _SubscriptionsEpisodesPageState
   }
 
   @override
+  void initState() {
+    super.initState();
+    // TODO Update subscription count in the database
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String podcastUrl =
-        ref.watch(openAirProvider.notifier).currentPodcast!['url'];
+    final String podcastUrl = widget.podcast['url'];
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));

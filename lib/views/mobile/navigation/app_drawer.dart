@@ -10,12 +10,16 @@ import 'package:openair/views/mobile/nav_pages/settings.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
-final FutureProvider<String> subCountProvider = FutureProvider((ref) async {
+final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
   return await ref.watch(openAirProvider).getAccumulatedSubscriptionCount();
 });
 
-final FutureProvider<String> feedCountProvider = FutureProvider((ref) async {
+final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
   return await ref.watch(openAirProvider).getFeedsCount();
+});
+
+final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
+  return await ref.watch(openAirProvider).getQueueCount();
 });
 
 class AppDrawer extends ConsumerStatefulWidget {
@@ -30,6 +34,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   Widget build(BuildContext context) {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
     final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
+    final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -63,6 +68,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     ),
                   ),
                 ),
+                // Home button
                 ListTile(
                   leading: const Icon(Icons.home_rounded),
                   title: const Text('Home'),
@@ -71,19 +77,20 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     Navigator.pushNamed(context, '/');
                   },
                 ),
+                const Divider(),
                 // Subscribed button
                 getSubCountValue.when(
                   loading: () {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscribed'),
+                      title: const Text('Subscriptions'),
                       trailing: const Text('...'),
                     );
                   },
                   error: (error, stackTrace) {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscribed'),
+                      title: const Text('Subscriptions'),
                       trailing: ElevatedButton(
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(subCountProvider),
@@ -105,19 +112,19 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     );
                   },
                 ),
-                // TODO Show the total number of episodes in total.
+                const Divider(),
                 // Feeds button
                 getFeedsCountValue.when(
                   loading: () {
                     return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
+                      leading: const Icon(Icons.feed_rounded),
                       title: const Text('Feeds'),
                       trailing: const Text('...'),
                     );
                   },
                   error: (error, stackTrace) {
                     return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
+                      leading: const Icon(Icons.feed_rounded),
                       title: const Text('Feeds'),
                       trailing: ElevatedButton(
                         child: const Text('Feeds'),
@@ -127,7 +134,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   },
                   data: (String data) {
                     return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
+                      leading: const Icon(Icons.feed_rounded),
                       title: const Text('Feeds'),
                       trailing: Text(data),
                       onTap: () {
@@ -139,17 +146,43 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     );
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.queue_music_rounded),
-                  title: const Text('Queue'),
-                  trailing: const Text('0'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Queue()),
+                const Divider(),
+                // TODO Show the total number of episodes in total.
+                // Queue button
+                getQueueCountValue.when(
+                  loading: () {
+                    return ListTile(
+                      leading: const Icon(Icons.queue_music_rounded),
+                      title: const Text('Queue'),
+                      trailing: const Text('...'),
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return ListTile(
+                      leading: const Icon(Icons.queue_music_rounded),
+                      title: const Text('Queue'),
+                      trailing: ElevatedButton(
+                        child: const Text('Feeds'),
+                        onPressed: () => ref.invalidate(subCountProvider),
+                      ),
+                    );
+                  },
+                  data: (String data) {
+                    return ListTile(
+                      leading: const Icon(Icons.queue_music_rounded),
+                      title: const Text('Queue'),
+                      trailing: Text(data),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Queue()),
+                        );
+                      },
                     );
                   },
                 ),
+                const Divider(),
+                // Downloads button
                 ListTile(
                   leading: const Icon(Icons.download_rounded),
                   title: const Text('Downloads'),
@@ -160,6 +193,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     );
                   },
                 ),
+                const Divider(),
+                // History button
                 ListTile(
                   leading: const Icon(Icons.history_rounded),
                   title: const Text('History'),
@@ -170,6 +205,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     );
                   },
                 ),
+                const Divider(),
+                // Settings button
                 ListTile(
                   leading: const Icon(Icons.add_rounded),
                   title: const Text('Add podcast'),
@@ -181,6 +218,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   },
                 ),
                 const Divider(),
+                // More options button
+                // TODO Show all fav podcasts that the user sub to.
                 ListTile(
                   leading: const Icon(Icons.more_horiz_rounded),
                   title: const Text('More options'),
@@ -190,6 +229,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             ),
           ),
           const Divider(),
+          // Settings button
           ListTile(
             leading: const Icon(Icons.settings_rounded),
             title: const Text('Settings'),

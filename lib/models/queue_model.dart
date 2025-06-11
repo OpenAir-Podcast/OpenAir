@@ -1,11 +1,11 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'episode.g.dart';
+part 'queue_model.g.dart';
 
-@HiveType(typeId: episodeTypeId)
-class Episode extends HiveObject {
-  Episode({
+@HiveType(typeId: queueTypeId)
+class QueueModel extends HiveObject {
+  QueueModel({
     required this.guid,
     required this.image,
     required this.title,
@@ -14,10 +14,11 @@ class Episode extends HiveObject {
     required this.description,
     required this.feedUrl,
     required this.duration,
-    required this.size,
+    required this.downloadSize,
     required this.podcastId,
     required this.enclosureLength,
     required this.enclosureUrl,
+    required this.pos,
   });
 
   @HiveField(0)
@@ -45,7 +46,7 @@ class Episode extends HiveObject {
   String duration;
 
   @HiveField(8)
-  String size;
+  String downloadSize;
 
   @HiveField(9)
   String podcastId;
@@ -56,19 +57,23 @@ class Episode extends HiveObject {
   @HiveField(11)
   String enclosureUrl;
 
-  factory Episode.fromJson(Map<String, dynamic> json) => Episode(
-        guid: json["guid"],
-        image: json["image"],
-        title: json["title"],
-        author: json["author"],
-        datePublished: json["datePublished"],
-        description: json["description"],
-        feedUrl: json["feedUrl"],
-        duration: json["duration"],
-        size: json["size"],
-        podcastId: json["podcastId"],
-        enclosureLength: json["enclosureLength"],
-        enclosureUrl: json["enclosureUrl"],
+  @HiveField(12)
+  int pos;
+
+  factory QueueModel.fromJson(Map<String, dynamic> json) => QueueModel(
+        guid: json['guid'],
+        image: json['image'],
+        title: json['title'],
+        author: json['author'],
+        datePublished: json['datePublished'],
+        description: json['description'],
+        feedUrl: json['feedUrl'],
+        duration: json['duration'],
+        downloadSize: json['downloadSize'],
+        podcastId: json['podcastId'],
+        enclosureLength: json['enclosureLength'],
+        enclosureUrl: json['enclosureUrl'],
+        pos: json['pos'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -80,9 +85,10 @@ class Episode extends HiveObject {
         'description': description,
         'feedUrl': feedUrl,
         'duration': duration,
-        'size': size,
+        'downloadSize': downloadSize,
         'podcastId': podcastId,
         'enclosureLength': enclosureLength,
         'enclosureUrl': enclosureUrl,
+        'pos': pos,
       };
 }

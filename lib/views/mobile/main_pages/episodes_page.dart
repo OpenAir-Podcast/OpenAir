@@ -29,8 +29,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final podcastUrl =
-        ref.watch(openAirProvider.notifier).currentPodcast!['url'];
+    final podcastUrl = ref.watch(openAirProvider).currentPodcast!['url'];
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
@@ -155,6 +154,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                 itemBuilder: (context, index) => EpisodeCard(
                   title: snapshot['items'][index]['title'],
                   episodeItem: snapshot['items'][index],
+                  podcast: widget.podcast,
                 ),
               ),
             ),

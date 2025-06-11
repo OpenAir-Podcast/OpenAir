@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
@@ -41,6 +43,9 @@ class _SubscriptionEpisodeCardState
         .watch(openAirProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
+    final AsyncValue<Map<String, QueueModel>> getQueueValue =
+        ref.watch(queueProvider);
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
@@ -66,7 +71,7 @@ class _SubscriptionEpisodeCardState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -104,11 +109,13 @@ class _SubscriptionEpisodeCardState
                                       MediaQuery.of(context).size.width - 130.0,
                                   // Podcast title
                                   child: Text(
-                                    widget.title,
+                                    widget.episodeItem['title'],
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    maxLines: 2,
                                   ),
                                 ),
                                 SizedBox(
@@ -140,15 +147,6 @@ class _SubscriptionEpisodeCardState
                           ),
                         ),
                       ],
-                    ),
-                    SizedBox(
-                      child: Text(
-                        widget.episodeItem['title'] ?? "Unknown",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                     // TODO: Use a rich text widget to display the description
                     Padding(
@@ -195,10 +193,58 @@ class _SubscriptionEpisodeCardState
                           ),
                         ),
                         // Playlist button
-                        IconButton(
-                          tooltip: "Add to queue",
-                          onPressed: () {},
-                          icon: const Icon(Icons.playlist_add_rounded),
+                        getQueueValue.when(
+                          data: (data) {
+                            bool isQueued = false;
+
+                            data.containsKey(widget.episodeItem['guid'])
+                                ? isQueued = true
+                                : isQueued = false;
+
+                            return IconButton(
+                              tooltip: "Add to queue",
+                              onPressed: () {
+                                isQueued
+                                    ? ref
+                                        .watch(openAirProvider)
+                                        .removeFromQueue(
+                                            widget.episodeItem['guid'])
+                                    : ref
+                                        .watch(openAirProvider)
+                                        .addToQueue(widget.episodeItem);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      isQueued
+                                          ? 'Removed ${widget.episodeItem['title']} from queue'
+                                          : 'Added ${widget.episodeItem['title']} to queue',
+                                    ),
+                                  ),
+                                );
+
+                                ref.invalidate(queueProvider);
+                              },
+                              icon: isQueued
+                                  ? const Icon(Icons.playlist_add_check_rounded)
+                                  : const Icon(Icons.playlist_add_rounded),
+                            );
+                          },
+                          error: (error, stackTrace) {
+                            return IconButton(
+                              tooltip: "Add to queue",
+                              onPressed: () {},
+                              icon: const Icon(Icons.error_outline_rounded),
+                            );
+                          },
+                          loading: () {
+                            return IconButton(
+                              tooltip: "Add to queue",
+                              onPressed: () {},
+                              icon: Icon(
+                                  Icons.keyboard_double_arrow_down_rounded),
+                            );
+                          },
                         ),
                         // Download button
                         IconButton(

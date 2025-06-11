@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 final podcastIndexProvider = Provider(
   (ref) => PodcastIndexProvider(),
@@ -20,26 +19,20 @@ class PodcastIndexProvider {
   late int unixTime;
   late String newUnixTime;
 
-  late Uint8List firstChunk;
-  late Uint8List secondChunk;
-  late Uint8List thirdChunk;
-
-  late AccumulatorSink<Digest> output;
-  late ByteConversionSink input;
-
   late Digest digest;
   late Map<String, String> headers;
+  late Dio _dio;
 
   PodcastIndexProvider() {
     unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     newUnixTime = unixTime.toString();
 
-    firstChunk = utf8.encode(podcastIndexApi!);
-    secondChunk = utf8.encode(podcastIndexSecret!);
-    thirdChunk = utf8.encode(newUnixTime);
+    final firstChunk = utf8.encode(podcastIndexApi!);
+    final secondChunk = utf8.encode(podcastIndexSecret!);
+    final thirdChunk = utf8.encode(newUnixTime);
 
-    output = AccumulatorSink<Digest>();
-    input = sha1.startChunkedConversion(output);
+    final output = AccumulatorSink<Digest>();
+    final ByteConversionSink input = sha1.startChunkedConversion(output);
     input.add(firstChunk);
     input.add(secondChunk);
     input.add(thirdChunk);
@@ -53,6 +46,8 @@ class PodcastIndexProvider {
       "Authorization": digest.toString(),
       "User-Agent": podcastIndexUserAgent!,
     };
+
+    _dio = Dio(BaseOptions(headers: headers));
   }
 
   /// This method is used to get the list of podcasts from the API.
@@ -77,13 +72,12 @@ class PodcastIndexProvider {
 
     debugPrint('Feed URL: $url');
 
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching episodes by feed URL: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
@@ -91,14 +85,15 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
 
-    final response = await http.get(Uri.parse(url), headers: headers);
+    // debugPrint('Podcast ID URL: $url');
 
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      Map<String, dynamic> data = json.decode(xmlString);
-      return data['feed']['episodeCount'];
-    } else {
-      throw Exception('Failed to get data from the API');
+    try {
+      final response = await _dio.get(url);
+
+      return response.data['feed']['episodeCount'];
+    } on DioException catch (e) {
+      debugPrint('DioError fetching podcast episode count by ID: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
@@ -110,13 +105,12 @@ class PodcastIndexProvider {
 
     debugPrint('Category URL: $url');
 
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching podcasts by category: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
@@ -124,88 +118,72 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching trending podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
   Future<Map<String, dynamic>> getTopPodcasts() async {
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty',
-        ),
-        headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    const url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching top podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
   Future<Map<String, dynamic>> getEducationPodcasts() async {
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty',
-        ),
-        headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    const url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty';
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching education podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
   Future<Map<String, dynamic>> getHealthPodcasts() async {
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty',
-        ),
-        headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    const url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty';
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching health podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty',
-        ),
-        headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    const url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty';
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching technology podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 
   Future<Map<String, dynamic>> getSportsPodcasts() async {
-    final response = await http.get(
-        Uri.parse(
-          'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty',
-        ),
-        headers: headers);
-
-    if (response.statusCode == 200) {
-      final String xmlString = response.body;
-      return json.decode(xmlString);
-    } else {
-      throw Exception('Failed to get data from the API');
+    const url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty';
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('DioError fetching sports podcasts: ${e.message}');
+      throw Exception('Failed to get data from the API: ${e.message}');
     }
   }
 }

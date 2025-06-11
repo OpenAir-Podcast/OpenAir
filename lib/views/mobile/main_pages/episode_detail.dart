@@ -40,7 +40,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
                           image: NetworkImage(
-                            ref.watch(openAirProvider).currentPodcast!['image'],
+                            widget.episodeItem!['feedImage'],
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -104,13 +104,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                   ),
                 ],
               ),
-              Text(
-                widget.episodeItem!['title'],
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
@@ -137,7 +130,18 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     ),
                     IconButton(
                       tooltip: "Add to queue",
-                      onPressed: () {},
+                      onPressed: () {
+                        ref
+                            .read(openAirProvider)
+                            .addToQueue(widget.episodeItem!);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Added ${widget.episodeItem!['title']} to queue'),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.playlist_add),
                     ),
                     // TODO: Add download button

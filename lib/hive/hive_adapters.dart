@@ -1,13 +1,13 @@
 import 'dart:collection';
 
 import 'package:hive_ce/hive.dart';
-import 'package:openair/models/completed_episode.dart';
-import 'package:openair/models/download.dart';
-import 'package:openair/models/episode.dart';
-import 'package:openair/models/feed.dart';
-import 'package:openair/models/history.dart';
-import 'package:openair/models/settings.dart';
-import 'package:openair/models/subscription.dart';
+import 'package:openair/models/completed_episode_model.dart';
+import 'package:openair/models/download_model.dart';
+import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/feed_model.dart';
+import 'package:openair/models/history_model.dart';
+import 'package:openair/models/settings_model.dart';
+import 'package:openair/models/subscription_model.dart';
 
 @GenerateAdapters([
   AdapterSpec<Subscription>(),

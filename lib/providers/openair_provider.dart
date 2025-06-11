@@ -6,8 +6,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/models/episode.dart';
-import 'package:openair/models/subscription.dart';
+import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
@@ -563,6 +564,56 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).feedsCount();
   }
 
+  Future<String> getQueueCount() async {
+    return await ref.read(hiveServiceProvider).queueCount();
+  }
+
+  void addToQueue(Map<String, dynamic> episode) async {
+    int pos;
+
+    List<QueueModel> queue = await ref.watch(hiveServiceProvider).getQueue();
+
+    if (queue.isEmpty) {
+      pos = 1;
+    } else {
+      int lastPos = queue.last.pos;
+
+      pos = lastPos + 1;
+    }
+
+    int enclosureLength = episode['enclosureLength'];
+    String duration = getPodcastDuration(enclosureLength);
+    String downloadSize = getEpisodeSize(enclosureLength);
+
+    QueueModel queueMod = QueueModel(
+      guid: episode['guid'],
+      title: episode['title'],
+      author: episode['author'] ?? 'Unknown',
+      image: episode['feedImage'],
+      datePublished: episode['datePublished'],
+      description: episode['description'],
+      feedUrl: episode['feedUrl'],
+      duration: duration,
+      downloadSize: downloadSize,
+      enclosureLength: episode['enclosureLength'],
+      enclosureUrl: episode['enclosureUrl'],
+      podcastId: currentPodcast!['id'].toString(),
+      pos: pos,
+    );
+
+    ref.read(hiveServiceProvider).addToQueue(queueMod);
+  }
+
+  Future<QueueModel?> getQueueByGuid(String guid) async {
+    return await ref.read(hiveServiceProvider).getQueueByGuid(guid);
+  }
+
+  void removeFromQueue(String guid) async {
+    ref.read(hiveServiceProvider).removeFromQueue(guid: guid);
+    ref.invalidate(queueProvider);
+    notifyListeners();
+  }
+
   void subscribe(
     Map<String, dynamic> podcast,
   ) async {
@@ -613,7 +664,7 @@ class OpenAirProvider with ChangeNotifier {
         guid: episodes['items'][i]['guid'],
         title: episodes['items'][i]['title'],
         author: podcast['author'] ?? 'Unknown',
-        image: podcast['image'],
+        image: episodes['items'][i]['feedImage'],
         datePublished: episodes['items'][i]['datePublished'],
         description: episodes['items'][i]['description'],
         feedUrl: episodes['items'][i]['feedUrl'],

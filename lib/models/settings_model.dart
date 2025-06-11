@@ -1,7 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'settings.g.dart';
+part 'settings_model.g.dart';
 
 @HiveType(typeId: settingsTypeId)
 class Settings extends HiveObject {

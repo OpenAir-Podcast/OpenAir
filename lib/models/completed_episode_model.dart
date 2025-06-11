@@ -1,28 +1,23 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'queue.g.dart';
+part 'completed_episode_model.g.dart';
 
-@HiveType(typeId: queueTypeId)
-class Queue extends HiveObject {
-  Queue({
+@HiveType(typeId: completedEpisodeTypeId)
+class CompletedEpisode extends HiveObject {
+  CompletedEpisode({
     required this.guid,
-    required this.pos,
   });
 
   @HiveField(0)
   String guid;
 
-  @HiveField(1)
-  int pos;
-
-  factory Queue.fromJson(Map<String, dynamic> json) => Queue(
+  factory CompletedEpisode.fromJson(Map<String, dynamic> json) =>
+      CompletedEpisode(
         guid: json["guid"],
-        pos: json["pos"],
       );
 
   Map<String, dynamic> toJson() => {
         'guid': guid,
-        'pos': pos,
       };
 }

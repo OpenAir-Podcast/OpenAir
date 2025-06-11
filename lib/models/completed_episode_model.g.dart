@@ -1,28 +1,28 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'download.dart';
+part of 'completed_episode_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DownloadAdapter extends TypeAdapter<Download> {
+class CompletedEpisodeAdapter extends TypeAdapter<CompletedEpisode> {
   @override
-  final typeId = 4;
+  final typeId = 6;
 
   @override
-  Download read(BinaryReader reader) {
+  CompletedEpisode read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Download(
+    return CompletedEpisode(
       guid: fields[0] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Download obj) {
+  void write(BinaryWriter writer, CompletedEpisode obj) {
     writer
       ..writeByte(1)
       ..writeByte(0)
@@ -35,7 +35,7 @@ class DownloadAdapter extends TypeAdapter<Download> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DownloadAdapter &&
+      other is CompletedEpisodeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

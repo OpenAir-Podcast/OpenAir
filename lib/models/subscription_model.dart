@@ -1,7 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'subscription.g.dart';
+part 'subscription_model.g.dart';
 
 @HiveType(typeId: subscriptionTypeId)
 class Subscription extends HiveObject {

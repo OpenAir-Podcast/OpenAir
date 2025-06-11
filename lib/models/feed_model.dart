@@ -1,18 +1,18 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'history.g.dart';
+part 'feed_model.g.dart';
 
-@HiveType(typeId: historyTypeId)
-class History extends HiveObject {
-  History({
+@HiveType(typeId: feedTypeId)
+class Feed extends HiveObject {
+  Feed({
     required this.guid,
   });
 
   @HiveField(0)
   String guid;
 
-  factory History.fromJson(Map<String, dynamic> json) => History(
+  factory Feed.fromJson(Map<String, dynamic> json) => Feed(
         guid: json["guid"],
       );
 

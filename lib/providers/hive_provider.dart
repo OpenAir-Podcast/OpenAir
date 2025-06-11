@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:openair/models/completed_episode.dart';
-import 'package:openair/models/episode.dart';
-import 'package:openair/models/feed.dart';
-import 'package:openair/models/subscription.dart';
-import 'package:openair/models/queue.dart';
-import 'package:openair/models/download.dart';
-import 'package:openair/models/history.dart';
-import 'package:openair/models/settings.dart';
+import 'package:openair/models/completed_episode_model.dart';
+import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/feed_model.dart';
+import 'package:openair/models/subscription_model.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/models/download_model.dart';
+import 'package:openair/models/history_model.dart';
+import 'package:openair/models/settings_model.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,7 +23,7 @@ final hiveServiceProvider = ChangeNotifierProvider<HiveService>(
 
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
-    StreamProvider<Map<String, Subscription>>((ref) async* {
+    StreamProvider.autoDispose<Map<String, Subscription>>((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
 
@@ -31,20 +31,22 @@ final subscriptionsProvider =
   yield await box.getAllValues();
 });
 
-// final episodesProvider = StreamProvider<Map<String, Episode>>((ref) async* {
-//   final hiveService = ref.watch(hiveServiceProvider);
-//   final box = await hiveService.episodeBox;
+// StreamProvider for Queue
+final queueProvider =
+    StreamProvider.autoDispose<Map<String, QueueModel>>((ref) async* {
+  final hiveService = ref.watch(hiveServiceProvider);
+  final box = await hiveService.queueBox;
 
-//   // Emit the initial state
-//   yield await box.getAllValues();
-// });
+  // Emit the initial state
+  yield await box.getAllValues();
+});
 
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
   late final Future<CollectionBox<Subscription>> subscriptionBox;
   late final Future<CollectionBox<Episode>> episodeBox;
   late final Future<CollectionBox<Feed>> feedBox;
-  late final Future<CollectionBox<Queue>> queueBox;
+  late final Future<CollectionBox<QueueModel>> queueBox;
   late final Future<CollectionBox<Download>> downloadBox;
   late final Future<CollectionBox<History>> historyBox;
   late final Future<CollectionBox<CompletedEpisode>> completedEpisodeBox;
@@ -101,7 +103,7 @@ class HiveService extends ChangeNotifier {
     subscriptionBox = collection.openBox<Subscription>('subscriptions');
     episodeBox = collection.openBox<Episode>('episodes');
     feedBox = collection.openBox<Feed>('feed');
-    queueBox = collection.openBox<Queue>('queue');
+    queueBox = collection.openBox<QueueModel>('queue');
     downloadBox = collection.openBox<Download>('download');
     historyBox = collection.openBox<History>('history');
     completedEpisodeBox =
@@ -156,7 +158,6 @@ class HiveService extends ChangeNotifier {
     Episode episode,
     String guid,
   ) async {
-    // Make return type Future<void>
     final box = await episodeBox;
     await box.put(guid, episode);
   }
@@ -241,7 +242,7 @@ class HiveService extends ChangeNotifier {
   }
 
   // Queue Operations:
-  Future<void> addToQueue(Queue queue) async {
+  Future<void> addToQueue(QueueModel queue) async {
     // Make return type Future<void>
     final box = await queueBox;
     await box.put(queue.guid, queue);
@@ -253,9 +254,25 @@ class HiveService extends ChangeNotifier {
     await box.delete(guid);
   }
 
-  Future<Map<String, Queue>> getQueue() async {
+  Future<List<QueueModel>> getQueue() async {
     final box = await queueBox;
-    return box.getAllValues();
+    var queue = await box.getAllValues();
+
+    final List<QueueModel> queueList = [];
+
+    for (final entry in queue.entries) {
+      queueList.add(entry.value);
+    }
+
+    // Sort the list by datePublished in descending order (newest first)
+    queueList.sort((a, b) => a.pos.compareTo(b.pos));
+
+    return queueList;
+  }
+
+  Future<QueueModel?> getQueueByGuid(String guid) async {
+    final box = await queueBox;
+    return box.get(guid);
   }
 
   Future<void> clearQueue() async {
@@ -264,9 +281,32 @@ class HiveService extends ChangeNotifier {
     await box.clear(); // Add await
   }
 
-  // TODO: Implement a reorderQueue method that tightly couple the pos together
   // This should get the fetch the list then sort it in ASC order
-  void reorderQueue() {}
+  void reorderQueue(int oldIndex, int newIndex) async {
+    final box = await queueBox;
+    List<QueueModel> queue = await getQueue();
+
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final QueueModel item = queue.removeAt(oldIndex);
+    queue.insert(newIndex, item);
+
+    // Update the 'pos' field for all items in the reordered list
+    for (int i = 0; i < queue.length; i++) {
+      queue[i].pos = i + 1;
+    }
+
+    // Clear the box and re-add the reordered items
+    await box.clear();
+
+    for (var item in queue) {
+      await box.put(item.guid, item);
+    }
+
+    notifyListeners();
+  }
 
   // Download Operations:
   Future<void> addToDownload(Download download) async {
@@ -387,6 +427,14 @@ class HiveService extends ChangeNotifier {
   Future<String> feedsCount() async {
     final box = await episodeBox;
     final Map<String, Episode> allEpisodes = await box.getAllValues();
+
+    int result = allEpisodes.length;
+    return result.toString();
+  }
+
+  Future<String> queueCount() async {
+    final box = await queueBox;
+    final Map<String, QueueModel> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();

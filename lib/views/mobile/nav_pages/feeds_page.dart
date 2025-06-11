@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/scale.dart';
-import 'package:openair/models/episode.dart';
+import 'package:openair/models/episode_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
@@ -48,6 +48,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 itemBuilder: (context, index) => EpisodeCard(
                   title: data[index].title,
                   episodeItem: data[index].toJson(),
+                  podcast: data[index].toJson(),
                 ),
               ),
             ),

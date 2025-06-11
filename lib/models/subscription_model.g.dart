@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'subscription.dart';
+part of 'subscription_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

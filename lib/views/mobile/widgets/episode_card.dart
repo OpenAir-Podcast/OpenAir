@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
@@ -10,11 +12,13 @@ import 'package:styled_text/styled_text.dart';
 class EpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
+  final Map<String, dynamic> podcast;
 
   const EpisodeCard({
     super.key,
     required this.episodeItem,
     required this.title,
+    required this.podcast,
   });
 
   @override
@@ -29,6 +33,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
     podcastDate = ref
         .watch(openAirProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
+
+    final AsyncValue<Map<String, QueueModel>> getQueueValue =
+        ref.watch(queueProvider);
 
     return GestureDetector(
       onTap: () {
@@ -54,7 +61,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
             children: [
               // Image, title, author, and date
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -68,7 +75,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                       child: CachedNetworkImage(
                         memCacheHeight: 62,
                         memCacheWidth: 62,
-                        imageUrl: widget.episodeItem['image'],
+                        imageUrl: widget.episodeItem['feedImage'],
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(
                           Icons.error,
@@ -91,15 +98,17 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               widget.title,
                               style: const TextStyle(
                                 fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                              maxLines: 2,
                             ),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              widget.episodeItem['author'] ?? "Unknown",
+                              widget.podcast['author'] ?? "Unknown",
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -121,16 +130,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   ),
                 ],
               ),
-              Text(
-                widget.episodeItem['title'] ?? "Unknown",
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               // TODO: Use a rich text widget to display the description
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 3.0),
                 child: StyledText(
                   text: widget.episodeItem['description'],
                   maxLines: 4,
@@ -170,10 +172,56 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     ),
                   ),
                   // Playlist button
-                  IconButton(
-                    tooltip: "Add to queue",
-                    onPressed: () {},
-                    icon: const Icon(Icons.playlist_add_rounded),
+                  getQueueValue.when(
+                    data: (data) {
+                      bool isQueued = false;
+
+                      data.containsKey(widget.episodeItem['guid'])
+                          ? isQueued = true
+                          : isQueued = false;
+
+                      return IconButton(
+                        tooltip: "Add to queue",
+                        onPressed: () {
+                          isQueued
+                              ? ref
+                                  .watch(openAirProvider)
+                                  .removeFromQueue(widget.episodeItem['guid'])
+                              : ref
+                                  .watch(openAirProvider)
+                                  .addToQueue(widget.episodeItem);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isQueued
+                                    ? 'Removed ${widget.episodeItem['title']} from queue'
+                                    : 'Added ${widget.episodeItem['title']} to queue',
+                              ),
+                            ),
+                          );
+
+                          ref.invalidate(queueProvider);
+                        },
+                        icon: isQueued
+                            ? const Icon(Icons.playlist_add_check_rounded)
+                            : const Icon(Icons.playlist_add_rounded),
+                      );
+                    },
+                    error: (error, stackTrace) {
+                      return IconButton(
+                        tooltip: "Add to queue",
+                        onPressed: () {},
+                        icon: const Icon(Icons.error_outline_rounded),
+                      );
+                    },
+                    loading: () {
+                      return IconButton(
+                        tooltip: "Add to queue",
+                        onPressed: () {},
+                        icon: Icon(Icons.keyboard_double_arrow_down_rounded),
+                      );
+                    },
                   ),
                   // Download button
                   IconButton(

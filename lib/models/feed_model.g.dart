@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'feed.dart';
+part of 'feed_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
