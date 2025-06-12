@@ -66,7 +66,7 @@ class HiveService extends ChangeNotifier {
     Hive.registerAdapter(SubscriptionAdapter());
     Hive.registerAdapter(EpisodeAdapter());
     Hive.registerAdapter(FeedAdapter());
-    Hive.registerAdapter(QueueAdapter());
+    Hive.registerAdapter(QueueModelAdapter());
     Hive.registerAdapter(DownloadAdapter());
     Hive.registerAdapter(HistoryAdapter());
     Hive.registerAdapter(CompletedEpisodeAdapter());
@@ -219,13 +219,11 @@ class HiveService extends ChangeNotifier {
 
   // Feed Operations:
   Future<void> addToFeed(Feed feed) async {
-    // Make return type Future<void>
     final box = await feedBox;
     await box.put(feed.guid, feed);
   }
 
   Future<void> deleteFromFeed({required String guid}) async {
-    // Make return type Future<void>
     final box = await feedBox;
     await box.delete(guid);
   }
@@ -236,20 +234,17 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> deleteFeed() async {
-    // Make return type Future<void>
     final box = await feedBox;
     await box.clear(); // Add await
   }
 
   // Queue Operations:
   Future<void> addToQueue(QueueModel queue) async {
-    // Make return type Future<void>
     final box = await queueBox;
     await box.put(queue.guid, queue);
   }
 
   Future<void> removeFromQueue({required String guid}) async {
-    // Make return type Future<void>
     final box = await queueBox;
     await box.delete(guid);
   }

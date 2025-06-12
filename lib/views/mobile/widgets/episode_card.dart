@@ -39,7 +39,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
 
     return GestureDetector(
       onTap: () {
-        ref.read(openAirProvider.notifier).currentPodcast = widget.episodeItem;
+        ref.read(openAirProvider.notifier).currentPodcast = widget.podcast;
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -187,9 +187,10 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ? ref
                                   .watch(openAirProvider)
                                   .removeFromQueue(widget.episodeItem['guid'])
-                              : ref
-                                  .watch(openAirProvider)
-                                  .addToQueue(widget.episodeItem);
+                              : ref.watch(openAirProvider).addToQueue(
+                                    widget.episodeItem,
+                                    widget.podcast,
+                                  );
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

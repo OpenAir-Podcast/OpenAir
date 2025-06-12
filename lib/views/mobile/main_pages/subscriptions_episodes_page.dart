@@ -164,6 +164,7 @@ class _SubscriptionsEpisodesPageState
                 itemBuilder: (context, index) => SubscriptionEpisodeCard(
                   title: snapshot['items'][index]['title'],
                   episodeItem: snapshot['items'][index],
+                  podcast: widget.podcast,
                 ),
               ),
             ),

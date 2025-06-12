@@ -5,18 +5,16 @@ import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/mobile/widgets/queue_card.dart';
 
-class Queue extends ConsumerStatefulWidget {
-  const Queue({super.key});
+class QueuePage extends ConsumerStatefulWidget {
+  const QueuePage({super.key});
 
   @override
-  ConsumerState createState() => _QueueState();
+  ConsumerState createState() => _QueuePageState();
 }
 
-class _QueueState extends ConsumerState<Queue> {
+class _QueuePageState extends ConsumerState<QueuePage> {
   @override
   Widget build(BuildContext context) {
-    // final queue = ref.watch(queueProvider); // This provider is defined but not used later.
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Queue'),

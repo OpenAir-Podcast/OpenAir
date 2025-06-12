@@ -24,7 +24,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FeedAdapter());
     registerAdapter(HistoryAdapter());
     registerAdapter(HistoryAdapter());
-    registerAdapter(QueueAdapter());
+    registerAdapter(QueueModelAdapter());
     registerAdapter(SettingsAdapter());
     registerAdapter(SettingsAdapter());
     registerAdapter(SubscriptionAdapter());
@@ -44,7 +44,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FeedAdapter());
     registerAdapter(HistoryAdapter());
     registerAdapter(HistoryAdapter());
-    registerAdapter(QueueAdapter());
+    registerAdapter(QueueModelAdapter());
     registerAdapter(SettingsAdapter());
     registerAdapter(SettingsAdapter());
     registerAdapter(SubscriptionAdapter());

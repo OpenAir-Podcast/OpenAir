@@ -24,7 +24,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ref.read(openAirProvider.notifier).currentPodcast = widget.podcastItem;
+        ref.read(openAirProvider).currentPodcast = widget.podcastItem;
 
         Navigator.of(context).push(
           MaterialPageRoute(

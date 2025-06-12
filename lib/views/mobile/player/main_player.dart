@@ -68,14 +68,18 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   const SizedBox(height: 8.0),
                   // Podcast Author
                   TextButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EpisodesPage(
-                          podcast: ref.watch(openAirProvider).currentPodcast!,
-                          id: ref.watch(openAirProvider).currentPodcast!['id'],
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EpisodesPage(
+                            podcast: ref.watch(openAirProvider).currentPodcast!,
+                            id: ref
+                                .watch(openAirProvider)
+                                .currentPodcast!['id'],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                     child: Text(
                       ref.watch(openAirProvider).currentEpisode!['author'] ??
                           'Unknown',
@@ -86,22 +90,6 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  // GestureDetector(
-                  //   onTap: () => Navigator.of(context).push(
-                  //     MaterialPageRoute(
-                  //       builder: (context) => EpisodesPage(),
-                  //     ),
-                  //   ),
-                  //   child: Text(
-                  //     ref.watch(openAirProvider).currentEpisode!['author'] ??
-                  //         'Unknown',
-                  //     style: const TextStyle(
-                  //       fontSize: 14.0,
-                  //       color: Colors.grey,
-                  //     ),
-                  //     textAlign: TextAlign.center,
-                  //   ),
-                  // ),
                 ],
               ),
             ),

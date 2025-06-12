@@ -268,14 +268,35 @@ class OpenAirProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePlaybackBar() {
-    player.getDuration().then((Duration? value) {
-      if (value == null) {
-        return;
-      }
+  void timerButtonClicked() {}
 
-      podcastDuration = value;
-      notifyListeners();
+  void updateCurrentPlaybackPositions(
+    String currentPlaybackPosition,
+    String currentPlaybackRemainingTime,
+    double position,
+    QueueModel queue,
+  ) async {
+    queue.podcastCurrentPositionInMilliseconds = position;
+    queue.currentPlaybackPositionString = currentPlaybackPosition;
+    queue.currentPlaybackRemainingTimeString = currentPlaybackRemainingTime;
+
+    await ref.read(hiveServiceProvider).addToQueue(queue);
+  }
+
+  void updatePlaybackBar() async {
+    var queueBox = await ref.read(hiveServiceProvider).getQueue();
+
+    var ifQueue =
+        queueBox.any((element) => element.guid == currentEpisode!['guid']);
+
+    player.getDuration().then((Duration? value) {
+      if (value != null) {
+        podcastDuration = value;
+        notifyListeners();
+      } else {
+        player.setSourceUrl(currentEpisode!['enclosureUrl']);
+        updatePlaybackBar();
+      }
     });
 
     player.onPositionChanged.listen((Duration p) {
@@ -290,6 +311,19 @@ class OpenAirProvider with ChangeNotifier {
       podcastCurrentPositionInMilliseconds =
           (podcastPosition.inMilliseconds / podcastDuration.inMilliseconds)
               .clamp(0.0, 1.0);
+
+      if (ifQueue) {
+        QueueModel queue = queueBox.firstWhere(
+          (element) => element.guid == currentEpisode!['guid'],
+        );
+
+        updateCurrentPlaybackPositions(
+          currentPlaybackPositionString,
+          currentPlaybackRemainingTimeString,
+          podcastCurrentPositionInMilliseconds,
+          queue,
+        );
+      }
 
       notifyListeners();
     });
@@ -568,7 +602,12 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).queueCount();
   }
 
-  void addToQueue(Map<String, dynamic> episode) async {
+  Duration getEpisodeDuration(int epoch) => Duration(seconds: epoch);
+
+  void addToQueue(
+    Map<String, dynamic> episode,
+    Map<String, dynamic>? podcast,
+  ) async {
     int pos;
 
     List<QueueModel> queue = await ref.watch(hiveServiceProvider).getQueue();
@@ -582,8 +621,9 @@ class OpenAirProvider with ChangeNotifier {
     }
 
     int enclosureLength = episode['enclosureLength'];
-    String duration = getPodcastDuration(enclosureLength);
     String downloadSize = getEpisodeSize(enclosureLength);
+
+    Duration episodeDuration = getEpisodeDuration(episode['enclosureLength']);
 
     QueueModel queueMod = QueueModel(
       guid: episode['guid'],
@@ -593,12 +633,16 @@ class OpenAirProvider with ChangeNotifier {
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],
-      duration: duration,
+      duration: episodeDuration,
       downloadSize: downloadSize,
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
-      podcastId: currentPodcast!['id'].toString(),
+      podcastId: podcast!['id'].toString(),
       pos: pos,
+      podcastCurrentPositionInMilliseconds:
+          podcastCurrentPositionInMilliseconds,
+      currentPlaybackPositionString: currentPlaybackPositionString,
+      currentPlaybackRemainingTimeString: currentPlaybackRemainingTimeString,
     );
 
     ref.read(hiveServiceProvider).addToQueue(queueMod);

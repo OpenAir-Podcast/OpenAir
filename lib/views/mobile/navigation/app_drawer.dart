@@ -5,7 +5,7 @@ import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/history.dart';
-import 'package:openair/views/mobile/nav_pages/queue.dart';
+import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:openair/views/mobile/nav_pages/settings.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
@@ -127,8 +127,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       leading: const Icon(Icons.feed_rounded),
                       title: const Text('Feeds'),
                       trailing: ElevatedButton(
-                        child: const Text('Feeds'),
-                        onPressed: () => ref.invalidate(subCountProvider),
+                        child: const Text('Retry'),
+                        onPressed: () => ref.invalidate(feedCountProvider),
                       ),
                     );
                   },
@@ -162,8 +162,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       leading: const Icon(Icons.queue_music_rounded),
                       title: const Text('Queue'),
                       trailing: ElevatedButton(
-                        child: const Text('Feeds'),
-                        onPressed: () => ref.invalidate(subCountProvider),
+                        child: const Text('Retry'),
+                        onPressed: () => ref.invalidate(queueCountProvider),
                       ),
                     );
                   },
@@ -175,7 +175,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Queue()),
+                          MaterialPageRoute(builder: (context) => QueuePage()),
                         );
                       },
                     );

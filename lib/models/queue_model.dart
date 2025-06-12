@@ -19,6 +19,9 @@ class QueueModel extends HiveObject {
     required this.enclosureLength,
     required this.enclosureUrl,
     required this.pos,
+    required this.podcastCurrentPositionInMilliseconds,
+    required this.currentPlaybackPositionString,
+    required this.currentPlaybackRemainingTimeString,
   });
 
   @HiveField(0)
@@ -43,7 +46,7 @@ class QueueModel extends HiveObject {
   String feedUrl;
 
   @HiveField(7)
-  String duration;
+  Duration duration;
 
   @HiveField(8)
   String downloadSize;
@@ -60,6 +63,15 @@ class QueueModel extends HiveObject {
   @HiveField(12)
   int pos;
 
+  @HiveField(13)
+  double podcastCurrentPositionInMilliseconds;
+
+  @HiveField(14)
+  String currentPlaybackPositionString;
+
+  @HiveField(15)
+  String currentPlaybackRemainingTimeString;
+
   factory QueueModel.fromJson(Map<String, dynamic> json) => QueueModel(
         guid: json['guid'],
         image: json['image'],
@@ -74,6 +86,11 @@ class QueueModel extends HiveObject {
         enclosureLength: json['enclosureLength'],
         enclosureUrl: json['enclosureUrl'],
         pos: json['pos'],
+        podcastCurrentPositionInMilliseconds:
+            json['podcastCurrentPositionInMilliseconds'],
+        currentPlaybackPositionString: json['currentPlaybackPositionString'],
+        currentPlaybackRemainingTimeString:
+            json['currentPlaybackRemainingTimeString'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -90,5 +107,10 @@ class QueueModel extends HiveObject {
         'enclosureLength': enclosureLength,
         'enclosureUrl': enclosureUrl,
         'pos': pos,
+        'podcastCurrentPositionInMilliseconds':
+            podcastCurrentPositionInMilliseconds,
+        'currentPlaybackPositionString': currentPlaybackPositionString,
+        'currentPlaybackRemainingTimeString':
+            currentPlaybackRemainingTimeString,
       };
 }

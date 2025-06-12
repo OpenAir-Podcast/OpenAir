@@ -89,7 +89,6 @@ class PodcastIndexProvider {
 
     try {
       final response = await _dio.get(url);
-
       return response.data['feed']['episodeCount'];
     } on DioException catch (e) {
       debugPrint('DioError fetching podcast episode count by ID: ${e.message}');

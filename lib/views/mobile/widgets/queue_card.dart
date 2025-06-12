@@ -60,14 +60,16 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                       ref
                           .watch(openAirProvider)
                           .getPodcastPublishedDateFromEpoch(
-                              widget.snapshot.data!.firstWhere(
-                            (element) {
-                              return element.guid == item.guid;
-                            },
-                          ).datePublished),
+                            widget.snapshot.data!.firstWhere(
+                              (element) {
+                                return element.guid == item.guid;
+                              },
+                            ).datePublished,
+                          ),
                       style: const TextStyle(fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
+                      textAlign: TextAlign.left,
                     ),
                     const Text(' | '),
                     Text(
@@ -92,13 +94,53 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     fontWeight: FontWeight.bold,
                   ),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
+                  textAlign: TextAlign.left,
                 ),
               ],
             ),
-            subtitle: Slider(
-              value: 0.0,
-              onChanged: (value) {},
+            subtitle: Column(
+              children: [
+                // Seek bar
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    5.0,
+                    10.0,
+                    5.0,
+                    10.0,
+                  ),
+                  child: LinearProgressIndicator(
+                    value: widget.snapshot.data!.firstWhere(
+                      (element) {
+                        return element.guid == item.guid;
+                      },
+                    ).podcastCurrentPositionInMilliseconds,
+                  ),
+                ),
+                // Seek positions
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.snapshot.data!.firstWhere(
+                          (element) {
+                            return element.guid == item.guid;
+                          },
+                        ).currentPlaybackPositionString,
+                      ),
+                      Text(
+                        '-${widget.snapshot.data!.firstWhere(
+                          (element) {
+                            return element.guid == item.guid;
+                          },
+                        ).currentPlaybackRemainingTimeString}',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             trailing: IconButton(
               icon: const Icon(

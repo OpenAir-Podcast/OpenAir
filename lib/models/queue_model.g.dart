@@ -6,7 +6,7 @@ part of 'queue_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class QueueAdapter extends TypeAdapter<QueueModel> {
+class QueueModelAdapter extends TypeAdapter<QueueModel> {
   @override
   final typeId = 3;
 
@@ -24,19 +24,22 @@ class QueueAdapter extends TypeAdapter<QueueModel> {
       datePublished: (fields[4] as num).toInt(),
       description: fields[5] as String,
       feedUrl: fields[6] as String,
-      duration: fields[7] as String,
+      duration: fields[7] as Duration,
       downloadSize: fields[8] as String,
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       pos: (fields[12] as num).toInt(),
+      podcastCurrentPositionInMilliseconds: (fields[13] as num).toDouble(),
+      currentPlaybackPositionString: fields[14] as String,
+      currentPlaybackRemainingTimeString: fields[15] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, QueueModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -62,7 +65,13 @@ class QueueAdapter extends TypeAdapter<QueueModel> {
       ..writeByte(11)
       ..write(obj.enclosureUrl)
       ..writeByte(12)
-      ..write(obj.pos);
+      ..write(obj.pos)
+      ..writeByte(13)
+      ..write(obj.podcastCurrentPositionInMilliseconds)
+      ..writeByte(14)
+      ..write(obj.currentPlaybackPositionString)
+      ..writeByte(15)
+      ..write(obj.currentPlaybackRemainingTimeString);
   }
 
   @override
@@ -71,7 +80,7 @@ class QueueAdapter extends TypeAdapter<QueueModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QueueAdapter &&
+      other is QueueModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

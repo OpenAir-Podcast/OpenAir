@@ -17,11 +17,13 @@ final isEpisodeNewProvider =
 
 class SubscriptionEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
+  final Map<String, dynamic> podcast;
   final String title;
 
   const SubscriptionEpisodeCard({
     super.key,
     required this.episodeItem,
+    required this.podcast,
     required this.title,
   });
 
@@ -209,9 +211,10 @@ class _SubscriptionEpisodeCardState
                                         .watch(openAirProvider)
                                         .removeFromQueue(
                                             widget.episodeItem['guid'])
-                                    : ref
-                                        .watch(openAirProvider)
-                                        .addToQueue(widget.episodeItem);
+                                    : ref.watch(openAirProvider).addToQueue(
+                                          widget.episodeItem,
+                                          widget.podcast,
+                                        );
 
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(

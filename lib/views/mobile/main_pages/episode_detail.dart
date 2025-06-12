@@ -9,9 +9,11 @@ class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
     super.key,
     this.episodeItem,
+    this.podcast,
   });
 
   final Map<String, dynamic>? episodeItem;
+  final Map<String, dynamic>? podcast;
 
   @override
   EpisodeDetailState createState() => EpisodeDetailState();
@@ -131,9 +133,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     IconButton(
                       tooltip: "Add to queue",
                       onPressed: () {
-                        ref
-                            .read(openAirProvider)
-                            .addToQueue(widget.episodeItem!);
+                        ref.read(openAirProvider).addToQueue(
+                              widget.episodeItem!,
+                              widget.podcast!,
+                            );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

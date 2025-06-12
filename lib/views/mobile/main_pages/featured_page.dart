@@ -325,7 +325,7 @@ class PodcastsCard extends ConsumerWidget {
                       ),
                       child: GestureDetector(
                         onTap: () {
-                          ref.read(openAirProvider.notifier).currentPodcast =
+                          ref.read(openAirProvider).currentPodcast =
                               snapshot['feeds'][index];
 
                           Navigator.of(context).push(
