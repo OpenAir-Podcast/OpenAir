@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
@@ -11,15 +12,21 @@ import 'package:openair/views/mobile/nav_pages/sign_in.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  return await ref.watch(openAirProvider).getAccumulatedSubscriptionCount();
+  // Watch hiveServiceProvider as subscription counts depend on Hive data
+  ref.watch(hiveServiceProvider);
+  return await ref.read(openAirProvider).getAccumulatedSubscriptionCount();
 });
 
 final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  return await ref.watch(openAirProvider).getFeedsCount();
+  // Watch hiveServiceProvider as feed counts depend on Hive data
+  ref.watch(hiveServiceProvider);
+  return await ref.read(openAirProvider).getFeedsCount();
 });
 
 final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  return await ref.watch(openAirProvider).getQueueCount();
+  // Watch hiveServiceProvider as queue counts depend on Hive data
+  ref.watch(hiveServiceProvider);
+  return await ref.read(openAirProvider).getQueueCount();
 });
 
 class AppDrawer extends ConsumerStatefulWidget {
@@ -79,6 +86,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 ),
                 const Divider(),
                 // Subscribed button
+                // FIXME does not load when the audio player is playing. Change this to using FutureBuilder instead
                 getSubCountValue.when(
                   loading: () {
                     return ListTile(

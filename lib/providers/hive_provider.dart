@@ -41,6 +41,15 @@ final queueProvider =
   yield await box.getAllValues();
 });
 
+// FutureProvider for sorted Queue List
+final sortedQueueListProvider =
+    FutureProvider.autoDispose<List<QueueModel>>((ref) async {
+  // Watch hiveServiceProvider to re-fetch when it notifies (e.g., after add/remove/reorder)
+  ref.watch(hiveServiceProvider);
+  // Use read here as watch is for dependency tracking causing re-evaluation.
+  return await ref.read(hiveServiceProvider).getQueue();
+});
+
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
   late final Future<CollectionBox<Subscription>> subscriptionBox;
@@ -242,11 +251,13 @@ class HiveService extends ChangeNotifier {
   Future<void> addToQueue(QueueModel queue) async {
     final box = await queueBox;
     await box.put(queue.guid, queue);
+    notifyListeners(); // Notify listeners that queue data has changed
   }
 
   Future<void> removeFromQueue({required String guid}) async {
     final box = await queueBox;
     await box.delete(guid);
+    notifyListeners(); // Notify listeners that queue data has changed
   }
 
   Future<List<QueueModel>> getQueue() async {
@@ -261,7 +272,6 @@ class HiveService extends ChangeNotifier {
 
     // Sort the list by datePublished in descending order (newest first)
     queueList.sort((a, b) => a.pos.compareTo(b.pos));
-
     return queueList;
   }
 
@@ -402,21 +412,34 @@ class HiveService extends ChangeNotifier {
 
   Future<String> podcastAccumulatedSubscribedEpisodes() async {
     final box = await subscriptionBox;
-    final Map<String, Subscription> allEpisodes = await box.getAllValues();
+    final Map<String, Subscription> allSubscriptions = await box.getAllValues();
 
-    int currentEpisodeCount = 0;
-    int liveEpisodeCount = 0;
-
-    for (final entry in allEpisodes.entries) {
-      currentEpisodeCount += entry.value.episodeCount;
-
-      liveEpisodeCount += await ref
-          .watch(podcastIndexProvider)
-          .getPodcastEpisodeCountByPodcastId(entry.value.id);
+    if (allSubscriptions.isEmpty) {
+      return "0";
     }
 
-    int result = liveEpisodeCount - currentEpisodeCount;
-    return result.toString();
+    int totalNewEpisodes = 0;
+
+    for (final MapEntry<String, Subscription> entry
+        in allSubscriptions.entries) {
+      final subscription = entry.value;
+      int storedCount = subscription.episodeCount;
+
+      try {
+        int liveCountForThisFeed = await ref
+            .read(podcastIndexProvider)
+            .getPodcastEpisodeCountByPodcastId(subscription.id);
+
+        int newEpisodesForThisFeed = liveCountForThisFeed - storedCount;
+        if (newEpisodesForThisFeed > 0) {
+          totalNewEpisodes += newEpisodesForThisFeed;
+        }
+      } catch (e) {
+        debugPrint(
+            'Error fetching live episode count for subscription ${subscription.id} (${subscription.title}). Error: $e. This subscription will contribute 0 to the new episodes count.');
+      }
+    }
+    return totalNewEpisodes.toString();
   }
 
   Future<String> feedsCount() async {

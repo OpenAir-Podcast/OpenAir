@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -580,7 +581,7 @@ class OpenAirProvider with ChangeNotifier {
 
     // Gets episodes count from PodcastIndex
     int podcastEpisodeCount = await ref
-        .watch(podcastIndexProvider)
+        .read(podcastIndexProvider)
         .getPodcastEpisodeCountByPodcastId(podcastId);
 
     int result = podcastEpisodeCount - currentSubEpCount;
@@ -610,7 +611,7 @@ class OpenAirProvider with ChangeNotifier {
   ) async {
     int pos;
 
-    List<QueueModel> queue = await ref.watch(hiveServiceProvider).getQueue();
+    List<QueueModel> queue = await ref.read(hiveServiceProvider).getQueue();
 
     if (queue.isEmpty) {
       pos = 1;
@@ -648,6 +649,13 @@ class OpenAirProvider with ChangeNotifier {
     ref.read(hiveServiceProvider).addToQueue(queueMod);
   }
 
+  Future<Queue<QueueModel>> getQueue() async {
+    Queue<QueueModel> queue = Queue();
+    List<QueueModel> queueList = await ref.read(hiveServiceProvider).getQueue();
+    queue.addAll(queueList);
+    return queue;
+  }
+
   Future<QueueModel?> getQueueByGuid(String guid) async {
     return await ref.read(hiveServiceProvider).getQueueByGuid(guid);
   }
@@ -662,7 +670,7 @@ class OpenAirProvider with ChangeNotifier {
     Map<String, dynamic> podcast,
   ) async {
     int podcastEpisodeCount = await ref
-        .watch(podcastIndexProvider)
+        .read(podcastIndexProvider)
         .getPodcastEpisodeCountByPodcastId(podcast['id']);
 
     Subscription subscription = Subscription(
@@ -691,7 +699,7 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void addPodcastEpisodes(Map<String, dynamic> podcast) async {
-    final apiService = ref.watch(podcastIndexProvider);
+    final apiService = ref.read(podcastIndexProvider);
 
     Map<String, dynamic> episodes =
         await apiService.getEpisodesByFeedUrl(podcast['url']);

@@ -26,11 +26,12 @@ class MobileScaffold extends ConsumerWidget {
           ],
         ),
         bottomNavigationBar: SizedBox(
-          // Checks if a podcast is playing then displays the banner player
-          height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-          child: ref.watch(openAirProvider).isPodcastSelected
+          height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+              ? 80.0
+              : 0.0,
+          child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
               ? const BannerAudioPlayer()
-              : const SizedBox(),
+              : const SizedBox.shrink(),
         ),
       ),
     );

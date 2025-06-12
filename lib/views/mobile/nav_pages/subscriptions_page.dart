@@ -9,10 +9,12 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
+import 'package:openair/views/mobile/player/banner_audio_player.dart';
 
 final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
-  final openAir = ref.watch(openAirProvider);
-  return await openAir.getSubscriptions();
+  // Watch hiveServiceProvider as subscription data comes from Hive
+  ref.watch(hiveServiceProvider);
+  return await ref.read(openAirProvider).getSubscriptions();
 });
 
 final getSubscriptionsCountProvider =
@@ -228,6 +230,15 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                 ),
               );
             },
+          ),
+          bottomNavigationBar: SizedBox(
+            height:
+                ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+                    ? 80.0
+                    : 0.0,
+            child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+                ? const BannerAudioPlayer()
+                : const SizedBox.shrink(),
           ),
         );
       },

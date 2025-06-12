@@ -31,7 +31,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
-        .watch(openAirProvider)
+        .read(openAirProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue<Map<String, QueueModel>> getQueueValue =
@@ -39,7 +39,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
 
     return GestureDetector(
       onTap: () {
-        ref.read(openAirProvider.notifier).currentPodcast = widget.podcast;
+        // FIXME Hi
+        // ref.read(openAirProvider.notifier).currentPodcast = widget.podcast;
 
         Navigator.of(context).push(
           MaterialPageRoute(

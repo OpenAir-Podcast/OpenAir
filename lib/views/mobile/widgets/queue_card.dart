@@ -7,8 +7,8 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 class QueueCard extends ConsumerStatefulWidget {
-  const QueueCard({super.key, required this.snapshot});
-  final AsyncSnapshot<List<QueueModel>> snapshot;
+  const QueueCard({super.key, required this.queueItems});
+  final List<QueueModel> queueItems;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _QueueCardState();
@@ -20,7 +20,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
       itemBuilder: (context, index) {
-        final item = widget.snapshot.data!.elementAt(index);
+        final item = widget.queueItems.elementAt(index);
         return Card(
           key: ValueKey(item.guid), // Use a unique and stable key
           child: ListTile(
@@ -60,11 +60,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                       ref
                           .watch(openAirProvider)
                           .getPodcastPublishedDateFromEpoch(
-                            widget.snapshot.data!.firstWhere(
-                              (element) {
-                                return element.guid == item.guid;
-                              },
-                            ).datePublished,
+                            item.datePublished,
                           ),
                       style: const TextStyle(fontSize: 12),
                       overflow: TextOverflow.ellipsis,
@@ -73,11 +69,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     ),
                     const Text(' | '),
                     Text(
-                      widget.snapshot.data!.firstWhere(
-                        (element) {
-                          return element.guid == item.guid;
-                        },
-                      ).downloadSize,
+                      item.downloadSize,
                       style: const TextStyle(fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -85,11 +77,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                   ],
                 ),
                 Text(
-                  widget.snapshot.data!.firstWhere(
-                    (element) {
-                      return element.guid == item.guid;
-                    },
-                  ).title,
+                  item.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -110,11 +98,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     10.0,
                   ),
                   child: LinearProgressIndicator(
-                    value: widget.snapshot.data!.firstWhere(
-                      (element) {
-                        return element.guid == item.guid;
-                      },
-                    ).podcastCurrentPositionInMilliseconds,
+                    value: item.podcastCurrentPositionInMilliseconds,
                   ),
                 ),
                 // Seek positions
@@ -124,18 +108,10 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        widget.snapshot.data!.firstWhere(
-                          (element) {
-                            return element.guid == item.guid;
-                          },
-                        ).currentPlaybackPositionString,
+                        item.currentPlaybackPositionString,
                       ),
                       Text(
-                        '-${widget.snapshot.data!.firstWhere(
-                          (element) {
-                            return element.guid == item.guid;
-                          },
-                        ).currentPlaybackRemainingTimeString}',
+                        '-${item.currentPlaybackRemainingTimeString}',
                       ),
                     ],
                   ),
@@ -143,9 +119,10 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               ],
             ),
             trailing: IconButton(
-              icon: const Icon(
+              iconSize: 40.0,
+              icon: Icon(
                 Icons.play_circle_outline_rounded,
-                size: 50.0,
+                size: 40.0,
               ),
               onPressed: () {
                 ref.read(openAirProvider.notifier).removeFromQueue(item.guid);
@@ -154,10 +131,9 @@ class _QueueCardState extends ConsumerState<QueueCard> {
           ),
         );
       },
-      itemCount: widget.snapshot.data!.length,
+      itemCount: widget.queueItems.length,
       onReorder: (oldIndex, newIndex) {
         ref.read(hiveServiceProvider).reorderQueue(oldIndex, newIndex);
-        ref.watch(hiveServiceProvider).reorderQueue(oldIndex, newIndex);
       },
     );
   }

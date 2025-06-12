@@ -9,10 +9,10 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 
-final FutureProvider<List<Episode>> getFeedsProvider =
-    FutureProvider((ref) async {
-  final openAir = ref.watch(openAirProvider);
-  return await openAir.getSubscribedEpisodes();
+final getFeedsProvider = FutureProvider.autoDispose((ref) async {
+  // Watch hiveServiceProvider as feed data comes from Hive
+  ref.watch(hiveServiceProvider);
+  return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 
 class FeedsPage extends ConsumerStatefulWidget {
@@ -54,10 +54,13 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-            child: ref.watch(openAirProvider).isPodcastSelected
+            height:
+                ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+                    ? 80.0
+                    : 0.0,
+            child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
-                : const SizedBox(),
+                : const SizedBox.shrink(),
           ),
         );
       },
@@ -99,7 +102,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                       ),
                     ),
                     onPressed: () async {
-                      ref.invalidate(subscriptionsProvider);
+                      ref.invalidate(getFeedsProvider);
                     },
                     child: const Text('Retry'),
                   ),

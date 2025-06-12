@@ -16,73 +16,68 @@ class BannerAudioPlayer extends ConsumerStatefulWidget {
 class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        return Container(
-          color: Colors.teal,
-          child: Column(
-            children: [
-              ListTile(
-                minTileHeight: 70.0,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MainPlayer(),
-                    ),
-                  );
-                },
-                leading: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  width: 62.0,
-                  height: 62.0,
-                  child: CachedNetworkImage(
-                    memCacheHeight: 62,
-                    memCacheWidth: 62,
-                    imageUrl:
-                        ref.watch(openAirProvider).currentPodcast!['image'],
-                  ),
+    return Container(
+      color: Colors.teal,
+      child: Column(
+        children: [
+          ListTile(
+            minTileHeight: 70.0,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MainPlayer(),
                 ),
-                title: SizedBox(
-                  height: 42.0,
-                  child: Text(
-                    ref.watch(openAirProvider).currentEpisode!['title'],
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    maxLines: 2,
-                  ),
-                ),
-                trailing: IconButton(
-                  onPressed: () {
-                    ref.watch(openAirProvider).audioState == 'Play'
-                        ? ref
-                            .read(openAirProvider.notifier)
-                            .playerPauseButtonClicked()
-                        : ref
-                            .read(openAirProvider.notifier)
-                            .playerPlayButtonClicked(
-                              ref.watch(openAirProvider).currentEpisode!,
-                            );
-                  },
-                  icon: ref.watch(openAirProvider).audioState == 'Play'
-                      ? const Icon(Icons.pause_rounded)
-                      : const Icon(Icons.play_arrow_rounded),
-                ),
+              );
+            },
+            leading: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-              LinearProgressIndicator(
-                value: ref
-                    .read(openAirProvider.notifier)
-                    .podcastCurrentPositionInMilliseconds,
+              width: 62.0,
+              height: 62.0,
+              child: CachedNetworkImage(
+                memCacheHeight: 62,
+                memCacheWidth: 62,
+                imageUrl: ref.watch(openAirProvider).currentPodcast!['image'],
               ),
-            ],
+            ),
+            title: SizedBox(
+              height: 42.0,
+              child: Text(
+                ref.watch(openAirProvider).currentEpisode!['title'],
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                maxLines: 2,
+              ),
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                ref.watch(openAirProvider).audioState == 'Play'
+                    ? ref
+                        .read(openAirProvider.notifier)
+                        .playerPauseButtonClicked()
+                    : ref
+                        .read(openAirProvider.notifier)
+                        .playerPlayButtonClicked(
+                          ref.watch(openAirProvider).currentEpisode!,
+                        );
+              },
+              icon: ref.watch(openAirProvider).audioState == 'Play'
+                  ? const Icon(Icons.pause_rounded)
+                  : const Icon(Icons.play_arrow_rounded),
+            ),
           ),
-        );
-      },
+          LinearProgressIndicator(
+            value: ref
+                .read(openAirProvider.notifier)
+                .podcastCurrentPositionInMilliseconds,
+          ),
+        ],
+      ),
     );
   }
 }
