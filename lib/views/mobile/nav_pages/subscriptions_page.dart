@@ -164,7 +164,6 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                 error: (error, stackTrace) {
                                   return Center(
                                     child: IconButton(
-                                      // FIXME does not work... need to reload page
                                       onPressed: () {
                                         ref.invalidate(subscriptionsProvider);
 

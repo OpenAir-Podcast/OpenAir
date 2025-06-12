@@ -447,13 +447,6 @@ class OpenAirProvider with ChangeNotifier {
       file.deleteSync();
     }
 
-    // FIXME: Fix this
-    // for (RssItemModel item in data) {
-    //   if (item.downloaded == DownloadStatus.downloaded) {
-    //     item.setDownloaded = DownloadStatus.notDownloaded;
-    //   }
-    // }
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Removed all downloaded podcasts'),

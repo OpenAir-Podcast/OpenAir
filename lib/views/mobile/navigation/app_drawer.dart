@@ -86,7 +86,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 ),
                 const Divider(),
                 // Subscribed button
-                // FIXME does not load when the audio player is playing. Change this to using FutureBuilder instead
                 getSubCountValue.when(
                   loading: () {
                     return ListTile(

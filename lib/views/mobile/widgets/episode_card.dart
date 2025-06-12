@@ -39,9 +39,6 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
 
     return GestureDetector(
       onTap: () {
-        // FIXME Hi
-        // ref.read(openAirProvider.notifier).currentPodcast = widget.podcast;
-
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => EpisodeDetail(

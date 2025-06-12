@@ -50,6 +50,30 @@ class PodcastIndexProvider {
     _dio = Dio(BaseOptions(headers: headers));
   }
 
+  Future<Response<T>> _retry<T>(
+    Future<Response<T>> Function() requestFactory, {
+    int retries = 4,
+    Duration delay = const Duration(seconds: 2),
+  }) async {
+    int attempt = 0;
+    while (true) {
+      try {
+        return await requestFactory();
+      } on DioException catch (e) {
+        attempt++;
+        if (attempt > retries) {
+          debugPrint('DioError after $retries retries: ${e.message}');
+          rethrow;
+        }
+        debugPrint(
+            'DioError attempt $attempt, retrying in $delay: ${e.message}');
+        await Future.delayed(delay);
+        // Exponential backoff for subsequent retries
+        delay *= 2;
+      }
+    }
+  }
+
   /// This method is used to get the list of podcasts from the API.
   ///
   /// The API uses a combination of the API key, secret key, and a Unix
@@ -72,13 +96,8 @@ class PodcastIndexProvider {
 
     debugPrint('Feed URL: $url');
 
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching episodes by feed URL: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
@@ -87,13 +106,8 @@ class PodcastIndexProvider {
 
     // debugPrint('Podcast ID URL: $url');
 
-    try {
-      final response = await _dio.get(url);
-      return response.data['feed']['episodeCount'];
-    } on DioException catch (e) {
-      debugPrint('DioError fetching podcast episode count by ID: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data['feed']['episodeCount'];
   }
 
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
@@ -104,85 +118,50 @@ class PodcastIndexProvider {
 
     debugPrint('Category URL: $url');
 
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching podcasts by category: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching trending podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getTopPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching top podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getEducationPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty';
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching education podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getHealthPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty';
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching health podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty';
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching technology podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 
   Future<Map<String, dynamic>> getSportsPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty';
-    try {
-      final response = await _dio.get(url);
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('DioError fetching sports podcasts: ${e.message}');
-      throw Exception('Failed to get data from the API: ${e.message}');
-    }
+    final response = await _retry(() => _dio.get(url));
+    return response.data;
   }
 }
