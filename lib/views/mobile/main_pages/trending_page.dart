@@ -6,12 +6,13 @@ import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
-final podcastDataByTrendingProvider = FutureProvider((ref) async {
+final podcastDataByTrendingProvider = FutureProvider.autoDispose((ref) async {
   final podcastIndexAPI = ref.read(podcastIndexProvider);
   return await podcastIndexAPI.getTrendingPodcasts();
 });
 
-final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
+final getConnectionStatusProvider =
+    FutureProvider.autoDispose<bool>((ref) async {
   final apiService = ref.read(openAirProvider);
   return await apiService.getConnectionStatus();
 });
@@ -136,7 +137,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                     ),
                   ),
                   onPressed: () async {
-                    ref.invalidate(podcastIndexProvider);
+                    ref.invalidate(getConnectionStatusProvider);
                   },
                   child: const Text('Retry'),
                 ),

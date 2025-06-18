@@ -11,6 +11,7 @@ import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart'; // Import for getFeedsProvider
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -287,9 +288,6 @@ class OpenAirProvider with ChangeNotifier {
   void updatePlaybackBar() async {
     var queueBox = await ref.read(hiveServiceProvider).getQueue();
 
-    var ifQueue =
-        queueBox.any((element) => element.guid == currentEpisode!['guid']);
-
     player.getDuration().then((Duration? value) {
       if (value != null) {
         podcastDuration = value;
@@ -313,19 +311,34 @@ class OpenAirProvider with ChangeNotifier {
           (podcastPosition.inMilliseconds / podcastDuration.inMilliseconds)
               .clamp(0.0, 1.0);
 
-      if (ifQueue) {
-        QueueModel queue = queueBox.firstWhere(
-          (element) => element.guid == currentEpisode!['guid'],
-        );
-
-        updateCurrentPlaybackPositions(
-          currentPlaybackPositionString,
-          currentPlaybackRemainingTimeString,
-          podcastCurrentPositionInMilliseconds,
-          queue,
-        );
+      // Check if the currently playing episode is in the fetched queue
+      // and update its playback progress in Hive.
+      if (currentEpisode != null && currentEpisode!['guid'] != null) {
+        final String currentEpisodeGuid = currentEpisode!['guid'];
+        try {
+          QueueModel queueItemToUpdate = queueBox.firstWhere(
+            (item) => item.guid == currentEpisodeGuid,
+          );
+          // If found, update its details in Hive
+          updateCurrentPlaybackPositions(
+            currentPlaybackPositionString,
+            currentPlaybackRemainingTimeString,
+            podcastCurrentPositionInMilliseconds,
+            queueItemToUpdate,
+          );
+        } on StateError catch (e) {
+          // firstWhere throws StateError if no element is found.
+          // If it's the "No element" error, we can ignore it, as it means
+          // the currently playing episode is not in the queue to be updated.
+          if (e.message != "No element") {
+            debugPrint("Unexpected StateError in updatePlaybackBar: $e");
+            // Optionally rethrow if it's not the "No element" error.
+          }
+        } catch (e) {
+          // Catch any other unexpected errors.
+          debugPrint("Error in updatePlaybackBar during queue update: $e");
+        }
       }
-
       notifyListeners();
     });
 
@@ -344,7 +357,8 @@ class OpenAirProvider with ChangeNotifier {
 
   String formatCurrentPlaybackPosition(Duration timeline) {
     int hours = timeline.inHours;
-    int minutes = timeline.inMinutes;
+    // Correctly get the minute part (0-59)
+    int minutes = timeline.inMinutes % 60;
 
     int seconds = timeline.inSeconds % 60;
 
@@ -596,7 +610,14 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).queueCount();
   }
 
-  Duration getEpisodeDuration(int epoch) => Duration(seconds: epoch);
+  Duration getEpisodeDuration(int epoch) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+    int hours = dateTime.hour;
+    int minutes = dateTime.minute;
+    int seconds = dateTime.second;
+
+    return Duration(hours: hours, minutes: minutes, seconds: seconds);
+  }
 
   void addToQueue(
     Map<String, dynamic> episode,
@@ -617,7 +638,27 @@ class OpenAirProvider with ChangeNotifier {
     int enclosureLength = episode['enclosureLength'];
     String downloadSize = getEpisodeSize(enclosureLength);
 
-    Duration episodeDuration = getEpisodeDuration(episode['enclosureLength']);
+    Duration episodeTotalDuration =
+        getEpisodeDuration(episode['enclosureLength']);
+
+    // Determine initial playback state for the queue item
+    double initialPositionMilliseconds;
+    String initialPositionString;
+
+    if (currentEpisode != null && currentEpisode!['guid'] == episode['guid']) {
+      // If the episode being added is the one currently playing, use its current progress
+      initialPositionMilliseconds = podcastCurrentPositionInMilliseconds;
+      initialPositionString = currentPlaybackPositionString;
+      // The QueueModel's remaining time string will be set to the total duration below.
+    } else {
+      // Otherwise, it's a new item, start from the beginning
+      initialPositionMilliseconds = 0.0;
+      initialPositionString = formatCurrentPlaybackPosition(Duration.zero);
+    }
+
+    // When adding to queue, currentPlaybackRemainingTimeString in QueueModel will store the formatted total duration.
+    final String formattedTotalDurationString =
+        formatCurrentPlaybackRemainingTime(Duration.zero, episodeTotalDuration);
 
     QueueModel queueMod = QueueModel(
       guid: episode['guid'],
@@ -627,16 +668,17 @@ class OpenAirProvider with ChangeNotifier {
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],
-      duration: episodeDuration,
+      duration: episodeTotalDuration,
       downloadSize: downloadSize,
+      enclosureType: episode['enclosureType'] ??
+          'audio/mpeg', // Store enclosureType, provide a default if null
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
-      podcastId: podcast!['id'].toString(),
+      podcast: podcast!,
       pos: pos,
-      podcastCurrentPositionInMilliseconds:
-          podcastCurrentPositionInMilliseconds,
-      currentPlaybackPositionString: currentPlaybackPositionString,
-      currentPlaybackRemainingTimeString: currentPlaybackRemainingTimeString,
+      podcastCurrentPositionInMilliseconds: initialPositionMilliseconds,
+      currentPlaybackPositionString: initialPositionString,
+      currentPlaybackRemainingTimeString: formattedTotalDurationString,
     );
 
     ref.read(hiveServiceProvider).addToQueue(queueMod);
@@ -655,7 +697,8 @@ class OpenAirProvider with ChangeNotifier {
 
   void removeFromQueue(String guid) async {
     ref.read(hiveServiceProvider).removeFromQueue(guid: guid);
-    ref.invalidate(queueProvider);
+    // queueProvider will update reactively as it watches hiveServiceProvider,
+    // which is notified by the removeFromQueue call above.
     notifyListeners();
   }
 
@@ -679,7 +722,9 @@ class OpenAirProvider with ChangeNotifier {
 
     addPodcastEpisodes(podcast);
 
-    ref.invalidate(subscriptionsProvider);
+    // subscriptionsProvider (from hive_provider.dart) will update reactively
+    // as it watches hiveServiceProvider, which is notified by the subscribe call.
+    ref.invalidate(getFeedsProvider);
     notifyListeners();
   }
 
@@ -687,7 +732,9 @@ class OpenAirProvider with ChangeNotifier {
     ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
     removePodcastEpisodes(podcast);
 
-    ref.invalidate(subscriptionsProvider);
+    // subscriptionsProvider (from hive_provider.dart) will update reactively
+    // as it watches hiveServiceProvider, which is notified by the unsubscribe call.
+    ref.invalidate(getFeedsProvider);
     notifyListeners();
   }
 

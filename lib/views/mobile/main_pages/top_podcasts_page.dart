@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
-final podcastDataByTrendingProvider = FutureProvider((ref) async {
+final podcastDataByTrendingProvider = FutureProvider.autoDispose((ref) async {
   final apiService = ref.watch(podcastIndexProvider);
   return await apiService.getTrendingPodcasts();
 });

@@ -15,7 +15,8 @@ class QueueModel extends HiveObject {
     required this.feedUrl,
     required this.duration,
     required this.downloadSize,
-    required this.podcastId,
+    required this.enclosureType,
+    required this.podcast,
     required this.enclosureLength,
     required this.enclosureUrl,
     required this.pos,
@@ -52,7 +53,7 @@ class QueueModel extends HiveObject {
   String downloadSize;
 
   @HiveField(9)
-  String podcastId;
+  Map<String, dynamic>? podcast;
 
   @HiveField(10)
   int enclosureLength;
@@ -72,6 +73,9 @@ class QueueModel extends HiveObject {
   @HiveField(15)
   String currentPlaybackRemainingTimeString;
 
+  @HiveField(16)
+  String? enclosureType;
+
   factory QueueModel.fromJson(Map<String, dynamic> json) => QueueModel(
         guid: json['guid'],
         image: json['image'],
@@ -82,7 +86,8 @@ class QueueModel extends HiveObject {
         feedUrl: json['feedUrl'],
         duration: json['duration'],
         downloadSize: json['downloadSize'],
-        podcastId: json['podcastId'],
+        enclosureType: json['enclosureType'],
+        podcast: json['podcast'],
         enclosureLength: json['enclosureLength'],
         enclosureUrl: json['enclosureUrl'],
         pos: json['pos'],
@@ -103,7 +108,8 @@ class QueueModel extends HiveObject {
         'feedUrl': feedUrl,
         'duration': duration,
         'downloadSize': downloadSize,
-        'podcastId': podcastId,
+        'enclosureType': enclosureType,
+        'podcast': podcast,
         'enclosureLength': enclosureLength,
         'enclosureUrl': enclosureUrl,
         'pos': pos,

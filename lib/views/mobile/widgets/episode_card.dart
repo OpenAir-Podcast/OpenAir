@@ -34,8 +34,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
         .read(openAirProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
-    final AsyncValue<Map<String, QueueModel>> getQueueValue =
-        ref.watch(queueProvider);
+    final AsyncValue<List<QueueModel>> queueListAsync =
+        ref.watch(sortedQueueListProvider);
 
     return GestureDetector(
       onTap: () {
@@ -170,22 +170,19 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     ),
                   ),
                   // Playlist button
-                  getQueueValue.when(
-                    data: (data) {
-                      bool isQueued = false;
-
-                      data.containsKey(widget.episodeItem['guid'])
-                          ? isQueued = true
-                          : isQueued = false;
+                  queueListAsync.when(
+                    data: (list) {
+                      final isQueued = list.any(
+                          (item) => item.guid == widget.episodeItem['guid']);
 
                       return IconButton(
                         tooltip: "Add to queue",
                         onPressed: () {
                           isQueued
                               ? ref
-                                  .watch(openAirProvider)
+                                  .read(openAirProvider)
                                   .removeFromQueue(widget.episodeItem['guid'])
-                              : ref.watch(openAirProvider).addToQueue(
+                              : ref.read(openAirProvider).addToQueue(
                                     widget.episodeItem,
                                     widget.podcast,
                                   );
@@ -199,8 +196,6 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ),
                             ),
                           );
-
-                          ref.invalidate(queueProvider);
                         },
                         icon: isQueued
                             ? const Icon(Icons.playlist_add_check_rounded)
@@ -208,6 +203,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                       );
                     },
                     error: (error, stackTrace) {
+                      debugPrint(
+                          'Error in queueListAsync for EpisodeCard: $error');
                       return IconButton(
                         tooltip: "Add to queue",
                         onPressed: () {},
@@ -215,10 +212,18 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                       );
                     },
                     loading: () {
+                      // Handle loading by showing previous state's icon, disabled
+                      final previousList = queueListAsync.valueOrNull;
+                      final isQueuedPreviously = previousList?.any((item) =>
+                              item.guid == widget.episodeItem['guid']) ??
+                          false;
+
                       return IconButton(
                         tooltip: "Add to queue",
-                        onPressed: () {},
-                        icon: Icon(Icons.keyboard_double_arrow_down_rounded),
+                        onPressed: null, // Disable button while loading
+                        icon: isQueuedPreviously
+                            ? const Icon(Icons.playlist_add_check_rounded)
+                            : const Icon(Icons.playlist_add_rounded),
                       );
                     },
                   ),

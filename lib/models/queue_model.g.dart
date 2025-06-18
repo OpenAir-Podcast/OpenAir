@@ -26,7 +26,8 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       feedUrl: fields[6] as String,
       duration: fields[7] as Duration,
       downloadSize: fields[8] as String,
-      podcastId: fields[9] as String,
+      enclosureType: fields[16] as String?,
+      podcast: (fields[9] as Map).cast<String, dynamic>(),
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       pos: (fields[12] as num).toInt(),
@@ -39,7 +40,7 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
   @override
   void write(BinaryWriter writer, QueueModel obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -59,7 +60,7 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       ..writeByte(8)
       ..write(obj.downloadSize)
       ..writeByte(9)
-      ..write(obj.podcastId)
+      ..write(obj.podcast)
       ..writeByte(10)
       ..write(obj.enclosureLength)
       ..writeByte(11)
@@ -71,7 +72,9 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       ..writeByte(14)
       ..write(obj.currentPlaybackPositionString)
       ..writeByte(15)
-      ..write(obj.currentPlaybackRemainingTimeString);
+      ..write(obj.currentPlaybackRemainingTimeString)
+      ..writeByte(16)
+      ..write(obj.enclosureType);
   }
 
   @override

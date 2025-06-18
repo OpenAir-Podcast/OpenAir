@@ -11,8 +11,8 @@ import 'package:styled_text/styled_text.dart';
 
 final isEpisodeNewProvider =
     FutureProvider.family<bool, String>((ref, guid) async {
-  final apiService = ref.watch(openAirProvider);
-  return await apiService.isEpisodeNew(guid);
+  // isEpisodeNew uses hive, doesn't depend on openAirProvider's frequent changes
+  return await ref.read(openAirProvider).isEpisodeNew(guid);
 });
 
 class SubscriptionEpisodeCard extends ConsumerStatefulWidget {
@@ -42,11 +42,11 @@ class _SubscriptionEpisodeCardState
         ref.watch(isEpisodeNewProvider(widget.episodeItem['guid'].toString()));
 
     podcastDate = ref
-        .watch(openAirProvider)
+        .read(openAirProvider) // Date for item is static
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
-    final AsyncValue<Map<String, QueueModel>> getQueueValue =
-        ref.watch(queueProvider);
+    final AsyncValue<List<QueueModel>> queueListAsync =
+        ref.watch(sortedQueueListProvider);
 
     return GestureDetector(
       onTap: () {
@@ -88,8 +88,7 @@ class _SubscriptionEpisodeCardState
                               memCacheHeight: 62,
                               memCacheWidth: 62,
                               imageUrl: ref
-                                  .watch(openAirProvider)
-                                  .currentPodcast!['image'],
+                                  .watch(openAirProvider).currentPodcast?['image'] ?? widget.podcast['image'], // Use widget.podcast image
                               fit: BoxFit.fill,
                               errorWidget: (context, url, error) => Icon(
                                 Icons.error,
@@ -126,9 +125,7 @@ class _SubscriptionEpisodeCardState
                                   // Podcast title
                                   child: Text(
                                     ref
-                                            .watch(openAirProvider)
-                                            .currentPodcast!['author'] ??
-                                        "Unknown",
+                                            .watch(openAirProvider).currentPodcast?['author'] ?? widget.podcast['author'] ?? "Unknown", // Use widget.podcast author
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,
@@ -195,13 +192,10 @@ class _SubscriptionEpisodeCardState
                           ),
                         ),
                         // Playlist button
-                        getQueueValue.when(
-                          data: (data) {
-                            bool isQueued = false;
-
-                            data.containsKey(widget.episodeItem['guid'])
-                                ? isQueued = true
-                                : isQueued = false;
+                        queueListAsync.when(
+                          data: (list) {
+                            final isQueued = list.any((item) =>
+                                item.guid == widget.episodeItem['guid']);
 
                             return IconButton(
                               tooltip: "Add to queue",
@@ -209,8 +203,7 @@ class _SubscriptionEpisodeCardState
                                 isQueued
                                     ? ref
                                         .watch(openAirProvider)
-                                        .removeFromQueue(
-                                            widget.episodeItem['guid'])
+                                        .removeFromQueue(widget.episodeItem['guid'])
                                     : ref.watch(openAirProvider).addToQueue(
                                           widget.episodeItem,
                                           widget.podcast,
@@ -226,7 +219,8 @@ class _SubscriptionEpisodeCardState
                                   ),
                                 );
 
-                                ref.invalidate(queueProvider);
+                                // No need to invalidate here, sortedQueueListProvider
+                                // updates reactively via hiveServiceProvider.
                               },
                               icon: isQueued
                                   ? const Icon(Icons.playlist_add_check_rounded)
@@ -234,18 +228,27 @@ class _SubscriptionEpisodeCardState
                             );
                           },
                           error: (error, stackTrace) {
+                            debugPrint(
+                                'Error in queueListAsync for SubscriptionEpisodeCard: $error');
                             return IconButton(
                               tooltip: "Add to queue",
                               onPressed: () {},
                               icon: const Icon(Icons.error_outline_rounded),
                             );
                           },
-                          loading: () {
+                          loading: () { // Handle loading by showing previous state's icon, disabled
+                            final previousList = queueListAsync.valueOrNull;
+                            final isQueuedPreviously = previousList?.any(
+                                    (item) => item.guid ==
+                                        widget.episodeItem['guid']) ??
+                                false;
                             return IconButton(
                               tooltip: "Add to queue",
-                              onPressed: () {},
-                              icon: Icon(
-                                  Icons.keyboard_double_arrow_down_rounded),
+                              onPressed: null, // Disable button while loading
+                              icon: isQueuedPreviously
+                                  ? const Icon(
+                                      Icons.playlist_add_check_rounded)
+                                  : const Icon(Icons.playlist_add_rounded),
                             );
                           },
                         ),

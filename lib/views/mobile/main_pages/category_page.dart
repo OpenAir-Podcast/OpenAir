@@ -6,8 +6,8 @@ import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 // Create a FutureProvider to fetch the podcast data
-final podcastDataByCategoryProvider =
-    FutureProvider.family<Map<String, dynamic>, String>((ref, category) async {
+final podcastDataByCategoryProvider = FutureProvider.family
+    .autoDispose<Map<String, dynamic>, String>((ref, category) async {
   return await ref
       .watch(podcastIndexProvider)
       .getPodcastsByCategory(category.toLowerCase());

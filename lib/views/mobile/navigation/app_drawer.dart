@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
 import 'package:openair/views/mobile/nav_pages/downloads.dart';
@@ -13,19 +12,16 @@ import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
   // Watch hiveServiceProvider as subscription counts depend on Hive data
-  ref.watch(hiveServiceProvider);
   return await ref.read(openAirProvider).getAccumulatedSubscriptionCount();
 });
 
 final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
   // Watch hiveServiceProvider as feed counts depend on Hive data
-  ref.watch(hiveServiceProvider);
   return await ref.read(openAirProvider).getFeedsCount();
 });
 
 final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
   // Watch hiveServiceProvider as queue counts depend on Hive data
-  ref.watch(hiveServiceProvider);
   return await ref.read(openAirProvider).getQueueCount();
 });
 
@@ -92,6 +88,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       leading: const Icon(Icons.subscriptions_rounded),
                       title: const Text('Subscriptions'),
                       trailing: const Text('...'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => SubscriptionsPage()),
+                        );
+                      },
                     );
                   },
                   error: (error, stackTrace) {
@@ -102,6 +105,13 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(subCountProvider),
                       ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => SubscriptionsPage()),
+                        );
+                      },
                     );
                   },
                   data: (String data) {

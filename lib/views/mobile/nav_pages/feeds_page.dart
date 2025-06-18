@@ -3,15 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/episode_model.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
-  // Watch hiveServiceProvider as feed data comes from Hive
-  ref.watch(hiveServiceProvider);
+  // Feeds data comes from subscribed episodes in Hive.
+  // This provider will be manually invalidated when subscriptions (and their episodes) change.
   return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 

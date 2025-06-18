@@ -26,7 +26,7 @@ final getSubscriptionsCountProvider =
 
   // Gets episodes count from PodcastIndex
   int podcastEpisodeCount = await ref
-      .watch(podcastIndexProvider)
+      .read(podcastIndexProvider) // podcastIndexProvider doesn't notify
       .getPodcastEpisodeCountByPodcastId(podcastId);
 
   int result = podcastEpisodeCount - currentSubEpCount;
@@ -104,18 +104,14 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                     ref.read(openAirProvider.notifier).currentPodcast =
                         podcastData;
 
-                    Navigator.of(context)
-                        .push(
-                          MaterialPageRoute(
-                            builder: (context) => SubscriptionsEpisodesPage(
-                              podcast: subs[index].toJson(),
-                              id: subs[index].id,
-                            ),
-                          ),
-                        )
-                        .then(
-                          (value) => ref.invalidate(subscriptionsProvider),
-                        );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SubscriptionsEpisodesPage(
+                          podcast: subs[index].toJson(),
+                          id: subs[index].id,
+                        ),
+                      ),
+                    );
                   },
                   child: Column(
                     children: [

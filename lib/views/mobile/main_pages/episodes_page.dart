@@ -91,6 +91,16 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             title: Text(ref.watch(openAirProvider).currentPodcast!['title'] ??
                 'Unknown'),
             actions: [
+              IconButton(
+                tooltip: 'Podcast details',
+                onPressed: () {
+                  // TODO Go to a screen that shows the details of the podcast
+                },
+                icon: Icon(
+                  Icons.info_outline_rounded,
+                  size: 30.0,
+                ),
+              ),
               FutureBuilder(
                 future: ref.watch(openAirProvider).isSubscribed(widget.id),
                 builder: (context, snapshot) {

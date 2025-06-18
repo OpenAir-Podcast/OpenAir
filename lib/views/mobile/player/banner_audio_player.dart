@@ -56,14 +56,17 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             ),
             trailing: IconButton(
               onPressed: () {
-                ref.watch(openAirProvider).audioState == 'Play'
+                ref.read(openAirProvider).audioState ==
+                        'Play' // Use read for state check in action
                     ? ref
                         .read(openAirProvider.notifier)
                         .playerPauseButtonClicked()
                     : ref
                         .read(openAirProvider.notifier)
                         .playerPlayButtonClicked(
-                          ref.watch(openAirProvider).currentEpisode!,
+                          ref
+                              .read(openAirProvider)
+                              .currentEpisode!, // Use read for state in action
                         );
               },
               icon: ref.watch(openAirProvider).audioState == 'Play'
@@ -72,9 +75,8 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             ),
           ),
           LinearProgressIndicator(
-            value: ref
-                .read(openAirProvider.notifier)
-                .podcastCurrentPositionInMilliseconds,
+            value: ref.watch(openAirProvider
+                .select((p) => p.podcastCurrentPositionInMilliseconds)),
           ),
         ],
       ),

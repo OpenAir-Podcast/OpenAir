@@ -20,6 +20,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
       appBar: AppBar(
         title: const Text('Queue'),
       ),
+      // FIXME always show the loading widget when a queue card is playing
       body: ref.watch(sortedQueueListProvider).when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(
@@ -27,13 +28,37 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             ),
             data: (queueData) {
               if (queueData.isEmpty) {
-            return NoQueue(title: 'Queue');
-          }
-          return QueueCard(
-            queueItems: queueData,
-          );
-        },
-      ),
+                return NoQueue(title: 'Queue');
+              }
+
+              final currentPlayingGuid =
+                  ref.watch(openAirProvider).currentEpisode?['guid'];
+
+              return ReorderableListView.builder(
+                buildDefaultDragHandles: false,
+                itemBuilder: (context, index) {
+                  final item = queueData.elementAt(index);
+                  final bool isCurrentlyPlaying =
+                      currentPlayingGuid == item.guid;
+
+                  return QueueCard(
+                    key: ValueKey(item.guid),
+                    item: item,
+                    index: index,
+                    isCurrentlyPlaying: isCurrentlyPlaying,
+                  );
+                },
+                itemCount: queueData.length,
+                onReorder: (oldIndex, newIndex) {
+                  ref
+                      .read(hiveServiceProvider)
+                      .reorderQueue(oldIndex, newIndex);
+                },
+              );
+
+              //
+            },
+          ),
       bottomNavigationBar: SizedBox(
         height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
             ? 80.0

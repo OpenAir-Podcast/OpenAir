@@ -42,7 +42,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         borderRadius: BorderRadius.circular(10.0),
                         image: DecorationImage(
                           image: NetworkImage(
-                            widget.episodeItem!['feedImage'],
+                            widget.episodeItem!['feedImage'] ??
+                                widget.episodeItem!['image'],
                           ),
                           fit: BoxFit.cover,
                         ),

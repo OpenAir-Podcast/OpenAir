@@ -101,13 +101,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   Slider(
                     min: 0.0,
                     max: 1.0,
-                    value: ref
-                        .watch(openAirProvider.notifier)
-                        .podcastCurrentPositionInMilliseconds,
+                    value: ref.watch(openAirProvider).podcastCurrentPositionInMilliseconds,
                     onChanged: (value) {
                       ref
-                          .watch(openAirProvider.notifier)
-                          .mainPlayerSliderClicked(value);
+                          .read(openAirProvider) 
+                          .mainPlayerSliderClicked(value); // Use read for actions
                     },
                   ),
                   // Seek positions
@@ -117,12 +115,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          ref
-                              .watch(openAirProvider.notifier)
-                              .currentPlaybackPositionString,
+                          ref.watch(openAirProvider).currentPlaybackPositionString,
                         ),
                         Text(
-                          '-${ref.watch(openAirProvider.notifier).currentPlaybackRemainingTimeString}',
+                          '-${ref.watch(openAirProvider).currentPlaybackRemainingTimeString}',
                         ),
                       ],
                     ),
@@ -141,8 +137,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 children: [
                   // Rewind button
                   IconButton(
-                    onPressed:
-                        ref.watch(openAirProvider.notifier).rewindButtonClicked,
+                    onPressed: ref.read(openAirProvider).rewindButtonClicked, // Use read for actions
                     icon: const SizedBox(
                       width: 52.0,
                       height: 52.0,
@@ -163,13 +158,13 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.read(openAirProvider).audioState == 'Play'
+                      ref.read(openAirProvider).audioState == 'Play' // Use read for state check in action
                           ? ref
-                              .watch(openAirProvider.notifier)
+                              .read(openAirProvider) // Use read for actions
                               .playerPauseButtonClicked()
-                          : ref.watch(openAirProvider).playerPlayButtonClicked(
-                                ref.watch(openAirProvider).currentEpisode!,
-                              );
+                          : ref.read(openAirProvider).playerPlayButtonClicked( // Use read for actions
+                                ref.read(openAirProvider).currentEpisode!, // Use read for state in action
+                              ); 
                     }, // Add play/pause functionality
                     icon: ref.watch(openAirProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
@@ -179,8 +174,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Fast forward button
                   IconButton(
                     onPressed: ref
-                        .watch(openAirProvider.notifier)
-                        .fastForwardButtonClicked,
+                        .read(openAirProvider).fastForwardButtonClicked, // Use read for actions
                     icon: const SizedBox(
                       width: 52.0,
                       height: 52.0,

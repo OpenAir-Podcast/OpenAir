@@ -31,22 +31,10 @@ final subscriptionsProvider =
   yield await box.getAllValues();
 });
 
-// StreamProvider for Queue
-final queueProvider =
-    StreamProvider.autoDispose<Map<String, QueueModel>>((ref) async* {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.queueBox;
-
-  // Emit the initial state
-  yield await box.getAllValues();
-});
-
 // FutureProvider for sorted Queue List
 final sortedQueueListProvider =
     FutureProvider.autoDispose<List<QueueModel>>((ref) async {
-  // Watch hiveServiceProvider to re-fetch when it notifies (e.g., after add/remove/reorder)
   ref.watch(hiveServiceProvider);
-  // Use read here as watch is for dependency tracking causing re-evaluation.
   return await ref.read(hiveServiceProvider).getQueue();
 });
 
@@ -262,16 +250,22 @@ class HiveService extends ChangeNotifier {
 
   Future<List<QueueModel>> getQueue() async {
     final box = await queueBox;
-    var queue = await box.getAllValues();
-
     final List<QueueModel> queueList = [];
+    // Fetch all keys first
+    final Map<String, QueueModel> allKeys = await box.getAllValues();
 
-    for (final entry in queue.entries) {
+    for (final entry in allKeys.entries) {
       queueList.add(entry.value);
     }
 
     // Sort the list by datePublished in descending order (newest first)
-    queueList.sort((a, b) => a.pos.compareTo(b.pos));
+    try {
+      queueList.sort((a, b) => a.pos.compareTo(b.pos));
+    } catch (e, s) {
+      debugPrint('HiveService: Error sorting queueList by pos: $e');
+      debugPrint('HiveService: Stacktrace for sorting error: $s');
+      // Depending on requirements, you might return the unsorted list or handle otherwise.
+    }
     return queueList;
   }
 
