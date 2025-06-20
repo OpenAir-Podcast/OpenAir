@@ -88,7 +88,10 @@ class _SubscriptionEpisodeCardState
                               memCacheHeight: 62,
                               memCacheWidth: 62,
                               imageUrl: ref
-                                  .watch(openAirProvider).currentPodcast?['image'] ?? widget.podcast['image'], // Use widget.podcast image
+                                      .watch(openAirProvider)
+                                      .currentPodcast?['image'] ??
+                                  widget.podcast[
+                                      'image'], // Use widget.podcast image
                               fit: BoxFit.fill,
                               errorWidget: (context, url, error) => Icon(
                                 Icons.error,
@@ -125,7 +128,10 @@ class _SubscriptionEpisodeCardState
                                   // Podcast title
                                   child: Text(
                                     ref
-                                            .watch(openAirProvider).currentPodcast?['author'] ?? widget.podcast['author'] ?? "Unknown", // Use widget.podcast author
+                                            .watch(openAirProvider)
+                                            .currentPodcast?['author'] ??
+                                        widget.podcast['author'] ??
+                                        "Unknown", // Use widget.podcast author
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,
@@ -203,7 +209,8 @@ class _SubscriptionEpisodeCardState
                                 isQueued
                                     ? ref
                                         .watch(openAirProvider)
-                                        .removeFromQueue(widget.episodeItem['guid'])
+                                        .removeFromQueue(
+                                            widget.episodeItem['guid'])
                                     : ref.watch(openAirProvider).addToQueue(
                                           widget.episodeItem,
                                           widget.podcast,
@@ -236,18 +243,19 @@ class _SubscriptionEpisodeCardState
                               icon: const Icon(Icons.error_outline_rounded),
                             );
                           },
-                          loading: () { // Handle loading by showing previous state's icon, disabled
+                          loading: () {
+                            // Handle loading by showing previous state's icon, disabled
                             final previousList = queueListAsync.valueOrNull;
                             final isQueuedPreviously = previousList?.any(
-                                    (item) => item.guid ==
+                                    (item) =>
+                                        item.guid ==
                                         widget.episodeItem['guid']) ??
                                 false;
                             return IconButton(
                               tooltip: "Add to queue",
                               onPressed: null, // Disable button while loading
                               icon: isQueuedPreviously
-                                  ? const Icon(
-                                      Icons.playlist_add_check_rounded)
+                                  ? const Icon(Icons.playlist_add_check_rounded)
                                   : const Icon(Icons.playlist_add_rounded),
                             );
                           },

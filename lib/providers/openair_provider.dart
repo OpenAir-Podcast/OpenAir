@@ -7,6 +7,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/completed_episode_model.dart';
 import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
@@ -52,6 +53,7 @@ class OpenAirProvider with ChangeNotifier {
   int navIndex = 1;
 
   bool isPodcastSelected = false;
+  bool onceQueueComplete = false;
 
   Map<String, dynamic>? currentPodcast;
   Map<String, dynamic>? currentEpisode;
@@ -221,6 +223,7 @@ class OpenAirProvider with ChangeNotifier {
     List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
+    onceQueueComplete = false;
 
     // Checks if the episode has already been downloaded
     if (result[1] == 'true') {
@@ -272,22 +275,33 @@ class OpenAirProvider with ChangeNotifier {
 
   void timerButtonClicked() {}
 
-  void updateCurrentPlaybackPositions(
-    String currentPlaybackPosition,
-    String currentPlaybackRemainingTime,
-    double position,
-    QueueModel queue,
-  ) async {
-    queue.podcastCurrentPositionInMilliseconds = position;
-    queue.currentPlaybackPositionString = currentPlaybackPosition;
-    queue.currentPlaybackRemainingTimeString = currentPlaybackRemainingTime;
+  void updateCurrentQueueCard() async {
+    var queueBox = await ref.read(hiveServiceProvider).getQueue();
 
-    await ref.read(hiveServiceProvider).addToQueue(queue);
+    if (currentEpisode != null && currentEpisode!['guid'] != null) {
+      final String currentEpisodeGuid = currentEpisode!['guid'];
+
+      QueueModel queueItemToUpdate = queueBox.firstWhere(
+        (item) => item.guid == currentEpisodeGuid,
+      );
+
+      queueItemToUpdate.podcastCurrentPositionInMilliseconds =
+          podcastCurrentPositionInMilliseconds;
+      queueItemToUpdate.currentPlaybackPositionString =
+          currentPlaybackPositionString;
+      queueItemToUpdate.currentPlaybackRemainingTimeString =
+          currentPlaybackRemainingTimeString;
+
+      // Update Hive without notifying listeners that would refresh the whole queue list
+      await ref
+          .read(hiveServiceProvider)
+          .addToQueue(queueItemToUpdate, notify: false);
+    }
+
+    notifyListeners();
   }
 
   void updatePlaybackBar() async {
-    var queueBox = await ref.read(hiveServiceProvider).getQueue();
-
     player.getDuration().then((Duration? value) {
       if (value != null) {
         podcastDuration = value;
@@ -311,34 +325,6 @@ class OpenAirProvider with ChangeNotifier {
           (podcastPosition.inMilliseconds / podcastDuration.inMilliseconds)
               .clamp(0.0, 1.0);
 
-      // Check if the currently playing episode is in the fetched queue
-      // and update its playback progress in Hive.
-      if (currentEpisode != null && currentEpisode!['guid'] != null) {
-        final String currentEpisodeGuid = currentEpisode!['guid'];
-        try {
-          QueueModel queueItemToUpdate = queueBox.firstWhere(
-            (item) => item.guid == currentEpisodeGuid,
-          );
-          // If found, update its details in Hive
-          updateCurrentPlaybackPositions(
-            currentPlaybackPositionString,
-            currentPlaybackRemainingTimeString,
-            podcastCurrentPositionInMilliseconds,
-            queueItemToUpdate,
-          );
-        } on StateError catch (e) {
-          // firstWhere throws StateError if no element is found.
-          // If it's the "No element" error, we can ignore it, as it means
-          // the currently playing episode is not in the queue to be updated.
-          if (e.message != "No element") {
-            debugPrint("Unexpected StateError in updatePlaybackBar: $e");
-            // Optionally rethrow if it's not the "No element" error.
-          }
-        } catch (e) {
-          // Catch any other unexpected errors.
-          debugPrint("Error in updatePlaybackBar during queue update: $e");
-        }
-      }
       notifyListeners();
     });
 
@@ -349,10 +335,85 @@ class OpenAirProvider with ChangeNotifier {
         isPodcastSelected = false;
         audioState = 'Stop';
         isPlaying = PlayingStatus.stop;
+        updateCurrentQueueCard();
+
+        if (!onceQueueComplete) {
+          onceQueueComplete = true;
+          playNextInQueue();
+        }
+      } else if (playerState == PlayerState.paused) {
+        audioState = 'Pause';
+        isPlaying = PlayingStatus.paused;
+        updateCurrentQueueCard();
       }
     });
 
     notifyListeners();
+  }
+
+  void playNextInQueue() async {
+    if (currentEpisode == null || currentEpisode!['guid'] == null) {
+      isPodcastSelected = false;
+      audioState = 'Stop';
+      isPlaying = PlayingStatus.stop;
+      notifyListeners();
+      return;
+    }
+
+    final String completedEpisodeGuid = currentEpisode!['guid'];
+
+    try {
+      // Attempt to stop the player. It's okay if it's already stopped.
+      // This helps ensure a clean state before playing the next track.
+      if (player.state != PlayerState.stopped) {
+        await player.stop();
+      }
+      // 1. Remove the completed episode from the queue
+      await ref
+          .read(hiveServiceProvider)
+          .removeFromQueue(guid: completedEpisodeGuid);
+
+      // 2. Add to completed episodes
+      // Assuming CompletedEpisode model has a constructor like: CompletedEpisode({required this.guid})
+      await ref
+          .read(hiveServiceProvider)
+          .addToCompletedEpisode(CompletedEpisode(guid: completedEpisodeGuid));
+
+      // 3. Get the updated queue to determine the next episode.
+      // The sortedQueueListProvider will also update reactively for the UI.
+      final updatedQueue = await ref.read(hiveServiceProvider).getQueue();
+
+      if (updatedQueue.isNotEmpty) {
+        // 4. If the queue is not empty, play the next episode.
+        final nextEpisodeToPlay =
+            updatedQueue.first; // Assumes getQueue() returns a sorted list
+
+        playerPlayButtonClicked(nextEpisodeToPlay.toJson());
+        // playerPlayButtonClicked handles setting currentEpisode, isPlaying, audioState, and notifying listeners.
+      } else {
+        // 5. If the queue is empty, reset player state.
+        isPodcastSelected = false;
+        audioState = 'Stop';
+        isPlaying = PlayingStatus.stop;
+        currentEpisode = null; // Clear the current episode
+        // Reset playback bar values
+        podcastPosition = Duration.zero;
+        podcastDuration = Duration.zero;
+        podcastCurrentPositionInMilliseconds = 0;
+        currentPlaybackPositionString = '00:00:00';
+        currentPlaybackRemainingTimeString = '00:00:00';
+        notifyListeners();
+      }
+    } catch (e, s) {
+      debugPrint('Error in playNextInQueue: $e');
+      debugPrint('Stack trace: $s');
+      // Fallback: Reset player state on error
+      isPodcastSelected = false;
+      audioState = 'Stop';
+      isPlaying = PlayingStatus.stop;
+      currentEpisode = null;
+      notifyListeners();
+    }
   }
 
   String formatCurrentPlaybackPosition(Duration timeline) {

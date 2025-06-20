@@ -24,15 +24,28 @@ class QueueCard extends ConsumerStatefulWidget {
 class _QueueCardState extends ConsumerState<QueueCard> {
   @override
   Widget build(BuildContext context) {
-    final double currentPositionMilliseconds = widget.isCurrentlyPlaying
-        ? ref.watch(openAirProvider).podcastCurrentPositionInMilliseconds
-        : widget.item.podcastCurrentPositionInMilliseconds;
-    final String currentPositionString = widget.isCurrentlyPlaying
-        ? ref.watch(openAirProvider).currentPlaybackPositionString
-        : widget.item.currentPlaybackPositionString;
-    final String currentRemainingString = widget.isCurrentlyPlaying
-        ? ref.watch(openAirProvider).currentPlaybackRemainingTimeString
-        : widget.item.currentPlaybackRemainingTimeString;
+    // final openAir = ref.watch(openAirProvider); // Less specific watch
+
+    final double currentPositionMilliseconds;
+    final String currentPositionString;
+    final String currentRemainingString;
+    final String audioState; // For play/pause icon
+
+    if (widget.isCurrentlyPlaying) {
+      currentPositionMilliseconds = ref.watch(openAirProvider
+          .select((p) => p.podcastCurrentPositionInMilliseconds));
+      currentPositionString = ref.watch(
+          openAirProvider.select((p) => p.currentPlaybackPositionString));
+      currentRemainingString = ref.watch(
+          openAirProvider.select((p) => p.currentPlaybackRemainingTimeString));
+      audioState = ref.watch(openAirProvider.select((p) => p.audioState));
+    } else {
+      currentPositionMilliseconds =
+          widget.item.podcastCurrentPositionInMilliseconds;
+      currentPositionString = widget.item.currentPlaybackPositionString;
+      currentRemainingString = widget.item.currentPlaybackRemainingTimeString;
+      audioState = 'Pause'; // Default for non-playing items
+    }
 
     return Card(
       key: ValueKey(widget.item.guid),
@@ -52,8 +65,8 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: CachedNetworkImage(
-                  memCacheHeight: 62,
-                  memCacheWidth: 62,
+                  memCacheHeight: 52,
+                  memCacheWidth: 52,
                   imageUrl: widget.item.image,
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Icon(
@@ -132,29 +145,32 @@ class _QueueCardState extends ConsumerState<QueueCard> {
         trailing: IconButton(
           iconSize: 40.0,
           icon: Icon(
-            widget.isCurrentlyPlaying &&
-                    ref.watch(openAirProvider).audioState == 'Play'
+            widget.isCurrentlyPlaying && audioState == 'Play'
                 ? Icons.pause_circle_outline_rounded
                 : Icons.play_circle_outline_rounded,
             size: 40.0,
           ),
           onPressed: () {
             final openAir = ref.read(openAirProvider);
+            final currentOpenAirState = ref
+                .read(openAirProvider); // For reading current state if needed
 
-            openAir.currentPodcast = widget.item.podcast;
-            openAir.currentEpisode = widget.item.toJson();
+            openAir.currentPodcast = widget.item
+                .podcast; // This is okay, playerPlayButtonClicked will likely also set it and notify
+
+            // FIXME Play the episode from the store position and not from the start
 
             if (widget.isCurrentlyPlaying) {
-              if (ref.watch(openAirProvider).audioState == 'Play') {
+              if (audioState == 'Play') {
+                // Use the selected audioState
                 openAir.playerPauseButtonClicked();
               } else {
                 // If paused and it's the current episode, play it
                 openAir.playerPlayButtonClicked(
-                    ref.watch(openAirProvider).currentEpisode!);
+                    currentOpenAirState.currentEpisode!);
               }
             } else {
               // If it's a different episode, play it
-              openAir.isPodcastSelected = true;
               openAir.playerPlayButtonClicked(widget.item.toJson());
             }
           },

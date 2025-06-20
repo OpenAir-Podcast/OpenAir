@@ -27,7 +27,7 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       duration: fields[7] as Duration,
       downloadSize: fields[8] as String,
       enclosureType: fields[16] as String?,
-      podcast: (fields[9] as Map).cast<String, dynamic>(),
+      podcast: (fields[9] as Map?)?.cast<String, dynamic>(),
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       pos: (fields[12] as num).toInt(),

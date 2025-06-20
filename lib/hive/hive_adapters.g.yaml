@@ -129,5 +129,39 @@ types:
         index: 1
   Queue:
     typeId: 3
-    nextIndex: 0
-    fields: {}
+    nextIndex: 17
+    fields:
+      guid:
+        index: 0
+      image:
+        index: 1
+      title:
+        index: 2
+      author:
+        index: 3
+      datePublished:
+        index: 4
+      description:
+        index: 5
+      feedUrl:
+        index: 6
+      duration:
+        index: 7
+      size:
+        index: 8
+      podcastId:
+        index: 9
+      enclosureLength:
+        index: 10
+      enclosureUrl:
+        index: 11
+      pos:
+        index: 12
+      podcastCurrentPositionInMilliseconds:
+        index: 13
+      currentPlaybackPositionString:
+        index: 14
+      currentPlaybackRemainingTimeString:
+        index: 15
+      enclosureType:
+        index: 16

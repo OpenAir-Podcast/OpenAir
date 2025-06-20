@@ -236,22 +236,30 @@ class HiveService extends ChangeNotifier {
   }
 
   // Queue Operations:
-  Future<void> addToQueue(QueueModel queue) async {
+  Future<void> addToQueue(QueueModel queue, {bool notify = true}) async {
     final box = await queueBox;
     await box.put(queue.guid, queue);
-    notifyListeners(); // Notify listeners that queue data has changed
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   Future<void> removeFromQueue({required String guid}) async {
     final box = await queueBox;
-    await box.delete(guid);
-    notifyListeners(); // Notify listeners that queue data has changed
+    final queueList = await getQueue();
+    final newQueueList = queueList.where((item) => item.guid != guid).toList();
+    await box.clear();
+
+    for (var item in newQueueList) {
+      await box.put(item.guid, item);
+    }
+
+    notifyListeners();
   }
 
   Future<List<QueueModel>> getQueue() async {
     final box = await queueBox;
     final List<QueueModel> queueList = [];
-    // Fetch all keys first
     final Map<String, QueueModel> allKeys = await box.getAllValues();
 
     for (final entry in allKeys.entries) {
@@ -356,7 +364,7 @@ class HiveService extends ChangeNotifier {
   }
 
   // Completed Episodes Operations:
-  Future<void> addToCompletedEpisodes(CompletedEpisode completedEpisode) async {
+  Future<void> addToCompletedEpisode(CompletedEpisode completedEpisode) async {
     // Make return type Future<void>
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);

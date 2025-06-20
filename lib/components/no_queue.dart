@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class NoQueue extends StatelessWidget {
   const NoQueue({
     super.key,
-    required this.title,
   });
-
-  final String title;
 
   @override
   Widget build(BuildContext context) {
