@@ -101,7 +101,9 @@ class OpenAirProvider with ChangeNotifier {
     currentPlaybackPositionString = '00:00:00';
     currentPlaybackRemainingTimeString = '00:00:00';
 
+    currentPodcast = {};
     currentEpisode = {};
+    nextEpisode = {};
 
     audioState = 'Pause';
     loadState = 'Detail'; // Play, Load, Detail
@@ -868,7 +870,7 @@ class OpenAirProvider with ChangeNotifier {
       guid: episode['guid'],
       title: episode['title'],
       author: episode['author'] ?? 'Unknown',
-      image: episode['feedImage'],
+      image: episode['feedImage'] ?? episode['image'],
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],

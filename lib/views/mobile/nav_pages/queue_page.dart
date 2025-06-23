@@ -40,7 +40,7 @@ class QueuePage extends ConsumerWidget {
 
               return QueueCard(
                 key: ValueKey(item.guid),
-                item: item,
+                episodeItem: item,
                 index: index,
                 isQueueSelected: isQueueSelected,
               );

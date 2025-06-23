@@ -4,16 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 
 class QueueCard extends ConsumerStatefulWidget {
   const QueueCard({
     super.key,
-    required this.item,
+    required this.episodeItem,
     required this.index,
     required this.isQueueSelected,
   });
 
-  final QueueModel item;
+  final QueueModel episodeItem;
   final int index;
   final bool isQueueSelected;
 
@@ -44,15 +45,26 @@ class _QueueCardState extends ConsumerState<QueueCard> {
     } else {
       // This is an inactive item in the queue. Show its saved progress.
       currentPositionMilliseconds =
-          widget.item.podcastCurrentPositionInMilliseconds;
-      currentPositionString = widget.item.currentPlaybackPositionString;
-      currentRemainingString = widget.item.currentPlaybackRemainingTimeString;
+          widget.episodeItem.podcastCurrentPositionInMilliseconds;
+      currentPositionString = widget.episodeItem.currentPlaybackPositionString;
+      currentRemainingString =
+          widget.episodeItem.currentPlaybackRemainingTimeString;
       audioState = 'Pause'; // Represents a "playable" state
     }
 
     return Card(
-      key: ValueKey(widget.item.guid),
+      key: ValueKey(widget.episodeItem.guid),
       child: ListTile(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EpisodeDetail(
+                episodeItem: widget.episodeItem.toJson(),
+                podcast: widget.episodeItem.podcast,
+              ),
+            ),
+          );
+        },
         leading: ReorderableDragStartListener(
           index: widget.index,
           child: Row(
@@ -70,7 +82,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 child: CachedNetworkImage(
                   memCacheHeight: 52,
                   memCacheWidth: 52,
-                  imageUrl: widget.item.image,
+                  imageUrl: widget.episodeItem.image,
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Icon(
                     Icons.error,
@@ -87,7 +99,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               children: [
                 Text(
                   ref.read(openAirProvider).getPodcastPublishedDateFromEpoch(
-                        widget.item.datePublished,
+                        widget.episodeItem.datePublished,
                       ),
                   style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
@@ -96,7 +108,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 ),
                 const Text(' | '),
                 Text(
-                  widget.item.downloadSize,
+                  widget.episodeItem.downloadSize,
                   style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -104,7 +116,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               ],
             ),
             Text(
-              widget.item.title,
+              widget.episodeItem.title,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -176,12 +188,12 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 );
               }
 
-              openAir.playerPosition = widget.item.playerPosition!;
+              openAir.playerPosition = widget.episodeItem.playerPosition!;
 
-              openAir.currentPodcast = widget.item.podcast;
-              openAir.currentEpisode = widget.item.toJson();
+              openAir.currentPodcast = widget.episodeItem.podcast;
+              openAir.currentEpisode = widget.episodeItem.toJson();
 
-              openAirNotifier.playNewQueueItem(widget.item);
+              openAirNotifier.playNewQueueItem(widget.episodeItem);
             }
           },
         ),

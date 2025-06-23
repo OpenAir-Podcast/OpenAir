@@ -43,6 +43,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
           MaterialPageRoute(
             builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
+              podcast: widget.podcast,
             ),
           ),
         );
