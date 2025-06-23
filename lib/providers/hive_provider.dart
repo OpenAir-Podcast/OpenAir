@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
@@ -437,9 +438,18 @@ class HiveService extends ChangeNotifier {
         if (newEpisodesForThisFeed > 0) {
           totalNewEpisodes += newEpisodesForThisFeed;
         }
-      } catch (e) {
+      } on DioException catch (e) {
         debugPrint(
-            'Error fetching live episode count for subscription ${subscription.id} (${subscription.title}). Error: $e. This subscription will contribute 0 to the new episodes count.');
+            'DioError fetching live episode count for subscription ${subscription.id} (${subscription.title}). This subscription will contribute 0 to the new episodes count.');
+        if (e.response != null) {
+          debugPrint('Response: ${e.response?.data}');
+          debugPrint('Status code: ${e.response?.statusCode}');
+        } else {
+          debugPrint('Error sending request: ${e.message}');
+        }
+      } catch (e, s) {
+        debugPrint(
+            'Error fetching live episode count for subscription ${subscription.id} (${subscription.title}). Error: $e. Stacktrace: $s. This subscription will contribute 0 to the new episodes count.');
       }
     }
     return totalNewEpisodes.toString();

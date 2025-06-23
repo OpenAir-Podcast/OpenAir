@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -777,13 +778,25 @@ class OpenAirProvider with ChangeNotifier {
         .podcastSubscribedEpisodeCount(podcastId);
 
     // Gets episodes count from PodcastIndex
-    int podcastEpisodeCount = await ref
-        .read(podcastIndexProvider)
-        .getPodcastEpisodeCountByPodcastId(podcastId);
+    try {
+      int podcastEpisodeCount = await ref
+          .read(podcastIndexProvider)
+          .getPodcastEpisodeCountByPodcastId(podcastId);
 
-    int result = podcastEpisodeCount - currentSubEpCount;
+      int result = podcastEpisodeCount - currentSubEpCount;
 
-    return result.toString();
+      return result.toString();
+    } on DioException catch (e) {
+      debugPrint(
+          'DioError getting episode count for podcast $podcastId: ${e.message}');
+      if (e.response != null) {
+        debugPrint('Response: ${e.response?.data}');
+      }
+      return '...'; // Or some other indicator of an error
+    } catch (e) {
+      debugPrint('Error getting episode count for podcast $podcastId: $e');
+      return '...';
+    }
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
@@ -898,27 +911,43 @@ class OpenAirProvider with ChangeNotifier {
   void subscribe(
     Map<String, dynamic> podcast,
   ) async {
-    int podcastEpisodeCount = await ref
-        .read(podcastIndexProvider)
-        .getPodcastEpisodeCountByPodcastId(podcast['id']);
+    try {
+      int podcastEpisodeCount = await ref
+          .read(podcastIndexProvider)
+          .getPodcastEpisodeCountByPodcastId(podcast['id']);
 
-    Subscription subscription = Subscription(
-      id: podcast['id'],
-      title: podcast['title'],
-      author: podcast['author'] ?? 'Unknown',
-      feedUrl: podcast['url'],
-      imageUrl: podcast['image'],
-      episodeCount: podcastEpisodeCount,
-    );
+      Subscription subscription = Subscription(
+        id: podcast['id'],
+        title: podcast['title'],
+        author: podcast['author'] ?? 'Unknown',
+        feedUrl: podcast['url'],
+        imageUrl: podcast['image'],
+        episodeCount: podcastEpisodeCount,
+      );
 
-    ref.read(hiveServiceProvider).subscribe(subscription);
+      ref.read(hiveServiceProvider).subscribe(subscription);
 
-    addPodcastEpisodes(podcast);
+      await addPodcastEpisodes(podcast);
 
-    // subscriptionsProvider (from hive_provider.dart) will update reactively
-    // as it watches hiveServiceProvider, which is notified by the subscribe call.
-    ref.invalidate(getFeedsProvider);
-    notifyListeners();
+      // subscriptionsProvider (from hive_provider.dart) will update reactively
+      // as it watches hiveServiceProvider, which is notified by the subscribe call.
+      ref.invalidate(getFeedsProvider);
+      notifyListeners();
+    } on DioException catch (e) {
+      debugPrint('Failed to subscribe to ${podcast['title']}: ${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to subscribe: ${e.message}'),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Failed to subscribe to ${podcast['title']}: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An unexpected error occurred while subscribing.'),
+        ),
+      );
+    }
   }
 
   void unsubscribe(Map<String, dynamic> podcast) async {
@@ -931,40 +960,52 @@ class OpenAirProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addPodcastEpisodes(Map<String, dynamic> podcast) async {
+  Future<void> addPodcastEpisodes(Map<String, dynamic> podcast) async {
     final apiService = ref.read(podcastIndexProvider);
+    try {
+      Map<String, dynamic> episodes =
+          await apiService.getEpisodesByFeedUrl(podcast['url']);
 
-    Map<String, dynamic> episodes =
-        await apiService.getEpisodesByFeedUrl(podcast['url']);
+      Episode episode;
 
-    Episode episode;
+      for (int i = 0; i < episodes['count']; i++) {
+        int enclosureLength = episodes['items'][i]['enclosureLength'];
+        String duration = getPodcastDuration(enclosureLength);
+        String size = getEpisodeSize(enclosureLength);
 
-    for (int i = 0; i < episodes['count']; i++) {
-      int enclosureLength = episodes['items'][i]['enclosureLength'];
-      String duration = getPodcastDuration(enclosureLength);
-      String size = getEpisodeSize(enclosureLength);
+        episode = Episode(
+          podcastId: podcast['id'].toString(),
+          guid: episodes['items'][i]['guid'],
+          title: episodes['items'][i]['title'],
+          author: podcast['author'] ?? 'Unknown',
+          image: episodes['items'][i]['feedImage'],
+          datePublished: episodes['items'][i]['datePublished'],
+          description: episodes['items'][i]['description'],
+          feedUrl: episodes['items'][i]['feedUrl'],
+          duration: duration,
+          size: size,
+          enclosureLength: enclosureLength,
+          enclosureUrl: episodes['items'][i]['enclosureUrl'],
+        );
 
-      episode = Episode(
-        podcastId: podcast['id'].toString(),
-        guid: episodes['items'][i]['guid'],
-        title: episodes['items'][i]['title'],
-        author: podcast['author'] ?? 'Unknown',
-        image: episodes['items'][i]['feedImage'],
-        datePublished: episodes['items'][i]['datePublished'],
-        description: episodes['items'][i]['description'],
-        feedUrl: episodes['items'][i]['feedUrl'],
-        duration: duration,
-        size: size,
-        enclosureLength: enclosureLength,
-        enclosureUrl: episodes['items'][i]['enclosureUrl'],
-      );
+        ref.read(hiveServiceProvider).insertEpisode(
+              episode,
+              episode.guid,
+            );
 
-      ref.read(hiveServiceProvider).insertEpisode(
-            episode,
-            episode.guid,
-          );
-
-      notifyListeners();
+        notifyListeners();
+      }
+    } on DioException catch (e) {
+      debugPrint(
+          'Failed to fetch episodes for ${podcast['title']}: ${e.message}');
+      // This error will be caught by the 'subscribe' method's catch block
+      // if called from there, which will show a SnackBar.
+      // To avoid duplicate error messages, we can rethrow.
+      rethrow;
+    } catch (e) {
+      debugPrint('Failed to fetch episodes for ${podcast['title']}: $e');
+      // Rethrow to be handled by the caller.
+      rethrow;
     }
   }
 
