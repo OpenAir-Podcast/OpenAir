@@ -253,73 +253,49 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<void> queuePlayButtonClicked(
-    Map<String, dynamic> episodeItem,
+    Map<String, dynamic> queueItem,
     Duration position,
   ) async {
     debugPrint(
-        'queuePlayButtonClicked called for: ${episodeItem['title']} at position: $position');
-    currentEpisode = episodeItem;
+        'queuePlayButtonClicked called for: ${queueItem['title']} at position: $position');
+
+    currentEpisode = queueItem;
     List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
     onceQueueComplete = false;
 
-    debugPrint(position.toString());
-    try {
-      // Checks if the episode has already been downloaded
-      if (result[1] == 'true') {
-        final filePath = await getDownloadsPath(result[0]);
-        debugPrint('Attempting to play DeviceFileSource from queue: $filePath');
-        await player
-            .play(
-              DeviceFileSource(filePath),
-              position: position,
-            )
-            .timeout(const Duration(seconds: 30));
-      } else {
-        debugPrint(
-            'Attempting to play UrlSource from queue: ${currentEpisode!['enclosureUrl']}');
-        await player
-            .play(
-              UrlSource(currentEpisode!['enclosureUrl']),
-              position: position,
-            )
-            .timeout(const Duration(seconds: 30));
-      }
+    debugPrint('Position: ${position.toString()}');
+    debugPrint('Player Position: ${playerPosition.toString()}');
 
-      if (episodeItem['guid'] == currentEpisode!['guid']) {
-        isPlaying = PlayingStatus.playing;
-      }
+    playerPosition = position;
 
-      audioState = 'Play';
-      loadState = 'Play';
-      nextEpisode = currentEpisode;
-      updatePlaybackBar();
-      notifyListeners();
-    } on TimeoutException catch (e) {
-      debugPrint('Timeout playing audio from queue: $e');
-      isPlaying = PlayingStatus.stop;
-      audioState = 'Stop';
-      loadState = 'Detail';
-      notifyListeners();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Playback timed out. Please check your connection or try again.'),
-        ),
+    // Checks if the episode has already been downloaded
+    if (result[1] == 'true') {
+      final filePath = await getDownloadsPath(result[0]);
+
+      debugPrint('Attempting to play DeviceFileSource from queue: $filePath');
+
+      await player.play(
+        DeviceFileSource(filePath),
+        position: position,
       );
-    } catch (e) {
-      debugPrint('Error playing audio from queue: $e');
-      isPlaying = PlayingStatus.stop;
-      audioState = 'Stop';
-      loadState = 'Detail';
-      notifyListeners();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to play audio from queue: ${e.toString()}'),
-        ),
+    } else {
+      await player.play(
+        UrlSource(currentEpisode!['enclosureUrl']),
+        position: position,
       );
     }
+
+    if (queueItem['guid'] == currentEpisode!['guid']) {
+      isPlaying = PlayingStatus.playing;
+    }
+
+    audioState = 'Play';
+    loadState = 'Play';
+    nextEpisode = currentEpisode;
+    updatePlaybackBar();
+    notifyListeners();
   }
 
   Future<void> playerResumeButtonClicked() async {
@@ -429,7 +405,6 @@ class OpenAirProvider with ChangeNotifier {
     player.onPlayerStateChanged.listen((PlayerState playerState) async {
       // TODO: Add marking podcast as completed automatically here
       // TODO: Autoplay next podcast here
-      Duration? playerPosition = await player.getCurrentPosition();
 
       if (playerState == PlayerState.completed) {
         if (!onceQueueComplete) {
@@ -445,7 +420,7 @@ class OpenAirProvider with ChangeNotifier {
             podcastCurrentPositionInMilliseconds,
             currentPlaybackPositionString,
             currentPlaybackRemainingTimeString,
-            playerPosition!,
+            playerPosition,
           );
 
           playNextInQueue();
@@ -463,7 +438,7 @@ class OpenAirProvider with ChangeNotifier {
             podcastCurrentPositionInMilliseconds,
             currentPlaybackPositionString,
             currentPlaybackRemainingTimeString,
-            playerPosition!,
+            playerPosition,
           );
         }
       }
@@ -493,7 +468,7 @@ class OpenAirProvider with ChangeNotifier {
     // 2. Play the new item from its saved position.
     await queuePlayButtonClicked(
       newItem.toJson(),
-      newItem.playerPosition ?? Duration.zero,
+      newItem.playerPosition!,
     );
   }
 
@@ -513,7 +488,11 @@ class OpenAirProvider with ChangeNotifier {
       // This helps ensure a clean state before playing the next track.
       if (player.state != PlayerState.stopped) {
         await player.stop();
+        isPodcastSelected = false;
+        audioState = 'Stop';
+        isPlaying = PlayingStatus.stop;
       }
+
       // 1. Remove the completed episode from the queue
       await ref
           .read(hiveServiceProvider)
@@ -527,18 +506,18 @@ class OpenAirProvider with ChangeNotifier {
 
       // 3. Get the updated queue to determine the next episode.
       // The sortedQueueListProvider will also update reactively for the UI.
-      final updatedQueue = await ref.read(hiveServiceProvider).getQueue();
+      final updatedQueue = await ref.read(hiveServiceProvider).getSortedQueue();
 
       if (updatedQueue.isNotEmpty) {
         // 4. If the queue is not empty, play the next episode.
-        final nextEpisodeToPlay =
-            updatedQueue.first; // Assumes getQueue() returns a sorted list
+        final nextEpisodeToPlay = updatedQueue.first;
 
         currentEpisode = nextEpisodeToPlay.toJson();
         currentPodcast = nextEpisodeToPlay.podcast;
 
-        playerPlayButtonClicked(nextEpisodeToPlay.toJson());
-        // playerPlayButtonClicked handles setting currentEpisode, isPlaying, audioState, and notifying listeners.
+        // TODO Here
+        // playerPlayButtonClicked(nextEpisodeToPlay.toJson());
+        playNewQueueItem(nextEpisodeToPlay);
       } else {
         // 5. If the queue is empty, reset player state.
         isPodcastSelected = false;
@@ -836,7 +815,8 @@ class OpenAirProvider with ChangeNotifier {
   ) async {
     int pos;
 
-    List<QueueModel> queue = await ref.read(hiveServiceProvider).getQueue();
+    List<QueueModel> queue =
+        await ref.read(hiveServiceProvider).getSortedQueue();
 
     if (queue.isEmpty) {
       pos = 1;
@@ -898,7 +878,8 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<Queue<QueueModel>> getQueue() async {
     Queue<QueueModel> queue = Queue();
-    List<QueueModel> queueList = await ref.read(hiveServiceProvider).getQueue();
+    List<QueueModel> queueList =
+        await ref.read(hiveServiceProvider).getSortedQueue();
     queue.addAll(queueList);
     return queue;
   }

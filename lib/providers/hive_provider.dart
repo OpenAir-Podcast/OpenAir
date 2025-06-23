@@ -35,7 +35,7 @@ final subscriptionsProvider =
 final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
   (ref) {
     ref.watch(hiveServiceProvider);
-    return ref.read(hiveServiceProvider).getQueue().asStream();
+    return ref.read(hiveServiceProvider).getSortedQueue().asStream();
   },
 );
 
@@ -247,7 +247,7 @@ class HiveService extends ChangeNotifier {
 
   Future<void> removeFromQueue({required String guid}) async {
     final box = await queueBox;
-    final queueList = await getQueue();
+    final queueList = await getSortedQueue();
     final newQueueList = queueList.where((item) => item.guid != guid).toList();
     await box.clear();
 
@@ -258,7 +258,7 @@ class HiveService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<QueueModel>> getQueue() async {
+  Future<List<QueueModel>> getSortedQueue() async {
     final box = await queueBox;
     final List<QueueModel> queueList = [];
     final Map<String, QueueModel> allKeys = await box.getAllValues();
@@ -292,7 +292,7 @@ class HiveService extends ChangeNotifier {
   // This should get the fetch the list then sort it in ASC order
   void reorderQueue(int oldIndex, int newIndex) async {
     final box = await queueBox;
-    List<QueueModel> queue = await getQueue();
+    List<QueueModel> queue = await getSortedQueue();
 
     if (oldIndex < newIndex) {
       newIndex -= 1;

@@ -166,11 +166,21 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               debugPrint('Resuming');
               openAirNotifier.playerResumeButtonClicked();
             } else if (!widget.isQueueSelected) {
-              // This handles playing a new item from the queue.
-              // The provider will handle saving the previous track's state.
+              if (openAir.currentEpisode!.isNotEmpty) {
+                openAirNotifier.updateCurrentQueueCard(
+                  openAir.currentEpisode!['guid'],
+                  openAir.podcastCurrentPositionInMilliseconds,
+                  openAir.currentPlaybackPositionString,
+                  openAir.currentPlaybackRemainingTimeString,
+                  openAir.playerPosition,
+                );
+              }
+
+              openAir.playerPosition = widget.item.playerPosition!;
 
               openAir.currentPodcast = widget.item.podcast;
               openAir.currentEpisode = widget.item.toJson();
+
               openAirNotifier.playNewQueueItem(widget.item);
             }
           },
