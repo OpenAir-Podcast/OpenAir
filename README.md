@@ -64,6 +64,10 @@ We welcome contributions of all kinds! Please refer to the contribution guidelin
 
 OpenAir is licensed under the MIT License (see LICENSE file for details).
 
+## Disclaimer
+
+OpenAir is provided "as is" without warranty of any kind, express or implied. The application relies on data provided by the PodcastIndex API and other third-party services. LiquidHive is not responsible for the accuracy, completeness, legality, or availability of podcast content accessed through OpenAir, nor for any interruptions or errors in the PodcastIndex API or other third-party services. Users are solely responsible for their use of the application and for adhering to the terms of service of any external platforms they access through OpenAir.
+
 ## About LiquidHive
 
 OpenAir is proudly developed and maintained by LiquidHive, a passionate team dedicated to building open-source tools for the community.
