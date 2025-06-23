@@ -19,6 +19,7 @@ class Download extends HiveObject {
     required this.enclosureLength,
     required this.enclosureUrl,
     required this.downloadDate,
+    required this.fileName,
   });
 
   @HiveField(0)
@@ -58,7 +59,10 @@ class Download extends HiveObject {
   String enclosureUrl;
 
   @HiveField(12)
-  Map<String, int> downloadDate;
+  int downloadDate;
+
+  @HiveField(13)
+  String fileName;
 
   factory Download.fromJson(Map<String, dynamic> json) => Download(
         guid: json["guid"],
@@ -74,6 +78,7 @@ class Download extends HiveObject {
         enclosureLength: json["enclosureLength"],
         enclosureUrl: json["enclosureUrl"],
         downloadDate: json["downloadDate"],
+        fileName: json["fileName"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -90,5 +95,6 @@ class Download extends HiveObject {
         'enclosureLength': enclosureLength,
         'enclosureUrl': enclosureUrl,
         'downloadDate': downloadDate,
+        'fileName': fileName,
       };
 }

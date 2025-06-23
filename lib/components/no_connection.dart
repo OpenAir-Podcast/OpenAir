@@ -22,6 +22,7 @@ class NoConnection extends ConsumerWidget {
           const SizedBox(height: 20.0),
           Text(
             'Oops, an error occurred...',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
@@ -29,6 +30,7 @@ class NoConnection extends ConsumerWidget {
           ),
           Text(
             'Please connect to network and try again',
+            textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16.0),
           ),
           const SizedBox(height: 20.0),

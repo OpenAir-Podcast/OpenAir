@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 
-class NoSubscriptions extends StatelessWidget {
-  const NoSubscriptions({
+class NoDownloadedEpisodes extends StatelessWidget {
+  const NoDownloadedEpisodes({
     super.key,
-    required this.title,
   });
-
-  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text('No Downloaded Episodes'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.list_alt_rounded,
+              Icons.download_rounded,
               size: 75.0,
               color: Colors.grey,
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Oops, looks like you have no subscription...',
+              'Oops, looks like you have no episodes downloaded...',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.0,
@@ -33,7 +30,7 @@ class NoSubscriptions extends StatelessWidget {
               ),
             ),
             Text(
-              'Please subscribe to a podcast and try again',
+              'Please download some episodes and try again',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16.0),
             ),

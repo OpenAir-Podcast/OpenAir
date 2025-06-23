@@ -76,7 +76,7 @@ class HiveService extends ChangeNotifier {
       final appDocumentDir = await getApplicationDocumentsDirectory();
 
       // Create the openair directory if it doesn't exist
-      openAirDir = Directory(join(appDocumentDir.path, 'OpenAir'));
+      openAirDir = Directory(join(appDocumentDir.path, 'OpenAir/.hive_config'));
 
       if (!await openAirDir.exists()) {
         await openAirDir.create(recursive: true);
@@ -329,6 +329,20 @@ class HiveService extends ChangeNotifier {
     return box.getAllValues();
   }
 
+  Future<List<Download>> getSortedDownloads() async {
+    final box = await downloadBox;
+    final Map<String, Download> allEpisodes = await box.getAllValues();
+    final List<Download> episodesList = [];
+
+    for (final entry in allEpisodes.entries) {
+      episodesList.add(entry.value);
+    }
+    // Sort the list by datePublished in descending order (newest first)
+    episodesList.sort((a, b) => b.downloadDate.compareTo(a.downloadDate));
+
+    return episodesList;
+  }
+
   Future<void> deleteDownload({required String guid}) async {
     // Make return type Future<void>
     final box = await downloadBox;
@@ -466,6 +480,14 @@ class HiveService extends ChangeNotifier {
   Future<String> queueCount() async {
     final box = await queueBox;
     final Map<String, QueueModel> allEpisodes = await box.getAllValues();
+
+    int result = allEpisodes.length;
+    return result.toString();
+  }
+
+  Future<String> downloadsCount() async {
+    final box = await downloadBox;
+    final Map<String, Download> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();

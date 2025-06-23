@@ -204,7 +204,7 @@ class _SubscriptionEpisodeCardState
                                 item.guid == widget.episodeItem['guid']);
 
                             return IconButton(
-                              tooltip: "Add to queue",
+                              tooltip: "Add to Queue",
                               onPressed: () {
                                 isQueued
                                     ? ref
@@ -238,7 +238,7 @@ class _SubscriptionEpisodeCardState
                             debugPrint(
                                 'Error in queueListAsync for SubscriptionEpisodeCard: $error');
                             return IconButton(
-                              tooltip: "Add to queue",
+                              tooltip: "Add to Queue",
                               onPressed: () {},
                               icon: const Icon(Icons.error_outline_rounded),
                             );
@@ -252,7 +252,7 @@ class _SubscriptionEpisodeCardState
                                         widget.episodeItem['guid']) ??
                                 false;
                             return IconButton(
-                              tooltip: "Add to queue",
+                              tooltip: "Add to Queue",
                               onPressed: null, // Disable button while loading
                               icon: isQueuedPreviously
                                   ? const Icon(Icons.playlist_add_check_rounded)

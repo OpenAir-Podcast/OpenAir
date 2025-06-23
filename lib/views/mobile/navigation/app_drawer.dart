@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/mobile/nav_pages/add_podcast.dart';
-import 'package:openair/views/mobile/nav_pages/downloads.dart';
+import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
+import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
-import 'package:openair/views/mobile/nav_pages/history.dart';
+import 'package:openair/views/mobile/nav_pages/history_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
-import 'package:openair/views/mobile/nav_pages/settings.dart';
-import 'package:openair/views/mobile/nav_pages/sign_in.dart';
+import 'package:openair/views/mobile/nav_pages/settings_page.dart';
+import 'package:openair/views/mobile/nav_pages/sign_in_page.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
@@ -25,6 +25,11 @@ final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
   return await ref.read(openAirProvider).getQueueCount();
 });
 
+final downloadsCountProvider = FutureProvider.autoDispose<String>((ref) async {
+  // Watch hiveServiceProvider as queue counts depend on Hive data
+  return await ref.read(openAirProvider).getDownloadsCount();
+});
+
 class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer({super.key});
 
@@ -38,6 +43,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
     final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
     final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
+    final AsyncValue<String> getDownloadsCountValue =
+        ref.watch(downloadsCountProvider);
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -200,13 +207,35 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 ),
                 const Divider(),
                 // Downloads button
-                ListTile(
-                  leading: const Icon(Icons.download_rounded),
-                  title: const Text('Downloads'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => Downloads()),
+                getDownloadsCountValue.when(
+                  loading: () {
+                    return ListTile(
+                      leading: const Icon(Icons.download_rounded),
+                      title: const Text('Downloads'),
+                      trailing: const Text('...'),
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return ListTile(
+                      leading: const Icon(Icons.download_rounded),
+                      title: const Text('Downloads'),
+                      trailing: ElevatedButton(
+                        child: const Text('Retry'),
+                        onPressed: () => ref.invalidate(queueCountProvider),
+                      ),
+                    );
+                  },
+                  data: (String data) {
+                    return ListTile(
+                      leading: const Icon(Icons.download_rounded),
+                      title: const Text('Downloads'),
+                      trailing: Text(data),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Downloads()),
+                        );
+                      },
                     );
                   },
                 ),

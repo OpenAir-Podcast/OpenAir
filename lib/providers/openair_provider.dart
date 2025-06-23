@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/models/completed_episode_model.dart';
+import 'package:openair/models/download_model.dart';
 import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
@@ -815,6 +816,10 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).queueCount();
   }
 
+  Future<String> getDownloadsCount() async {
+    return await ref.read(hiveServiceProvider).downloadsCount();
+  }
+
   Duration getEpisodeDuration(int epoch) {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
     int hours = dateTime.hour;
@@ -1028,5 +1033,9 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<List<Episode>> getSubscribedEpisodes() async {
     return ref.read(hiveServiceProvider).getEpisodes();
+  }
+
+  Future<List<Download>> getSortedDownloadedEpisodes() async {
+    return ref.read(hiveServiceProvider).getSortedDownloads();
   }
 }

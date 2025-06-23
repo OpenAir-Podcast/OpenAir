@@ -29,14 +29,15 @@ class DownloadAdapter extends TypeAdapter<Download> {
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
-      downloadDate: (fields[12] as Map).cast<String, int>(),
+      downloadDate: (fields[12] as num).toInt(),
+      fileName: fields[13] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Download obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class DownloadAdapter extends TypeAdapter<Download> {
       ..writeByte(11)
       ..write(obj.enclosureUrl)
       ..writeByte(12)
-      ..write(obj.downloadDate);
+      ..write(obj.downloadDate)
+      ..writeByte(13)
+      ..write(obj.fileName);
   }
 
   @override

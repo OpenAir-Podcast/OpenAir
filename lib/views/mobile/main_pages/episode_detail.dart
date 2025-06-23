@@ -143,7 +143,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             (item) => item.guid == widget.episodeItem!['guid']);
 
                         return IconButton(
-                          tooltip: "Add to queue",
+                          tooltip: "Add to Queue",
                           onPressed: () {
                             isQueued
                                 ? ref.read(openAirProvider).removeFromQueue(
@@ -172,7 +172,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         debugPrint(
                             'Error in queueListAsync for EpisodeCard: $error');
                         return IconButton(
-                          tooltip: "Add to queue",
+                          tooltip: "Add to Queue",
                           onPressed: () {},
                           icon: const Icon(Icons.error_outline_rounded),
                         );
@@ -185,7 +185,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             false;
 
                         return IconButton(
-                          tooltip: "Add to queue",
+                          tooltip: "Add to Queue",
                           onPressed: null, // Disable button while loading
                           icon: isQueuedPreviously
                               ? const Icon(Icons.playlist_add_check_rounded)
@@ -242,9 +242,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     ),
                     // More Button
                     IconButton(
-                      tooltip: "More",
+                      tooltip: "Share",
                       onPressed: () {},
-                      icon: const Icon(Icons.more_vert_outlined),
+                      icon: const Icon(Icons.share_rounded),
                     ),
                   ],
                 ),
