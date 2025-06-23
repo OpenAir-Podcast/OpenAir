@@ -39,8 +39,8 @@ class OpenAirProvider with ChangeNotifier {
   late String audioState; // Play, Pause, Stop
   late String loadState; // Play, Load, Detail
 
-  late Duration podcastPosition;
-  late Duration podcastDuration;
+  late Duration playerPosition;
+  late Duration playerTotalDuration;
 
   late double podcastCurrentPositionInMilliseconds;
   late String currentPlaybackPositionString;
@@ -93,8 +93,8 @@ class OpenAirProvider with ChangeNotifier {
     podcastTitle = 'episodeName';
     podcastSubtitle = 'name';
 
-    podcastPosition = Duration.zero;
-    podcastDuration = Duration.zero;
+    playerPosition = Duration.zero;
+    playerTotalDuration = Duration.zero;
 
     podcastCurrentPositionInMilliseconds = 0;
     currentPlaybackPositionString = '00:00:00';
@@ -172,11 +172,9 @@ class OpenAirProvider with ChangeNotifier {
     Map<String, dynamic> currentEpisode,
   ) async {
     loadState = 'Load';
-
     isPlaying = PlayingStatus.buffering;
     notifyListeners();
 
-    // TODO: Add support for multiple podcast
     String mp3Name =
         formattedDownloadedPodcastName(currentEpisode['enclosureUrl']);
 
@@ -184,84 +182,172 @@ class OpenAirProvider with ChangeNotifier {
 
     List<String> result = [mp3Name, isDownloaded.toString()];
 
-    // TODO:Add support for downloading podcasts
-    // isDownloaded
-    //     ? {
-    //         await player.setSource(DeviceFileSource(
-    //           currentEpisode['enclosureUrl'],
-    //           mimeType: currentEpisode['enclosureType'],
-    //         ))
-    //       }
-    //     : await player.setSource(
-    //         UrlSource(
-    //           currentEpisode['enclosureUrl'],
-    //           mimeType: currentEpisode['enclosureType'],
-    //         ),
-    //       );
-
-    // TODO: Remove this when I implement the isDownload functionality
-    player.setSource(
-      UrlSource(
-        currentEpisode['enclosureUrl'],
-        mimeType: currentEpisode['enclosureType'],
-      ),
-    );
-
     return result;
   }
 
   void rewindButtonClicked() {
-    if (podcastPosition.inSeconds - 10 > 0) {
-      player.seek(Duration(seconds: podcastPosition.inSeconds - 10));
+    if (playerPosition.inSeconds - 10 > 0) {
+      player.seek(Duration(seconds: playerPosition.inSeconds - 10));
     }
   }
 
-  void playerPlayButtonClicked(
+  Future<void> playerPlayButtonClicked(
     Map<String, dynamic> episodeItem,
   ) async {
+    debugPrint('playerPlayButtonClicked called for: ${episodeItem['title']}');
     currentEpisode = episodeItem;
     List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
     onceQueueComplete = false;
 
-    // Checks if the episode has already been downloaded
-    if (result[1] == 'true') {
-      player.play(DeviceFileSource(
-          '/data/user/0/com.liquidhive.openair/app_flutter/downloads/${result[0]}'));
-    } else {
-      await player.play(UrlSource(currentEpisode!['enclosureUrl']));
-    }
+    try {
+      // Checks if the episode has already been downloaded
+      if (result[1] == 'true') {
+        final filePath = await getDownloadsPath(result[0]);
+        debugPrint('Attempting to play DeviceFileSource: $filePath');
+        await player
+            .play(DeviceFileSource(filePath))
+            .timeout(const Duration(seconds: 30));
+      } else {
+        debugPrint(
+            'Attempting to play UrlSource: ${currentEpisode!['enclosureUrl']}');
+        await player
+            .play(UrlSource(currentEpisode!['enclosureUrl']))
+            .timeout(const Duration(seconds: 30));
+      }
 
-    if (episodeItem == currentEpisode) {
+      if (episodeItem['guid'] == currentEpisode!['guid']) {
+        isPlaying = PlayingStatus.playing;
+      }
+
+      audioState = 'Play';
+      loadState = 'Play';
+      nextEpisode = currentEpisode;
+      updatePlaybackBar();
+      notifyListeners();
+    } on TimeoutException catch (e) {
+      debugPrint('Timeout playing audio: $e');
+      isPlaying = PlayingStatus.stop;
+      audioState = 'Stop';
+      loadState = 'Detail';
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Playback timed out. Please check your connection or try again.'),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error playing audio: $e');
+      isPlaying = PlayingStatus.stop;
+      audioState = 'Stop';
+      loadState = 'Detail';
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to play audio: ${e.toString()}'),
+        ),
+      );
+    }
+  }
+
+  Future<void> queuePlayButtonClicked(
+    Map<String, dynamic> episodeItem,
+    Duration position,
+  ) async {
+    debugPrint(
+        'queuePlayButtonClicked called for: ${episodeItem['title']} at position: $position');
+    currentEpisode = episodeItem;
+    List<String> result = await setPodcastStream(currentEpisode!);
+
+    isPodcastSelected = true;
+    onceQueueComplete = false;
+
+    debugPrint(position.toString());
+    try {
+      // Checks if the episode has already been downloaded
+      if (result[1] == 'true') {
+        final filePath = await getDownloadsPath(result[0]);
+        debugPrint('Attempting to play DeviceFileSource from queue: $filePath');
+        await player
+            .play(
+              DeviceFileSource(filePath),
+              position: position,
+            )
+            .timeout(const Duration(seconds: 30));
+      } else {
+        debugPrint(
+            'Attempting to play UrlSource from queue: ${currentEpisode!['enclosureUrl']}');
+        await player
+            .play(
+              UrlSource(currentEpisode!['enclosureUrl']),
+              position: position,
+            )
+            .timeout(const Duration(seconds: 30));
+      }
+
+      if (episodeItem['guid'] == currentEpisode!['guid']) {
+        isPlaying = PlayingStatus.playing;
+      }
+
+      audioState = 'Play';
+      loadState = 'Play';
+      nextEpisode = currentEpisode;
+      updatePlaybackBar();
+      notifyListeners();
+    } on TimeoutException catch (e) {
+      debugPrint('Timeout playing audio from queue: $e');
+      isPlaying = PlayingStatus.stop;
+      audioState = 'Stop';
+      loadState = 'Detail';
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Playback timed out. Please check your connection or try again.'),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error playing audio from queue: $e');
+      isPlaying = PlayingStatus.stop;
+      audioState = 'Stop';
+      loadState = 'Detail';
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to play audio from queue: ${e.toString()}'),
+        ),
+      );
+    }
+  }
+
+  Future<void> playerResumeButtonClicked() async {
+    if (player.state == PlayerState.paused) {
+      await player.resume();
+      audioState = 'Play';
+      // loadState can remain 'Detail' or be set to 'Play' based on desired UI behavior
+      loadState = 'Play';
       isPlaying = PlayingStatus.playing;
+      notifyListeners();
     }
-
-    // TODO: Add the episode to the Episode and History Tables
-
-    audioState = 'Play';
-    loadState = 'Play';
-    nextEpisode = currentEpisode;
-    updatePlaybackBar();
-    notifyListeners();
+    // If player was stopped but currentEpisode is set, one might consider
+    // re-playing it from its last known position, but that's more complex
+    // than a simple resume. For now, resume only works from paused state.
   }
 
   Future<void> playerPauseButtonClicked() async {
-    audioState = 'Pause';
-    loadState = 'Detail';
-
     if (player.state == PlayerState.playing) {
       await player.pause();
+      audioState = 'Pause';
+      loadState = 'Detail';
+      isPlaying = PlayingStatus.paused;
     }
-
-    isPlaying = PlayingStatus.paused;
-
-    notifyListeners();
   }
 
   void fastForwardButtonClicked() {
-    if (podcastPosition.inSeconds + 10 < podcastDuration.inSeconds) {
-      player.seek(Duration(seconds: podcastPosition.inSeconds + 10));
+    if (playerPosition.inSeconds + 10 < playerTotalDuration.inSeconds) {
+      player.seek(Duration(seconds: playerPosition.inSeconds + 10));
     }
   }
 
@@ -275,36 +361,48 @@ class OpenAirProvider with ChangeNotifier {
 
   void timerButtonClicked() {}
 
-  void updateCurrentQueueCard() async {
-    var queueBox = await ref.read(hiveServiceProvider).getQueue();
+  Future<void> updateCurrentQueueCard(
+    String guid,
+    double podcastCurrentPositionInMilliseconds,
+    String currentPlaybackPositionString,
+    String currentPlaybackRemainingTimeString,
+    Duration position,
+  ) async {
+    debugPrint('Updating current queue card: $guid');
+    final hiveService = ref.read(hiveServiceProvider);
 
-    if (currentEpisode != null && currentEpisode!['guid'] != null) {
-      final String currentEpisodeGuid = currentEpisode!['guid'];
+    // Retrieve the existing QueueModel from Hive
+    QueueModel? existingQueueItem = await hiveService.getQueueByGuid(guid);
 
-      QueueModel queueItemToUpdate = queueBox.firstWhere(
-        (item) => item.guid == currentEpisodeGuid,
-      );
-
-      queueItemToUpdate.podcastCurrentPositionInMilliseconds =
+    if (existingQueueItem != null) {
+      // Update the properties of the existing item
+      existingQueueItem.podcastCurrentPositionInMilliseconds =
           podcastCurrentPositionInMilliseconds;
-      queueItemToUpdate.currentPlaybackPositionString =
+
+      existingQueueItem.currentPlaybackPositionString =
           currentPlaybackPositionString;
-      queueItemToUpdate.currentPlaybackRemainingTimeString =
+
+      existingQueueItem.currentPlaybackRemainingTimeString =
           currentPlaybackRemainingTimeString;
 
-      // Update Hive without notifying listeners that would refresh the whole queue list
-      await ref
-          .read(hiveServiceProvider)
-          .addToQueue(queueItemToUpdate, notify: false);
-    }
+      existingQueueItem.playerPosition = position;
 
-    notifyListeners();
+      // Save the updated item back to Hive.
+      // The `addToQueue` method is used here because it handles both
+      // insertion and updating (if the key already exists).
+      await hiveService.addToQueue(existingQueueItem, notify: true);
+      // notify: false is important here to prevent an infinite loop
+      // if this method is called from within a listener that triggers
+      // a UI rebuild which then re-reads the queue.
+    } else {
+      debugPrint('Queue item with GUID $guid not found for update.');
+    }
   }
 
   void updatePlaybackBar() async {
     player.getDuration().then((Duration? value) {
       if (value != null) {
-        podcastDuration = value;
+        playerTotalDuration = value;
         notifyListeners();
       } else {
         player.setSourceUrl(currentEpisode!['enclosureUrl']);
@@ -313,42 +411,90 @@ class OpenAirProvider with ChangeNotifier {
     });
 
     player.onPositionChanged.listen((Duration p) {
-      podcastPosition = p;
+      playerPosition = p;
 
       currentPlaybackPositionString =
-          formatCurrentPlaybackPosition(podcastPosition);
+          formatCurrentPlaybackPosition(this.playerPosition);
 
-      currentPlaybackRemainingTimeString =
-          formatCurrentPlaybackRemainingTime(podcastPosition, podcastDuration);
+      currentPlaybackRemainingTimeString = formatCurrentPlaybackRemainingTime(
+          this.playerPosition, playerTotalDuration);
 
       podcastCurrentPositionInMilliseconds =
-          (podcastPosition.inMilliseconds / podcastDuration.inMilliseconds)
+          (playerPosition.inMilliseconds / playerTotalDuration.inMilliseconds)
               .clamp(0.0, 1.0);
 
       notifyListeners();
     });
 
-    player.onPlayerStateChanged.listen((PlayerState playerState) {
+    player.onPlayerStateChanged.listen((PlayerState playerState) async {
       // TODO: Add marking podcast as completed automatically here
       // TODO: Autoplay next podcast here
-      if (playerState == PlayerState.completed) {
-        isPodcastSelected = false;
-        audioState = 'Stop';
-        isPlaying = PlayingStatus.stop;
-        updateCurrentQueueCard();
+      Duration? playerPosition = await player.getCurrentPosition();
 
+      if (playerState == PlayerState.completed) {
         if (!onceQueueComplete) {
+          debugPrint('Completed');
           onceQueueComplete = true;
+
+          isPodcastSelected = false;
+          audioState = 'Stop';
+          isPlaying = PlayingStatus.stop;
+
+          await updateCurrentQueueCard(
+            currentEpisode!['guid'],
+            podcastCurrentPositionInMilliseconds,
+            currentPlaybackPositionString,
+            currentPlaybackRemainingTimeString,
+            playerPosition!,
+          );
+
           playNextInQueue();
         }
       } else if (playerState == PlayerState.paused) {
-        audioState = 'Pause';
-        isPlaying = PlayingStatus.paused;
-        updateCurrentQueueCard();
+        if (!onceQueueComplete) {
+          onceQueueComplete = true;
+          debugPrint('Paused');
+
+          audioState = 'Pause';
+          isPlaying = PlayingStatus.paused;
+
+          await updateCurrentQueueCard(
+            currentEpisode!['guid'],
+            podcastCurrentPositionInMilliseconds,
+            currentPlaybackPositionString,
+            currentPlaybackRemainingTimeString,
+            playerPosition!,
+          );
+        }
       }
     });
 
     notifyListeners();
+  }
+
+  Future<void> playNewQueueItem(QueueModel newItem) async {
+    // 1. Save progress of the current episode if one is active.
+    if ((isPlaying == PlayingStatus.playing ||
+            isPlaying == PlayingStatus.paused) &&
+        currentEpisode != null) {
+      debugPrint(
+          'Switching track. Saving progress for previous episode: ${currentEpisode!['guid']}');
+
+      // The provider's state is updated by onPositionChanged, so it's fresh enough.
+      await updateCurrentQueueCard(
+        currentEpisode!['guid'],
+        podcastCurrentPositionInMilliseconds,
+        currentPlaybackPositionString,
+        currentPlaybackRemainingTimeString,
+        playerPosition,
+      );
+    }
+
+    // 2. Play the new item from its saved position.
+    await queuePlayButtonClicked(
+      newItem.toJson(),
+      newItem.playerPosition ?? Duration.zero,
+    );
   }
 
   void playNextInQueue() async {
@@ -388,6 +534,9 @@ class OpenAirProvider with ChangeNotifier {
         final nextEpisodeToPlay =
             updatedQueue.first; // Assumes getQueue() returns a sorted list
 
+        currentEpisode = nextEpisodeToPlay.toJson();
+        currentPodcast = nextEpisodeToPlay.podcast;
+
         playerPlayButtonClicked(nextEpisodeToPlay.toJson());
         // playerPlayButtonClicked handles setting currentEpisode, isPlaying, audioState, and notifying listeners.
       } else {
@@ -397,8 +546,8 @@ class OpenAirProvider with ChangeNotifier {
         isPlaying = PlayingStatus.stop;
         currentEpisode = null; // Clear the current episode
         // Reset playback bar values
-        podcastPosition = Duration.zero;
-        podcastDuration = Duration.zero;
+        playerPosition = Duration.zero;
+        playerTotalDuration = Duration.zero;
         podcastCurrentPositionInMilliseconds = 0;
         currentPlaybackPositionString = '00:00:00';
         currentPlaybackRemainingTimeString = '00:00:00';
@@ -583,11 +732,12 @@ class OpenAirProvider with ChangeNotifier {
   // Update the main player slider position based on the slider value.
   void mainPlayerSliderClicked(double sliderValue) {
     Duration duration = Duration(
-        milliseconds: (sliderValue * podcastDuration.inMilliseconds).toInt());
+        milliseconds:
+            (sliderValue * playerTotalDuration.inMilliseconds).toInt());
 
     podcastCurrentPositionInMilliseconds =
-        ((sliderValue * podcastDuration.inMilliseconds) /
-                podcastDuration.inMilliseconds)
+        ((sliderValue * playerTotalDuration.inMilliseconds) /
+                playerTotalDuration.inMilliseconds)
             .clamp(0.0, 1.0);
 
     player.seek(duration);
@@ -740,6 +890,7 @@ class OpenAirProvider with ChangeNotifier {
       podcastCurrentPositionInMilliseconds: initialPositionMilliseconds,
       currentPlaybackPositionString: initialPositionString,
       currentPlaybackRemainingTimeString: formattedTotalDurationString,
+      playerPosition: Duration.zero,
     );
 
     ref.read(hiveServiceProvider).addToQueue(queueMod);

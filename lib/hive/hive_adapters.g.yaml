@@ -129,7 +129,7 @@ types:
         index: 1
   Queue:
     typeId: 3
-    nextIndex: 17
+    nextIndex: 18
     fields:
       guid:
         index: 0
@@ -165,3 +165,5 @@ types:
         index: 15
       enclosureType:
         index: 16
+      position:
+        index: 17

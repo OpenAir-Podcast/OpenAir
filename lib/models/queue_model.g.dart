@@ -34,13 +34,14 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       podcastCurrentPositionInMilliseconds: (fields[13] as num).toDouble(),
       currentPlaybackPositionString: fields[14] as String,
       currentPlaybackRemainingTimeString: fields[15] as String,
+      playerPosition: fields[17] as Duration?,
     );
   }
 
   @override
   void write(BinaryWriter writer, QueueModel obj) {
     writer
-      ..writeByte(17)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -74,7 +75,9 @@ class QueueModelAdapter extends TypeAdapter<QueueModel> {
       ..writeByte(15)
       ..write(obj.currentPlaybackRemainingTimeString)
       ..writeByte(16)
-      ..write(obj.enclosureType);
+      ..write(obj.enclosureType)
+      ..writeByte(17)
+      ..write(obj.playerPosition);
   }
 
   @override

@@ -32,11 +32,12 @@ final subscriptionsProvider =
 });
 
 // FutureProvider for sorted Queue List
-final sortedQueueListProvider =
-    FutureProvider.autoDispose<List<QueueModel>>((ref) async {
-  ref.watch(hiveServiceProvider);
-  return await ref.read(hiveServiceProvider).getQueue();
-});
+final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
+  (ref) {
+    ref.watch(hiveServiceProvider);
+    return ref.read(hiveServiceProvider).getQueue().asStream();
+  },
+);
 
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;

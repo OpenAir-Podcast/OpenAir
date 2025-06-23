@@ -122,10 +122,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             ),
                           ),
                         ),
-                        onPressed: () =>
-                            ref.read(openAirProvider).playerPlayButtonClicked(
-                                  widget.episodeItem!,
-                                ),
+                        onPressed: () => ref
+                            .read(openAirProvider)
+                            .playerPlayButtonClicked(widget.episodeItem!),
                         child: PlayButtonWidget(
                           episodeItem: widget.episodeItem!,
                         ),
