@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
@@ -22,6 +24,9 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
+    final AsyncValue<List<QueueModel>> queueListAsync =
+        ref.watch(sortedQueueListProvider);
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -112,6 +117,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // Play button
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -130,22 +136,62 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         ),
                       ),
                     ),
-                    IconButton(
-                      tooltip: "Add to queue",
-                      onPressed: () {
-                        ref.read(openAirProvider).addToQueue(
-                              widget.episodeItem!,
-                              widget.podcast!,
-                            );
+                    // Queue Button
+                    queueListAsync.when(
+                      data: (list) {
+                        final isQueued = list.any(
+                            (item) => item.guid == widget.episodeItem!['guid']);
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Added ${widget.episodeItem!['title']} to queue'),
-                          ),
+                        return IconButton(
+                          tooltip: "Add to queue",
+                          onPressed: () {
+                            isQueued
+                                ? ref.read(openAirProvider).removeFromQueue(
+                                    widget.episodeItem!['guid'])
+                                : ref.read(openAirProvider).addToQueue(
+                                      widget.episodeItem!,
+                                      widget.podcast,
+                                    );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isQueued
+                                      ? 'Removed ${widget.episodeItem!['title']} from queue'
+                                      : 'Added ${widget.episodeItem!['title']} to queue',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: isQueued
+                              ? const Icon(Icons.playlist_add_check_rounded)
+                              : const Icon(Icons.playlist_add_rounded),
                         );
                       },
-                      icon: const Icon(Icons.playlist_add),
+                      error: (error, stackTrace) {
+                        debugPrint(
+                            'Error in queueListAsync for EpisodeCard: $error');
+                        return IconButton(
+                          tooltip: "Add to queue",
+                          onPressed: () {},
+                          icon: const Icon(Icons.error_outline_rounded),
+                        );
+                      },
+                      loading: () {
+                        // Handle loading by showing previous state's icon, disabled
+                        final previousList = queueListAsync.valueOrNull;
+                        final isQueuedPreviously = previousList?.any((item) =>
+                                item.guid == widget.episodeItem!['guid']) ??
+                            false;
+
+                        return IconButton(
+                          tooltip: "Add to queue",
+                          onPressed: null, // Disable button while loading
+                          icon: isQueuedPreviously
+                              ? const Icon(Icons.playlist_add_check_rounded)
+                              : const Icon(Icons.playlist_add_rounded),
+                        );
+                      },
                     ),
                     // TODO: Add download button
                     // Download Button
