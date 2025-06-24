@@ -33,7 +33,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
         ref.watch(sortedDownloadsProvider);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(widget.episodeItem!['title']),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 15.0,
@@ -198,7 +200,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         );
                       },
                     ),
-                    // TODO: Add download button
                     // Download Button
                     if (!kIsWeb)
                       downloadedListAsync.when(
@@ -266,8 +267,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 ),
                               );
                             };
-                          } else {
-                            debugPrint('Episode not downloaded');
+                          }
+                          // Episode not downloaded
+                          else {
                             iconData = Icons.download_rounded;
                             tooltip = 'Download Episode';
 
@@ -314,6 +316,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 ),
               ),
               // Episode Description
+              // TODO: Use a rich text widget to display the description
               SingleChildScrollView(
                 child: Html(
                   data: widget.episodeItem!['description'],

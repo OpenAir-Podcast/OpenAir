@@ -19,15 +19,6 @@ AppBar mainAppBar(WidgetRef ref) {
           icon: const Icon(Icons.search),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-        child: IconButton(
-          tooltip: 'Pause player',
-          // TODO: Refresh featured podcasts
-          onPressed: () {},
-          icon: const Icon(Icons.refresh_rounded),
-        ),
-      ),
     ],
     bottom: const TabBar(
       tabs: [

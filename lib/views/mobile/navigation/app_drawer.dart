@@ -171,7 +171,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   },
                 ),
                 const Divider(),
-                // TODO Show the total number of episodes in total.
                 // Queue button
                 getQueueCountValue.when(
                   loading: () {
@@ -262,14 +261,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       MaterialPageRoute(builder: (context) => AddPodcast()),
                     );
                   },
-                ),
-                const Divider(),
-                // More options button
-                // TODO Show all fav podcasts that the user sub to.
-                ListTile(
-                  leading: const Icon(Icons.more_horiz_rounded),
-                  title: const Text('More options'),
-                  onTap: () {},
                 ),
               ],
             ),

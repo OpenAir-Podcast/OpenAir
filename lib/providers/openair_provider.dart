@@ -172,27 +172,33 @@ class OpenAirProvider with ChangeNotifier {
 
   void audioPlayerSheetCloseButtonClicked() {}
 
-  Future<List<String>> setPodcastStream(
-    Map<String, dynamic> currentEpisode,
-  ) async {
-    loadState = 'Load';
-    isPlaying = PlayingStatus.buffering;
-    notifyListeners();
-
-    String mp3Name =
-        formattedDownloadedPodcastName(currentEpisode['enclosureUrl']);
-
-    bool isDownloaded = await isMp3FileDownloaded(mp3Name);
-
-    List<String> result = [mp3Name, isDownloaded.toString()];
-
-    return result;
-  }
-
   void rewindButtonClicked() {
     if (playerPosition.inSeconds - 10 > 0) {
       player.seek(Duration(seconds: playerPosition.inSeconds - 10));
     }
+  }
+
+  /// Returns the directory where downloaded episodes are stored.
+  /// This method creates the directory if it doesn't exist.
+  Future<String> getDownloadsDir() async {
+    if (kIsWeb) {
+      throw UnsupportedError(
+          'File system operations are not supported on web.');
+    }
+
+    // The HiveService initializes and holds the reference to the app's base directory.
+    final hiveService = ref.read(hiveServiceProvider);
+    final baseDir = hiveService.openAirDir;
+
+    // Define a specific subdirectory for downloads to keep things organized.
+    final downloadsDirPath = path.join(baseDir.path, '.downloaded_episodes');
+
+    final downloadsDir = Directory(downloadsDirPath);
+    // Ensure the directory exists before we try to use it.
+    if (!await downloadsDir.exists()) {
+      await downloadsDir.create(recursive: true);
+    }
+    return downloadsDir.path;
   }
 
   Future<void> playerPlayButtonClicked(
@@ -200,22 +206,25 @@ class OpenAirProvider with ChangeNotifier {
   ) async {
     debugPrint('playerPlayButtonClicked called for: ${episodeItem['title']}');
     currentEpisode = episodeItem;
-    List<String> result = await setPodcastStream(currentEpisode!);
+    bool isDownloaded = await isAudioFileDownloaded(currentEpisode!['guid']);
 
     isPodcastSelected = true;
     onceQueueComplete = false;
 
     try {
       // Checks if the episode has already been downloaded
-      if (result[1] == 'true') {
-        final filePath = await getDownloadsPath(result[0]);
-        debugPrint('Attempting to play DeviceFileSource: $filePath');
+      if (isDownloaded == true) {
+        debugPrint(
+            'Attempting to play DeviceFileSource: ${episodeItem['guid']}.mp3');
+        final downloadsDir = await getDownloadsDir();
+        final filePath = path.join(downloadsDir, '${episodeItem['guid']}.mp3');
         await player
             .play(DeviceFileSource(filePath))
             .timeout(const Duration(seconds: 30));
       } else {
         debugPrint(
             'Attempting to play UrlSource: ${currentEpisode!['enclosureUrl']}');
+
         await player
             .play(UrlSource(currentEpisode!['enclosureUrl']))
             .timeout(const Duration(seconds: 30));
@@ -250,11 +259,14 @@ class OpenAirProvider with ChangeNotifier {
       audioState = 'Stop';
       loadState = 'Detail';
       notifyListeners();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to play audio: ${e.toString()}'),
-        ),
-      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to play audio: ${e.toString()}'),
+          ),
+        );
+      }
     }
   }
 
@@ -265,8 +277,9 @@ class OpenAirProvider with ChangeNotifier {
     debugPrint(
         'queuePlayButtonClicked called for: ${queueItem['title']} at position: $position');
 
+    bool isDownloaded = await isAudioFileDownloaded(queueItem['guid']);
+
     currentEpisode = queueItem;
-    List<String> result = await setPodcastStream(currentEpisode!);
 
     isPodcastSelected = true;
     onceQueueComplete = false;
@@ -277,13 +290,15 @@ class OpenAirProvider with ChangeNotifier {
     playerPosition = position;
 
     // Checks if the episode has already been downloaded
-    if (result[1] == 'true') {
-      final filePath = await getDownloadsPath(result[0]);
+    if (isDownloaded == true) {
+      String filename = '${currentEpisode!['guid']}.mp3';
+      final filePath = await getDownloadsDir();
+      final file = File('$filePath/$filename');
 
       debugPrint('Attempting to play DeviceFileSource from queue: $filePath');
 
       await player.play(
-        DeviceFileSource(filePath),
+        DeviceFileSource(file.path),
         position: position,
       );
     } else {
@@ -521,8 +536,6 @@ class OpenAirProvider with ChangeNotifier {
         currentEpisode = nextEpisodeToPlay.toJson();
         currentPodcast = nextEpisodeToPlay.podcast;
 
-        // TODO Here
-        // playerPlayButtonClicked(nextEpisodeToPlay.toJson());
         playNewQueueItem(nextEpisodeToPlay);
       } else {
         // 5. If the queue is empty, reset player state.
@@ -605,63 +618,46 @@ class OpenAirProvider with ChangeNotifier {
     return result;
   }
 
-  // TODO: Add playlist here
-
-  Future<DownloadStatus> getDownloadStatus(String filename) async {
-    if (await isMp3FileDownloaded(filename)) {
-      return DownloadStatus.downloaded;
-    }
-
-    return DownloadStatus.notDownloaded;
-  }
-
-  Future<bool> isMp3FileDownloaded(String filename) async {
-    final filePath = '${directory!.path}/downloads/$filename';
-    final file = File(filePath);
-    return file.exists();
-  }
-
-  Future<String> getDownloadsPath(String filename) async {
-    const storagePath = 'OpenAir/.downloaded_episodes';
-
-    // Create the downloads directory if it doesn't exist
-    await Directory(path.join(directory!.path, storagePath))
-        .create(recursive: true);
-
-    final absolutePath = path.joinAll([directory!.path, storagePath, filename]);
-
-    return absolutePath;
-  }
-
-  String formattedDownloadedPodcastName(String audioUrl) {
-    String filename = path.basename(audioUrl); // Extract filename from URL
-
-    int indexOfQuestionMark = filename.indexOf('?');
-
-    if (indexOfQuestionMark != -1) {
-      filename = filename.substring(0, indexOfQuestionMark);
-    }
-
-    return filename;
-  }
-
-  // TODO: Add playlist here
-
   Future<void> removeAllDownloadedPodcasts() async {
-    Directory downloadsDirectory =
-        Directory('/data/user/0/com.liquidhive.openair/app_flutter/downloads');
-
-    List<FileSystemEntity> files = downloadsDirectory.listSync();
-
-    for (FileSystemEntity file in files) {
-      file.deleteSync();
+    if (kIsWeb) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This action is not available on the web.'),
+          ),
+        );
+      }
+      return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Removed all downloaded podcasts'),
-      ),
-    );
+    try {
+      final downloadsDirPath = await getDownloadsDir();
+      final downloadsDirectory = Directory(downloadsDirPath);
+
+      if (await downloadsDirectory.exists()) {
+        // Use async listing and deletion
+        await for (final entity in downloadsDirectory.list()) {
+          await entity.delete(recursive: true);
+        }
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Removed all downloaded podcasts'),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error removing all downloaded podcasts: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to remove downloaded podcasts.'),
+          ),
+        );
+      }
+    }
 
     notifyListeners();
   }
@@ -699,7 +695,9 @@ class OpenAirProvider with ChangeNotifier {
 
     try {
       String filename = '${item['guid']}.mp3';
-      final savePath = await getDownloadsPath(filename);
+      final downloadsDir = await getDownloadsDir();
+      debugPrint('Downloading ${item['title']} to $downloadsDir/$filename');
+      final savePath = path.join(downloadsDir, filename);
 
       await dio.download(url, savePath);
 
@@ -728,9 +726,8 @@ class OpenAirProvider with ChangeNotifier {
       debugPrint('Error downloading ${item['title']}: $e');
 
       String filename = '${item['guid']}.mp3';
-      final savePath = await getDownloadsPath(filename);
-      final file = File(savePath);
-
+      final filePath = await getDownloadsDir();
+      final file = File('$filePath/$filename');
       if (await file.exists()) {
         await file.delete();
       }
@@ -757,8 +754,9 @@ class OpenAirProvider with ChangeNotifier {
 
     try {
       String filename = '${item['guid']}.mp3';
-      final filePath = await getDownloadsPath(filename);
-      final file = File(filePath);
+      final filePath = await getDownloadsDir();
+      final file = File('$filePath/$filename');
+
       if (await file.exists()) {
         await file.delete();
       }
@@ -768,6 +766,17 @@ class OpenAirProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error removing download for ${item['title']}: $e');
     }
+  }
+
+  Future<bool> isAudioFileDownloaded(String guid) async {
+    if (kIsWeb) {
+      return false;
+    }
+    // The filename is consistently the GUID with a .mp3 extension.
+    final filename = '$guid.mp3';
+    final downloadsDir = await getDownloadsDir();
+    final filePath = path.join(downloadsDir, filename);
+    return File(filePath).exists();
   }
 
   // Update the main player slider position based on the slider value.
