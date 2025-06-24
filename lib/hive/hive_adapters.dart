@@ -15,7 +15,7 @@ import 'package:openair/models/subscription_model.dart';
   AdapterSpec<Feed>(),
   AdapterSpec<Queue>(),
   AdapterSpec<Download>(),
-  AdapterSpec<History>(),
+  AdapterSpec<HistoryModel>(),
   AdapterSpec<CompletedEpisode>(),
   AdapterSpec<Settings>(),
 ])

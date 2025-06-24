@@ -11,14 +11,14 @@ final getDownloadsProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSortedDownloadedEpisodes();
 });
 
-class Downloads extends ConsumerStatefulWidget {
-  const Downloads({super.key});
+class DownloadsPage extends ConsumerStatefulWidget {
+  const DownloadsPage({super.key});
 
   @override
   ConsumerState createState() => _DownloadsState();
 }
 
-class _DownloadsState extends ConsumerState<Downloads> {
+class _DownloadsState extends ConsumerState<DownloadsPage> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<Download>> getEpisodesValue =

@@ -232,7 +232,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Downloads()),
+                          MaterialPageRoute(
+                              builder: (context) => DownloadsPage()),
                         );
                       },
                     );
@@ -246,7 +247,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => History()),
+                      MaterialPageRoute(builder: (context) => HistoryPage()),
                     );
                   },
                 ),

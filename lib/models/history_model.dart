@@ -4,8 +4,8 @@ import 'package:openair/config/hive_types.dart';
 part 'history_model.g.dart';
 
 @HiveType(typeId: downloadTypeId)
-class History extends HiveObject {
-  History({
+class HistoryModel extends HiveObject {
+  HistoryModel({
     required this.guid,
     required this.image,
     required this.title,
@@ -58,9 +58,9 @@ class History extends HiveObject {
   String enclosureUrl;
 
   @HiveField(12)
-  Map<String, int> playDate;
+  DateTime playDate;
 
-  factory History.fromJson(Map<String, dynamic> json) => History(
+  factory HistoryModel.fromJson(Map<String, dynamic> json) => HistoryModel(
         guid: json["guid"],
         image: json["image"],
         title: json["title"],

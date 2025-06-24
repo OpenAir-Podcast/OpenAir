@@ -6,17 +6,17 @@ part of 'history_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class HistoryAdapter extends TypeAdapter<History> {
+class HistoryAdapter extends TypeAdapter<HistoryModel> {
   @override
   final typeId = 5;
 
   @override
-  History read(BinaryReader reader) {
+  HistoryModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return History(
+    return HistoryModel(
       guid: fields[0] as String,
       image: fields[1] as String,
       title: fields[2] as String,
@@ -29,12 +29,12 @@ class HistoryAdapter extends TypeAdapter<History> {
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
-      playDate: (fields[12] as Map).cast<String, int>(),
+      playDate: fields[12] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, History obj) {
+  void write(BinaryWriter writer, HistoryModel obj) {
     writer
       ..writeByte(13)
       ..writeByte(0)

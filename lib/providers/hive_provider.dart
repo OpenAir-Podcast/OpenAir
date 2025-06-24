@@ -54,7 +54,7 @@ class HiveService extends ChangeNotifier {
   late final Future<CollectionBox<Feed>> feedBox;
   late final Future<CollectionBox<QueueModel>> queueBox;
   late final Future<CollectionBox<Download>> downloadBox;
-  late final Future<CollectionBox<History>> historyBox;
+  late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisode>> completedEpisodeBox;
   late final Future<CollectionBox<Settings>> settingsBox;
 
@@ -111,7 +111,7 @@ class HiveService extends ChangeNotifier {
     feedBox = collection.openBox<Feed>('feed');
     queueBox = collection.openBox<QueueModel>('queue');
     downloadBox = collection.openBox<Download>('download');
-    historyBox = collection.openBox<History>('history');
+    historyBox = collection.openBox<HistoryModel>('history');
     completedEpisodeBox =
         collection.openBox<CompletedEpisode>('completed_episodes');
     settingsBox = collection.openBox<Settings>('settings');
@@ -350,6 +350,19 @@ class HiveService extends ChangeNotifier {
     return episodesList;
   }
 
+  Future<List<HistoryModel>> getSortedHistory() async {
+    final box = await historyBox;
+    final Map<String, HistoryModel> allEpisodes = await box.getAllValues();
+    final List<HistoryModel> episodesList = [];
+
+    for (final entry in allEpisodes.entries) {
+      episodesList.add(entry.value);
+    }
+
+    episodesList.sort((a, b) => b.playDate.compareTo(a.playDate));
+    return episodesList;
+  }
+
   Future<void> deleteDownload(String guid) async {
     // Make return type Future<void>
     final box = await downloadBox;
@@ -364,13 +377,13 @@ class HiveService extends ChangeNotifier {
   }
 
   // History Operations:
-  Future<void> addToHistory(History history) async {
+  Future<void> addToHistory(HistoryModel history) async {
     // Make return type Future<void>
     final box = await historyBox;
     await box.put(history.guid, history);
   }
 
-  Future<Map<String, History>> getHistory() async {
+  Future<Map<String, HistoryModel>> getHistory() async {
     final box = await historyBox;
     return box.getAllValues();
   }

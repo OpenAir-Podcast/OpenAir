@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/models/completed_episode_model.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -229,6 +230,11 @@ class OpenAirProvider with ChangeNotifier {
         isPlaying = PlayingStatus.playing;
       }
 
+      addToHistory(
+        episodeItem,
+        currentPodcast,
+      );
+
       audioState = 'Play';
       loadState = 'Play';
       nextEpisode = currentEpisode;
@@ -298,6 +304,11 @@ class OpenAirProvider with ChangeNotifier {
     if (queueItem['guid'] == currentEpisode!['guid']) {
       isPlaying = PlayingStatus.playing;
     }
+
+    addToHistory(
+      queueItem,
+      currentPodcast,
+    );
 
     audioState = 'Play';
     loadState = 'Play';
@@ -948,6 +959,35 @@ class OpenAirProvider with ChangeNotifier {
     ref.read(hiveServiceProvider).addToQueue(queueMod);
   }
 
+  void addToHistory(
+    Map<String, dynamic> episode,
+    Map<String, dynamic>? podcast,
+  ) async {
+    int enclosureLength = episode['enclosureLength'];
+    String downloadSize = getEpisodeSize(enclosureLength);
+
+    Duration episodeTotalDuration =
+        getEpisodeDuration(episode['enclosureLength']);
+
+    HistoryModel historyMod = HistoryModel(
+      guid: episode['guid'],
+      image: podcast!['image'],
+      title: episode['title'],
+      author: episode['author'] ?? 'Unknown',
+      datePublished: episode['datePublished'],
+      description: episode['description'],
+      feedUrl: episode['feedUrl'],
+      duration: episodeTotalDuration.inSeconds.toString(),
+      size: downloadSize,
+      podcastId: podcast!['id'].toString(),
+      enclosureLength: episode['enclosureLength'],
+      enclosureUrl: episode['enclosureUrl'],
+      playDate: DateTime.now(),
+    );
+
+    ref.read(hiveServiceProvider).addToHistory(historyMod);
+  }
+
   Future<Queue<QueueModel>> getQueue() async {
     Queue<QueueModel> queue = Queue();
     List<QueueModel> queueList =
@@ -1095,6 +1135,10 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<List<Download>> getSortedDownloadedEpisodes() async {
     return ref.read(hiveServiceProvider).getSortedDownloads();
+  }
+
+  Future<List<HistoryModel>> getSortedHistory() async {
+    return ref.read(hiveServiceProvider).getSortedHistory();
   }
 
   void share() {
