@@ -979,7 +979,7 @@ class OpenAirProvider with ChangeNotifier {
       feedUrl: episode['feedUrl'],
       duration: episodeTotalDuration.inSeconds.toString(),
       size: downloadSize,
-      podcastId: podcast!['id'].toString(),
+      podcastId: podcast['id'].toString(),
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
       playDate: DateTime.now(),

@@ -8,10 +8,6 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
 
-final getHistoryProvider = FutureProvider.autoDispose((ref) async {
-  return await ref.read(openAirProvider).getSortedHistory();
-});
-
 class HistoryPage extends ConsumerStatefulWidget {
   const HistoryPage({super.key});
 
