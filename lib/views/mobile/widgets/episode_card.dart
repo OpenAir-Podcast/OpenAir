@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/download_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -36,6 +38,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
 
     final AsyncValue<List<QueueModel>> queueListAsync =
         ref.watch(sortedQueueListProvider);
+
+    final AsyncValue<List<Download>> downloadedListAsync =
+        ref.watch(sortedDownloadsProvider);
 
     return GestureDetector(
       onTap: () {
@@ -229,16 +234,111 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     },
                   ),
                   // Download button
-                  IconButton(
-                    tooltip: "Download Episode",
-                    onPressed: () {
-                      
-                    },
-                    icon: const Icon(Icons.download_rounded),
-                  ),
+                  if (!kIsWeb)
+                    downloadedListAsync.when(
+                      data: (downloads) {
+                        final isDownloaded = downloads
+                            .any((d) => d.guid == widget.episodeItem['guid']);
+
+                        final isDownloading = ref.watch(openAirProvider.select(
+                            (p) => p.downloadingPodcasts
+                                .contains(widget.episodeItem['guid'])));
+
+                        IconData iconData;
+                        String tooltip;
+                        VoidCallback? onPressed;
+
+                        if (isDownloading) {
+                          iconData = Icons.downloading_rounded;
+                          tooltip = 'Downloading...';
+                          onPressed = null; // Or implement cancel
+                        } else if (isDownloaded) {
+                          iconData = Icons.download_done_rounded;
+                          tooltip = 'Delete Download';
+
+                          onPressed = () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext dialogContext) =>
+                                  AlertDialog(
+                                title: const Text('Confirm Deletion'),
+                                content: Text(
+                                    'Are you sure you want to remove the download for \'${widget.episodeItem['title']}\'?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(dialogContext)
+                                          .pop(); // Dismiss the dialog
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('Remove'),
+                                    onPressed: () async {
+                                      // Pop the dialog first
+                                      Navigator.of(dialogContext).pop();
+
+                                      // Then perform the removal
+                                      await ref
+                                          .read(openAirProvider.notifier)
+                                          .removeDownload(widget.episodeItem);
+
+                                      // Show feedback
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Removed \'${widget.episodeItem['title']}\''),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          };
+                        }
+                        // Not downloaded
+                        else {
+                          iconData = Icons.download_rounded;
+                          tooltip = 'Download Episode';
+
+                          onPressed = () {
+                            ref.read(openAirProvider.notifier).downloadEpisode(
+                                  widget.episodeItem,
+                                  widget.podcast,
+                                );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Downloading \'${widget.episodeItem['title']}\''),
+                              ),
+                            );
+                          };
+                        }
+
+                        return IconButton(
+                          tooltip: tooltip,
+                          onPressed: onPressed,
+                          icon: Icon(iconData),
+                        );
+                      },
+                      error: (e, s) => const IconButton(
+                          icon: Icon(Icons.error), onPressed: null),
+                      loading: () => const IconButton(
+                          icon: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2.0)),
+                          onPressed: null),
+                    ),
                   IconButton(
                     tooltip: "Share",
-                    onPressed: () {},
+                    onPressed: () => ref.watch(openAirProvider).share(),
                     icon: const Icon(Icons.share_rounded),
                   ),
                 ],

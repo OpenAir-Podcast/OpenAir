@@ -40,6 +40,13 @@ final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
   },
 );
 
+final sortedDownloadsProvider = StreamProvider.autoDispose<List<Download>>(
+  (ref) {
+    ref.watch(hiveServiceProvider);
+    return ref.read(hiveServiceProvider).getSortedDownloads().asStream();
+  },
+);
+
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
   late final Future<CollectionBox<Subscription>> subscriptionBox;
@@ -76,7 +83,7 @@ class HiveService extends ChangeNotifier {
       final appDocumentDir = await getApplicationDocumentsDirectory();
 
       // Create the openair directory if it doesn't exist
-      openAirDir = Directory(join(appDocumentDir.path, 'OpenAir/.hive_config'));
+      openAirDir = Directory(join(appDocumentDir.path, 'OpenAir'));
 
       if (!await openAirDir.exists()) {
         await openAirDir.create(recursive: true);
@@ -96,7 +103,7 @@ class HiveService extends ChangeNotifier {
         'completed_episodes',
         'settings',
       },
-      path: openAirDir.path,
+      path: kIsWeb ? null : openAirDir.path,
     );
 
     subscriptionBox = collection.openBox<Subscription>('subscriptions');
@@ -318,10 +325,10 @@ class HiveService extends ChangeNotifier {
   }
 
   // Download Operations:
-  Future<void> addToDownload(Download download) async {
-    // Make return type Future<void>
+  Future<void> addToDownloads(Download download) async {
     final box = await downloadBox;
     await box.put(download.guid, download);
+    notifyListeners();
   }
 
   Future<Map<String, Download>> getDownloads() async {
@@ -343,10 +350,11 @@ class HiveService extends ChangeNotifier {
     return episodesList;
   }
 
-  Future<void> deleteDownload({required String guid}) async {
+  Future<void> deleteDownload(String guid) async {
     // Make return type Future<void>
     final box = await downloadBox;
     await box.delete(guid);
+    notifyListeners();
   }
 
   Future<void> clearDownloads() async {

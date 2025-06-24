@@ -63,8 +63,6 @@ class OpenAirProvider with ChangeNotifier {
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
-  List<String> downloadingPodcasts = [];
-
   late String? currentPodcastTimeRemaining;
 
   String audioSpeedButtonLabel = '1.0x';
@@ -76,6 +74,8 @@ class OpenAirProvider with ChangeNotifier {
   final Ref<OpenAirProvider> ref;
 
   OpenAirProvider(this.ref);
+
+  List downloadingPodcasts = [];
 
   Future<void> initial(
     BuildContext context,
@@ -236,12 +236,14 @@ class OpenAirProvider with ChangeNotifier {
       audioState = 'Stop';
       loadState = 'Detail';
       notifyListeners();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Playback timed out. Please check your connection or try again.'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Playback timed out. Please check your connection or try again.'),
+          ),
+        );
+      }
     } catch (e) {
       debugPrint('Error playing audio: $e');
       isPlaying = PlayingStatus.stop;
@@ -620,7 +622,7 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<String> getDownloadsPath(String filename) async {
-    const storagePath = 'downloads'; // Assuming a downloads subdirectory
+    const storagePath = 'OpenAir/.downloaded_episodes';
 
     // Create the downloads directory if it doesn't exist
     await Directory(path.join(directory!.path, storagePath))
@@ -648,6 +650,7 @@ class OpenAirProvider with ChangeNotifier {
   Future<void> removeAllDownloadedPodcasts() async {
     Directory downloadsDirectory =
         Directory('/data/user/0/com.liquidhive.openair/app_flutter/downloads');
+
     List<FileSystemEntity> files = downloadsDirectory.listSync();
 
     for (FileSystemEntity file in files) {
@@ -663,53 +666,108 @@ class OpenAirProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // TODO: Needs to be multithreaded
-  void playerDownloadButtonClicked(Map<String, dynamic> item) async {
-    // item.setDownloaded = DownloadStatus.downloading;
-    // downloadingPodcasts.add(item.rssItem!.guid!);
-    //
-    // notifyListeners();
-    //
-    // final response = await http.get(Uri.parse(item.rssItem!.enclosure!.url!));
-    //
-    // if (response.statusCode == 200) {
-    //   String filename =
-    //       formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
-    //
-    //   final file = File(await getDownloadsPath(filename));
-    //
-    //   await file.writeAsBytes(response.bodyBytes).whenComplete(
-    //     () {
-    //       item.setDownloaded = DownloadStatus.downloaded;
-    //       downloadingPodcasts.remove(item..rssItem!.guid);
-    //       notifyListeners();
-    //     },
-    //   );
-    // } else {
-    //   throw Exception(
-    //       'Failed to download podcast (Status Code: ${response.statusCode})');
-    // }
+  Future<void> downloadEpisode(
+    Map<String, dynamic> item,
+    Map<String, dynamic> podcast,
+  ) async {
+    if (kIsWeb) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Downloading is not available on the web.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    final dio = Dio();
+
+    final guid = item['guid'] as String;
+    final url = item['enclosureUrl'] as String;
+
+    final size = getEpisodeSize(item['enclosureLength']);
+    Duration episodeTotalDuration = getEpisodeDuration(item['enclosureLength']);
+
+    if (downloadingPodcasts.contains(guid)) {
+      debugPrint('Already downloading ${item['title']}');
+      return;
+    }
+
+    downloadingPodcasts.add(guid);
+    notifyListeners();
+
+    try {
+      String filename = '${item['guid']}.mp3';
+      final savePath = await getDownloadsPath(filename);
+
+      await dio.download(url, savePath);
+
+      final downloadModel = Download(
+        guid: guid,
+        image: item['image'],
+        title: item['title'],
+        author: item['author'] ?? 'Unknown',
+        datePublished: item['datePublished'],
+        description: item['description'],
+        feedUrl: item['feedUrl'],
+        duration: episodeTotalDuration,
+        size: size,
+        podcastId: podcast['id'].toString(),
+        enclosureLength: item['enclosureLength'],
+        enclosureUrl: item['enclosureUrl'],
+        downloadDate: DateTime.now(),
+        fileName: filename,
+      );
+
+      await ref.read(hiveServiceProvider).addToDownloads(downloadModel);
+      notifyListeners();
+
+      debugPrint('Download complete for ${item['title']}');
+    } catch (e) {
+      debugPrint('Error downloading ${item['title']}: $e');
+
+      String filename = '${item['guid']}.mp3';
+      final savePath = await getDownloadsPath(filename);
+      final file = File(savePath);
+
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to download ${item['title']}.'),
+          ),
+        );
+      }
+    } finally {
+      downloadingPodcasts.remove(guid);
+      notifyListeners();
+    }
   }
 
-  void playerRemoveDownloadButtonClicked(Map<String, dynamic> item) async {
-    // Directory downloadsDirectory =
-    //     Directory('/data/user/0/com.liquidhive.openair/app_flutter/downloads');
-    // List<FileSystemEntity> files = downloadsDirectory.listSync();
-    //
-    // String filename =
-    //     formattedDownloadedPodcastName(item.rssItem!.enclosure!.url!);
-    //
-    // for (FileSystemEntity file in files) {
-    //   if (path.basename(file.path) == filename) {
-    //     file.deleteSync();
-    //     break;
-    //   }
-    // }
-    //
-    // item.downloaded = DownloadStatus.notDownloaded;
-    //
-    // Navigator.pop(context);
-    // notifyListeners();
+  Future<void> removeDownload(Map<String, dynamic> item) async {
+    if (kIsWeb) {
+      // This action is not possible on the web.
+      return;
+    }
+    final guid = item['guid'] as String;
+
+    try {
+      String filename = '${item['guid']}.mp3';
+      final filePath = await getDownloadsPath(filename);
+      final file = File(filePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      await ref.read(hiveServiceProvider).deleteDownload(guid);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error removing download for ${item['title']}: $e');
+    }
   }
 
   // Update the main player slider position based on the slider value.
@@ -1037,5 +1095,9 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<List<Download>> getSortedDownloadedEpisodes() async {
     return ref.read(hiveServiceProvider).getSortedDownloads();
+  }
+
+  void share() {
+    debugPrint('share button clicked');
   }
 }

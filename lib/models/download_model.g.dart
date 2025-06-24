@@ -24,12 +24,12 @@ class DownloadAdapter extends TypeAdapter<Download> {
       datePublished: (fields[4] as num).toInt(),
       description: fields[5] as String,
       feedUrl: fields[6] as String,
-      duration: fields[7] as String,
+      duration: fields[7] as Duration,
       size: fields[8] as String,
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
-      downloadDate: (fields[12] as num).toInt(),
+      downloadDate: fields[12] as DateTime,
       fileName: fields[13] as String,
     );
   }

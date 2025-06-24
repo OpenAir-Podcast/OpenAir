@@ -44,7 +44,7 @@ class Download extends HiveObject {
   String feedUrl;
 
   @HiveField(7)
-  String duration;
+  Duration duration;
 
   @HiveField(8)
   String size;
@@ -59,7 +59,7 @@ class Download extends HiveObject {
   String enclosureUrl;
 
   @HiveField(12)
-  int downloadDate;
+  DateTime downloadDate;
 
   @HiveField(13)
   String fileName;
