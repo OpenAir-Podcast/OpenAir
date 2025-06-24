@@ -11,12 +11,12 @@ import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
-class EpisodeCard extends ConsumerStatefulWidget {
+class FeedsEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
   final Map<String, dynamic> podcast;
 
-  const EpisodeCard({
+  const FeedsEpisodeCard({
     super.key,
     required this.episodeItem,
     required this.title,
@@ -24,12 +24,11 @@ class EpisodeCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<EpisodeCard> createState() => _EpisodeCardState();
+  ConsumerState<FeedsEpisodeCard> createState() => _EpisodeCardState();
 }
 
-class _EpisodeCardState extends ConsumerState<EpisodeCard> {
+class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
   String podcastDate = "";
-  bool cancel = false;
 
   @override
   Widget build(BuildContext context) {

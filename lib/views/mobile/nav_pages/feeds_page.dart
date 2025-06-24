@@ -6,7 +6,7 @@ import 'package:openair/models/episode_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/widgets/episode_card.dart';
+import 'package:openair/views/mobile/widgets/feeds_episode_card%20.dart';
 
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
   // Feeds data comes from subscribed episodes in Hive.
@@ -44,7 +44,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
               child: ListView.builder(
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
-                itemBuilder: (context, index) => EpisodeCard(
+                itemBuilder: (context, index) => FeedsEpisodeCard(
                   title: data[index].title,
                   episodeItem: data[index].toJson(),
                   podcast: data[index].toJson(),

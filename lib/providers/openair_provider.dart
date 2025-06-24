@@ -695,6 +695,15 @@ class OpenAirProvider with ChangeNotifier {
       );
 
       await ref.read(hiveServiceProvider).addToDownloads(downloadModel);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Downloaded \'${item['title']}\''),
+          ),
+        );
+      }
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
@@ -736,6 +745,7 @@ class OpenAirProvider with ChangeNotifier {
       }
 
       await ref.read(hiveServiceProvider).deleteDownload(guid);
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error removing download for ${item['title']}: $e');

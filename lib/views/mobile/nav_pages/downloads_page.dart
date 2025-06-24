@@ -5,7 +5,7 @@ import 'package:openair/config/scale.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/widgets/episode_card.dart';
+import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
 
 final getDownloadsProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSortedDownloadedEpisodes();
@@ -41,11 +41,13 @@ class _DownloadsState extends ConsumerState<Downloads> {
               child: ListView.builder(
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
-                itemBuilder: (context, index) => EpisodeCard(
-                  title: data[index].title,
-                  episodeItem: data[index].toJson(),
-                  podcast: data[index].toJson(),
-                ),
+                itemBuilder: (context, index) {
+                  return DownloadsEpisodeCard(
+                    title: data[index].title,
+                    episodeItem: data[index].toJson(),
+                    podcast: data[index].toJson(),
+                  );
+                },
               ),
             ),
           ),

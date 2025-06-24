@@ -40,6 +40,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 memCacheHeight: 62,
                 memCacheWidth: 62,
                 imageUrl: ref.watch(openAirProvider).currentPodcast!['image'],
+                fit: BoxFit.fill,
               ),
             ),
             title: SizedBox(

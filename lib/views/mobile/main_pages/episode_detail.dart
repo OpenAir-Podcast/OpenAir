@@ -176,8 +176,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         );
                       },
                       error: (error, stackTrace) {
-                        debugPrint(
-                            'Error in queueListAsync for EpisodeCard: $error');
+                        debugPrint('Error in queueListAsync: $error');
                         return IconButton(
                           tooltip: "Add to Queue",
                           onPressed: () {},
@@ -218,7 +217,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           if (isDownloading) {
                             iconData = Icons.downloading_rounded;
                             tooltip = 'Downloading...';
-                            onPressed = null; // Or implement cancel
+                            onPressed = null;
                           } else if (isDownloaded) {
                             iconData = Icons.download_done_rounded;
                             tooltip = 'Delete Download';
