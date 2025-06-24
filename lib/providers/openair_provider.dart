@@ -204,7 +204,6 @@ class OpenAirProvider with ChangeNotifier {
   Future<void> playerPlayButtonClicked(
     Map<String, dynamic> episodeItem,
   ) async {
-    debugPrint('playerPlayButtonClicked called for: ${episodeItem['title']}');
     currentEpisode = episodeItem;
     bool isDownloaded = await isAudioFileDownloaded(currentEpisode!['guid']);
 
@@ -214,17 +213,13 @@ class OpenAirProvider with ChangeNotifier {
     try {
       // Checks if the episode has already been downloaded
       if (isDownloaded == true) {
-        debugPrint(
-            'Attempting to play DeviceFileSource: ${episodeItem['guid']}.mp3');
         final downloadsDir = await getDownloadsDir();
         final filePath = path.join(downloadsDir, '${episodeItem['guid']}.mp3');
+
         await player
             .play(DeviceFileSource(filePath))
             .timeout(const Duration(seconds: 30));
       } else {
-        debugPrint(
-            'Attempting to play UrlSource: ${currentEpisode!['enclosureUrl']}');
-
         await player
             .play(UrlSource(currentEpisode!['enclosureUrl']))
             .timeout(const Duration(seconds: 30));
@@ -274,18 +269,12 @@ class OpenAirProvider with ChangeNotifier {
     Map<String, dynamic> queueItem,
     Duration position,
   ) async {
-    debugPrint(
-        'queuePlayButtonClicked called for: ${queueItem['title']} at position: $position');
-
     bool isDownloaded = await isAudioFileDownloaded(queueItem['guid']);
 
     currentEpisode = queueItem;
 
     isPodcastSelected = true;
     onceQueueComplete = false;
-
-    debugPrint('Position: ${position.toString()}');
-    debugPrint('Player Position: ${playerPosition.toString()}');
 
     playerPosition = position;
 
@@ -294,8 +283,6 @@ class OpenAirProvider with ChangeNotifier {
       String filename = '${currentEpisode!['guid']}.mp3';
       final filePath = await getDownloadsDir();
       final file = File('$filePath/$filename');
-
-      debugPrint('Attempting to play DeviceFileSource from queue: $filePath');
 
       await player.play(
         DeviceFileSource(file.path),
@@ -365,7 +352,6 @@ class OpenAirProvider with ChangeNotifier {
     String currentPlaybackRemainingTimeString,
     Duration position,
   ) async {
-    debugPrint('Updating current queue card: $guid');
     final hiveService = ref.read(hiveServiceProvider);
 
     // Retrieve the existing QueueModel from Hive
@@ -391,8 +377,6 @@ class OpenAirProvider with ChangeNotifier {
       // notify: false is important here to prevent an infinite loop
       // if this method is called from within a listener that triggers
       // a UI rebuild which then re-reads the queue.
-    } else {
-      debugPrint('Queue item with GUID $guid not found for update.');
     }
   }
 
@@ -411,7 +395,7 @@ class OpenAirProvider with ChangeNotifier {
       playerPosition = p;
 
       currentPlaybackPositionString =
-          formatCurrentPlaybackPosition(this.playerPosition);
+          formatCurrentPlaybackPosition(playerPosition);
 
       currentPlaybackRemainingTimeString = formatCurrentPlaybackRemainingTime(
           this.playerPosition, playerTotalDuration);
@@ -425,11 +409,9 @@ class OpenAirProvider with ChangeNotifier {
 
     player.onPlayerStateChanged.listen((PlayerState playerState) async {
       // TODO: Add marking podcast as completed automatically here
-      // TODO: Autoplay next podcast here
 
       if (playerState == PlayerState.completed) {
         if (!onceQueueComplete) {
-          debugPrint('Completed');
           onceQueueComplete = true;
 
           isPodcastSelected = false;
@@ -449,7 +431,6 @@ class OpenAirProvider with ChangeNotifier {
       } else if (playerState == PlayerState.paused) {
         if (!onceQueueComplete) {
           onceQueueComplete = true;
-          debugPrint('Paused');
 
           audioState = 'Pause';
           isPlaying = PlayingStatus.paused;
@@ -473,9 +454,6 @@ class OpenAirProvider with ChangeNotifier {
     if ((isPlaying == PlayingStatus.playing ||
             isPlaying == PlayingStatus.paused) &&
         currentEpisode != null) {
-      debugPrint(
-          'Switching track. Saving progress for previous episode: ${currentEpisode!['guid']}');
-
       // The provider's state is updated by onPositionChanged, so it's fresh enough.
       await updateCurrentQueueCard(
         currentEpisode!['guid'],
@@ -686,7 +664,6 @@ class OpenAirProvider with ChangeNotifier {
     Duration episodeTotalDuration = getEpisodeDuration(item['enclosureLength']);
 
     if (downloadingPodcasts.contains(guid)) {
-      debugPrint('Already downloading ${item['title']}');
       return;
     }
 
@@ -696,7 +673,6 @@ class OpenAirProvider with ChangeNotifier {
     try {
       String filename = '${item['guid']}.mp3';
       final downloadsDir = await getDownloadsDir();
-      debugPrint('Downloading ${item['title']} to $downloadsDir/$filename');
       final savePath = path.join(downloadsDir, filename);
 
       await dio.download(url, savePath);
@@ -720,8 +696,6 @@ class OpenAirProvider with ChangeNotifier {
 
       await ref.read(hiveServiceProvider).addToDownloads(downloadModel);
       notifyListeners();
-
-      debugPrint('Download complete for ${item['title']}');
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
 
@@ -859,6 +833,7 @@ class OpenAirProvider with ChangeNotifier {
     } on DioException catch (e) {
       debugPrint(
           'DioError getting episode count for podcast $podcastId: ${e.message}');
+
       if (e.response != null) {
         debugPrint('Response: ${e.response?.data}');
       }
@@ -1009,18 +984,24 @@ class OpenAirProvider with ChangeNotifier {
       notifyListeners();
     } on DioException catch (e) {
       debugPrint('Failed to subscribe to ${podcast['title']}: ${e.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to subscribe: ${e.message}'),
-        ),
-      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to subscribe: ${e.message}'),
+          ),
+        );
+      }
     } catch (e) {
       debugPrint('Failed to subscribe to ${podcast['title']}: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An unexpected error occurred while subscribing.'),
-        ),
-      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An unexpected error occurred while subscribing.'),
+          ),
+        );
+      }
     }
   }
 
