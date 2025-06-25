@@ -47,13 +47,6 @@ final sortedDownloadsProvider = StreamProvider.autoDispose<List<Download>>(
   },
 );
 
-final getHistoryProvider = StreamProvider.autoDispose<List<HistoryModel>>(
-  (ref) {
-    ref.watch(hiveServiceProvider);
-    return ref.read(hiveServiceProvider).getSortedHistory().asStream();
-  },
-);
-
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
   late final Future<CollectionBox<Subscription>> subscriptionBox;
