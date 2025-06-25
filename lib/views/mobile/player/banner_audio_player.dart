@@ -58,9 +58,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             trailing: IconButton(
               onPressed: () {
                 ref.read(openAirProvider).audioState == 'Play'
-                    ? ref
-                        .read(openAirProvider.notifier)
-                        .playerPauseButtonClicked()
+                    ? ref.read(openAirProvider).playerPauseButtonClicked()
                     : ref.read(openAirProvider).playerPlayButtonClicked(
                         ref.read(openAirProvider).currentEpisode!);
               },

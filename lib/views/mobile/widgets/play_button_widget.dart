@@ -21,7 +21,8 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
   Widget build(BuildContext context) {
     const double paddingSpace = 8.0;
 
-    if (widget.episodeItem != ref.watch(openAirProvider).currentEpisode) {
+    if (widget.episodeItem['guid'] !=
+        ref.watch(openAirProvider).currentEpisode!['guid']) {
       if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }

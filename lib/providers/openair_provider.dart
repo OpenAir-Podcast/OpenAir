@@ -15,7 +15,7 @@ import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/views/mobile/nav_pages/feeds_page.dart'; // Import for getFeedsProvider
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -93,7 +93,6 @@ class OpenAirProvider with ChangeNotifier {
     this.context = context;
 
     podcastSubtitle = 'podcastImage';
-    podcastTitle = 'episodeName';
     podcastSubtitle = 'name';
 
     playerPosition = Duration.zero;
@@ -321,7 +320,7 @@ class OpenAirProvider with ChangeNotifier {
     if (player.state == PlayerState.paused) {
       await player.resume();
       audioState = 'Play';
-      // loadState can remain 'Detail' or be set to 'Play' based on desired UI behavior
+      // loadState can remain 'Detail' or be set to 'Play' based on desired UI behaviour
       loadState = 'Play';
       isPlaying = PlayingStatus.playing;
       notifyListeners();
@@ -409,7 +408,7 @@ class OpenAirProvider with ChangeNotifier {
           formatCurrentPlaybackPosition(playerPosition);
 
       currentPlaybackRemainingTimeString = formatCurrentPlaybackRemainingTime(
-          this.playerPosition, playerTotalDuration);
+          playerPosition, playerTotalDuration);
 
       podcastCurrentPositionInMilliseconds =
           (playerPosition.inMilliseconds / playerTotalDuration.inMilliseconds)
@@ -419,8 +418,6 @@ class OpenAirProvider with ChangeNotifier {
     });
 
     player.onPlayerStateChanged.listen((PlayerState playerState) async {
-      // TODO: Add marking podcast as completed automatically here
-
       if (playerState == PlayerState.completed) {
         if (!onceQueueComplete) {
           onceQueueComplete = true;
@@ -428,6 +425,10 @@ class OpenAirProvider with ChangeNotifier {
           isPodcastSelected = false;
           audioState = 'Stop';
           isPlaying = PlayingStatus.stop;
+
+          ref.watch(hiveServiceProvider).addToCompletedEpisode(
+                CompletedEpisode(guid: currentEpisode!['guid']),
+              );
 
           await updateCurrentQueueCard(
             currentEpisode!['guid'],
@@ -963,23 +964,57 @@ class OpenAirProvider with ChangeNotifier {
     Map<String, dynamic> episode,
     Map<String, dynamic>? podcast,
   ) async {
-    int enclosureLength = episode['enclosureLength'];
-    String downloadSize = getEpisodeSize(enclosureLength);
+    final int enclosureLength = episode['enclosureLength'];
+    final String downloadSize = getEpisodeSize(enclosureLength);
 
-    Duration episodeTotalDuration =
+    final Duration episodeTotalDuration =
         getEpisodeDuration(episode['enclosureLength']);
 
+    String historyPodcastId;
+    String historyPodcastImage;
+    String historyPodcastAuthor;
+
+    // Determine the correct podcast ID, image, and author based on the 'podcast' map structure
+    if (podcast != null) {
+      if (podcast.containsKey('id')) {
+        // This is likely a full podcast object (e.g., from search results or feeds)
+        historyPodcastId = podcast['id'].toString();
+        historyPodcastImage = podcast['image'];
+        historyPodcastAuthor = podcast['author'] ?? 'Unknown';
+      } else if (podcast.containsKey('podcastId')) {
+        // This is likely a HistoryModel converted to a map (from DownloadsEpisodeCard)
+        historyPodcastId = podcast['podcastId'];
+        historyPodcastImage = podcast['image']; // HistoryModel also has 'image'
+        historyPodcastAuthor =
+            podcast['author'] ?? 'Unknown'; // HistoryModel also has 'author'
+      } else {
+        // Fallback for unexpected podcast map structure
+        debugPrint(
+            'Warning: Podcast map missing expected ID or podcastId in addToHistory. Using episode author/image.');
+        historyPodcastId = episode['podcastId']?.toString() ??
+            'unknown'; // Try to get from episode if available
+        historyPodcastImage =
+            episode['image'] ?? ''; // Try to get from episode if available
+        historyPodcastAuthor = episode['author'] ?? 'Unknown';
+      }
+    } else {
+      debugPrint(
+          'Warning: Podcast map is null in addToHistory. Using episode author/image.');
+      historyPodcastId = episode['podcastId']?.toString() ?? 'unknown';
+      historyPodcastImage = episode['image'] ?? '';
+      historyPodcastAuthor = episode['author'] ?? 'Unknown';
+    }
     HistoryModel historyMod = HistoryModel(
       guid: episode['guid'],
-      image: podcast!['image'],
+      image: historyPodcastImage,
       title: episode['title'],
-      author: episode['author'] ?? 'Unknown',
+      author: historyPodcastAuthor,
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],
       duration: episodeTotalDuration.inSeconds.toString(),
       size: downloadSize,
-      podcastId: podcast['id'].toString(),
+      podcastId: historyPodcastId,
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
       playDate: DateTime.now(),
