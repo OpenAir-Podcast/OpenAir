@@ -33,6 +33,42 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Downloads'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.delete_sweep_rounded),
+                  tooltip: 'Clear Downloads',
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) => AlertDialog(
+                        title: const Text('Clear Downloads'),
+                        content: const Text(
+                            'Are you sure you want to clear all downloaded episodes? This action cannot be undone.'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Clear'),
+                            onPressed: () async {
+                              Navigator.of(dialogContext).pop();
+                              await ref
+                                  .read(openAirProvider.notifier)
+                                  .removeAllDownloadedPodcasts();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -292,7 +292,6 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> clearQueue() async {
-    // Make return type Future<void>
     final box = await queueBox;
     await box.clear(); // Add await
   }
@@ -364,21 +363,18 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> deleteDownload(String guid) async {
-    // Make return type Future<void>
     final box = await downloadBox;
     await box.delete(guid);
     notifyListeners();
   }
 
   Future<void> clearDownloads() async {
-    // Make return type Future<void>
     final box = await downloadBox;
-    await box.clear(); // Add await
+    await box.clear();
   }
 
   // History Operations:
   Future<void> addToHistory(HistoryModel history) async {
-    // Make return type Future<void>
     final box = await historyBox;
     await box.put(history.guid, history);
   }
@@ -389,20 +385,17 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> deleteHistory({required String guid}) async {
-    // Make return type Future<void>
     final box = await historyBox;
     await box.delete(guid);
   }
 
   Future<void> clearHistory() async {
-    // Make return type Future<void>
     final box = await historyBox;
-    await box.clear(); // Add await
+    await box.clear();
   }
 
   // Completed Episodes Operations:
   Future<void> addToCompletedEpisode(CompletedEpisode completedEpisode) async {
-    // Make return type Future<void>
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);
   }
@@ -413,20 +406,17 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> deleteCompletedEpisode({required String guid}) async {
-    // Make return type Future<void>
     final box = await completedEpisodeBox;
     await box.delete(guid);
   }
 
   Future<void> clearCompletedEpisodes() async {
-    // Make return type Future<void>
     final box = await completedEpisodeBox;
     await box.clear(); // Add await
   }
 
   // Settings Operations:
   Future<void> saveSettings(Settings settings) async {
-    // Make return type Future<void>
     final box = await settingsBox;
     await box.put('settings', settings);
   }
@@ -437,7 +427,6 @@ class HiveService extends ChangeNotifier {
   }
 
   Future<void> deleteSettings() async {
-    // Make return type Future<void>
     final box = await settingsBox;
     await box.delete('settings'); // Add await
   }

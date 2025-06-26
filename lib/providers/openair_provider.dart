@@ -15,6 +15,7 @@ import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
@@ -630,6 +631,9 @@ class OpenAirProvider with ChangeNotifier {
           await entity.delete(recursive: true);
         }
       }
+
+      ref.watch(hiveServiceProvider).clearDownloads();
+      ref.invalidate(getDownloadsProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
