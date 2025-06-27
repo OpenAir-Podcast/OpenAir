@@ -70,4 +70,4 @@ OpenAir is provided "as is" without warranty of any kind, express or implied. Th
 
 ## About OpenAir
 
-OpenAir is proudly developed and maintained by a dedicated team who, as enthusiastic podcast listeners themselves, are passionate about building open-source tools for the community. We hope you enjoy using OpenAir!
+OpenAir is proudly developed and maintained by its contributors—who are enthusiastic podcast listeners themselves. Dedicated to building open-source tools for the community, by the community, we hope you enjoy using OpenAir!
