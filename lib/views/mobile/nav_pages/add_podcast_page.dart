@@ -142,39 +142,43 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                               var rssFeed = RssFeed.parse(xmlString);
 
-                              debugPrint(rssFeed.items!.first.guid);
+                              debugPrint(rssFeed.link);
+                              debugPrint(rssFeed.items!.first.link);
+                              debugPrint(rssFeed.itunes!.newFeedUrl);
+                              debugPrint(snapshot[index]['xmlURL']);
 
-                              // Map<String, dynamic> podcast = {
-                              //   'id': rssFeed.items!.first.guid,
-                              //   'url': rssFeed.items!.first.link,
-                              //   'title': rssFeed.title,
-                              //   'description': rssFeed.description,
-                              //   'author': rssFeed.author,
-                              //   'image': snapshot[index]['imgURL'],
-                              //   'artwork': snapshot[index]['imgURL'],
-                              //   'newestItemPublishTime': rssFeed.items!.first
-                              //           .pubDate!.millisecondsSinceEpoch ~/
-                              //       1000,
-                              //   'language': rssFeed.language,
-                              //   'categories': {
-                              //     for (var category in rssFeed.categories!)
-                              //       category.hashCode: category
-                              //   },
-                              // };
+                              Map<String, dynamic> podcast = {
+                                'id':
+                                    rssFeed.items!.first.itunes!.episode ?? -1,
+                                'url': snapshot[index]['xmlURL'],
+                                'title': rssFeed.title,
+                                'description': rssFeed.description,
+                                'author': rssFeed.author,
+                                'image': snapshot[index]['imgURL'],
+                                'artwork': snapshot[index]['imgURL'],
+                                'newestItemPublishTime': rssFeed.items!.first
+                                        .pubDate!.millisecondsSinceEpoch ~/
+                                    1000,
+                                'language': rssFeed.language,
+                                'categories': {
+                                  for (var category in rssFeed.categories!)
+                                    category.hashCode: category
+                                },
+                              };
 
-                              // ref.read(openAirProvider).currentPodcast =
-                              //     podcast;
+                              ref.read(openAirProvider).currentPodcast =
+                                  podcast;
 
-                              // if (context.mounted) {
-                              //   Navigator.of(context).push(
-                              //     MaterialPageRoute(
-                              //       builder: (context) => EpisodesPage(
-                              //         podcast: podcast,
-                              //         id: podcast['id'],
-                              //       ),
-                              //     ),
-                              //   );
-                              // }
+                              if (context.mounted) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EpisodesPage(
+                                      podcast: podcast,
+                                      id: podcast['id'],
+                                    ),
+                                  ),
+                                );
+                              }
                             },
                             child: Container(
                               decoration: BoxDecoration(
