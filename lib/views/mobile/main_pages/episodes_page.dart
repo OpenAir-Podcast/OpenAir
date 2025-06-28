@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 

@@ -41,12 +41,20 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
     cd OpenAir
     ```
 3.  **Create a `.env` file** in the root of the `OpenAir` project directory.
-4.  **Add your PodcastIndex API credentials to the `.env` file:**
+4.  **Add your API credentials to the `.env` file:**
+
+    For PodcastIndex (required):
     ```env
     PODCASTINDEX_API_KEY=YOUR_API_KEY_HERE
     PODCASTINDEX_API_SECRET=YOUR_API_SECRET_HERE
     ```
     **Important:** Replace `YOUR_API_KEY_HERE` and `YOUR_API_SECRET_HERE` with your actual API key and secret from the PodcastIndex developer portal.
+
+    For Fyyd (optional, for additional podcast discovery):
+    ```env
+    FYYD_CLIENT_ID=YOUR_FYYD_CLIENT_ID
+    FYYD_CLIENT_SECRET=YOUR_FYYD_CLIENT_SECRET
+    ```
 5.  **Install dependencies:**
     ```bash
     flutter pub get

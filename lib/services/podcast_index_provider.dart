@@ -100,11 +100,12 @@ class PodcastIndexProvider {
     return response.data;
   }
 
+  // FIXME change to use guid instead of id
   Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
 
-    // debugPrint('Podcast ID URL: $url');
+    debugPrint('Podcast ID URL: $url');
 
     final response = await _retry(() => _dio.get(url));
     return response.data['feed']['episodeCount'];
@@ -126,6 +127,8 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
+    debugPrint('Trending URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -133,6 +136,9 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getTopPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
+
+    debugPrint('Top Podcast URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -140,6 +146,9 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getEducationPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty';
+
+    debugPrint('Feed URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -147,6 +156,9 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getHealthPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty';
+
+    debugPrint('Feed URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -154,6 +166,9 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty';
+
+    debugPrint('Feed URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -161,6 +176,9 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getSportsPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty';
+
+    debugPrint('Feed URL: $url');
+
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }

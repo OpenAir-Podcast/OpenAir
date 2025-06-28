@@ -16,7 +16,7 @@ class MobileScaffold extends ConsumerWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: mainAppBar(ref),
+        appBar: mainAppBar(ref, context),
         drawer: const AppDrawer(),
         body: TabBarView(
           children: [

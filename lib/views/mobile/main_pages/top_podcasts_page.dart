@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 final podcastDataByTrendingProvider = FutureProvider.autoDispose((ref) async {

@@ -6,7 +6,7 @@ import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';

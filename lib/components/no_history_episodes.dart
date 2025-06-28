@@ -9,7 +9,7 @@ class NoHistoryEpisodes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('No Episodes Listened'),
+        title: Text('History'),
       ),
       body: Center(
         child: Column(

@@ -15,9 +15,9 @@ import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -1064,7 +1064,6 @@ class OpenAirProvider with ChangeNotifier {
       );
 
       ref.read(hiveServiceProvider).subscribe(subscription);
-
       await addPodcastEpisodes(podcast);
 
       // subscriptionsProvider (from hive_provider.dart) will update reactively

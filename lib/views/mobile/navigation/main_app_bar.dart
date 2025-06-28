@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 
-AppBar mainAppBar(WidgetRef ref) {
+AppBar mainAppBar(WidgetRef ref, BuildContext context) {
   return AppBar(
     elevation: 4.0,
     shadowColor: Colors.grey,
@@ -13,9 +14,12 @@ AppBar mainAppBar(WidgetRef ref) {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
-          tooltip: 'Remove all downloaded podcasts',
-          // TODO: Add search functionality
-          onPressed: () {},
+          tooltip: 'Search Podcasts',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => AddPodcast(),
+            ),
+          ),
           icon: const Icon(Icons.search),
         ),
       ),

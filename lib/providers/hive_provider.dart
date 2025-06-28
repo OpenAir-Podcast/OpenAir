@@ -12,7 +12,7 @@ import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/models/history_model.dart';
 import 'package:openair/models/settings_model.dart';
-import 'package:openair/providers/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
