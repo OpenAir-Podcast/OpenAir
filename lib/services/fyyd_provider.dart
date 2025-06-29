@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
@@ -109,6 +110,7 @@ class FyydProvider {
         throw Exception('Failed to load podcast XML from $xmlUrl');
       }
     } catch (e) {
+      debugPrint('Error loading podcast XML: $e');
       rethrow;
     }
   }

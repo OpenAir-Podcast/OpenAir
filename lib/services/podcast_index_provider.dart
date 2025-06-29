@@ -65,8 +65,10 @@ class PodcastIndexProvider {
           debugPrint('DioError after $retries retries: ${e.message}');
           rethrow;
         }
+
         debugPrint(
             'DioError attempt $attempt, retrying in $delay: ${e.message}');
+
         await Future.delayed(delay);
         // Exponential backoff for subsequent retries
         delay *= 2;
@@ -100,7 +102,6 @@ class PodcastIndexProvider {
     return response.data;
   }
 
-  // FIXME change to use guid instead of id
   Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
@@ -111,7 +112,7 @@ class PodcastIndexProvider {
     return response.data['feed']['episodeCount'];
   }
 
-  Future<int> getPodcastEpisodeCountByPodcastName(String name) async {
+  Future<int> getPodcastEpisodeCountByTitle(String name) async {
     String cat = name
         .replaceAll(' ', '+')
         .replaceAll('/', '%2F')
@@ -119,13 +120,21 @@ class PodcastIndexProvider {
         .replaceAll('(', '%28')
         .replaceAll(')', '%29');
 
-    String url =
-        'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat&pretty';
+    String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
+    String fullUrl = '$url&pretty';
 
-    debugPrint(url);
+    final response = await _retry(() => _dio.get(fullUrl));
+    final feeds = response.data['feeds'];
 
-    final response = await _retry(() => _dio.get(url));
-    return response.data['feeds']['episodeCount'];
+    if (feeds is List && feeds.isNotEmpty) {
+      // The 'feeds' key returns a list of feeds.
+      // We'll assume the first one is the one we want.
+      final count = feeds.first['episodeCount'];
+      return count;
+    } else {
+      // Return 0 or throw an exception if no feeds are found.
+      return 0;
+    }
   }
 
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {

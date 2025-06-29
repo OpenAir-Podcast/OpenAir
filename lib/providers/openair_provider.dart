@@ -17,7 +17,6 @@ import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:path/path.dart' as path;
@@ -1057,15 +1056,6 @@ class OpenAirProvider with ChangeNotifier {
           .read(podcastIndexProvider)
           .getPodcastEpisodeCountByPodcastId(podcast['id']);
 
-      // TODO Remove after
-      // debugPrint('Subscribing to podcast:');
-      // debugPrint('  ID: ${podcast['id']}');
-      // debugPrint('  Title: ${podcast['title']}');
-      // debugPrint('  Author: ${podcast['author'] ?? 'Unknown'}');
-      // debugPrint('  Feed URL: ${podcast['url']}');
-      // debugPrint('  Image URL: ${podcast['image']}');
-      // debugPrint('  Episode Count: $podcastEpisodeCount');
-
       Subscription subscription = Subscription(
         id: podcast['id'],
         title: podcast['title'],
@@ -1112,16 +1102,7 @@ class OpenAirProvider with ChangeNotifier {
     try {
       int podcastEpisodeCount = await ref
           .read(podcastIndexProvider)
-          .getPodcastEpisodeCountByPodcastName(podcast['title']);
-
-      // TODO Remove after
-      // debugPrint('Subscribing to podcast:');
-      // debugPrint('  ID: ${podcast['id']}');
-      // debugPrint('  Title: ${podcast['title']}');
-      // debugPrint('  Author: ${podcast['author'] ?? 'Unknown'}');
-      // debugPrint('  Feed URL: ${podcast['url']}');
-      // debugPrint('  Image URL: ${podcast['image']}');
-      // debugPrint('  Episode Count: $podcastEpisodeCount');
+          .getPodcastEpisodeCountByTitle(podcast['title']);
 
       Subscription subscription = Subscription(
         id: podcast['id'],
@@ -1135,11 +1116,6 @@ class OpenAirProvider with ChangeNotifier {
       ref.read(hiveServiceProvider).subscribe(subscription);
       await addPodcastEpisodes(podcast);
 
-      // subscriptionsProvider (from hive_provider.dart) will update reactively
-      // as it watches hiveServiceProvider, which is notified by the subscribe call.
-      ref.invalidate(getFeedsProvider);
-      notifyListeners();
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1149,16 +1125,15 @@ class OpenAirProvider with ChangeNotifier {
           ),
         );
       }
-
-      ref.invalidate(podcastDataByUrlProvider(podcast['title']));
     } on DioException catch (e) {
       debugPrint(
-          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
+          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to subscribe: ${e.message}'),
+            content: Text(
+                'Failed to subscribe: \'${podcast['title']}\'. Try again later.'),
           ),
         );
       }
@@ -1271,7 +1246,7 @@ class OpenAirProvider with ChangeNotifier {
 
     RssFeed rssFeed = RssFeed.parse(xmlString);
 
-    // debugPrint(xmlString);
+    // debugPrint(rssFeed.title);
 
     // debugPrint(rssFeed.link);
     // debugPrint(rssFeed.items!.first.link);
@@ -1279,7 +1254,7 @@ class OpenAirProvider with ChangeNotifier {
     // debugPrint(snapshot[index]['xmlURL']);
 
     Map<String, dynamic> podcast = {
-      'id': rssFeed.ttl,
+      'id': rssUrl.hashCode,
       'url': rssUrl,
       'title': rssFeed.title,
       'description': rssFeed.description,

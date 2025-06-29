@@ -143,21 +143,13 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                               var rssFeed = RssFeed.parse(xmlString);
 
-                              debugPrint(snapshot[index]['xmlURL']);
-
-                              // debugPrint(rssFeed.link);
-                              // debugPrint(rssFeed.items!.first.link);
-                              // debugPrint(rssFeed.itunes!.newFeedUrl);
-                              // debugPrint(snapshot[index]['xmlURL']);
-                              debugPrint(snapshot[index]['id'].toString());
-
                               Map<String, dynamic> podcast = {
                                 'id': snapshot[index]['id'],
                                 'url': snapshot[index]['xmlURL'],
                                 'title': rssFeed.title,
                                 'description': rssFeed.description,
                                 'author': rssFeed.author,
-                                'image': rssFeed.image!.url,
+                                'image': snapshot[index]['imgURL'],
                                 'artwork': snapshot[index]['imgURL'],
                                 'newestItemPublishTime': rssFeed.items!.first
                                         .pubDate!.millisecondsSinceEpoch ~/
