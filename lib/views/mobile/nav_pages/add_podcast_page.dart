@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
+import 'package:openair/views/mobile/main_pages/discovery_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:shimmer/shimmer.dart';
@@ -142,19 +143,21 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                               var rssFeed = RssFeed.parse(xmlString);
 
-                              debugPrint(rssFeed.link);
-                              debugPrint(rssFeed.items!.first.link);
-                              debugPrint(rssFeed.itunes!.newFeedUrl);
                               debugPrint(snapshot[index]['xmlURL']);
 
+                              // debugPrint(rssFeed.link);
+                              // debugPrint(rssFeed.items!.first.link);
+                              // debugPrint(rssFeed.itunes!.newFeedUrl);
+                              // debugPrint(snapshot[index]['xmlURL']);
+                              debugPrint(snapshot[index]['id'].toString());
+
                               Map<String, dynamic> podcast = {
-                                'id':
-                                    rssFeed.items!.first.itunes!.episode ?? -1,
+                                'id': snapshot[index]['id'],
                                 'url': snapshot[index]['xmlURL'],
                                 'title': rssFeed.title,
                                 'description': rssFeed.description,
                                 'author': rssFeed.author,
-                                'image': snapshot[index]['imgURL'],
+                                'image': rssFeed.image!.url,
                                 'artwork': snapshot[index]['imgURL'],
                                 'newestItemPublishTime': rssFeed.items!.first
                                         .pubDate!.millisecondsSinceEpoch ~/
@@ -242,7 +245,12 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                       ),
                     ],
                   ),
-                  onPressed: () => debugPrint('Discover More'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DiscoveryPage(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -258,8 +266,85 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   fontSize: 18.0,
                 ),
               ),
-              onTap: () => debugPrint(
-                'Add podcast by RSS URL',
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) {
+                  TextEditingController textInputControl =
+                      TextEditingController();
+
+                  return AlertDialog(
+                    insetPadding: EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: MediaQuery.of(context).size.height * 0.2,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.sizeOf(context).width * 0.05,
+                      vertical: 15.0,
+                    ),
+                    titlePadding: const EdgeInsets.symmetric(
+                        horizontal: 100.0, vertical: 15.0),
+                    title: Text(
+                      'Add podcast by RSS URL',
+                      textAlign: TextAlign.start,
+                    ),
+                    content: TextField(
+                      autofocus: true,
+                      controller: textInputControl,
+                      keyboardType: TextInputType.url,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        icon: Icon(
+                          Icons.link_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        labelText: 'RSS URL',
+                      ),
+                    ),
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+
+                            if (textInputControl.text.isEmpty) {
+                              return;
+                            }
+
+                            ref
+                                .watch(openAirProvider)
+                                .addPodcastByRssUrl(textInputControl.text);
+                          },
+                          child: const Text(
+                            'Add',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 10),

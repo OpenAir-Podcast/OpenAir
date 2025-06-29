@@ -15,11 +15,14 @@ import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:webfeed_plus/domain/rss_feed.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) {
@@ -1054,6 +1057,15 @@ class OpenAirProvider with ChangeNotifier {
           .read(podcastIndexProvider)
           .getPodcastEpisodeCountByPodcastId(podcast['id']);
 
+      // TODO Remove after
+      // debugPrint('Subscribing to podcast:');
+      // debugPrint('  ID: ${podcast['id']}');
+      // debugPrint('  Title: ${podcast['title']}');
+      // debugPrint('  Author: ${podcast['author'] ?? 'Unknown'}');
+      // debugPrint('  Feed URL: ${podcast['url']}');
+      // debugPrint('  Image URL: ${podcast['image']}');
+      // debugPrint('  Episode Count: $podcastEpisodeCount');
+
       Subscription subscription = Subscription(
         id: podcast['id'],
         title: podcast['title'],
@@ -1071,7 +1083,77 @@ class OpenAirProvider with ChangeNotifier {
       ref.invalidate(getFeedsProvider);
       notifyListeners();
     } on DioException catch (e) {
-      debugPrint('Failed to subscribe to ${podcast['title']}: ${e.message}');
+      debugPrint(
+          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to subscribe: ${e.message}'),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to subscribe to ${podcast['title']}: $e');
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An unexpected error occurred while subscribing.'),
+          ),
+        );
+      }
+    }
+  }
+
+  void subscribeByRssFeed(
+    Map<String, dynamic> podcast,
+  ) async {
+    try {
+      int podcastEpisodeCount = await ref
+          .read(podcastIndexProvider)
+          .getPodcastEpisodeCountByPodcastName(podcast['title']);
+
+      // TODO Remove after
+      // debugPrint('Subscribing to podcast:');
+      // debugPrint('  ID: ${podcast['id']}');
+      // debugPrint('  Title: ${podcast['title']}');
+      // debugPrint('  Author: ${podcast['author'] ?? 'Unknown'}');
+      // debugPrint('  Feed URL: ${podcast['url']}');
+      // debugPrint('  Image URL: ${podcast['image']}');
+      // debugPrint('  Episode Count: $podcastEpisodeCount');
+
+      Subscription subscription = Subscription(
+        id: podcast['id'],
+        title: podcast['title'],
+        author: podcast['author'] ?? 'Unknown',
+        feedUrl: podcast['url'],
+        imageUrl: podcast['image'],
+        episodeCount: podcastEpisodeCount,
+      );
+
+      ref.read(hiveServiceProvider).subscribe(subscription);
+      await addPodcastEpisodes(podcast);
+
+      // subscriptionsProvider (from hive_provider.dart) will update reactively
+      // as it watches hiveServiceProvider, which is notified by the subscribe call.
+      ref.invalidate(getFeedsProvider);
+      notifyListeners();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Subscribed to ${podcast['title']}',
+            ),
+          ),
+        );
+      }
+
+      ref.invalidate(podcastDataByUrlProvider(podcast['title']));
+    } on DioException catch (e) {
+      debugPrint(
+          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1181,5 +1263,36 @@ class OpenAirProvider with ChangeNotifier {
 
   void share() {
     debugPrint('share button clicked');
+  }
+
+  void addPodcastByRssUrl(String rssUrl) async {
+    final String xmlString =
+        await ref.watch(fyydProvider).getPodcastXml(rssUrl);
+
+    RssFeed rssFeed = RssFeed.parse(xmlString);
+
+    // debugPrint(xmlString);
+
+    // debugPrint(rssFeed.link);
+    // debugPrint(rssFeed.items!.first.link);
+    // debugPrint(rssFeed.itunes!.newFeedUrl);
+    // debugPrint(snapshot[index]['xmlURL']);
+
+    Map<String, dynamic> podcast = {
+      'id': rssFeed.ttl,
+      'url': rssUrl,
+      'title': rssFeed.title,
+      'description': rssFeed.description,
+      'author': rssFeed.author,
+      'image': rssFeed.image!.url,
+      'newestItemPublishTime':
+          rssFeed.items!.first.pubDate!.millisecondsSinceEpoch ~/ 1000,
+      'language': rssFeed.language,
+      'categories': {
+        for (var category in rssFeed.categories!) category.hashCode: category
+      },
+    };
+
+    subscribeByRssFeed(podcast);
   }
 }

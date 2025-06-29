@@ -73,6 +73,25 @@ class FyydProvider {
     }
   }
 
+  Future<List<dynamic>> getDiscoveryPodcasts() async {
+    try {
+      final response = await _dio.get(
+        '/feature/podcast/hot',
+        queryParameters: {
+          'count': 20,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        return response.data['data'];
+      } else {
+        throw Exception('Failed to load featured podcasts');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<String> getPodcastXml(String xmlUrl) async {
     try {
       // Using a new Dio instance to avoid sending fyyd-specific headers

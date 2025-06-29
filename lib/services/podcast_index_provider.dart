@@ -111,6 +111,23 @@ class PodcastIndexProvider {
     return response.data['feed']['episodeCount'];
   }
 
+  Future<int> getPodcastEpisodeCountByPodcastName(String name) async {
+    String cat = name
+        .replaceAll(' ', '+')
+        .replaceAll('/', '%2F')
+        .replaceAll('&', '%26')
+        .replaceAll('(', '%28')
+        .replaceAll(')', '%29');
+
+    String url =
+        'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat&pretty';
+
+    debugPrint(url);
+
+    final response = await _retry(() => _dio.get(url));
+    return response.data['feeds']['episodeCount'];
+  }
+
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
     String cat = category.replaceAll(' ', '%20');
 
