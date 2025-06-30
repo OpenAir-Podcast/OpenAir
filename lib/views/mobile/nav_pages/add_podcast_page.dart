@@ -267,14 +267,16 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   return AlertDialog(
                     insetPadding: EdgeInsets.symmetric(
                       horizontal: 2,
-                      vertical: MediaQuery.of(context).size.height * 0.2,
+                      vertical: MediaQuery.of(context).size.height * 0.3,
                     ),
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: MediaQuery.sizeOf(context).width * 0.05,
                       vertical: 15.0,
                     ),
                     titlePadding: const EdgeInsets.symmetric(
-                        horizontal: 100.0, vertical: 15.0),
+                      horizontal: 100.0,
+                      vertical: 15.0,
+                    ),
                     title: Text(
                       'Add podcast by RSS URL',
                       textAlign: TextAlign.start,

@@ -1242,10 +1242,11 @@ class OpenAirProvider with ChangeNotifier {
 
   void addPodcastByRssUrl(String rssUrl) async {
     final String xmlString =
-        await ref.watch(fyydProvider).getPodcastXml(rssUrl);
+        await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
 
     RssFeed rssFeed = RssFeed.parse(xmlString);
 
+    // TODO Remove these
     // debugPrint(rssFeed.title);
 
     // debugPrint(rssFeed.link);

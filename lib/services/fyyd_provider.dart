@@ -79,7 +79,7 @@ class FyydProvider {
       final response = await _dio.get(
         '/feature/podcast/hot',
         queryParameters: {
-          'count': 20,
+          'count': 50,
         },
       );
 
@@ -93,7 +93,7 @@ class FyydProvider {
     }
   }
 
-  Future<String> getPodcastXml(String xmlUrl) async {
+  Future<String> getPodcastXml(String xmlUrl, [BuildContext? context]) async {
     try {
       // Using a new Dio instance to avoid sending fyyd-specific headers
       final dio = Dio();
@@ -111,6 +111,53 @@ class FyydProvider {
       }
     } catch (e) {
       debugPrint('Error loading podcast XML: $e');
+
+      if (context!.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: 2,
+                vertical: MediaQuery.of(context).size.height * 0.3,
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 62.0,
+                vertical: 15.0,
+              ),
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 100.0,
+                vertical: 15.0,
+              ),
+              title: const Text(
+                'Error',
+                textAlign: TextAlign.center,
+              ),
+              content: const Text(
+                'Cannot fetch podcast from RSS URL. Check if the URL is valid and try again.',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+
       rethrow;
     }
   }
