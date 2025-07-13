@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/podcast_model.dart';
+import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
@@ -143,33 +145,27 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                               var rssFeed = RssFeed.parse(xmlString);
 
-                              Map<String, dynamic> podcast = {
-                                'id': snapshot[index]['id'],
-                                'url': snapshot[index]['xmlURL'],
-                                'title': rssFeed.title,
-                                'description': rssFeed.description,
-                                'author': rssFeed.author,
-                                'image': snapshot[index]['imgURL'],
-                                'artwork': snapshot[index]['imgURL'],
-                                'newestItemPublishTime': rssFeed.items!.first
-                                        .pubDate!.millisecondsSinceEpoch ~/
-                                    1000,
-                                'language': rssFeed.language,
-                                'categories': {
-                                  for (var category in rssFeed.categories!)
-                                    category.hashCode: category
-                                },
-                              };
+                              SubscriptionModel podcast = SubscriptionModel(
+                                id: snapshot[index]['id'],
+                                feedUrl: snapshot[index]['xmlURL'],
+                                title: rssFeed.title ?? '',
+                                description: rssFeed.description ?? '',
+                                author: rssFeed.author ?? '',
+                                imageUrl: snapshot[index]['imgURL'] ?? '',
+                                episodeCount: rssFeed.items?.length ?? 0,
+                                artwork: rssFeed.image!.url!,
+                              );
 
                               ref.read(openAirProvider).currentPodcast =
-                                  podcast;
+                                  PodcastModel.fromJson(podcast.toJson());
 
                               if (context.mounted) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => EpisodesPage(
-                                      podcast: podcast,
-                                      id: podcast['id'],
+                                      podcast: PodcastModel.fromJson(
+                                          podcast.toJson()),
+                                      id: podcast.id,
                                     ),
                                   ),
                                 );
@@ -264,6 +260,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   TextEditingController textInputControl =
                       TextEditingController();
 
+                  // FIXME Adjust dialogBox size
                   return AlertDialog(
                     insetPadding: EdgeInsets.symmetric(
                       horizontal: 2,

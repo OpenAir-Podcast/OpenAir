@@ -1,5 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
+import 'package:openair/models/podcast_model.dart';
 
 part 'queue_model.g.dart';
 
@@ -54,7 +55,7 @@ class QueueModel extends HiveObject {
   String downloadSize;
 
   @HiveField(9)
-  Map<String, dynamic>? podcast;
+  PodcastModel? podcast;
 
   @HiveField(10)
   int enclosureLength;

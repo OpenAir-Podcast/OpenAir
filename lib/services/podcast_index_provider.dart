@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:openair/providers/hive_provider.dart';
 
 final podcastIndexProvider = Provider(
-  (ref) => PodcastIndexProvider(),
+  (ref) => PodcastIndexProvider(ref),
 );
 
 class PodcastIndexProvider {
@@ -23,7 +24,9 @@ class PodcastIndexProvider {
   late Map<String, String> headers;
   late Dio _dio;
 
-  PodcastIndexProvider() {
+  final Ref ref;
+
+  PodcastIndexProvider(this.ref) {
     unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     newUnixTime = unixTime.toString();
 
@@ -123,6 +126,8 @@ class PodcastIndexProvider {
     String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
     String fullUrl = '$url&pretty';
 
+    debugPrint('Podcast Title URL: $fullUrl');
+
     final response = await _retry(() => _dio.get(fullUrl));
     final feeds = response.data['feeds'];
 
@@ -153,9 +158,11 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
-    // debugPrint('Trending URL: $url');
+    debugPrint('Trending URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.watch(hiveServiceProvider).putTrendingPodcast(response.data);
+
     return response.data;
   }
 

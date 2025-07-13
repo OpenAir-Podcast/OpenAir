@@ -40,7 +40,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         memCacheHeight: imageSize.ceil(),
                         memCacheWidth: imageSize.ceil(),
                         imageUrl:
-                            ref.watch(openAirProvider).currentPodcast!['image'],
+                            ref.watch(openAirProvider).currentPodcast!.imageUrl,
                       ),
                     ),
                   ),
@@ -73,9 +73,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         MaterialPageRoute(
                           builder: (context) => EpisodesPage(
                             podcast: ref.watch(openAirProvider).currentPodcast!,
-                            id: ref
-                                .watch(openAirProvider)
-                                .currentPodcast!['id'],
+                            id: ref.watch(openAirProvider).currentPodcast!.id,
                           ),
                         ),
                       );

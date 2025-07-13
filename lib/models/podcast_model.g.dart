@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'subscription_model.dart';
+part of 'podcast_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
+class PodcastModelAdapter extends TypeAdapter<PodcastModel> {
   @override
-  final typeId = 0;
+  final typeId = 8;
 
   @override
-  SubscriptionModel read(BinaryReader reader) {
+  PodcastModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SubscriptionModel(
+    return PodcastModel(
       id: (fields[0] as num).toInt(),
       feedUrl: fields[1] as String,
       title: fields[2] as String,
@@ -24,14 +24,13 @@ class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
       imageUrl: fields[4] as String,
       artwork: fields[5] as String,
       description: fields[6] as String,
-      episodeCount: (fields[7] as num).toInt(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, SubscriptionModel obj) {
+  void write(BinaryWriter writer, PodcastModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -45,9 +44,7 @@ class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
       ..writeByte(5)
       ..write(obj.artwork)
       ..writeByte(6)
-      ..write(obj.description)
-      ..writeByte(7)
-      ..write(obj.episodeCount);
+      ..write(obj.description);
   }
 
   @override
@@ -56,7 +53,7 @@ class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SubscriptionModelAdapter &&
+      other is PodcastModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,11 +1,11 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 
-part 'subscription_model.g.dart';
+part 'podcast_model.g.dart';
 
-@HiveType(typeId: subscriptionTypeId)
-class SubscriptionModel extends HiveObject {
-  SubscriptionModel({
+@HiveType(typeId: podcastTypeId)
+class PodcastModel extends HiveObject {
+  PodcastModel({
     required this.id,
     required this.feedUrl,
     required this.title,
@@ -13,7 +13,6 @@ class SubscriptionModel extends HiveObject {
     required this.imageUrl,
     required this.artwork,
     required this.description,
-    required this.episodeCount,
   });
 
   @HiveField(0)
@@ -37,19 +36,14 @@ class SubscriptionModel extends HiveObject {
   @HiveField(6)
   String description;
 
-  @HiveField(7)
-  int episodeCount;
-
-  factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
-      SubscriptionModel(
+  factory PodcastModel.fromJson(Map<String, dynamic> json) => PodcastModel(
         id: json['id'],
         feedUrl: json['url'],
         title: json['title'],
-        author: json['author'],
+        author: json['author'] ?? 'unknown',
         imageUrl: json['image'],
-        artwork: json['artwork'],
-        description: json['description'],
-        episodeCount: json['episodeCount'],
+        artwork: json['artwork'] ?? json['image'],
+        description: json['description'] ?? 'unknown',
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,7 +54,6 @@ class SubscriptionModel extends HiveObject {
         'image': imageUrl,
         'artwork': artwork,
         'description': description,
-        'episodeCount': episodeCount,
       };
 
   @override
@@ -73,7 +66,6 @@ class SubscriptionModel extends HiveObject {
     imageUrl: $imageUrl,
     artwork: $artwork,
     description: $description,
-    episodeCount: $episodeCount,
     ''';
   }
 }

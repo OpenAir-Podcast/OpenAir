@@ -6,17 +6,17 @@ part of 'download_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DownloadAdapter extends TypeAdapter<Download> {
+class DownloadModelAdapter extends TypeAdapter<DownloadModel> {
   @override
   final typeId = 4;
 
   @override
-  Download read(BinaryReader reader) {
+  DownloadModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Download(
+    return DownloadModel(
       guid: fields[0] as String,
       image: fields[1] as String,
       title: fields[2] as String,
@@ -35,7 +35,7 @@ class DownloadAdapter extends TypeAdapter<Download> {
   }
 
   @override
-  void write(BinaryWriter writer, Download obj) {
+  void write(BinaryWriter writer, DownloadModel obj) {
     writer
       ..writeByte(14)
       ..writeByte(0)
@@ -74,7 +74,7 @@ class DownloadAdapter extends TypeAdapter<Download> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DownloadAdapter &&
+      other is DownloadModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

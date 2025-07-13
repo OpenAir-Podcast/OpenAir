@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -24,11 +25,11 @@ class FeedsPage extends ConsumerStatefulWidget {
 class _FeedsPageState extends ConsumerState<FeedsPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Episode>> getEpisodesValue =
+    final AsyncValue<List<EpisodeModel>> getEpisodesValue =
         ref.watch(getFeedsProvider);
 
     return getEpisodesValue.when(
-      data: (List<Episode> data) {
+      data: (List<EpisodeModel> data) {
         if (data.isEmpty) {
           return NoSubscriptions(title: 'Feeds');
         }
@@ -44,11 +45,23 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
               child: ListView.builder(
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
-                itemBuilder: (context, index) => FeedsEpisodeCard(
-                  title: data[index].title,
-                  episodeItem: data[index].toJson(),
-                  podcast: data[index].toJson(),
-                ),
+                itemBuilder: (context, index) {
+                  PodcastModel podcastModel = PodcastModel(
+                    id: int.parse(data[index].podcastId),
+                    title: data[index].title,
+                    author: data[index].author,
+                    feedUrl: data[index].feedUrl,
+                    imageUrl: data[index].image,
+                    description: data[index].description,
+                    artwork: data[index].image,
+                  );
+
+                  return FeedsEpisodeCard(
+                    title: data[index].title,
+                    episodeItem: data[index].toJson(),
+                    podcast: podcastModel,
+                  );
+                },
               ),
             ),
           ),

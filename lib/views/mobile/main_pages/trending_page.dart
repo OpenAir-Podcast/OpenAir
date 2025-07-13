@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
-final podcastDataByTrendingProvider = FutureProvider.autoDispose((ref) async {
+// TODO Add a button to refresh data
+
+final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
+    FutureProvider.autoDispose((ref) async {
+  final trendingPodcastData =
+      await ref.read(hiveServiceProvider).getTrendingPodcast();
+
+  if (trendingPodcastData != null) {
+    return trendingPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final podcastIndexAPI = ref.read(podcastIndexProvider);
-  return await podcastIndexAPI.getTrendingPodcasts();
+  final trendingData = await podcastIndexAPI.getTrendingPodcasts();
+
+  return FetchDataModel.fromJson(trendingData);
 });
 
 final getConnectionStatusProvider =
@@ -25,7 +41,6 @@ class TrendingPage extends ConsumerStatefulWidget {
 }
 
 class _TrendingPageState extends ConsumerState<TrendingPage> {
-  @override
   @override
   Widget build(BuildContext context) {
     final podcastDataAsyncTrendingValue =
@@ -64,9 +79,12 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        '$error',
-                        style: TextStyle(fontSize: 16.0),
+                      Center(
+                        child: Text(
+                          '$error\n$stackTrace',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16.0),
+                        ),
                       ),
                       const SizedBox(height: 20.0),
                       SizedBox(
@@ -87,15 +105,15 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                     ],
                   ),
                 ),
-            data: (trendingData) {
+            data: (FetchDataModel trendingData) {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView.builder(
                   cacheExtent: cacheExtent,
-                  itemCount: trendingData['count'],
+                  itemCount: trendingData.count,
                   itemBuilder: (context, index) {
                     return PodcastCard(
-                      podcastItem: trendingData['feeds'][index],
+                      podcastItem: trendingData.feeds[index],
                     );
                   },
                 ),
@@ -123,7 +141,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                 ),
               ),
               Text(
-                '$error',
+                '$error\n$stackTrace',
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 20.0),

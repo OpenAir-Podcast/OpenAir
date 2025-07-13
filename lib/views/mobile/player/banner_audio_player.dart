@@ -41,7 +41,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               child: CachedNetworkImage(
                 memCacheHeight: 62,
                 memCacheWidth: 62,
-                imageUrl: ref.watch(openAirProvider).currentPodcast!['image'],
+                imageUrl: ref.watch(openAirProvider).currentPodcast!.imageUrl,
                 fit: BoxFit.fill,
                 errorWidget: (context, url, error) => Icon(
                   Icons.error,

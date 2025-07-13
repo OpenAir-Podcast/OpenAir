@@ -6,23 +6,23 @@ part of 'feed_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class FeedAdapter extends TypeAdapter<Feed> {
+class FeedModelAdapter extends TypeAdapter<FeedModel> {
   @override
   final typeId = 2;
 
   @override
-  Feed read(BinaryReader reader) {
+  FeedModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Feed(
+    return FeedModel(
       guid: fields[0] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Feed obj) {
+  void write(BinaryWriter writer, FeedModel obj) {
     writer
       ..writeByte(1)
       ..writeByte(0)
@@ -35,7 +35,7 @@ class FeedAdapter extends TypeAdapter<Feed> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FeedAdapter &&
+      other is FeedModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

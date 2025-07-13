@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 
@@ -17,7 +18,7 @@ final podcastDataByUrlProvider =
 class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
   const SubscriptionsEpisodesPage(
       {super.key, required this.podcast, required this.id});
-  final Map<String, dynamic> podcast;
+  final PodcastModel podcast;
   final int id;
 
   @override
@@ -28,12 +29,12 @@ class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
 class _SubscriptionsEpisodesPageState
     extends ConsumerState<SubscriptionsEpisodesPage> {
   Future<bool> getSub() async {
-    return await ref.watch(openAirProvider).isSubscribed(widget.id);
+    return await ref.watch(openAirProvider).isSubscribed(widget.podcast.title);
   }
 
   @override
   Widget build(BuildContext context) {
-    final String podcastUrl = widget.podcast['url'];
+    final String podcastUrl = widget.podcast.feedUrl;
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
@@ -92,11 +93,12 @@ class _SubscriptionsEpisodesPageState
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(ref.watch(openAirProvider).currentPodcast!['title'] ??
-                'Unknown'),
+            title: Text(ref.watch(openAirProvider).currentPodcast!.title),
             actions: [
               FutureBuilder(
-                future: ref.watch(openAirProvider).isSubscribed(widget.id),
+                future: ref
+                    .watch(openAirProvider)
+                    .isSubscribed(widget.podcast.title),
                 builder: (context, snapshot) {
                   if (snapshot.hasData == false && !once) {
                     once = true;
@@ -128,8 +130,8 @@ class _SubscriptionsEpisodesPageState
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? 'Unsubscribed from ${widget.podcast['title']}'
-                                  : 'Subscribed to ${widget.podcast['title']}',
+                                  ? 'Unsubscribed from ${widget.podcast.title}'
+                                  : 'Subscribed to ${widget.podcast.title}',
                             ),
                           ),
                         );

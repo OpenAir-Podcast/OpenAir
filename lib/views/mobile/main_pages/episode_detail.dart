@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/models/download_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -17,7 +18,7 @@ class EpisodeDetail extends ConsumerStatefulWidget {
   });
 
   final Map<String, dynamic>? episodeItem;
-  final Map<String, dynamic>? podcast;
+  final PodcastModel? podcast;
 
   @override
   EpisodeDetailState createState() => EpisodeDetailState();
@@ -29,7 +30,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
     final AsyncValue<List<QueueModel>> queueListAsync =
         ref.watch(sortedQueueListProvider);
 
-    final AsyncValue<List<Download>> downloadedListAsync =
+    final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
 
     return Scaffold(
@@ -77,7 +78,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            widget.podcast!['title'],
+                            widget.podcast!.title,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -91,8 +92,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           child: Text(
                             ref
                                     .watch(openAirProvider)
-                                    .currentPodcast!['author'] ??
-                                'Unknown',
+                                    .currentPodcast!.author,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,

@@ -2,11 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 
 class PodcastCard extends ConsumerStatefulWidget {
-  final Map<String, dynamic> podcastItem;
+  final PodcastModel podcastItem;
 
   const PodcastCard({
     super.key,
@@ -30,7 +31,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
           MaterialPageRoute(
             builder: (context) => EpisodesPage(
               podcast: widget.podcastItem,
-              id: widget.podcastItem['id'],
+              id: widget.podcastItem.id,
             ),
           ),
         );
@@ -52,7 +53,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                 child: CachedNetworkImage(
                   memCacheHeight: 62,
                   memCacheWidth: 62,
-                  imageUrl: widget.podcastItem['image'],
+                  imageUrl: widget.podcastItem.imageUrl,
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Container(
                     color: cardImageShadow,
@@ -74,7 +75,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 105.0,
                           child: Text(
-                            widget.podcastItem['title'],
+                            widget.podcastItem.title,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -85,7 +86,9 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 120.0,
                           child: Text(
-                            widget.podcastItem['author'] ?? 'Unknown',
+                            widget.podcastItem.author.isNotEmpty
+                                ? widget.podcastItem.author
+                                : 'Unknown',
                             maxLines: 2,
                             style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
@@ -101,7 +104,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
               FutureBuilder(
                 future: ref
                     .watch(openAirProvider)
-                    .isSubscribed(widget.podcastItem['id']),
+                    .isSubscribed(widget.podcastItem.title),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Padding(
@@ -134,14 +137,14 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? 'Unsubscribed from ${widget.podcastItem['title']}'
-                                  : 'Subscribed to ${widget.podcastItem['title']}',
+                                  ? 'Unsubscribed from ${widget.podcastItem.title}'
+                                  : 'Subscribed to ${widget.podcastItem.title}',
                             ),
                           ),
                         );
 
                         ref.invalidate(podcastDataByUrlProvider(
-                            widget.podcastItem['url']));
+                            widget.podcastItem.feedUrl));
                       },
                       icon: snapshot.data!
                           ? const Icon(Icons.check)

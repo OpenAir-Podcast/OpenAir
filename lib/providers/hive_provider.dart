@@ -4,14 +4,18 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
+
 import 'package:openair/models/completed_episode_model.dart';
 import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/feed_model.dart';
-import 'package:openair/models/subscription_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/models/history_model.dart';
 import 'package:openair/models/settings_model.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/models/subscription_model.dart';
+
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,7 +28,7 @@ final hiveServiceProvider = ChangeNotifierProvider<HiveService>(
 
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
-    StreamProvider.autoDispose<Map<String, Subscription>>((ref) async* {
+    StreamProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
 
@@ -40,7 +44,7 @@ final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
   },
 );
 
-final sortedDownloadsProvider = StreamProvider.autoDispose<List<Download>>(
+final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
   (ref) {
     ref.watch(hiveServiceProvider);
     return ref.read(hiveServiceProvider).getSortedDownloads().asStream();
@@ -49,14 +53,24 @@ final sortedDownloadsProvider = StreamProvider.autoDispose<List<Download>>(
 
 class HiveService extends ChangeNotifier {
   late final BoxCollection collection;
-  late final Future<CollectionBox<Subscription>> subscriptionBox;
-  late final Future<CollectionBox<Episode>> episodeBox;
-  late final Future<CollectionBox<Feed>> feedBox;
+  late final Future<CollectionBox<SubscriptionModel>> subscriptionBox;
+  late final Future<CollectionBox<EpisodeModel>> episodeBox;
+  late final Future<CollectionBox<FeedModel>> feedBox;
   late final Future<CollectionBox<QueueModel>> queueBox;
-  late final Future<CollectionBox<Download>> downloadBox;
+  late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
-  late final Future<CollectionBox<CompletedEpisode>> completedEpisodeBox;
-  late final Future<CollectionBox<Settings>> settingsBox;
+  late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
+  late final Future<CollectionBox<SettingsModel>> settingsBox;
+
+  late final Future<CollectionBox<PodcastModel>> topFeaturedBox;
+  late final Future<CollectionBox<PodcastModel>> educationFeaturedBox;
+  late final Future<CollectionBox<PodcastModel>> healthFeaturedBox;
+  late final Future<CollectionBox<PodcastModel>> technologyFeaturedBox;
+  late final Future<CollectionBox<PodcastModel>> sportsFeaturedBox;
+
+  late final Future<CollectionBox<FetchDataModel>> trendingBox;
+
+  late final Future<CollectionBox<Map<String, PodcastModel>>> categoryBox;
 
   bool _isInitialized = false;
 
@@ -69,14 +83,17 @@ class HiveService extends ChangeNotifier {
     if (_isInitialized) return;
 
     // Register all adapters
-    Hive.registerAdapter(SubscriptionAdapter());
-    Hive.registerAdapter(EpisodeAdapter());
-    Hive.registerAdapter(FeedAdapter());
+    Hive.registerAdapter(PodcastModelAdapter());
+    Hive.registerAdapter(EpisodeModelAdapter());
+    Hive.registerAdapter(FeedModelAdapter());
     Hive.registerAdapter(QueueModelAdapter());
-    Hive.registerAdapter(DownloadAdapter());
-    Hive.registerAdapter(HistoryAdapter());
-    Hive.registerAdapter(CompletedEpisodeAdapter());
-    Hive.registerAdapter(SettingsAdapter());
+    Hive.registerAdapter(DownloadModelAdapter());
+    Hive.registerAdapter(HistoryModelAdapter());
+    Hive.registerAdapter(CompletedEpisodeModelAdapter());
+    Hive.registerAdapter(SettingsModelAdapter());
+    Hive.registerAdapter(SubscriptionModelAdapter());
+
+    Hive.registerAdapter(FetchDataModelAdapter());
 
     // Get the application documents directory
     if (!kIsWeb) {
@@ -102,19 +119,38 @@ class HiveService extends ChangeNotifier {
         'history',
         'completed_episodes',
         'settings',
+        'top_featured',
+        'education_featured',
+        'health_featured',
+        'technology_featured',
+        'sports_featured',
+        'trending',
+        'category',
       },
       path: kIsWeb ? null : openAirDir.path,
     );
 
-    subscriptionBox = collection.openBox<Subscription>('subscriptions');
-    episodeBox = collection.openBox<Episode>('episodes');
-    feedBox = collection.openBox<Feed>('feed');
+    subscriptionBox = collection.openBox<SubscriptionModel>('subscriptions');
+    episodeBox = collection.openBox<EpisodeModel>('episodes');
+    feedBox = collection.openBox<FeedModel>('feed');
     queueBox = collection.openBox<QueueModel>('queue');
-    downloadBox = collection.openBox<Download>('download');
+    downloadBox = collection.openBox<DownloadModel>('download');
     historyBox = collection.openBox<HistoryModel>('history');
     completedEpisodeBox =
-        collection.openBox<CompletedEpisode>('completed_episodes');
-    settingsBox = collection.openBox<Settings>('settings');
+        collection.openBox<CompletedEpisodeModel>('completed_episodes');
+    settingsBox = collection.openBox<SettingsModel>('settings');
+
+    topFeaturedBox = collection.openBox<PodcastModel>('top_featured');
+    educationFeaturedBox =
+        collection.openBox<PodcastModel>('education_featured');
+    healthFeaturedBox = collection.openBox<PodcastModel>('health_featured');
+    technologyFeaturedBox =
+        collection.openBox<PodcastModel>('technology_featured');
+    sportsFeaturedBox = collection.openBox<PodcastModel>('sports_featured');
+
+    trendingBox = collection.openBox('trending');
+
+    categoryBox = collection.openBox('category');
 
     _isInitialized = true;
   }
@@ -127,9 +163,13 @@ class HiveService extends ChangeNotifier {
   }
 
   // Subscription Operations:
-  Future<void> subscribe(Subscription subscription) async {
+  Future<void> subscribe(SubscriptionModel subscription) async {
     final box = await subscriptionBox;
-    await box.put('${subscription.id}', subscription);
+    await box.put(
+      subscription.title,
+      subscription,
+    );
+
     notifyListeners();
   }
 
@@ -139,14 +179,14 @@ class HiveService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, Subscription>> getSubscriptions() async {
+  Future<Map<String, SubscriptionModel>> getSubscriptions() async {
     final box = await subscriptionBox;
     return box.getAllValues();
   }
 
-  Future<Subscription?> getSubscription(String id) async {
+  Future<SubscriptionModel?> getSubscription(String title) async {
     final box = await subscriptionBox;
-    return box.get(id);
+    return box.get(title);
   }
 
   Future<void> deleteSubscriptions() async {
@@ -161,7 +201,7 @@ class HiveService extends ChangeNotifier {
 
   // Episodes Operations:
   Future<void> insertEpisode(
-    Episode episode,
+    EpisodeModel episode,
     String guid,
   ) async {
     final box = await episodeBox;
@@ -178,7 +218,7 @@ class HiveService extends ChangeNotifier {
   Future<void> deleteEpisodes(String podcastId) async {
     final box = await episodeBox;
 
-    final Map<String, Episode> allEpisodes = await box.getAllValues();
+    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
     final List<String> keysToDelete = [];
 
     for (final entry in allEpisodes.entries) {
@@ -192,10 +232,10 @@ class HiveService extends ChangeNotifier {
     }
   }
 
-  Future<List<Episode>> getEpisodes() async {
+  Future<List<EpisodeModel>> getEpisodes() async {
     final box = await episodeBox;
-    final Map<String, Episode> allEpisodes = await box.getAllValues();
-    final List<Episode> episodesList = [];
+    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
+    final List<EpisodeModel> episodesList = [];
 
     for (final entry in allEpisodes.entries) {
       episodesList.add(entry.value);
@@ -206,12 +246,12 @@ class HiveService extends ChangeNotifier {
     return episodesList;
   }
 
-  Future<Episode?> getEpisode(String guid) async {
+  Future<EpisodeModel?> getEpisode(String guid) async {
     final box = await episodeBox;
     return box.get(guid);
   }
 
-  Future<Iterable<MapEntry<String, Episode>>> getEpisodesForPodcast(
+  Future<Iterable<MapEntry<String, EpisodeModel>>> getEpisodesForPodcast(
       String podcastId) async {
     final box = await episodeBox;
     final allEpisodes = await box.getAllValues();
@@ -224,7 +264,7 @@ class HiveService extends ChangeNotifier {
   }
 
   // Feed Operations:
-  Future<void> addToFeed(Feed feed) async {
+  Future<void> addToFeed(FeedModel feed) async {
     final box = await feedBox;
     await box.put(feed.guid, feed);
   }
@@ -234,7 +274,7 @@ class HiveService extends ChangeNotifier {
     await box.delete(guid);
   }
 
-  Future<Map<String, Feed>> getFeed() async {
+  Future<Map<String, FeedModel>> getFeed() async {
     final box = await feedBox;
     return box.getAllValues();
   }
@@ -324,21 +364,21 @@ class HiveService extends ChangeNotifier {
   }
 
   // Download Operations:
-  Future<void> addToDownloads(Download download) async {
+  Future<void> addToDownloads(DownloadModel download) async {
     final box = await downloadBox;
     await box.put(download.guid, download);
     notifyListeners();
   }
 
-  Future<Map<String, Download>> getDownloads() async {
+  Future<Map<String, DownloadModel>> getDownloads() async {
     final box = await downloadBox;
     return box.getAllValues();
   }
 
-  Future<List<Download>> getSortedDownloads() async {
+  Future<List<DownloadModel>> getSortedDownloads() async {
     final box = await downloadBox;
-    final Map<String, Download> allEpisodes = await box.getAllValues();
-    final List<Download> episodesList = [];
+    final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
+    final List<DownloadModel> episodesList = [];
 
     for (final entry in allEpisodes.entries) {
       episodesList.add(entry.value);
@@ -395,12 +435,13 @@ class HiveService extends ChangeNotifier {
   }
 
   // Completed Episodes Operations:
-  Future<void> addToCompletedEpisode(CompletedEpisode completedEpisode) async {
+  Future<void> addToCompletedEpisode(
+      CompletedEpisodeModel completedEpisode) async {
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);
   }
 
-  Future<Map<String, CompletedEpisode>> getCompletedEpisodes() async {
+  Future<Map<String, CompletedEpisodeModel>> getCompletedEpisodes() async {
     final box = await completedEpisodeBox;
     return box.getAllValues();
   }
@@ -416,12 +457,12 @@ class HiveService extends ChangeNotifier {
   }
 
   // Settings Operations:
-  Future<void> saveSettings(Settings settings) async {
+  Future<void> saveSettings(SettingsModel settings) async {
     final box = await settingsBox;
     await box.put('settings', settings);
   }
 
-  Future<Settings?> getSettings() async {
+  Future<SettingsModel?> getSettings() async {
     final box = await settingsBox;
     return box.get('settings');
   }
@@ -433,14 +474,15 @@ class HiveService extends ChangeNotifier {
 
   Future<int> podcastSubscribedEpisodeCount(int podcastId) async {
     final box = await subscriptionBox;
-    final Subscription? allEpisodes = await box.get(podcastId.toString());
+    final SubscriptionModel? allEpisodes = await box.get(podcastId.toString());
 
     return allEpisodes!.episodeCount;
   }
 
   Future<String> podcastAccumulatedSubscribedEpisodes() async {
     final box = await subscriptionBox;
-    final Map<String, Subscription> allSubscriptions = await box.getAllValues();
+    final Map<String, SubscriptionModel> allSubscriptions =
+        await box.getAllValues();
 
     if (allSubscriptions.isEmpty) {
       return "0";
@@ -448,7 +490,7 @@ class HiveService extends ChangeNotifier {
 
     int totalNewEpisodes = 0;
 
-    for (final MapEntry<String, Subscription> entry
+    for (final MapEntry<String, SubscriptionModel> entry
         in allSubscriptions.entries) {
       final subscription = entry.value;
       int storedCount = subscription.episodeCount;
@@ -481,7 +523,7 @@ class HiveService extends ChangeNotifier {
 
   Future<String> feedsCount() async {
     final box = await episodeBox;
-    final Map<String, Episode> allEpisodes = await box.getAllValues();
+    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();
@@ -497,7 +539,7 @@ class HiveService extends ChangeNotifier {
 
   Future<String> downloadsCount() async {
     final box = await downloadBox;
-    final Map<String, Download> allEpisodes = await box.getAllValues();
+    final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();
@@ -505,7 +547,7 @@ class HiveService extends ChangeNotifier {
 
   Future<int> getAccumulatedEpisodes() async {
     final box = await subscriptionBox;
-    final Map<String, Subscription> allEpisodes = await box.getAllValues();
+    final Map<String, SubscriptionModel> allEpisodes = await box.getAllValues();
 
     int episodeCount = 0;
 
@@ -514,5 +556,15 @@ class HiveService extends ChangeNotifier {
     }
 
     return episodeCount;
+  }
+
+  Future<FetchDataModel?>? getTrendingPodcast() async {
+    final box = await trendingBox;
+    return await box.get('trending');
+  }
+
+  void putTrendingPodcast(Map<String, dynamic> data) async {
+    final box = await trendingBox;
+    await box.put('trending', FetchDataModel.fromJson(data));
   }
 }

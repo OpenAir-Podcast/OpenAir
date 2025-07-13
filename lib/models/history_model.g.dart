@@ -6,7 +6,7 @@ part of 'history_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class HistoryAdapter extends TypeAdapter<HistoryModel> {
+class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
   @override
   final typeId = 5;
 
@@ -71,7 +71,7 @@ class HistoryAdapter extends TypeAdapter<HistoryModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HistoryAdapter &&
+      other is HistoryModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

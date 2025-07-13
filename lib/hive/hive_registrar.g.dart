@@ -2,52 +2,50 @@
 // Do not modify
 // Check in to version control
 
-import 'package:hive_ce/hive.dart';
-import 'package:openair/models/completed_episode_model.dart';
-import 'package:openair/models/download_model.dart';
-import 'package:openair/models/episode_model.dart';
-import 'package:openair/models/feed_model.dart';
-import 'package:openair/models/history_model.dart';
-import 'package:openair/models/queue_model.dart';
-import 'package:openair/models/settings_model.dart';
-import 'package:openair/models/subscription_model.dart';
+part of 'hive_adapters.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
-    registerAdapter(CompletedEpisodeAdapter());
-    registerAdapter(CompletedEpisodeAdapter());
-    registerAdapter(DownloadAdapter());
-    registerAdapter(DownloadAdapter());
-    registerAdapter(EpisodeAdapter());
-    registerAdapter(EpisodeAdapter());
-    registerAdapter(FeedAdapter());
-    registerAdapter(FeedAdapter());
-    registerAdapter(HistoryAdapter());
-    registerAdapter(HistoryAdapter());
+    registerAdapter(CompletedEpisodeModelAdapter());
+    registerAdapter(CompletedEpisodeModelAdapter());
+    registerAdapter(DownloadModelAdapter());
+    registerAdapter(DownloadModelAdapter());
+    registerAdapter(EpisodeModelAdapter());
+    registerAdapter(EpisodeModelAdapter());
+    registerAdapter(FeedModelAdapter());
+    registerAdapter(FeedModelAdapter());
+    registerAdapter(FetchDataModelAdapter());
+    registerAdapter(HistoryModelAdapter());
+    registerAdapter(HistoryModelAdapter());
+    registerAdapter(PodcastModelAdapter());
+    registerAdapter(PodcastModelAdapter());
     registerAdapter(QueueModelAdapter());
-    registerAdapter(SettingsAdapter());
-    registerAdapter(SettingsAdapter());
-    registerAdapter(SubscriptionAdapter());
-    registerAdapter(SubscriptionAdapter());
+    registerAdapter(QueueModelAdapter());
+    registerAdapter(SettingsModelAdapter());
+    registerAdapter(SettingsModelAdapter());
+    registerAdapter(SubscriptionModelAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
-    registerAdapter(CompletedEpisodeAdapter());
-    registerAdapter(CompletedEpisodeAdapter());
-    registerAdapter(DownloadAdapter());
-    registerAdapter(DownloadAdapter());
-    registerAdapter(EpisodeAdapter());
-    registerAdapter(EpisodeAdapter());
-    registerAdapter(FeedAdapter());
-    registerAdapter(FeedAdapter());
-    registerAdapter(HistoryAdapter());
-    registerAdapter(HistoryAdapter());
+    registerAdapter(CompletedEpisodeModelAdapter());
+    registerAdapter(CompletedEpisodeModelAdapter());
+    registerAdapter(DownloadModelAdapter());
+    registerAdapter(DownloadModelAdapter());
+    registerAdapter(EpisodeModelAdapter());
+    registerAdapter(EpisodeModelAdapter());
+    registerAdapter(FeedModelAdapter());
+    registerAdapter(FeedModelAdapter());
+    registerAdapter(FetchDataModelAdapter());
+    registerAdapter(HistoryModelAdapter());
+    registerAdapter(HistoryModelAdapter());
+    registerAdapter(PodcastModelAdapter());
+    registerAdapter(PodcastModelAdapter());
     registerAdapter(QueueModelAdapter());
-    registerAdapter(SettingsAdapter());
-    registerAdapter(SettingsAdapter());
-    registerAdapter(SubscriptionAdapter());
-    registerAdapter(SubscriptionAdapter());
+    registerAdapter(QueueModelAdapter());
+    registerAdapter(SettingsModelAdapter());
+    registerAdapter(SettingsModelAdapter());
+    registerAdapter(SubscriptionModelAdapter());
   }
 }

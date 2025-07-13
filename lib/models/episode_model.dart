@@ -4,8 +4,8 @@ import 'package:openair/config/hive_types.dart';
 part 'episode_model.g.dart';
 
 @HiveType(typeId: episodeTypeId)
-class Episode extends HiveObject {
-  Episode({
+class EpisodeModel extends HiveObject {
+  EpisodeModel({
     required this.guid,
     required this.image,
     required this.title,
@@ -56,7 +56,7 @@ class Episode extends HiveObject {
   @HiveField(11)
   String enclosureUrl;
 
-  factory Episode.fromJson(Map<String, dynamic> json) => Episode(
+  factory EpisodeModel.fromJson(Map<String, dynamic> json) => EpisodeModel(
         guid: json["guid"],
         image: json["feedImage"],
         title: json["title"],

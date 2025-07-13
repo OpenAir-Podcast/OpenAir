@@ -13,6 +13,7 @@ import 'package:openair/models/download_model.dart';
 import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/history_model.dart';
 import 'package:openair/models/queue_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
@@ -24,9 +25,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
-  (ref) {
-    return OpenAirProvider(ref);
-  },
+  (ref) => OpenAirProvider(ref),
 );
 
 enum DownloadStatus { downloaded, downloading, notDownloaded }
@@ -61,7 +60,7 @@ class OpenAirProvider with ChangeNotifier {
   bool isPodcastSelected = false;
   bool onceQueueComplete = false;
 
-  Map<String, dynamic>? currentPodcast;
+  PodcastModel? currentPodcast;
   Map<String, dynamic>? currentEpisode;
   Map<String, dynamic>? nextEpisode;
 
@@ -105,7 +104,6 @@ class OpenAirProvider with ChangeNotifier {
     currentPlaybackPositionString = '00:00:00';
     currentPlaybackRemainingTimeString = '00:00:00';
 
-    currentPodcast = {};
     currentEpisode = {};
     nextEpisode = {};
 
@@ -430,7 +428,7 @@ class OpenAirProvider with ChangeNotifier {
           isPlaying = PlayingStatus.stop;
 
           ref.watch(hiveServiceProvider).addToCompletedEpisode(
-                CompletedEpisode(guid: currentEpisode!['guid']),
+                CompletedEpisodeModel(guid: currentEpisode!['guid']),
               );
 
           await updateCurrentQueueCard(
@@ -514,9 +512,8 @@ class OpenAirProvider with ChangeNotifier {
 
       // 2. Add to completed episodes
       // Assuming CompletedEpisode model has a constructor like: CompletedEpisode({required this.guid})
-      await ref
-          .read(hiveServiceProvider)
-          .addToCompletedEpisode(CompletedEpisode(guid: completedEpisodeGuid));
+      await ref.read(hiveServiceProvider).addToCompletedEpisode(
+          CompletedEpisodeModel(guid: completedEpisodeGuid));
 
       // 3. Get the updated queue to determine the next episode.
       // The sortedQueueListProvider will also update reactively for the UI.
@@ -660,7 +657,7 @@ class OpenAirProvider with ChangeNotifier {
 
   Future<void> downloadEpisode(
     Map<String, dynamic> item,
-    Map<String, dynamic> podcast,
+    PodcastModel podcast,
   ) async {
     if (kIsWeb) {
       if (context.mounted) {
@@ -695,7 +692,7 @@ class OpenAirProvider with ChangeNotifier {
 
       await dio.download(url, savePath);
 
-      final downloadModel = Download(
+      final downloadModel = DownloadModel(
         guid: guid,
         image: item['image'],
         title: item['title'],
@@ -705,7 +702,7 @@ class OpenAirProvider with ChangeNotifier {
         feedUrl: item['feedUrl'],
         duration: episodeTotalDuration,
         size: size,
-        podcastId: podcast['id'].toString(),
+        podcastId: podcast.id.toString(),
         enclosureLength: item['enclosureLength'],
         enclosureUrl: item['enclosureUrl'],
         downloadDate: DateTime.now(),
@@ -827,10 +824,10 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   // Database Operations:
-  Future<bool> isSubscribed(int podcastId) async {
-    Subscription? resultSet = await ref
+  Future<bool> isSubscribed(String podcastTitle) async {
+    SubscriptionModel? resultSet = await ref
         .read(hiveServiceProvider)
-        .getSubscription(podcastId.toString());
+        .getSubscription(podcastTitle);
 
     if (resultSet != null) {
       return true;
@@ -839,7 +836,7 @@ class OpenAirProvider with ChangeNotifier {
     return false;
   }
 
-  Future<Map<String, Subscription>> getSubscriptions() async {
+  Future<Map<String, SubscriptionModel>> getSubscriptions() async {
     return await ref.read(hiveServiceProvider).getSubscriptions();
   }
 
@@ -873,9 +870,12 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
-    return await ref
-        .read(hiveServiceProvider)
-        .podcastAccumulatedSubscribedEpisodes();
+    // TODO Reimplement this function
+    // return await ref
+    //     .read(hiveServiceProvider)
+    //     .podcastAccumulatedSubscribedEpisodes();
+
+    return 'REWORK';
   }
 
   Future<String> getFeedsCount() async {
@@ -901,7 +901,7 @@ class OpenAirProvider with ChangeNotifier {
 
   void addToQueue(
     Map<String, dynamic> episode,
-    Map<String, dynamic>? podcast,
+    PodcastModel? podcast,
   ) async {
     int pos;
 
@@ -968,7 +968,7 @@ class OpenAirProvider with ChangeNotifier {
 
   void addToHistory(
     Map<String, dynamic> episode,
-    Map<String, dynamic>? podcast,
+    PodcastModel? podcast,
   ) async {
     final int enclosureLength = episode['enclosureLength'];
     final String downloadSize = getEpisodeSize(enclosureLength);
@@ -982,27 +982,10 @@ class OpenAirProvider with ChangeNotifier {
 
     // Determine the correct podcast ID, image, and author based on the 'podcast' map structure
     if (podcast != null) {
-      if (podcast.containsKey('id')) {
-        // This is likely a full podcast object (e.g., from search results or feeds)
-        historyPodcastId = podcast['id'].toString();
-        historyPodcastImage = podcast['image'];
-        historyPodcastAuthor = podcast['author'] ?? 'Unknown';
-      } else if (podcast.containsKey('podcastId')) {
-        // This is likely a HistoryModel converted to a map (from DownloadsEpisodeCard)
-        historyPodcastId = podcast['podcastId'];
-        historyPodcastImage = podcast['image']; // HistoryModel also has 'image'
-        historyPodcastAuthor =
-            podcast['author'] ?? 'Unknown'; // HistoryModel also has 'author'
-      } else {
-        // Fallback for unexpected podcast map structure
-        debugPrint(
-            'Warning: Podcast map missing expected ID or podcastId in addToHistory. Using episode author/image.');
-        historyPodcastId = episode['podcastId']?.toString() ??
-            'unknown'; // Try to get from episode if available
-        historyPodcastImage =
-            episode['image'] ?? ''; // Try to get from episode if available
-        historyPodcastAuthor = episode['author'] ?? 'Unknown';
-      }
+      historyPodcastId = podcast.id.toString();
+      historyPodcastImage = podcast.imageUrl;
+      historyPodcastAuthor =
+          podcast.author.isNotEmpty ? podcast.author : 'Unknown';
     } else {
       debugPrint(
           'Warning: Podcast map is null in addToHistory. Using episode author/image.');
@@ -1010,6 +993,7 @@ class OpenAirProvider with ChangeNotifier {
       historyPodcastImage = episode['image'] ?? '';
       historyPodcastAuthor = episode['author'] ?? 'Unknown';
     }
+
     HistoryModel historyMod = HistoryModel(
       guid: episode['guid'],
       image: historyPodcastImage,
@@ -1049,24 +1033,29 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void subscribe(
-    Map<String, dynamic> podcast,
+    PodcastModel podcast,
   ) async {
     try {
       int podcastEpisodeCount = await ref
           .read(podcastIndexProvider)
-          .getPodcastEpisodeCountByPodcastId(podcast['id']);
+          .getPodcastEpisodeCountByPodcastId(podcast.id);
 
-      Subscription subscription = Subscription(
-        id: podcast['id'],
-        title: podcast['title'],
-        author: podcast['author'] ?? 'Unknown',
-        feedUrl: podcast['url'],
-        imageUrl: podcast['image'],
+      debugPrint('podcast episode count: $podcastEpisodeCount');
+      debugPrint('podcast id: ${podcast.id}');
+
+      SubscriptionModel subscription = SubscriptionModel(
+        id: podcast.id,
+        title: podcast.title,
+        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        feedUrl: podcast.feedUrl,
+        imageUrl: podcast.imageUrl,
         episodeCount: podcastEpisodeCount,
+        description: podcast.description,
+        artwork: podcast.artwork,
       );
 
       ref.read(hiveServiceProvider).subscribe(subscription);
-      await addPodcastEpisodes(podcast);
+      await addPodcastEpisodes(subscription);
 
       // subscriptionsProvider (from hive_provider.dart) will update reactively
       // as it watches hiveServiceProvider, which is notified by the subscribe call.
@@ -1074,7 +1063,7 @@ class OpenAirProvider with ChangeNotifier {
       notifyListeners();
     } on DioException catch (e) {
       debugPrint(
-          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
+          'OP:Failed to subscribe to ${podcast.title}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1084,7 +1073,7 @@ class OpenAirProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint('Failed to subscribe to ${podcast['title']}: $e');
+      debugPrint('Failed to subscribe to ${podcast.title}: $e');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1097,20 +1086,22 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void subscribeByRssFeed(
-    Map<String, dynamic> podcast,
+    SubscriptionModel podcast,
   ) async {
     try {
       int podcastEpisodeCount = await ref
           .read(podcastIndexProvider)
-          .getPodcastEpisodeCountByTitle(podcast['title']);
+          .getPodcastEpisodeCountByTitle(podcast.title);
 
-      Subscription subscription = Subscription(
-        id: podcast['id'],
-        title: podcast['title'],
-        author: podcast['author'] ?? 'Unknown',
-        feedUrl: podcast['url'],
-        imageUrl: podcast['image'],
+      SubscriptionModel subscription = SubscriptionModel(
+        id: podcast.id,
+        title: podcast.title,
+        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        feedUrl: podcast.feedUrl,
+        imageUrl: podcast.imageUrl,
         episodeCount: podcastEpisodeCount,
+        description: podcast.description,
+        artwork: '',
       );
 
       ref.read(hiveServiceProvider).subscribe(subscription);
@@ -1120,25 +1111,25 @@ class OpenAirProvider with ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Subscribed to ${podcast['title']}',
+              'Subscribed to ${podcast.title}',
             ),
           ),
         );
       }
     } on DioException catch (e) {
       debugPrint(
-          'Failed to subscribe to ${podcast['title']}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
+          'Failed to subscribe to ${podcast.title}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Failed to subscribe: \'${podcast['title']}\'. Try again later.'),
+                'Failed to subscribe: \'${podcast.title}\'. Try again later.'),
           ),
         );
       }
     } catch (e) {
-      debugPrint('Failed to subscribe to ${podcast['title']}: $e');
+      debugPrint('Failed to subscribe to ${podcast.title}: $e');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1150,8 +1141,8 @@ class OpenAirProvider with ChangeNotifier {
     }
   }
 
-  void unsubscribe(Map<String, dynamic> podcast) async {
-    ref.read(hiveServiceProvider).unsubscribe(podcast['id'].toString());
+  void unsubscribe(PodcastModel podcast) async {
+    ref.read(hiveServiceProvider).unsubscribe(podcast.id.toString());
     removePodcastEpisodes(podcast);
 
     // subscriptionsProvider (from hive_provider.dart) will update reactively
@@ -1160,62 +1151,51 @@ class OpenAirProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addPodcastEpisodes(Map<String, dynamic> podcast) async {
+  Future<void> addPodcastEpisodes(SubscriptionModel podcast) async {
     final apiService = ref.read(podcastIndexProvider);
-    try {
-      Map<String, dynamic> episodes =
-          await apiService.getEpisodesByFeedUrl(podcast['url']);
 
-      Episode episode;
+    Map<String, dynamic> episodes =
+        await apiService.getEpisodesByFeedUrl(podcast.feedUrl);
 
-      for (int i = 0; i < episodes['count']; i++) {
-        int enclosureLength = episodes['items'][i]['enclosureLength'];
-        String duration = getPodcastDuration(enclosureLength);
-        String size = getEpisodeSize(enclosureLength);
+    EpisodeModel episode;
 
-        episode = Episode(
-          podcastId: podcast['id'].toString(),
-          guid: episodes['items'][i]['guid'],
-          title: episodes['items'][i]['title'],
-          author: podcast['author'] ?? 'Unknown',
-          image: episodes['items'][i]['feedImage'],
-          datePublished: episodes['items'][i]['datePublished'],
-          description: episodes['items'][i]['description'],
-          feedUrl: episodes['items'][i]['feedUrl'],
-          duration: duration,
-          size: size,
-          enclosureLength: enclosureLength,
-          enclosureUrl: episodes['items'][i]['enclosureUrl'],
-        );
+    for (int i = 0; i < episodes['count']; i++) {
+      int enclosureLength = episodes['items'][i]['enclosureLength'];
+      String duration = getPodcastDuration(enclosureLength);
+      String size = getEpisodeSize(enclosureLength);
 
-        ref.read(hiveServiceProvider).insertEpisode(
-              episode,
-              episode.guid,
-            );
+      episode = EpisodeModel(
+        podcastId: podcast.id.toString(),
+        guid: episodes['items'][i]['guid'],
+        title: episodes['items'][i]['title'],
+        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        image: episodes['items'][i]['feedImage'],
+        datePublished: episodes['items'][i]['datePublished'],
+        description: episodes['items'][i]['description'],
+        feedUrl: episodes['items'][i]['feedUrl'],
+        duration: duration,
+        size: size,
+        enclosureLength: enclosureLength,
+        enclosureUrl: episodes['items'][i]['enclosureUrl'],
+      );
 
-        notifyListeners();
-      }
-    } on DioException catch (e) {
-      debugPrint(
-          'Failed to fetch episodes for ${podcast['title']}: ${e.message}');
-      // This error will be caught by the 'subscribe' method's catch block
-      // if called from there, which will show a SnackBar.
-      // To avoid duplicate error messages, we can rethrow.
-      rethrow;
-    } catch (e) {
-      debugPrint('Failed to fetch episodes for ${podcast['title']}: $e');
-      // Rethrow to be handled by the caller.
-      rethrow;
+      ref.read(hiveServiceProvider).insertEpisode(
+            episode,
+            episode.guid,
+          );
     }
+
+    notifyListeners();
   }
 
-  void removePodcastEpisodes(Map<String, dynamic> podcast) async {
-    ref.read(hiveServiceProvider).deleteEpisodes(podcast['id'].toString());
+  void removePodcastEpisodes(PodcastModel podcast) async {
+    ref.read(hiveServiceProvider).deleteEpisodes(podcast.title);
     notifyListeners();
   }
 
   Future<bool> isEpisodeNew(String guid) async {
-    Episode? resultSet = await ref.read(hiveServiceProvider).getEpisode(guid);
+    EpisodeModel? resultSet =
+        await ref.read(hiveServiceProvider).getEpisode(guid);
 
     if (resultSet != null) {
       return false;
@@ -1224,11 +1204,11 @@ class OpenAirProvider with ChangeNotifier {
     return true;
   }
 
-  Future<List<Episode>> getSubscribedEpisodes() async {
+  Future<List<EpisodeModel>> getSubscribedEpisodes() async {
     return ref.read(hiveServiceProvider).getEpisodes();
   }
 
-  Future<List<Download>> getSortedDownloadedEpisodes() async {
+  Future<List<DownloadModel>> getSortedDownloadedEpisodes() async {
     return ref.read(hiveServiceProvider).getSortedDownloads();
   }
 
@@ -1241,34 +1221,79 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void addPodcastByRssUrl(String rssUrl) async {
-    final String xmlString =
-        await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
+    String xmlString;
+    try {
+      xmlString = await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
 
-    RssFeed rssFeed = RssFeed.parse(xmlString);
+      RssFeed rssFeed = RssFeed.parse(xmlString);
 
-    // TODO Remove these
-    // debugPrint(rssFeed.title);
+      // TODO Remove these
+      // debugPrint(rssFeed.title);
 
-    // debugPrint(rssFeed.link);
-    // debugPrint(rssFeed.items!.first.link);
-    // debugPrint(rssFeed.itunes!.newFeedUrl);
-    // debugPrint(snapshot[index]['xmlURL']);
+      // debugPrint(rssFeed.link);
+      // debugPrint(rssFeed.items!.first.link);
+      // debugPrint(rssFeed.itunes!.newFeedUrl);
+      // debugPrint(snapshot[index]['xmlURL']);
 
-    Map<String, dynamic> podcast = {
-      'id': rssUrl.hashCode,
-      'url': rssUrl,
-      'title': rssFeed.title,
-      'description': rssFeed.description,
-      'author': rssFeed.author,
-      'image': rssFeed.image!.url,
-      'newestItemPublishTime':
-          rssFeed.items!.first.pubDate!.millisecondsSinceEpoch ~/ 1000,
-      'language': rssFeed.language,
-      'categories': {
-        for (var category in rssFeed.categories!) category.hashCode: category
-      },
-    };
+      SubscriptionModel podcast = SubscriptionModel(
+        id: 0, // ID will be assigned by Hive
+        title: rssFeed.title ?? 'Unknown Title',
+        author:
+            rssFeed.itunes?.author ?? rssFeed.dc?.creator ?? 'Unknown Author',
+        feedUrl: rssUrl,
+        imageUrl: rssFeed.itunes?.image?.href ?? rssFeed.image?.url ?? '',
+        episodeCount: 0,
+        description: rssFeed.description ?? '',
+        artwork: rssFeed.image!.url!,
+      );
 
-    subscribeByRssFeed(podcast);
+      subscribeByRssFeed(podcast);
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: 2,
+                vertical: MediaQuery.of(context).size.height * 0.3,
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 62.0,
+                vertical: 15.0,
+              ),
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 100.0,
+                vertical: 15.0,
+              ),
+              title: const Text(
+                'Error',
+                textAlign: TextAlign.center,
+              ),
+              content: const Text(
+                'Cannot fetch podcast from RSS URL. Check if the URL is valid and try again.',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 }

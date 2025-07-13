@@ -6,17 +6,17 @@ part of 'episode_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class EpisodeAdapter extends TypeAdapter<Episode> {
+class EpisodeModelAdapter extends TypeAdapter<EpisodeModel> {
   @override
   final typeId = 1;
 
   @override
-  Episode read(BinaryReader reader) {
+  EpisodeModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Episode(
+    return EpisodeModel(
       guid: fields[0] as String,
       image: fields[1] as String,
       title: fields[2] as String,
@@ -33,7 +33,7 @@ class EpisodeAdapter extends TypeAdapter<Episode> {
   }
 
   @override
-  void write(BinaryWriter writer, Episode obj) {
+  void write(BinaryWriter writer, EpisodeModel obj) {
     writer
       ..writeByte(12)
       ..writeByte(0)
@@ -68,7 +68,7 @@ class EpisodeAdapter extends TypeAdapter<Episode> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EpisodeAdapter &&
+      other is EpisodeModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

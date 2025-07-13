@@ -3,7 +3,7 @@ import 'package:openair/config/hive_types.dart';
 
 part 'history_model.g.dart';
 
-@HiveType(typeId: downloadTypeId)
+@HiveType(typeId: historyTypeId)
 class HistoryModel extends HiveObject {
   HistoryModel({
     required this.guid,

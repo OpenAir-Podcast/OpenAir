@@ -4,16 +4,16 @@ import 'package:openair/config/hive_types.dart';
 part 'completed_episode_model.g.dart';
 
 @HiveType(typeId: completedEpisodeTypeId)
-class CompletedEpisode extends HiveObject {
-  CompletedEpisode({
+class CompletedEpisodeModel extends HiveObject {
+  CompletedEpisodeModel({
     required this.guid,
   });
 
   @HiveField(0)
   String guid;
 
-  factory CompletedEpisode.fromJson(Map<String, dynamic> json) =>
-      CompletedEpisode(
+  factory CompletedEpisodeModel.fromJson(Map<String, dynamic> json) =>
+      CompletedEpisodeModel(
         guid: json["guid"],
       );
 

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
@@ -6,32 +5,14 @@ import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
 
-import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/widgets/subscription_card.dart';
 
 final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
   // Watch hiveServiceProvider as subscription data comes from Hive
   ref.watch(hiveServiceProvider);
   return await ref.read(openAirProvider).getSubscriptions();
-});
-
-final getSubscriptionsCountProvider =
-    FutureProvider.family.autoDispose<String, int>((ref, podcastId) async {
-  // Gets episodes count from last stored index of episodes
-  int currentSubEpCount = await ref
-      .read(hiveServiceProvider)
-      .podcastSubscribedEpisodeCount(podcastId);
-
-  // Gets episodes count from PodcastIndex
-  int podcastEpisodeCount = await ref
-      .read(podcastIndexProvider) // podcastIndexProvider doesn't notify
-      .getPodcastEpisodeCountByPodcastId(podcastId);
-
-  int result = podcastEpisodeCount - currentSubEpCount;
-
-  return result.toString();
 });
 
 class SubscriptionsPage extends ConsumerStatefulWidget {
@@ -45,16 +26,16 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   @override
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map<String, Subscription>> getSubscriptionsValue =
+    final AsyncValue<Map<String, SubscriptionModel>> getSubscriptionsValue =
         ref.watch(subscriptionsProvider);
 
     return getSubscriptionsValue.when(
-      data: (Map<String, Subscription> data) {
+      data: (Map<String, SubscriptionModel> data) {
         if (data.isEmpty) {
           return NoSubscriptions(title: 'Subscriptions');
         }
 
-        final List<Subscription> subs = data.values.toList();
+        final List<SubscriptionModel> subs = data.values.toList();
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -72,7 +53,7 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: () {
-                    // TODO Add some options here
+                    // TODO Add dropdown menu here
                   },
                   icon: const Icon(Icons.more_vert_rounded),
                 ),
@@ -87,142 +68,10 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
               mainAxisExtent: subscribedMobileMainAxisExtent,
             ),
             itemBuilder: (context, index) {
-              final subCountDataAsyncValue =
-                  ref.watch(getSubscriptionsCountProvider(subs[index].id));
-
-              return Padding(
-                padding: EdgeInsets.fromLTRB(
-                  cardSidePadding,
-                  cardTopPadding,
-                  cardSidePadding,
-                  cardTopPadding,
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    final podcastData = subs[index].toJson();
-
-                    ref.read(openAirProvider.notifier).currentPodcast =
-                        podcastData;
-
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => SubscriptionsEpisodesPage(
-                          podcast: subs[index].toJson(),
-                          id: subs[index].id,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cardImageShadow,
-                                  blurRadius: blurRadius,
-                                )
-                              ],
-                            ),
-                            height: cardImageHeight,
-                            width: cardImageWidth,
-                            child: CachedNetworkImage(
-                              memCacheHeight: cardImageHeight.ceil(),
-                              memCacheWidth: cardImageWidth.ceil(),
-                              imageUrl: subs[index].imageUrl,
-                            ),
-                          ),
-                          Positioned(
-                            right: 0.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: subscriptionCountBoxColor,
-                              ),
-                              height: subscriptionCountBoxSize,
-                              width: subscriptionCountBoxSize,
-                              child: subCountDataAsyncValue.when(
-                                data: (data) {
-                                  return Center(
-                                    child: Text(
-                                      data,
-                                      style: TextStyle(
-                                        color: subscriptionCountBoxTextColor,
-                                        fontSize: subscriptionCountBoxFontSize,
-                                        fontWeight:
-                                            subscriptionCountBoxFontWeight,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                error: (error, stackTrace) {
-                                  return Center(
-                                    child: IconButton(
-                                      onPressed: () {
-                                        ref.invalidate(subscriptionsProvider);
-
-                                        ref.invalidate(
-                                            getSubscriptionsCountProvider(
-                                                subs[index].id));
-                                      },
-                                      icon: Icon(
-                                        Icons.error_outline_rounded,
-                                        color: Colors.white,
-                                        size: subscriptionCountBoxSize - 12,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                loading: () {
-                                  return Center(
-                                    child: Text(
-                                      '...',
-                                      style: TextStyle(
-                                        color: subscriptionCountBoxTextColor,
-                                        fontSize: subscriptionCountBoxFontSize,
-                                        fontWeight:
-                                            subscriptionCountBoxFontWeight,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: cardLabelHeight,
-                        width: cardLabelWidth,
-                        decoration: BoxDecoration(
-                          color: cardLabelBackground,
-                          boxShadow: [
-                            BoxShadow(
-                              color: cardLabelShadow,
-                              blurRadius: blurRadius,
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(cardLabelPadding),
-                          child: Text(
-                            subs[index].title,
-                            maxLines: cardLabelMaxLines,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: cardLabelTextColor,
-                              fontSize: cardLabelFontSize,
-                              fontWeight: cardLabelFontWeight,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              return SubscriptionCard(
+                subs: subs,
+                ref: ref,
+                index: index,
               );
             },
           ),

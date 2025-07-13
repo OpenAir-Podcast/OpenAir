@@ -4,8 +4,8 @@ import 'package:openair/config/hive_types.dart';
 part 'settings_model.g.dart';
 
 @HiveType(typeId: settingsTypeId)
-class Settings extends HiveObject {
-  Settings({
+class SettingsModel extends HiveObject {
+  SettingsModel({
     required this.language,
     required this.theme,
   });
@@ -16,7 +16,7 @@ class Settings extends HiveObject {
   @HiveField(1)
   String theme;
 
-  factory Settings.fromJson(Map<String, dynamic> json) => Settings(
+  factory SettingsModel.fromJson(Map<String, dynamic> json) => SettingsModel(
         language: json['language'],
         theme: json['theme'],
       );

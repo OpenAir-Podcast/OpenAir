@@ -4,15 +4,15 @@ import 'package:openair/config/hive_types.dart';
 part 'feed_model.g.dart';
 
 @HiveType(typeId: feedTypeId)
-class Feed extends HiveObject {
-  Feed({
+class FeedModel extends HiveObject {
+  FeedModel({
     required this.guid,
   });
 
   @HiveField(0)
   String guid;
 
-  factory Feed.fromJson(Map<String, dynamic> json) => Feed(
+  factory FeedModel.fromJson(Map<String, dynamic> json) => FeedModel(
         guid: json["guid"],
       );
 

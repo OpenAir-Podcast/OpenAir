@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/download_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -19,7 +20,7 @@ final isEpisodeNewProvider =
 
 class SubscriptionEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
-  final Map<String, dynamic> podcast;
+  final PodcastModel podcast;
   final String title;
 
   const SubscriptionEpisodeCard({
@@ -47,7 +48,7 @@ class _SubscriptionEpisodeCardState
         .read(openAirProvider) // Date for item is static
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
-    final AsyncValue<List<Download>> downloadedListAsync =
+    final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
 
     final AsyncValue<List<QueueModel>> queueListAsync =
@@ -95,9 +96,9 @@ class _SubscriptionEpisodeCardState
                               memCacheWidth: 62,
                               imageUrl: ref
                                       .watch(openAirProvider)
-                                      .currentPodcast?['image'] ??
-                                  widget.podcast[
-                                      'image'], // Use widget.podcast image
+                                      .currentPodcast
+                                      ?.imageUrl ??
+                                  widget.podcast.imageUrl,
                               fit: BoxFit.fill,
                               errorWidget: (context, url, error) => Icon(
                                 Icons.error,
@@ -135,9 +136,11 @@ class _SubscriptionEpisodeCardState
                                   child: Text(
                                     ref
                                             .watch(openAirProvider)
-                                            .currentPodcast?['author'] ??
-                                        widget.podcast['author'] ??
-                                        "Unknown", // Use widget.podcast author
+                                            .currentPodcast!
+                                            .author
+                                            .isNotEmpty
+                                        ? widget.podcast.author
+                                        : "Unknown", // Use widget.podcast author
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,

@@ -3,16 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/history_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
 
-
 final getHistoryProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSortedHistory();
 });
-
 
 class HistoryPage extends ConsumerStatefulWidget {
   const HistoryPage({super.key});
@@ -89,10 +88,20 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
+                  PodcastModel podcastModel = PodcastModel(
+                    id: int.parse(data[index].podcastId),
+                    feedUrl: data[index].feedUrl,
+                    title: data[index].title,
+                    author: data[index].author,
+                    imageUrl: data[index].image,
+                    description: data[index].description,
+                    artwork: data[index].image,
+                  );
+
                   return DownloadsEpisodeCard(
                     title: data[index].title,
                     episodeItem: data[index].toJson(),
-                    podcast: data[index].toJson(),
+                    podcast: podcastModel,
                   );
                 },
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
@@ -77,8 +78,9 @@ class TopPodcastsPage extends ConsumerWidget {
               itemCount: snapshot['count'],
               itemBuilder: (context, index) {
                 return PodcastCard(
-                  podcastItem: snapshot['feeds'][index],
-                );
+                    // TODO convert to use PodcastModel
+                    podcastItem:
+                        PodcastModel.fromJson(snapshot['feeds'][index]));
               },
             ),
           ),

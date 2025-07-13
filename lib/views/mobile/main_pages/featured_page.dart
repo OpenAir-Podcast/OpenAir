@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
@@ -9,6 +10,9 @@ import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
+
+// TODO Rework to only fetch the data once then store it using hive
+// Add a button to refresh data
 
 bool once = false;
 
@@ -326,12 +330,14 @@ class PodcastsCard extends ConsumerWidget {
                       child: GestureDetector(
                         onTap: () {
                           ref.read(openAirProvider).currentPodcast =
-                              snapshot['feeds'][index];
+                              PodcastModel.fromJson(snapshot['feeds'][index]);
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                podcast: snapshot['feeds'][index],
+                                podcast: PodcastModel.fromJson(
+                                  snapshot['feeds'][index],
+                                ),
                                 id: snapshot['feeds'][index]['id'],
                               ),
                             ),

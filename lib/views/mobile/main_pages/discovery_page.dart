@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/components/no_connection.dart';
@@ -98,19 +99,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                     itemCount: data.length,
                     itemBuilder: (context, index) {
                       return PodcastCard(
-                        podcastItem: {
-                          'id': data[index]['id'],
-                          'url': data[index]['xmlURL'],
-                          'title': data[index]['title'],
-                          'description': data[index]['description'],
-                          'author': data[index]['author'],
-                          'image': data[index]['imgURL'],
-                          'artwork': data[index]['imgURL'],
-                          'newestItemPublishTime': data[index]
-                              ['newestItemPublishTime'],
-                          'language': data[index]['language'],
-                          'categories': data[index]['categories'],
-                        },
+                        podcastItem: PodcastModel.fromJson(data[index]),
                       );
                     },
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_downloaded_episodes.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/download_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
@@ -21,11 +22,11 @@ class DownloadsPage extends ConsumerStatefulWidget {
 class _DownloadsState extends ConsumerState<DownloadsPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Download>> getEpisodesValue =
+    final AsyncValue<List<DownloadModel>> getEpisodesValue =
         ref.watch(getDownloadsProvider);
 
     return getEpisodesValue.when(
-      data: (List<Download> data) {
+      data: (List<DownloadModel> data) {
         if (data.isEmpty) {
           return NoDownloadedEpisodes();
         }
@@ -78,10 +79,20 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
+                  PodcastModel podcastModel = PodcastModel(
+                    id: int.parse(data[index].podcastId),
+                    title: data[index].title,
+                    author: data[index].author,
+                    feedUrl: data[index].feedUrl,
+                    imageUrl: data[index].image,
+                    description: data[index].description,
+                    artwork: data[index].image,
+                  );
+
                   return DownloadsEpisodeCard(
                     title: data[index].title,
                     episodeItem: data[index].toJson(),
-                    podcast: data[index].toJson(),
+                    podcast: podcastModel,
                   );
                 },
               ),

@@ -4,8 +4,8 @@ import 'package:openair/config/hive_types.dart';
 part 'download_model.g.dart';
 
 @HiveType(typeId: downloadTypeId)
-class Download extends HiveObject {
-  Download({
+class DownloadModel extends HiveObject {
+  DownloadModel({
     required this.guid,
     required this.image,
     required this.title,
@@ -64,7 +64,7 @@ class Download extends HiveObject {
   @HiveField(13)
   String fileName;
 
-  factory Download.fromJson(Map<String, dynamic> json) => Download(
+  factory DownloadModel.fromJson(Map<String, dynamic> json) => DownloadModel(
         guid: json["guid"],
         image: json["image"],
         title: json["title"],

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
 import 'package:openair/models/download_model.dart';
+import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -14,7 +15,7 @@ import 'package:styled_text/styled_text.dart';
 class DownloadsEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
-  final Map<String, dynamic> podcast;
+  final PodcastModel podcast;
 
   const DownloadsEpisodeCard({
     super.key,
@@ -39,7 +40,7 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
     final AsyncValue<List<QueueModel>> queueListAsync =
         ref.watch(sortedQueueListProvider);
 
-    final AsyncValue<List<Download>> downloadedListAsync =
+    final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
 
     return GestureDetector(
@@ -79,7 +80,7 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                       child: CachedNetworkImage(
                         memCacheHeight: 62,
                         memCacheWidth: 62,
-                        imageUrl: widget.podcast['image'],
+                        imageUrl: widget.podcast.imageUrl,
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(
                           Icons.error,
@@ -112,7 +113,9 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              widget.podcast['author'] ?? "Unknown",
+                              widget.podcast.author.isNotEmpty
+                                  ? widget.podcast.author
+                                  : "Unknown",
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
