@@ -151,6 +151,7 @@ class PodcastIndexProvider {
     // debugPrint('Category URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putCategoryPodcast(category, response.data);
     return response.data;
   }
 
@@ -158,11 +159,10 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
-    debugPrint('Trending URL: $url');
+    // debugPrint('Trending URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.watch(hiveServiceProvider).putTrendingPodcast(response.data);
-
+    ref.read(hiveServiceProvider).putTrendingPodcast(response.data);
     return response.data;
   }
 
@@ -170,9 +170,10 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
 
-    // debugPrint('Top Podcast URL: $url');
+    debugPrint('Top Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putTopFeaturedPodcast(response.data);
     return response.data;
   }
 
@@ -180,9 +181,10 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty';
 
-    // debugPrint('Feed URL: $url');
+    debugPrint('Education Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putEducationFeaturedPodcast(response.data);
     return response.data;
   }
 
@@ -190,9 +192,10 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty';
 
-    // debugPrint('Feed URL: $url');
+    debugPrint('Health Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putHealthFeaturedPodcast(response.data);
     return response.data;
   }
 
@@ -200,9 +203,10 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty';
 
-    // debugPrint('Feed URL: $url');
+    debugPrint('Technology Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putTechnologyFeaturedPodcast(response.data);
     return response.data;
   }
 
@@ -210,9 +214,10 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty';
 
-    // debugPrint('Feed URL: $url');
+    debugPrint('Sports Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
+    ref.read(hiveServiceProvider).putSportsFeaturedPodcast(response.data);
     return response.data;
   }
 }

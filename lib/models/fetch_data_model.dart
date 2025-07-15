@@ -25,7 +25,7 @@ class FetchDataModel extends HiveObject {
   int count;
 
   @HiveField(3)
-  int max;
+  int? max;
 
   @HiveField(4)
   int since;
@@ -41,12 +41,20 @@ class FetchDataModel extends HiveObject {
           (json['feeds'] as List).map((i) => PodcastModel.fromJson(i)).toList();
     }
 
+    final int maxTmp = json['max'].runtimeType == int
+        ? json['max']
+        : json['max'] == null
+            ? -1
+            : int.parse(json['max']);
+
+    final int sinceTmp = json['since'] ?? -1;
+
     return FetchDataModel(
       count: json['count'],
       feeds: feeds,
       status: json['status'],
-      max: json['max'],
-      since: json['since'],
+      max: maxTmp,
+      since: sinceTmp,
       description: json['description'],
     );
   }

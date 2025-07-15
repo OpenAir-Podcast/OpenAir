@@ -825,9 +825,8 @@ class OpenAirProvider with ChangeNotifier {
 
   // Database Operations:
   Future<bool> isSubscribed(String podcastTitle) async {
-    SubscriptionModel? resultSet = await ref
-        .read(hiveServiceProvider)
-        .getSubscription(podcastTitle);
+    SubscriptionModel? resultSet =
+        await ref.read(hiveServiceProvider).getSubscription(podcastTitle);
 
     if (resultSet != null) {
       return true;
@@ -1142,7 +1141,7 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void unsubscribe(PodcastModel podcast) async {
-    ref.read(hiveServiceProvider).unsubscribe(podcast.id.toString());
+    ref.read(hiveServiceProvider).unsubscribe(podcast.title);
     removePodcastEpisodes(podcast);
 
     // subscriptionsProvider (from hive_provider.dart) will update reactively

@@ -2,7 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
-import 'package:openair/models/podcast_model.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
@@ -16,35 +17,85 @@ import 'package:shimmer/shimmer.dart';
 
 bool once = false;
 
-final podcastDataByTopProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
+// TODO Rework these to store the podcasts instead of fetching each time.
+final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
+  final FetchDataModel? topFeaturedPodcastData =
+      await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
+
+  // debugPrint(topFeaturedPodcastData.toString());
+
+  if (topFeaturedPodcastData != null) {
+    return topFeaturedPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final apiService = ref.read(podcastIndexProvider);
-  return await apiService.getTopPodcasts();
+  final data = await apiService.getTopPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByEducationProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
+    FutureProvider<FetchDataModel>((ref) async {
+  final FetchDataModel? educationPodcastData =
+      await ref.read(hiveServiceProvider).getEducationFeaturedPodcast();
+
+  if (educationPodcastData != null) {
+    return educationPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final apiService = ref.read(podcastIndexProvider);
-  return await apiService.getEducationPodcasts();
+  final data = await apiService.getEducationPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
-final podcastDataByHealthProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
+final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
+  final FetchDataModel? healthPodcastData =
+      await ref.read(hiveServiceProvider).getHealthFeaturedPodcast();
+
+  if (healthPodcastData != null) {
+    return healthPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final apiService = ref.read(podcastIndexProvider);
-  return await apiService.getHealthPodcasts();
+  final data = await apiService.getHealthPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
 final podcastDataByTechnologyProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
+    FutureProvider<FetchDataModel>((ref) async {
+  final FetchDataModel? tehnologyPodcastData =
+      await ref.read(hiveServiceProvider).getTechnologyFeaturedPodcast();
+
+  if (tehnologyPodcastData != null) {
+    return tehnologyPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final apiService = ref.read(podcastIndexProvider);
-  return await apiService.getTechnologyPodcasts();
+  final data = await apiService.getTechnologyPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
-final podcastDataBySportsProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
+final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
+  final FetchDataModel? sportsPodcastData =
+      await ref.read(hiveServiceProvider).getSportsFeaturedPodcast();
+
+  if (sportsPodcastData != null) {
+    return sportsPodcastData;
+  }
+
+  debugPrint('Fetching podcasts from Podcast Index');
+
   final apiService = ref.read(podcastIndexProvider);
-  return await apiService.getSportsPodcasts();
+  final data = await apiService.getSportsPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
 final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
@@ -165,9 +216,9 @@ class PodcastsCard extends ConsumerWidget {
     required this.podcastDataProvider,
   });
 
-  final AsyncValue<Map<String, dynamic>> podcastDataAsyncValue;
+  final AsyncValue<FetchDataModel> podcastDataAsyncValue;
   final String title;
-  final FutureProvider<Map<String, dynamic>> podcastDataProvider;
+  final FutureProvider<FetchDataModel> podcastDataProvider;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -330,15 +381,13 @@ class PodcastsCard extends ConsumerWidget {
                       child: GestureDetector(
                         onTap: () {
                           ref.read(openAirProvider).currentPodcast =
-                              PodcastModel.fromJson(snapshot['feeds'][index]);
+                              snapshot.feeds[index];
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => EpisodesPage(
-                                podcast: PodcastModel.fromJson(
-                                  snapshot['feeds'][index],
-                                ),
-                                id: snapshot['feeds'][index]['id'],
+                                podcast: snapshot.feeds[index],
+                                id: snapshot.feeds[index].id,
                               ),
                             ),
                           );
@@ -359,7 +408,7 @@ class PodcastsCard extends ConsumerWidget {
                               child: CachedNetworkImage(
                                 memCacheHeight: cardImageHeight.ceil(),
                                 memCacheWidth: cardImageWidth.ceil(),
-                                imageUrl: snapshot['feeds'][index]['image'],
+                                imageUrl: snapshot.feeds[index].artwork,
                                 fit: BoxFit.fill,
                                 errorWidget: (context, url, error) => Icon(
                                   Icons.error,
@@ -382,7 +431,7 @@ class PodcastsCard extends ConsumerWidget {
                               child: Padding(
                                 padding: EdgeInsets.all(cardLabelPadding),
                                 child: Text(
-                                  snapshot['feeds'][index]['title'],
+                                  snapshot.feeds[index].title,
                                   maxLines: cardLabelMaxLines,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(

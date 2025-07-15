@@ -62,15 +62,15 @@ class HiveService extends ChangeNotifier {
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
   late final Future<CollectionBox<SettingsModel>> settingsBox;
 
-  late final Future<CollectionBox<PodcastModel>> topFeaturedBox;
-  late final Future<CollectionBox<PodcastModel>> educationFeaturedBox;
-  late final Future<CollectionBox<PodcastModel>> healthFeaturedBox;
-  late final Future<CollectionBox<PodcastModel>> technologyFeaturedBox;
-  late final Future<CollectionBox<PodcastModel>> sportsFeaturedBox;
-
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
-  late final Future<CollectionBox<Map<String, PodcastModel>>> categoryBox;
+  late final Future<CollectionBox<FetchDataModel>> topFeaturedBox;
+  late final Future<CollectionBox<FetchDataModel>> educationFeaturedBox;
+  late final Future<CollectionBox<FetchDataModel>> healthFeaturedBox;
+  late final Future<CollectionBox<FetchDataModel>> technologyFeaturedBox;
+  late final Future<CollectionBox<FetchDataModel>> sportsFeaturedBox;
+
+  late final Future<CollectionBox<FetchDataModel>> categoryBox;
 
   bool _isInitialized = false;
 
@@ -136,21 +136,33 @@ class HiveService extends ChangeNotifier {
     queueBox = collection.openBox<QueueModel>('queue');
     downloadBox = collection.openBox<DownloadModel>('download');
     historyBox = collection.openBox<HistoryModel>('history');
+
     completedEpisodeBox =
         collection.openBox<CompletedEpisodeModel>('completed_episodes');
+
     settingsBox = collection.openBox<SettingsModel>('settings');
 
-    topFeaturedBox = collection.openBox<PodcastModel>('top_featured');
+    // Trending page
+
+    trendingBox = collection.openBox<FetchDataModel>('trending');
+
+    // Featured page
+
+    topFeaturedBox = collection.openBox<FetchDataModel>('top_featured');
+
     educationFeaturedBox =
-        collection.openBox<PodcastModel>('education_featured');
-    healthFeaturedBox = collection.openBox<PodcastModel>('health_featured');
+        collection.openBox<FetchDataModel>('education_featured');
+
+    healthFeaturedBox = collection.openBox<FetchDataModel>('health_featured');
+
     technologyFeaturedBox =
-        collection.openBox<PodcastModel>('technology_featured');
-    sportsFeaturedBox = collection.openBox<PodcastModel>('sports_featured');
+        collection.openBox<FetchDataModel>('technology_featured');
 
-    trendingBox = collection.openBox('trending');
+    sportsFeaturedBox = collection.openBox<FetchDataModel>('sports_featured');
 
-    categoryBox = collection.openBox('category');
+    // Category page
+
+    categoryBox = collection.openBox<FetchDataModel>('category');
 
     _isInitialized = true;
   }
@@ -173,9 +185,9 @@ class HiveService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> unsubscribe(String id) async {
+  Future<void> unsubscribe(String title) async {
     final box = await subscriptionBox;
-    await box.delete(id);
+    await box.delete(title);
     notifyListeners();
   }
 
@@ -558,7 +570,7 @@ class HiveService extends ChangeNotifier {
     return episodeCount;
   }
 
-  Future<FetchDataModel?>? getTrendingPodcast() async {
+  Future<FetchDataModel?> getTrendingPodcast() async {
     final box = await trendingBox;
     return await box.get('trending');
   }
@@ -566,5 +578,65 @@ class HiveService extends ChangeNotifier {
   void putTrendingPodcast(Map<String, dynamic> data) async {
     final box = await trendingBox;
     await box.put('trending', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getTopFeaturedPodcast() async {
+    final box = await topFeaturedBox;
+    return await box.get('top_featured');
+  }
+
+  void putTopFeaturedPodcast(Map<String, dynamic> data) async {
+    final box = await topFeaturedBox;
+    await box.put('top_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getEducationFeaturedPodcast() async {
+    final box = await educationFeaturedBox;
+    return await box.get('education_featured');
+  }
+
+  void putEducationFeaturedPodcast(Map<String, dynamic> data) async {
+    final box = await educationFeaturedBox;
+    await box.put('education_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getHealthFeaturedPodcast() async {
+    final box = await healthFeaturedBox;
+    return await box.get('health_featured');
+  }
+
+  void putHealthFeaturedPodcast(Map<String, dynamic> data) async {
+    final box = await healthFeaturedBox;
+    await box.put('health_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getTechnologyFeaturedPodcast() async {
+    final box = await technologyFeaturedBox;
+    return await box.get('technology_featured');
+  }
+
+  void putTechnologyFeaturedPodcast(Map<String, dynamic> data) async {
+    final box = await technologyFeaturedBox;
+    await box.put('technology_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getSportsFeaturedPodcast() async {
+    final box = await sportsFeaturedBox;
+    return await box.get('sports_featured');
+  }
+
+  void putSportsFeaturedPodcast(Map<String, dynamic> data) async {
+    final box = await sportsFeaturedBox;
+    await box.put('sports_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<FetchDataModel?> getCategoryPodcast(String category) async {
+    final box = await categoryBox;
+    return await box.get(category);
+  }
+
+  void putCategoryPodcast(String category, Map<String, dynamic> data) async {
+    final box = await categoryBox;
+    await box.put(category, FetchDataModel.fromJson(data));
   }
 }

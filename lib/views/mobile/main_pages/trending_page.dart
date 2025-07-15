@@ -12,7 +12,7 @@ import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     FutureProvider.autoDispose((ref) async {
-  final trendingPodcastData =
+  final FetchDataModel? trendingPodcastData =
       await ref.read(hiveServiceProvider).getTrendingPodcast();
 
   if (trendingPodcastData != null) {
@@ -22,9 +22,9 @@ final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
   debugPrint('Fetching podcasts from Podcast Index');
 
   final podcastIndexAPI = ref.read(podcastIndexProvider);
-  final trendingData = await podcastIndexAPI.getTrendingPodcasts();
+  final data = await podcastIndexAPI.getTrendingPodcasts();
 
-  return FetchDataModel.fromJson(trendingData);
+  return FetchDataModel.fromJson(data);
 });
 
 final getConnectionStatusProvider =
