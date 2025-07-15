@@ -452,13 +452,14 @@ class HiveService extends ChangeNotifier {
     await box.delete('settings'); // Add await
   }
 
-  Future<int> podcastSubscribedEpisodeCount(int podcastId) async {
+  Future<int> podcastSubscribedEpisodeCount(String title) async {
     final box = await subscriptionBox;
-    final SubscriptionModel? allEpisodes = await box.get(podcastId.toString());
+    final SubscriptionModel? allEpisodes = await box.get(title);
 
     return allEpisodes!.episodeCount;
   }
 
+  // FIXME HERE
   Future<String> podcastAccumulatedSubscribedEpisodes() async {
     final box = await subscriptionBox;
     final Map<String, SubscriptionModel> allSubscriptions =

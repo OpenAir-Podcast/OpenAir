@@ -98,6 +98,18 @@ class CategoryPage extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(category),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  tooltip: 'Refreash',
+                  onPressed: () {
+                    // TODO Implement refreash mechanic
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

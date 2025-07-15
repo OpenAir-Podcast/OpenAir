@@ -836,42 +836,42 @@ class OpenAirProvider with ChangeNotifier {
     return await ref.read(hiveServiceProvider).getSubscriptions();
   }
 
-  Future<String> getSubscriptionsCount(int podcastId) async {
+  Future<String> getSubscriptionsCount(String title) async {
     // Gets episodes count from last stored index of episodes
     int currentSubEpCount = await ref
         .read(hiveServiceProvider)
-        .podcastSubscribedEpisodeCount(podcastId);
+        .podcastSubscribedEpisodeCount(title);
 
     // Gets episodes count from PodcastIndex
     try {
       int podcastEpisodeCount = await ref
           .read(podcastIndexProvider)
-          .getPodcastEpisodeCountByPodcastId(podcastId);
+          .getPodcastEpisodeCountByTitle(title);
 
       int result = podcastEpisodeCount - currentSubEpCount;
 
       return result.toString();
     } on DioException catch (e) {
       debugPrint(
-          'DioError getting episode count for podcast $podcastId: ${e.message}');
+          'DioError getting episode count for podcast $title: ${e.message}');
 
       if (e.response != null) {
         debugPrint('Response: ${e.response?.data}');
       }
       return '...'; // Or some other indicator of an error
     } catch (e) {
-      debugPrint('Error getting episode count for podcast $podcastId: $e');
+      debugPrint('Error getting episode count for podcast $title: $e');
       return '...';
     }
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
     // TODO Reimplement this function
-    // return await ref
-    //     .read(hiveServiceProvider)
-    //     .podcastAccumulatedSubscribedEpisodes();
+    return await ref
+        .read(hiveServiceProvider)
+        .podcastAccumulatedSubscribedEpisodes();
 
-    return 'REWORK';
+    // return 'REWORK';
   }
 
   Future<String> getFeedsCount() async {

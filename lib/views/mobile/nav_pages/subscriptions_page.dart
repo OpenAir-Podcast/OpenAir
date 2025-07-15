@@ -24,7 +24,6 @@ class SubscriptionsPage extends ConsumerStatefulWidget {
 
 class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   @override
-  @override
   Widget build(BuildContext context) {
     final AsyncValue<Map<String, SubscriptionModel>> getSubscriptionsValue =
         ref.watch(subscriptionsProvider);

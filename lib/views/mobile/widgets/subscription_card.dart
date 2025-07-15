@@ -11,24 +11,17 @@ import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
-final getSubscriptionsCountProvider = FutureProvider.family
-    .autoDispose<String, Map<String, dynamic>>((ref, data) async {
+final getSubscriptionsCountProvider =
+    FutureProvider.family.autoDispose<String, String>((ref, title) async {
   // Gets episodes count from last stored index of episodes
-  int currentSubEpCount = await ref
-      .read(hiveServiceProvider)
-      .podcastSubscribedEpisodeCount(data['podcastId']);
+  int currentSubEpCount =
+      await ref.read(hiveServiceProvider).podcastSubscribedEpisodeCount(title);
 
   // Gets episodes count from PodcastIndex
-  int podcastEpisodeCount = await ref
-      .read(podcastIndexProvider)
-      .getPodcastEpisodeCountByTitle(data['title']);
-
-  debugPrint('currentSubEpCount: $currentSubEpCount');
-  debugPrint('podcastEpisodeCount: $podcastEpisodeCount');
-  debugPrint('\n\n');
+  int podcastEpisodeCount =
+      await ref.read(podcastIndexProvider).getPodcastEpisodeCountByTitle(title);
 
   int result = podcastEpisodeCount - currentSubEpCount;
-  // return result.toString();
   return '$result';
 });
 
@@ -46,10 +39,8 @@ class SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subCountDataAsyncValue = ref.watch(getSubscriptionsCountProvider({
-      'podcastId': subs[index].id,
-      'title': subs[index].title,
-    }));
+    final subCountDataAsyncValue =
+        ref.watch(getSubscriptionsCountProvider(subs[index].title));
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -63,7 +54,8 @@ class SubscriptionCard extends StatelessWidget {
           // TODO Add a dropmenu here
         },
         onTap: () {
-          ref.read(openAirProvider.notifier).currentPodcast = PodcastModel.fromJson(subs[index].toJson());
+          ref.read(openAirProvider.notifier).currentPodcast =
+              PodcastModel.fromJson(subs[index].toJson());
 
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -124,10 +116,8 @@ class SubscriptionCard extends StatelessWidget {
                               ref.invalidate(subscriptionsProvider);
 
                               ref.invalidate(
-                                getSubscriptionsCountProvider({
-                                  'podcastId': subs[index].id,
-                                  'title': subs[index].title,
-                                }),
+                                getSubscriptionsCountProvider(
+                                    subs[index].title),
                               );
                             },
                             icon: Icon(
