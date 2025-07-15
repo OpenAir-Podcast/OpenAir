@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/models/podcast_model.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -8,10 +9,23 @@ import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider = FutureProvider.family
-    .autoDispose<Map<String, dynamic>, String>((ref, category) async {
-  return await ref
+    .autoDispose<FetchDataModel, String>((ref, category) async {
+  final FetchDataModel? categoryPodcastData =
+      await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
+
+  debugPrint('Fetch feed from hive');
+
+  if (categoryPodcastData != null) {
+    return categoryPodcastData;
+  }
+
+  debugPrint('Fetch feed from podcast index');
+
+  final data = await ref
       .watch(podcastIndexProvider)
       .getPodcastsByCategory(category.toLowerCase());
+
+  return FetchDataModel.fromJson(data);
 });
 
 class CategoryPage extends ConsumerWidget {
@@ -89,10 +103,10 @@ class CategoryPage extends ConsumerWidget {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
-              itemCount: snapshot['count'],
+              itemCount: snapshot.count,
               itemBuilder: (context, index) {
                 return PodcastCard(
-                  podcastItem: PodcastModel.fromJson(snapshot['feeds'][index]),
+                  podcastItem: snapshot.feeds[index],
                 );
               },
             ),

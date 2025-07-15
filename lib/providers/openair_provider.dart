@@ -87,9 +87,6 @@ class OpenAirProvider with ChangeNotifier {
       directory = await getApplicationDocumentsDirectory();
     }
 
-    // Initialise db
-    await ref.read(hiveServiceProvider).init();
-
     player = AudioPlayer();
 
     this.context = context;

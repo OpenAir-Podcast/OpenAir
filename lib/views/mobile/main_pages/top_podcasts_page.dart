@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/models/podcast_model.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
-final podcastDataByTrendingProvider = FutureProvider.autoDispose((ref) async {
+final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
+    FutureProvider.autoDispose((ref) async {
+  final FetchDataModel? topFeaturedPodcastData =
+      await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
+
+  if (topFeaturedPodcastData != null) {
+    return topFeaturedPodcastData;
+  }
+
   final apiService = ref.watch(podcastIndexProvider);
-  return await apiService.getTrendingPodcasts();
+  final data = await apiService.getTrendingPodcasts();
+  return FetchDataModel.fromJson(data);
 });
 
 class TopPodcastsPage extends ConsumerWidget {
@@ -75,12 +85,9 @@ class TopPodcastsPage extends ConsumerWidget {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
-              itemCount: snapshot['count'],
+              itemCount: snapshot.feeds.length,
               itemBuilder: (context, index) {
-                return PodcastCard(
-                    // TODO convert to use PodcastModel
-                    podcastItem:
-                        PodcastModel.fromJson(snapshot['feeds'][index]));
+                return PodcastCard(podcastItem: snapshot.feeds[index]);
               },
             ),
           ),

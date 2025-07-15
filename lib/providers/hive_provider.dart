@@ -72,16 +72,12 @@ class HiveService extends ChangeNotifier {
 
   late final Future<CollectionBox<FetchDataModel>> categoryBox;
 
-  bool _isInitialized = false;
-
   late final Directory openAirDir;
 
   HiveService(this.ref);
   final Ref<HiveService> ref;
 
-  Future<void> init() async {
-    if (_isInitialized) return;
-
+  Future<void> initial() async {
     // Register all adapters
     Hive.registerAdapter(PodcastModelAdapter());
     Hive.registerAdapter(EpisodeModelAdapter());
@@ -161,17 +157,7 @@ class HiveService extends ChangeNotifier {
     sportsFeaturedBox = collection.openBox<FetchDataModel>('sports_featured');
 
     // Category page
-
     categoryBox = collection.openBox<FetchDataModel>('category');
-
-    _isInitialized = true;
-  }
-
-  void close() async {
-    // Ensure collection is initialized before closing
-    if (_isInitialized) {
-      collection.close();
-    }
   }
 
   // Subscription Operations:

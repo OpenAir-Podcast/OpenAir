@@ -15,9 +15,6 @@ import 'package:shimmer/shimmer.dart';
 // TODO Rework to only fetch the data once then store it using hive
 // Add a button to refresh data
 
-bool once = false;
-
-// TODO Rework these to store the podcasts instead of fetching each time.
 final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
@@ -116,19 +113,6 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage>
   bool get wantKeepAlive => true;
 
   @override
-  void initState() {
-    super.initState();
-    if (once == false) {
-      // Initialize the provider
-      ref.read(openAirProvider).initial(
-            context,
-          );
-
-      once = true;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     super.build(context); // Important for AutomaticKeepAliveClientMixin
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
@@ -152,6 +136,15 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage>
 
         final podcastDataAsyncSportsValue =
             ref.watch(podcastDataBySportsProvider);
+
+        if (podcastDataAsyncTopValue.hasError) {
+          return Container(
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
         return Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
@@ -281,49 +274,44 @@ class PodcastsCard extends ConsumerWidget {
             ),
           ],
         ),
-        error: (error, stackTrace) => Scaffold(
-          body: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 75.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 20.0),
-                Text(
-                  'Oops, an error occurred...',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$error',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  width: 180.0,
-                  height: 40.0,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      ref.invalidate(podcastDataProvider);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ),
-              ],
+        error: (error, stackTrace) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 75.0,
+              color: Colors.grey,
             ),
-          ),
+            const SizedBox(height: 20.0),
+            Text(
+              'Oops, an error occurred...',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '$error',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: 180.0,
+              height: 40.0,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                onPressed: () async {
+                  ref.invalidate(podcastDataProvider);
+                },
+                child: const Text('Retry'),
+              ),
+            ),
+          ],
         ),
         data: (snapshot) {
           return Column(
