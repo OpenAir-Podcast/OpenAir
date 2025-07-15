@@ -143,7 +143,7 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getPodcastsByCategory(String category) async {
-    String cat = category.replaceAll(' ', '%20');
+    String cat = category.replaceAll(' ', '%20').toLowerCase();
 
     String url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
@@ -151,7 +151,9 @@ class PodcastIndexProvider {
     // debugPrint('Category URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putCategoryPodcast(category, response.data);
+    ref
+        .read(hiveServiceProvider)
+        .putCategoryPodcast(category.replaceAll(' ', ''), response.data);
     return response.data;
   }
 
@@ -179,45 +181,49 @@ class PodcastIndexProvider {
 
   Future<Map<String, dynamic>> getEducationPodcasts() async {
     const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=education&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=education&lang=en&pretty';
 
     debugPrint('Education Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putEducationFeaturedPodcast(response.data);
+    ref
+        .read(hiveServiceProvider)
+        .putCategoryPodcast('Education', response.data);
     return response.data;
   }
 
   Future<Map<String, dynamic>> getHealthPodcasts() async {
     const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=health&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=health&lang=en&pretty';
 
     debugPrint('Health Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putHealthFeaturedPodcast(response.data);
+    ref.read(hiveServiceProvider).putCategoryPodcast('Health', response.data);
     return response.data;
   }
 
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
     const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=technology&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=technology&lang=en&pretty';
 
     debugPrint('Technology Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putTechnologyFeaturedPodcast(response.data);
+    ref
+        .read(hiveServiceProvider)
+        .putCategoryPodcast('Technology', response.data);
     return response.data;
   }
 
   Future<Map<String, dynamic>> getSportsPodcasts() async {
     const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?max=3&cat=sports&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=sports&lang=en&pretty';
 
     debugPrint('Sports Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putSportsFeaturedPodcast(response.data);
+    ref.read(hiveServiceProvider).putCategoryPodcast('Sports', response.data);
     return response.data;
   }
 }

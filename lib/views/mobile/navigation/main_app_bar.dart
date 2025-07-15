@@ -14,6 +14,16 @@ AppBar mainAppBar(WidgetRef ref, BuildContext context) {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
+          tooltip: 'Refreash',
+          onPressed: () {
+            // TODO Implement refreash mechanic 
+          },
+          icon: const Icon(Icons.refresh_rounded),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
           tooltip: 'Search Podcasts',
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(

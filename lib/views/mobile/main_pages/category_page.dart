@@ -10,20 +10,19 @@ import 'package:openair/views/mobile/widgets/podcast_card.dart';
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider = FutureProvider.family
     .autoDispose<FetchDataModel, String>((ref, category) async {
-  final FetchDataModel? categoryPodcastData =
-      await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
-
-  debugPrint('Fetch feed from hive');
+  final FetchDataModel? categoryPodcastData = await ref
+      .read(hiveServiceProvider)
+      .getCategoryPodcast(category.replaceAll(' ', ''));
 
   if (categoryPodcastData != null) {
+    debugPrint('Fetch feed from hive');
     return categoryPodcastData;
   }
 
   debugPrint('Fetch feed from podcast index');
 
-  final data = await ref
-      .watch(podcastIndexProvider)
-      .getPodcastsByCategory(category.toLowerCase());
+  final data =
+      await ref.watch(podcastIndexProvider).getPodcastsByCategory(category);
 
   return FetchDataModel.fromJson(data);
 });

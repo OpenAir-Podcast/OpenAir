@@ -36,7 +36,7 @@ final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
 final podcastDataByEducationProvider =
     FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? educationPodcastData =
-      await ref.read(hiveServiceProvider).getEducationFeaturedPodcast();
+      await ref.read(hiveServiceProvider).getCategoryPodcast('Education');
 
   if (educationPodcastData != null) {
     return educationPodcastData;
@@ -51,7 +51,7 @@ final podcastDataByEducationProvider =
 
 final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? healthPodcastData =
-      await ref.read(hiveServiceProvider).getHealthFeaturedPodcast();
+      await ref.read(hiveServiceProvider).getCategoryPodcast('Health');
 
   if (healthPodcastData != null) {
     return healthPodcastData;
@@ -67,7 +67,7 @@ final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
 final podcastDataByTechnologyProvider =
     FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? tehnologyPodcastData =
-      await ref.read(hiveServiceProvider).getTechnologyFeaturedPodcast();
+      await ref.read(hiveServiceProvider).getCategoryPodcast('Technology');
 
   if (tehnologyPodcastData != null) {
     return tehnologyPodcastData;
@@ -82,7 +82,7 @@ final podcastDataByTechnologyProvider =
 
 final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? sportsPodcastData =
-      await ref.read(hiveServiceProvider).getSportsFeaturedPodcast();
+      await ref.read(hiveServiceProvider).getCategoryPodcast('Sports');
 
   if (sportsPodcastData != null) {
     return sportsPodcastData;
