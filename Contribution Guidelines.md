@@ -42,13 +42,13 @@ When suggesting an enhancement, please consider the following:
 
 We follow a standard GitHub workflow:
 
-1.  **Fork the Repository:** Create your own copy of the `openair` repository on GitHub.
+1.  **Fork the Repository:** Create your own copy of the `OpenAir` repository on GitHub.
 2.  **Create a Branch:** Create a new branch for your feature or bug fix. Choose a descriptive name (e.g., `feature/add-sleep-timer`, `bugfix/playback-controls`).
 3.  **Make Your Changes:** Write your code, adhering to the project's coding style (see below).
 4.  **Write Tests:** Ensure your changes are well-tested. Add unit, widget, or integration tests as appropriate.
 5.  **Commit Your Changes:** Make clear and concise commit messages following the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This helps us understand the purpose of your changes.
 6.  **Push to Your Fork:** Push your local branch to your GitHub repository.
-7.  **Create a Pull Request (PR):** Submit a pull request to the `main` branch of the `LiquidHive/openair` repository.
+7.  **Create a Pull Request (PR):** Submit a pull request to the `main` branch of the `OpenAir-Podcast/OpenAir` repository.
 
 ### Pull Request Guidelines
 
