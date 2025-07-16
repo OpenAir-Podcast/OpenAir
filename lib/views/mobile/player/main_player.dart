@@ -72,9 +72,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => EpisodesPage(
-                            podcast: ref.watch(openAirProvider).currentPodcast!,
-                            id: ref.watch(openAirProvider).currentPodcast!.id,
-                          ),
+                              podcast:
+                                  ref.watch(openAirProvider).currentPodcast!),
                         ),
                       );
                     },

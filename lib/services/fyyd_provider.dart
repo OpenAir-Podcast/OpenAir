@@ -60,7 +60,7 @@ class FyydProvider {
       final response = await _dio.get(
         '/feature/podcast/hot',
         queryParameters: {
-          'count': 12,
+          'count': 50,
         },
       );
 

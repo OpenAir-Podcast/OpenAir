@@ -459,7 +459,6 @@ class HiveService extends ChangeNotifier {
     return allEpisodes!.episodeCount;
   }
 
-  // FIXME HERE
   Future<String> podcastAccumulatedSubscribedEpisodes() async {
     final box = await subscriptionBox;
     final Map<String, SubscriptionModel> allSubscriptions =
@@ -479,7 +478,7 @@ class HiveService extends ChangeNotifier {
       try {
         int liveCountForThisFeed = await ref
             .read(podcastIndexProvider)
-            .getPodcastEpisodeCountByPodcastId(subscription.id);
+            .getPodcastEpisodeCountByTitle(subscription.title);
 
         int newEpisodesForThisFeed = liveCountForThisFeed - storedCount;
         if (newEpisodesForThisFeed > 0) {
@@ -499,6 +498,7 @@ class HiveService extends ChangeNotifier {
             'Error fetching live episode count for subscription ${subscription.id} (${subscription.title}). Error: $e. Stacktrace: $s. This subscription will contribute 0 to the new episodes count.');
       }
     }
+
     return totalNewEpisodes.toString();
   }
 
@@ -561,13 +561,11 @@ class HiveService extends ChangeNotifier {
 
   Future<FetchDataModel?> getCategoryPodcast(String category) async {
     final box = await categoryBox;
-    debugPrint('GET Category: $category');
     return await box.get(category);
   }
 
   void putCategoryPodcast(String category, Map<String, dynamic> data) async {
     final box = await categoryBox;
-    debugPrint('PUT Category: $category');
     await box.put(category, FetchDataModel.fromJson(data));
   }
 }

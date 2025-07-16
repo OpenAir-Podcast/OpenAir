@@ -42,7 +42,6 @@ final podcastDataByEducationProvider =
     return educationPodcastData;
   }
 
-  debugPrint('Fetching podcasts from Podcast Index');
 
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getEducationPodcasts();
@@ -373,10 +372,8 @@ class PodcastsCard extends ConsumerWidget {
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => EpisodesPage(
-                                podcast: snapshot.feeds[index],
-                                id: snapshot.feeds[index].id,
-                              ),
+                              builder: (context) =>
+                                  EpisodesPage(podcast: snapshot.feeds[index]),
                             ),
                           );
                         },

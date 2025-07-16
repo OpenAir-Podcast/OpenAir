@@ -15,9 +15,8 @@ final podcastDataByUrlProvider =
 });
 
 class EpisodesPage extends ConsumerStatefulWidget {
-  const EpisodesPage({super.key, required this.podcast, required this.id});
+  const EpisodesPage({super.key, required this.podcast});
   final PodcastModel podcast;
-  final int id;
 
   @override
   ConsumerState<EpisodesPage> createState() => _EpisodesPageState();

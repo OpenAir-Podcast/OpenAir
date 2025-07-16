@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
-import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/components/no_connection.dart';
-import 'package:openair/views/mobile/widgets/podcast_card.dart';
-
-final discoveryProvider = FutureProvider.autoDispose((ref) async {
-  final fyydAPI = ref.read(fyydProvider);
-  return await fyydAPI.getDiscoveryPodcasts();
-});
+import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
+import 'package:openair/views/mobile/widgets/discovery_podcast_card.dart';
 
 final getConnectionStatusProvider =
     FutureProvider.autoDispose<bool>((ref) async {
@@ -19,7 +13,8 @@ final getConnectionStatusProvider =
 });
 
 class DiscoveryPage extends ConsumerStatefulWidget {
-  const DiscoveryPage({super.key});
+  final AsyncValue<List<dynamic>> podcastDataAsyncValue;
+  const DiscoveryPage({super.key, required this.podcastDataAsyncValue});
 
   @override
   ConsumerState<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -29,8 +24,6 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
   @override
   @override
   Widget build(BuildContext context) {
-    final podcastDataAsyncValue = ref.watch(discoveryProvider);
-
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return Scaffold(
@@ -43,7 +36,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
             return NoConnection();
           }
 
-          return podcastDataAsyncValue.when(
+          return widget.podcastDataAsyncValue.when(
               loading: () => const Scaffold(
                     body: Center(
                       child: CircularProgressIndicator(),
@@ -83,7 +76,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                               ),
                             ),
                             onPressed: () async {
-                              ref.invalidate(discoveryProvider);
+                              ref.invalidate(podcastDataFeaturedProvider);
                             },
                             child: const Text('Retry'),
                           ),
@@ -98,8 +91,8 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                     cacheExtent: cacheExtent,
                     itemCount: data.length,
                     itemBuilder: (context, index) {
-                      return PodcastCard(
-                        podcastItem: PodcastModel.fromJson(data[index]),
+                      return DiscoveryPodcastCard(
+                        podcastItem: data[index],
                       );
                     },
                   ),

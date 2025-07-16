@@ -866,12 +866,9 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
-    // TODO Reimplement this function
     return await ref
         .read(hiveServiceProvider)
         .podcastAccumulatedSubscribedEpisodes();
-
-    // return 'REWORK';
   }
 
   Future<String> getFeedsCount() async {
@@ -1036,9 +1033,6 @@ class OpenAirProvider with ChangeNotifier {
           .read(podcastIndexProvider)
           .getPodcastEpisodeCountByPodcastId(podcast.id);
 
-      debugPrint('podcast episode count: $podcastEpisodeCount');
-      debugPrint('podcast id: ${podcast.id}');
-
       SubscriptionModel subscription = SubscriptionModel(
         id: podcast.id,
         title: podcast.title,
@@ -1102,38 +1096,14 @@ class OpenAirProvider with ChangeNotifier {
 
       ref.read(hiveServiceProvider).subscribe(subscription);
       await addPodcastEpisodes(podcast);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Subscribed to ${podcast.title}',
-            ),
-          ),
-        );
-      }
     } on DioException catch (e) {
       debugPrint(
           'Failed to subscribe to ${podcast.title}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
 
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Failed to subscribe: \'${podcast.title}\'. Try again later.'),
-          ),
-        );
-      }
+      rethrow;
     } catch (e) {
       debugPrint('Failed to subscribe to ${podcast.title}: $e');
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An unexpected error occurred while subscribing.'),
-          ),
-        );
-      }
+      rethrow;
     }
   }
 
@@ -1217,77 +1187,40 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void addPodcastByRssUrl(String rssUrl) async {
-    String xmlString;
     try {
-      xmlString = await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
+      String xmlString =
+          await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
 
       RssFeed rssFeed = RssFeed.parse(xmlString);
 
-      // TODO Remove these
-      // debugPrint(rssFeed.title);
-
-      // debugPrint(rssFeed.link);
-      // debugPrint(rssFeed.items!.first.link);
-      // debugPrint(rssFeed.itunes!.newFeedUrl);
-      // debugPrint(snapshot[index]['xmlURL']);
-
       SubscriptionModel podcast = SubscriptionModel(
-        id: 0, // ID will be assigned by Hive
-        title: rssFeed.title ?? 'Unknown Title',
-        author:
-            rssFeed.itunes?.author ?? rssFeed.dc?.creator ?? 'Unknown Author',
+        id: 0,
+        title: rssFeed.title!,
+        author: rssFeed.itunes?.author ?? rssFeed.dc?.creator ?? 'Unknown',
         feedUrl: rssUrl,
-        imageUrl: rssFeed.itunes?.image?.href ?? rssFeed.image?.url ?? '',
+        imageUrl: rssFeed.itunes!.image!.href!,
         episodeCount: 0,
-        description: rssFeed.description ?? '',
-        artwork: rssFeed.image!.url!,
+        description: rssFeed.description!,
+        artwork: rssFeed.itunes!.image!.href!,
       );
 
       subscribeByRssFeed(podcast);
-    } catch (e) {
+    } on DioException catch (e) {
+      debugPrint('Failed to add podcast by RSS URL. DioError: ${e.message}');
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              insetPadding: EdgeInsets.symmetric(
-                horizontal: 2,
-                vertical: MediaQuery.of(context).size.height * 0.3,
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 62.0,
-                vertical: 15.0,
-              ),
-              titlePadding: const EdgeInsets.symmetric(
-                horizontal: 100.0,
-                vertical: 15.0,
-              ),
-              title: const Text(
-                'Error',
-                textAlign: TextAlign.center,
-              ),
-              content: const Text(
-                'Cannot fetch podcast from RSS URL. Check if the URL is valid and try again.',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add podcast: ${e.message}'),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to add podcast by RSS URL: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An unexpected error occurred while adding podcast.'),
+          ),
         );
       }
     }

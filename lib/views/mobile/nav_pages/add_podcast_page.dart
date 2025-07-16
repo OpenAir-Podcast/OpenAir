@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
@@ -148,12 +149,12 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                               SubscriptionModel podcast = SubscriptionModel(
                                 id: snapshot[index]['id'],
                                 feedUrl: snapshot[index]['xmlURL'],
-                                title: rssFeed.title ?? '',
-                                description: rssFeed.description ?? '',
-                                author: rssFeed.author ?? '',
-                                imageUrl: snapshot[index]['imgURL'] ?? '',
-                                episodeCount: rssFeed.items?.length ?? 0,
-                                artwork: rssFeed.image!.url!,
+                                title: rssFeed.title!,
+                                description: rssFeed.description!,
+                                author: rssFeed.author ?? 'unkown',
+                                imageUrl: snapshot[index]['imgURL'],
+                                episodeCount: rssFeed.items!.length,
+                                artwork: snapshot[index]['imgURL'],
                               );
 
                               ref.read(openAirProvider).currentPodcast =
@@ -163,10 +164,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => EpisodesPage(
-                                      podcast: PodcastModel.fromJson(
-                                          podcast.toJson()),
-                                      id: podcast.id,
-                                    ),
+                                        podcast: PodcastModel.fromJson(
+                                            podcast.toJson())),
                                   ),
                                 );
                               }
@@ -236,7 +235,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DiscoveryPage(),
+                      builder: (context) => DiscoveryPage(
+                          podcastDataAsyncValue: podcastDataAsyncValue),
                     ),
                   ),
                 ),
@@ -318,10 +318,39 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             if (textInputControl.text.isEmpty) {
                               return;
                             }
+                            try {
+                              ref
+                                  .watch(openAirProvider)
+                                  .addPodcastByRssUrl(textInputControl.text);
 
-                            ref
-                                .watch(openAirProvider)
-                                .addPodcastByRssUrl(textInputControl.text);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Subscribed',
+                                  ),
+                                ),
+                              );
+                            } on DioException catch (e) {
+                              debugPrint(
+                                  'Failed to add podcast by RSS URL. DioError: ${e.message}');
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Failed to add podcast: ${e.message}'),
+                                ),
+                              );
+                            } catch (e) {
+                              debugPrint(
+                                  'Failed to add podcast by RSS URL: $e');
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'An unexpected error occurred while adding podcast.'),
+                                ),
+                              );
+                            }
                           },
                           child: const Text(
                             'Add',

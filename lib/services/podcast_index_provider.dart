@@ -99,8 +99,6 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
 
-    // debugPrint('Feed URL: $url');
-
     final response = await _retry(() => _dio.get(url));
     return response.data;
   }
@@ -108,8 +106,6 @@ class PodcastIndexProvider {
   Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=$podcastId&pretty';
-
-    // debugPrint('Podcast ID URL: $url');
 
     final response = await _retry(() => _dio.get(url));
     return response.data['feed']['episodeCount'];
@@ -121,12 +117,11 @@ class PodcastIndexProvider {
         .replaceAll('/', '%2F')
         .replaceAll('&', '%26')
         .replaceAll('(', '%28')
-        .replaceAll(')', '%29');
+        .replaceAll(')', '%29')
+        .trim();
 
     String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
     String fullUrl = '$url&pretty';
-
-    debugPrint('Podcast Title URL: $fullUrl');
 
     final response = await _retry(() => _dio.get(fullUrl));
     final feeds = response.data['feeds'];
@@ -148,8 +143,6 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
 
-    // debugPrint('Category URL: $url');
-
     final response = await _retry(() => _dio.get(url));
     ref
         .read(hiveServiceProvider)
@@ -161,8 +154,6 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
 
-    // debugPrint('Trending URL: $url');
-
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putTrendingPodcast(response.data);
     return response.data;
@@ -172,8 +163,6 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
 
-    debugPrint('Top Podcast URL: $url');
-
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putTopFeaturedPodcast(response.data);
     return response.data;
@@ -182,8 +171,6 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getEducationPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=education&lang=en&pretty';
-
-    debugPrint('Education Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
     ref
@@ -196,8 +183,6 @@ class PodcastIndexProvider {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=health&lang=en&pretty';
 
-    debugPrint('Health Podcast URL: $url');
-
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putCategoryPodcast('Health', response.data);
     return response.data;
@@ -206,8 +191,6 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=technology&lang=en&pretty';
-
-    debugPrint('Technology Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
     ref
@@ -219,8 +202,6 @@ class PodcastIndexProvider {
   Future<Map<String, dynamic>> getSportsPodcasts() async {
     const url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=sports&lang=en&pretty';
-
-    debugPrint('Sports Podcast URL: $url');
 
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putCategoryPodcast('Sports', response.data);

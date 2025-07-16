@@ -15,11 +15,8 @@ final podcastDataByCategoryProvider = FutureProvider.family
       .getCategoryPodcast(category.replaceAll(' ', ''));
 
   if (categoryPodcastData != null) {
-    debugPrint('Fetch feed from hive');
     return categoryPodcastData;
   }
-
-  debugPrint('Fetch feed from podcast index');
 
   final data =
       await ref.watch(podcastIndexProvider).getPodcastsByCategory(category);
