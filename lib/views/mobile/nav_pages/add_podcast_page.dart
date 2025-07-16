@@ -40,6 +40,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // TODO Implement this next
             TextField(
               keyboardType: TextInputType.webSearch,
               style: const TextStyle(
@@ -53,6 +54,10 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                 ),
                 labelText: 'Search Podcast (fyyd)',
               ),
+              autofocus: true,
+              onSubmitted: (value) {
+                debugPrint(value);
+              },
             ),
             SizedBox(height: 15),
             podcastDataAsyncValue.when(

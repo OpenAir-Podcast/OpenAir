@@ -15,11 +15,11 @@ OpenAir embraces open-source principles. The codebase is freely accessible, allo
 
 ## Get Involved:
 
-Clone the repository: https://github.com/LiquidHive/openair.git
+Clone the repository: https://github.com/OpenAir-Podcast/openair.git
 
-Read the contribution guidelines: [click here for contribution guidelines](https://github.com/LiquidHive/openair/blob/main/Contribution%20Guidelines.md)
+Read the contribution guidelines: [click here for contribution guidelines](https://github.com/OpenAir-Podcast/openair/blob/main/Contribution%20Guidelines.md)
 
-Join the discussion: [click here for discussion](https://github.com/LiquidHive/openair/discussions)
+Join the discussion: [click here for discussion](https://github.com/OpenAir-Podcast/openair/discussions)
 
 ## Getting Started
 
@@ -34,7 +34,7 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/LiquidHive/openair.git
+    git clone https://github.com/OpenAir-Podcast/openair.git
     ```
 2.  **Navigate to the project directory:**
     ```bash
@@ -74,7 +74,7 @@ OpenAir is licensed under the MIT License (see LICENSE file for details).
 
 ## Disclaimer
 
-OpenAir is provided "as is" without warranty of any kind, express or implied. The application relies on data provided by the PodcastIndex API and other third-party services. LiquidHive is not responsible for the accuracy, completeness, legality, or availability of podcast content accessed through OpenAir, nor for any interruptions or errors in the PodcastIndex API or other third-party services. Users are solely responsible for their use of the application and for adhering to the terms of service of any external platforms they access through OpenAir.
+OpenAir is provided "as is" without warranty of any kind, express or implied. The application relies on data provided by the PodcastIndex API and other third-party services. OpenAir-Podcast is not responsible for the accuracy, completeness, legality, or availability of podcast content accessed through OpenAir, nor for any interruptions or errors in the PodcastIndex API or other third-party services. Users are solely responsible for their use of the application and for adhering to the terms of service of any external platforms they access through OpenAir.
 
 ## About OpenAir
 
