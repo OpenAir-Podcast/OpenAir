@@ -26,6 +26,8 @@ class AddPodcast extends ConsumerStatefulWidget {
 }
 
 class _AddPodcastState extends ConsumerState<AddPodcast> {
+  TextEditingController textInputControl = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final podcastDataAsyncValue = ref.watch(podcastDataFeaturedProvider);
@@ -40,8 +42,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // TODO Implement this next
             TextField(
+              controller: textInputControl,
               keyboardType: TextInputType.webSearch,
               style: const TextStyle(
                 fontSize: 16,
@@ -53,10 +55,63 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 labelText: 'Search Podcast (fyyd)',
+                suffix: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      textInputControl.text = '';
+                      textInputControl.clear();
+                    });
+                  },
+                  icon: Icon(Icons.clear_rounded),
+                ),
               ),
               autofocus: true,
-              onSubmitted: (value) {
-                debugPrint(value);
+              onSubmitted: (value) async {
+                try {
+                  List podcasts =
+                      await ref.read(fyydProvider).searchPodcasts(value);
+
+                  if (podcasts.isEmpty) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No podcasts found for your query.'),
+                        ),
+                      );
+                    }
+                  } else {
+                    final xmlString = await ref
+                        .watch(fyydProvider)
+                        .getPodcastXml(podcasts.first['xmlURL']);
+
+                    var rssFeed = RssFeed.parse(xmlString);
+
+                    SubscriptionModel podcast = SubscriptionModel(
+                      id: podcasts.first['id'],
+                      feedUrl: podcasts.first['xmlURL'],
+                      title: rssFeed.title!,
+                      description: rssFeed.description!,
+                      author: rssFeed.author ?? 'unkown',
+                      imageUrl: podcasts.first['imgURL'],
+                      episodeCount: rssFeed.items!.length,
+                      artwork: podcasts.first['imgURL'],
+                    );
+
+                    ref.read(openAirProvider).currentPodcast =
+                        PodcastModel.fromJson(podcast.toJson());
+
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EpisodesPage(
+                              podcast: PodcastModel.fromJson(podcast.toJson())),
+                        ),
+                      );
+                    }
+                  }
+                } catch (e) {
+                  debugPrint('Error: $e');
+                }
               },
             ),
             SizedBox(height: 15),

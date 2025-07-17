@@ -42,7 +42,7 @@ class FyydProvider {
     try {
       final response = await _dio.get(
         '/search/podcast',
-        queryParameters: {'q': query},
+        queryParameters: {'title': query},
       );
 
       if (response.statusCode == 200 && response.data['data'] != null) {
