@@ -23,6 +23,8 @@ class SearchCard extends ConsumerStatefulWidget {
 class _SearchCardState extends ConsumerState<SearchCard> {
   @override
   Widget build(BuildContext context) {
+    bool isSub = false;
+
     return GestureDetector(
       onTap: () async {
         final xmlString = await ref
@@ -134,6 +136,8 @@ class _SearchCardState extends ConsumerState<SearchCard> {
                     );
                   }
 
+                  isSub = snapshot.data!;
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: IconButton(
@@ -157,27 +161,31 @@ class _SearchCardState extends ConsumerState<SearchCard> {
                           description: rssFeed.description!,
                         );
 
-                        snapshot.data!
-                            ? ref
-                                .read(openAirProvider)
-                                .unsubscribe(podcastModel)
-                            : ref.read(openAirProvider).subscribe(podcastModel);
+                        if (snapshot.data!) {
+                          ref.read(openAirProvider).unsubscribe(podcastModel);
+                          setState(() {
+                            isSub = false;
+                          });
+                        } else {
+                          ref.read(openAirProvider).subscribe(podcastModel);
+                          setState(() {
+                            isSub = true;
+                          });
+                        }
 
-                        setState(() {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  snapshot.data!
-                                      ? 'Unsubscribed from ${podcastModel.title}'
-                                      : 'Subscribed to ${podcastModel.title}',
-                                ),
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                snapshot.data!
+                                    ? 'Unsubscribed from ${podcastModel.title}'
+                                    : 'Subscribed to ${podcastModel.title}',
                               ),
-                            );
-                          }
-                        });
+                            ),
+                          );
+                        }
                       },
-                      icon: snapshot.data!
+                      icon: isSub
                           ? const Icon(Icons.check_rounded)
                           : const Icon(Icons.add_rounded),
                     ),

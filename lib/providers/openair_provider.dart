@@ -1186,9 +1186,9 @@ class OpenAirProvider with ChangeNotifier {
     debugPrint('share button clicked');
   }
 
-  void addPodcastByRssUrl(String rssUrl) async {
+  Future<bool> addPodcastByRssUrl(String rssUrl) async {
     try {
-      String xmlString =
+      String? xmlString =
           await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
 
       RssFeed rssFeed = RssFeed.parse(xmlString);
@@ -1205,24 +1205,13 @@ class OpenAirProvider with ChangeNotifier {
       );
 
       subscribeByRssFeed(podcast);
+      return true;
     } on DioException catch (e) {
-      debugPrint('Failed to add podcast by RSS URL. DioError: ${e.message}');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to add podcast: ${e.message}'),
-          ),
-        );
-      }
+      debugPrint('DioError: ${e.message}');
+      return false;
     } catch (e) {
       debugPrint('Failed to add podcast by RSS URL: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An unexpected error occurred while adding podcast.'),
-          ),
-        );
-      }
+      return false;
     }
   }
 }

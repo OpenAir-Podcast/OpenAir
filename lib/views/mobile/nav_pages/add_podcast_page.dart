@@ -7,11 +7,11 @@ import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/fyyd_search_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/widgets/loading_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
@@ -70,6 +70,14 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
               ),
               autofocus: true,
               onSubmitted: (value) async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return LoadingDialog();
+                  },
+                );
+
                 try {
                   List podcasts =
                       await ref.read(fyydProvider).searchPodcasts(value);
@@ -84,6 +92,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     }
                   } else {
                     if (context.mounted) {
+                      Navigator.pop(context);
+
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => FyydSearchPage(
@@ -371,38 +381,31 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             if (textInputControl.text.isEmpty) {
                               return;
                             }
-                            try {
-                              ref
-                                  .watch(openAirProvider)
-                                  .addPodcastByRssUrl(textInputControl.text);
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Subscribed',
+                            bool i = await ref
+                                .watch(openAirProvider)
+                                .addPodcastByRssUrl(textInputControl.text);
+
+                            debugPrint(i.toString());
+
+                            if (context.mounted) {
+                              if (i == true) {
+                                debugPrint('Subscribed');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Subscribed',
+                                    ),
                                   ),
-                                ),
-                              );
-                            } on DioException catch (e) {
-                              debugPrint(
-                                  'Failed to add podcast by RSS URL. DioError: ${e.message}');
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Failed to add podcast: ${e.message}'),
-                                ),
-                              );
-                            } catch (e) {
-                              debugPrint(
-                                  'Failed to add podcast by RSS URL: $e');
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'An unexpected error occurred while adding podcast.'),
-                                ),
-                              );
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'An unexpected error occurred while adding podcast.'),
+                                  ),
+                                );
+                              }
                             }
                           },
                           child: const Text(
@@ -491,18 +494,41 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () async {
-                            // TODO Modify this
-
                             Navigator.pop(context);
 
                             if (textInputControl.text.isEmpty) {
                               return;
                             }
 
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                const double size = 150;
+
+                                return const AlertDialog(
+                                  content: SizedBox(
+                                    height: size,
+                                    width: size,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(height: 35),
+                                          Text("Searching..."),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+
                             try {
-                              final podcast = ref
-                                  .watch(podcastIndexProvider)
-                                  .searchPodcasts(textInputControl.text);
+                              // final podcast = ref
+                              //     .watch(podcastIndexProvider)
+                              //     .searchPodcasts(textInputControl.text);
 
                               // var rssFeed = RssFeed.parse(xmlString);
 

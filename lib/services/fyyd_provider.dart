@@ -110,7 +110,7 @@ class FyydProvider {
         throw Exception('Failed to load podcast XML from $xmlUrl');
       }
     } catch (e) {
-      debugPrint('Error loading podcast XML: $e');
+      debugPrint('Podacast XML Error: $e');
       rethrow;
     }
   }
