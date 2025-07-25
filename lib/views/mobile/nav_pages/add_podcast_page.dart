@@ -7,8 +7,10 @@ import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
+import 'package:openair/views/mobile/main_pages/fyyd_search_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
@@ -43,6 +45,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
+              maxLength: 256,
               controller: textInputControl,
               keyboardType: TextInputType.webSearch,
               style: const TextStyle(
@@ -75,42 +78,32 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('No podcasts found for your query.'),
+                          content: Text('No podcasts was found.'),
                         ),
                       );
                     }
                   } else {
-                    final xmlString = await ref
-                        .watch(fyydProvider)
-                        .getPodcastXml(podcasts.first['xmlURL']);
-
-                    var rssFeed = RssFeed.parse(xmlString);
-
-                    SubscriptionModel podcast = SubscriptionModel(
-                      id: podcasts.first['id'],
-                      feedUrl: podcasts.first['xmlURL'],
-                      title: rssFeed.title!,
-                      description: rssFeed.description!,
-                      author: rssFeed.author ?? 'unkown',
-                      imageUrl: podcasts.first['imgURL'],
-                      episodeCount: rssFeed.items!.length,
-                      artwork: podcasts.first['imgURL'],
-                    );
-
-                    ref.read(openAirProvider).currentPodcast =
-                        PodcastModel.fromJson(podcast.toJson());
-
                     if (context.mounted) {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => EpisodesPage(
-                              podcast: PodcastModel.fromJson(podcast.toJson())),
+                          builder: (context) => FyydSearchPage(
+                            podcasts: podcasts,
+                            searchWord: value,
+                          ),
                         ),
                       );
                     }
                   }
                 } catch (e) {
-                  debugPrint('Error: $e');
+                  debugPrint('Failed to find podcasts: $e');
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to find podcasts.'),
+                      ),
+                    );
+                  }
                 }
               },
             ),
@@ -320,43 +313,43 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   TextEditingController textInputControl =
                       TextEditingController();
 
-                  // FIXME Adjust dialogBox size
                   return AlertDialog(
-                    insetPadding: EdgeInsets.symmetric(
-                      horizontal: 2,
-                      vertical: MediaQuery.of(context).size.height * 0.3,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.sizeOf(context).width * 0.05,
-                      vertical: 15.0,
-                    ),
-                    titlePadding: const EdgeInsets.symmetric(
-                      horizontal: 100.0,
-                      vertical: 15.0,
-                    ),
                     title: Text(
                       'Add podcast by RSS URL',
                       textAlign: TextAlign.start,
                     ),
-                    content: TextField(
-                      autofocus: true,
-                      controller: textInputControl,
-                      keyboardType: TextInputType.url,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.link_rounded,
-                          color: Theme.of(context).colorScheme.primary,
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: TextField(
+                        maxLength: 256,
+                        autofocus: true,
+                        controller: textInputControl,
+                        keyboardType: TextInputType.url,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                        labelText: 'RSS URL',
+                        decoration: InputDecoration(
+                          icon: Icon(
+                            Icons.link_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          labelText: 'RSS URL',
+                          suffix: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                textInputControl.text = '';
+                                textInputControl.clear();
+                              });
+                            },
+                            icon: Icon(Icons.clear_rounded),
+                          ),
+                        ),
                       ),
                     ),
                     actions: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
                           child: const Text(
@@ -370,7 +363,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () async {
                             Navigator.pop(context);
@@ -439,8 +432,138 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   fontSize: 18.0,
                 ),
               ),
-              onTap: () => debugPrint(
-                'Add podcast by RSS URL',
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) {
+                  TextEditingController textInputControl =
+                      TextEditingController();
+
+                  return AlertDialog(
+                    title: Text(
+                      'Search Podcast Index',
+                      textAlign: TextAlign.start,
+                    ),
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: TextField(
+                        maxLength: 256,
+                        autofocus: true,
+                        controller: textInputControl,
+                        keyboardType: TextInputType.url,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        decoration: InputDecoration(
+                          icon: Icon(
+                            Icons.title_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          labelText: 'Title',
+                          suffix: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                textInputControl.text = '';
+                                textInputControl.clear();
+                              });
+                            },
+                            icon: Icon(Icons.clear_rounded),
+                          ),
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: TextButton(
+                          onPressed: () async {
+                            // TODO Modify this
+
+                            Navigator.pop(context);
+
+                            if (textInputControl.text.isEmpty) {
+                              return;
+                            }
+
+                            try {
+                              final podcast = ref
+                                  .watch(podcastIndexProvider)
+                                  .searchPodcasts(textInputControl.text);
+
+                              // var rssFeed = RssFeed.parse(xmlString);
+
+                              // SubscriptionModel podcast = SubscriptionModel(
+                              //   id: podcasts.first['id'],
+                              //   feedUrl: podcasts.first['xmlURL'],
+                              //   title: rssFeed.title!,
+                              //   description: rssFeed.description!,
+                              //   author: rssFeed.author ?? 'unkown',
+                              //   imageUrl: podcasts.first['imgURL'],
+                              //   episodeCount: rssFeed.items!.length,
+                              //   artwork: podcasts.first['imgURL'],
+                              // );
+
+                              // ref.read(openAirProvider).currentPodcast =
+                              //     PodcastModel.fromJson(podcast.toJson());
+
+                              // if (context.mounted) {
+                              //   Navigator.of(context).push(
+                              //     MaterialPageRoute(
+                              //       builder: (context) => EpisodesPage(
+                              //           podcast: PodcastModel.fromJson(
+                              //               podcast.toJson())),
+                              //     ),
+                              //   );
+                              // }
+                            } on DioException catch (e) {
+                              debugPrint(
+                                  'Failed to add podcast by RSS URL. DioError: ${e.message}');
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Failed to add podcast: ${e.message}'),
+                                ),
+                              );
+                            } catch (e) {
+                              debugPrint(
+                                  'Failed to add podcast by RSS URL: $e');
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'An unexpected error occurred while adding podcast.'),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Search',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 10),

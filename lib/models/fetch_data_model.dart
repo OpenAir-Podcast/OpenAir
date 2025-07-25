@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
 import 'package:openair/models/podcast_model.dart';
@@ -39,6 +40,10 @@ class FetchDataModel extends HiveObject {
     if (json['feeds'] != null) {
       feeds =
           (json['feeds'] as List).map((i) => PodcastModel.fromJson(i)).toList();
+    } else {
+      debugPrint('Feeds is null');
+      feeds =
+          (json['data'] as List).map((e) => PodcastModel.fromJson(e)).toList();
     }
 
     final int maxTmp = json['max'].runtimeType == int
@@ -50,7 +55,7 @@ class FetchDataModel extends HiveObject {
     final int sinceTmp = json['since'] ?? -1;
 
     return FetchDataModel(
-      count: json['count'],
+      count: json['count'] ?? json['data'].length,
       feeds: feeds,
       status: json['status'],
       max: maxTmp,
