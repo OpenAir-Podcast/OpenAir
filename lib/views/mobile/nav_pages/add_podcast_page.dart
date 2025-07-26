@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/scale.dart';
+import 'package:openair/models/fetch_data_model.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
+import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/fyyd_search_page.dart';
+import 'package:openair/views/mobile/main_pages/podcast_index_search_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/loading_dialog.dart';
 import 'package:shimmer/shimmer.dart';
@@ -72,10 +74,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
               onSubmitted: (value) async {
                 showDialog(
                   context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return LoadingDialog();
-                  },
+                  barrierDismissible: true,
+                  builder: (BuildContext context) => LoadingDialog(),
                 );
 
                 try {
@@ -386,11 +386,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                                 .watch(openAirProvider)
                                 .addPodcastByRssUrl(textInputControl.text);
 
-                            debugPrint(i.toString());
-
                             if (context.mounted) {
                               if (i == true) {
-                                debugPrint('Subscribed');
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -473,6 +470,40 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             icon: Icon(Icons.clear_rounded),
                           ),
                         ),
+                        onSubmitted: (value) async {
+                          // Navigator.pop(context);
+
+                          if (textInputControl.text.isEmpty) {
+                            return;
+                          }
+
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (BuildContext context) => LoadingDialog(),
+                          );
+
+                          final podcast = await ref
+                              .watch(podcastIndexProvider)
+                              .searchPodcasts(textInputControl.text);
+
+                          FetchDataModel podcasts =
+                              FetchDataModel.fromJson(podcast);
+
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PodcastIndexSearchPage(
+                                  podcasts: podcasts,
+                                  searchWord: textInputControl.text,
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
                     actions: [
@@ -494,7 +525,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () async {
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
 
                             if (textInputControl.text.isEmpty) {
                               return;
@@ -502,77 +533,28 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                             showDialog(
                               context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                const double size = 150;
-
-                                return const AlertDialog(
-                                  content: SizedBox(
-                                    height: size,
-                                    width: size,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          CircularProgressIndicator(),
-                                          SizedBox(height: 35),
-                                          Text("Searching..."),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
+                              barrierDismissible: true,
+                              builder: (BuildContext context) =>
+                                  LoadingDialog(),
                             );
 
-                            try {
-                              // final podcast = ref
-                              //     .watch(podcastIndexProvider)
-                              //     .searchPodcasts(textInputControl.text);
+                            final podcast = await ref
+                                .watch(podcastIndexProvider)
+                                .searchPodcasts(textInputControl.text);
 
-                              // var rssFeed = RssFeed.parse(xmlString);
+                            FetchDataModel podcasts =
+                                FetchDataModel.fromJson(podcast);
 
-                              // SubscriptionModel podcast = SubscriptionModel(
-                              //   id: podcasts.first['id'],
-                              //   feedUrl: podcasts.first['xmlURL'],
-                              //   title: rssFeed.title!,
-                              //   description: rssFeed.description!,
-                              //   author: rssFeed.author ?? 'unkown',
-                              //   imageUrl: podcasts.first['imgURL'],
-                              //   episodeCount: rssFeed.items!.length,
-                              //   artwork: podcasts.first['imgURL'],
-                              // );
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
 
-                              // ref.read(openAirProvider).currentPodcast =
-                              //     PodcastModel.fromJson(podcast.toJson());
-
-                              // if (context.mounted) {
-                              //   Navigator.of(context).push(
-                              //     MaterialPageRoute(
-                              //       builder: (context) => EpisodesPage(
-                              //           podcast: PodcastModel.fromJson(
-                              //               podcast.toJson())),
-                              //     ),
-                              //   );
-                              // }
-                            } on DioException catch (e) {
-                              debugPrint(
-                                  'Failed to add podcast by RSS URL. DioError: ${e.message}');
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Failed to add podcast: ${e.message}'),
-                                ),
-                              );
-                            } catch (e) {
-                              debugPrint(
-                                  'Failed to add podcast by RSS URL: $e');
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'An unexpected error occurred while adding podcast.'),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => PodcastIndexSearchPage(
+                                    podcasts: podcasts,
+                                    searchWord: textInputControl.text,
+                                  ),
                                 ),
                               );
                             }

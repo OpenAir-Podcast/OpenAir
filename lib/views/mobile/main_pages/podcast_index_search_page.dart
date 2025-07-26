@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/fetch_data_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/widgets/fyyd_search_card.dart';
+import 'package:openair/views/mobile/widgets/podcast_index_search_card.dart';
 
-class FyydSearchPage extends ConsumerWidget {
-  const FyydSearchPage({
+class PodcastIndexSearchPage extends ConsumerWidget {
+  const PodcastIndexSearchPage({
     super.key,
     required this.podcasts,
     required this.searchWord,
   });
 
-  final List podcasts;
+  final FetchDataModel podcasts;
   final String searchWord;
 
   @override
@@ -35,9 +36,9 @@ class FyydSearchPage extends ConsumerWidget {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
-          itemCount: podcasts.length,
-          itemBuilder: (context, index) => FyydSearchCard(
-            podcastItem: podcasts[index],
+          itemCount: podcasts.count,
+          itemBuilder: (context, index) => PodcastIndexSearchCard(
+            podcastItem: podcasts.feeds[index],
           ),
         ),
       ),

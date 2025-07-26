@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:openair/providers/hive_provider.dart';
 
+import '../config/scale.dart';
+
 final podcastIndexProvider = Provider(
   (ref) => PodcastIndexProvider(ref),
 );
@@ -152,7 +154,7 @@ class PodcastIndexProvider {
 
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
     String url =
-        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=150&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putTrendingPodcast(response.data);
@@ -217,8 +219,10 @@ class PodcastIndexProvider {
         .replaceAll(')', '%29')
         .trim();
 
-    String url = 'https://api.podcastindex.org/api/1.0/search/byterm?q=$cat';
+    String url =
+        'https://api.podcastindex.org/api/1.0/search/byterm?max=$max&q=$cat';
     String fullUrl = '$url&pretty';
+    debugPrint(fullUrl);
 
     final response = await _retry(() => _dio.get(fullUrl));
     return response.data;
