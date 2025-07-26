@@ -586,9 +586,22 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   fontSize: 18.0,
                 ),
               ),
-              onTap: () => debugPrint(
-                'Add podcast by RSS URL',
-              ),
+              onTap: () async {
+                bool i =
+                    await ref.watch(openAirProvider).importPodcastFromOpml();
+
+                if (context.mounted) {
+                  if (i == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Imported podcasts from OPML file.',
+                        ),
+                      ),
+                    );
+                  }
+                }
+              },
             ),
           ],
         ),

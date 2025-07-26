@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,7 @@ import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
@@ -1214,4 +1216,41 @@ class OpenAirProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> importPodcastFromOpml() async {
+    String defaultFilePath;
+
+    if (Platform.isAndroid) {
+      defaultFilePath = '/storage/emulated/0/Download';
+    } else if (Platform.isIOS) {
+      defaultFilePath = (await getApplicationDocumentsDirectory()).path;
+    } else {
+      defaultFilePath = (await getDownloadsDirectory())?.path ??
+          (await getApplicationDocumentsDirectory()).path;
+    }
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Import podcast list (OPML)',
+      type: FileType.custom,
+      allowedExtensions: ['opml'],
+      initialDirectory: defaultFilePath,
+    );
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      final xml = file.readAsStringSync();
+
+      final doc = OpmlDocument.parse(xml);
+
+      for (var feed in doc.body) {
+        await addPodcastByRssUrl(feed.xmlUrl!);
+      }
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void exportPodcastToOpml() async {}
 }
