@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/models/completed_episode_model.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/models/episode_model.dart';
@@ -82,6 +83,8 @@ class OpenAirProvider with ChangeNotifier {
 
   List downloadingPodcasts = [];
 
+  late Config config;
+
   Future<void> initial(
     BuildContext context,
   ) async {
@@ -121,6 +124,10 @@ class OpenAirProvider with ChangeNotifier {
     } catch (e) {
       debugPrint(e.toString());
       hasConnection = false;
+    }
+
+    if (context.mounted) {
+      config = Config(context);
     }
   }
 

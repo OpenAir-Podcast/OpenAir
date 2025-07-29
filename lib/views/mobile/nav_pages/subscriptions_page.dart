@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -61,10 +60,14 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           ),
           body: GridView.builder(
             itemCount: subs.length,
-            cacheExtent: cacheExtent,
+            cacheExtent: ref.read(openAirProvider).config.cacheExtent,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: mobileCrossAxisCount,
-              mainAxisExtent: subscribedMobileMainAxisExtent,
+              crossAxisCount:
+                  ref.read(openAirProvider).config.mobileCrossAxisCount,
+              mainAxisExtent: ref
+                  .read(openAirProvider)
+                  .config
+                  .subscribedMobileMainAxisExtent,
             ),
             itemBuilder: (context, index) {
               return SubscriptionCard(

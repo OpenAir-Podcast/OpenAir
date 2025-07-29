@@ -446,7 +446,9 @@ class HiveService extends ChangeNotifier {
 
   Future<SettingsModel> getSettings() async {
     final box = await settingsBox;
-    return await box.get('settings');
+    var i = await box.get('settings');
+    debugPrint('Settings: $i');
+    return i;
   }
 
   // Counts

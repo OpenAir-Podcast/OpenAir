@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/episode_model.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -43,7 +42,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getFeedsProvider),
               child: ListView.builder(
-                cacheExtent: cacheExtent,
+                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(

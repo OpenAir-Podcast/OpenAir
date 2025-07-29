@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/fetch_data_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -109,7 +108,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView.builder(
-                  cacheExtent: cacheExtent,
+                  cacheExtent: ref.read(openAirProvider).config.cacheExtent,
                   itemCount: trendingData.count,
                   itemBuilder: (context, index) {
                     return PodcastCard(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
@@ -88,7 +87,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView.builder(
-                    cacheExtent: cacheExtent,
+                    cacheExtent: ref.read(openAirProvider).config.cacheExtent,
                     itemCount: data.length,
                     itemBuilder: (context, index) {
                       return DiscoveryPodcastCard(

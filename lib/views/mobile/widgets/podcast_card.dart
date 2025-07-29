@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
@@ -53,7 +52,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                   imageUrl: widget.podcastItem.imageUrl,
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Container(
-                    color: cardImageShadow,
+                    color: ref.read(openAirProvider).config.cardImageShadow,
                     child: Icon(
                       Icons.error,
                       size: 56.0,

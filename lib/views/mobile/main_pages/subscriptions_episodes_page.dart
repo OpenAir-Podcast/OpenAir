@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
@@ -155,7 +154,7 @@ class _SubscriptionsEpisodesPageState
               onRefresh: () async =>
                   ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
               child: ListView.builder(
-                cacheExtent: cacheExtent,
+                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => SubscriptionEpisodeCard(
                   title: snapshot['items'][index]['title'],

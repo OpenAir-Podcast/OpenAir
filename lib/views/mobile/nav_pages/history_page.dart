@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/history_model.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -85,7 +84,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getHistoryProvider),
               child: ListView.builder(
-                cacheExtent: cacheExtent,
+                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(

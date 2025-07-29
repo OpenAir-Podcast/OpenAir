@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/fetch_data_model.dart';
 import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/subscription_model.dart';
@@ -132,10 +131,15 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     ),
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
-                        baseColor: cardBackgroundColor!,
-                        highlightColor: highlightColor!,
+                        baseColor: ref
+                            .read(openAirProvider)
+                            .config
+                            .cardBackgroundColor!,
+                        highlightColor:
+                            ref.read(openAirProvider).config.highlightColor!,
                         child: Container(
-                          color: highlightColor,
+                          color:
+                              ref.read(openAirProvider).config.highlightColor,
                         ),
                       );
                     },
@@ -237,16 +241,36 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: cardImageShadow,
-                                    blurRadius: blurRadius,
+                                    color: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardImageShadow,
+                                    blurRadius: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .blurRadius,
                                   )
                                 ],
                               ),
-                              height: cardImageHeight,
-                              width: cardImageWidth,
+                              height: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardImageHeight,
+                              width: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardImageWidth,
                               child: CachedNetworkImage(
-                                memCacheHeight: cardImageHeight.ceil(),
-                                memCacheWidth: cardImageWidth.ceil(),
+                                memCacheHeight: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardImageHeight
+                                    .ceil(),
+                                memCacheWidth: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardImageWidth
+                                    .ceil(),
                                 imageUrl: snapshot[index]['imgURL'],
                                 fit: BoxFit.fill,
                                 errorWidget: (context, url, error) => Icon(

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/scale.dart';
 import 'package:openair/models/fetch_data_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -41,7 +40,6 @@ final podcastDataByEducationProvider =
   if (educationPodcastData != null) {
     return educationPodcastData;
   }
-
 
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getEducationPodcasts();
@@ -215,10 +213,11 @@ class PodcastsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: cardBackgroundColor,
-      elevation: cardElevation,
+      color: ref.read(openAirProvider).config.cardBackgroundColor,
+      elevation: ref.read(openAirProvider).config.cardElevation,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(cardBottomCornersRatio),
+        borderRadius: BorderRadius.circular(
+            ref.read(openAirProvider).config.cardBottomCornersRatio),
       ),
       child: podcastDataAsyncValue.when(
         loading: () => Column(
@@ -228,41 +227,66 @@ class PodcastsCard extends ConsumerWidget {
               trailing: const Text('See All'),
             ),
             SizedBox(
-              height: featuredCardHeight,
+              height: ref.read(openAirProvider).config.featuredCardHeight,
               width: double.infinity,
               child: GridView.builder(
-                itemCount: mobileItemCountPortrait,
+                itemCount:
+                    ref.read(openAirProvider).config.mobileItemCountPortrait,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: mobileCrossAxisCount,
-                  mainAxisExtent: mobileMainAxisExtent,
+                  crossAxisCount:
+                      ref.read(openAirProvider).config.mobileCrossAxisCount,
+                  mainAxisExtent:
+                      ref.read(openAirProvider).config.mobileMainAxisExtent,
                 ),
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
-                    baseColor: cardBackgroundColor!,
-                    highlightColor: highlightColor!,
+                    baseColor:
+                        ref.read(openAirProvider).config.cardBackgroundColor!,
+                    highlightColor:
+                        ref.read(openAirProvider).config.highlightColor!,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        cardSidePadding,
-                        cardTopPadding,
-                        cardSidePadding,
-                        cardTopPadding,
+                        ref.read(openAirProvider).config.cardSidePadding,
+                        ref.read(openAirProvider).config.cardTopPadding,
+                        ref.read(openAirProvider).config.cardSidePadding,
+                        ref.read(openAirProvider).config.cardTopPadding,
                       ),
                       child: Column(
                         children: [
                           Container(
-                            color: highlightColor2,
-                            height: cardImageHeight - 14.0,
-                            width: cardImageWidth,
+                            color: ref
+                                .read(openAirProvider)
+                                .config
+                                .highlightColor2,
+                            height: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardImageHeight -
+                                14.0,
+                            width:
+                                ref.read(openAirProvider).config.cardImageWidth,
                           ),
                           Container(
-                            color: highlightColor,
-                            height: cardLabelHeight - 14.0,
-                            width: cardLabelWidth,
+                            color:
+                                ref.read(openAirProvider).config.highlightColor,
+                            height: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardLabelHeight -
+                                14.0,
+                            width:
+                                ref.read(openAirProvider).config.cardLabelWidth,
                           ),
                           Container(
-                            color: highlightColor,
-                            height: cardLabelHeight - 14.0,
-                            width: cardLabelWidth,
+                            color:
+                                ref.read(openAirProvider).config.highlightColor,
+                            height: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardLabelHeight -
+                                14.0,
+                            width:
+                                ref.read(openAirProvider).config.cardLabelWidth,
                           ),
                         ],
                       ),
@@ -318,18 +342,24 @@ class PodcastsCard extends ConsumerWidget {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(cardTopCornersRatio),
-                    topRight: Radius.circular(cardTopCornersRatio),
+                    topLeft: Radius.circular(
+                        ref.read(openAirProvider).config.cardTopCornersRatio),
+                    topRight: Radius.circular(
+                        ref.read(openAirProvider).config.cardTopCornersRatio),
                   ),
                 ),
-                tileColor: cardHeaderColor,
+                tileColor: ref.read(openAirProvider).config.cardHeaderColor,
                 leading: Text(
                   title,
-                  style: TextStyle(color: cardHeaderTextColor),
+                  style: TextStyle(
+                      color:
+                          ref.read(openAirProvider).config.cardHeaderTextColor),
                 ),
                 trailing: Text(
                   'See All',
-                  style: TextStyle(color: cardHeaderTextColor),
+                  style: TextStyle(
+                      color:
+                          ref.read(openAirProvider).config.cardHeaderTextColor),
                 ),
                 onTap: () {
                   Navigator.of(context).push(
@@ -348,22 +378,25 @@ class PodcastsCard extends ConsumerWidget {
                 },
               ),
               SizedBox(
-                height: featuredCardHeight,
+                height: ref.read(openAirProvider).config.featuredCardHeight,
                 width: double.infinity,
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: mobileItemCountPortrait,
+                  itemCount:
+                      ref.read(openAirProvider).config.mobileItemCountPortrait,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: mobileCrossAxisCount,
-                    mainAxisExtent: mobileMainAxisExtent,
+                    crossAxisCount:
+                        ref.read(openAirProvider).config.mobileCrossAxisCount,
+                    mainAxisExtent:
+                        ref.read(openAirProvider).config.mobileMainAxisExtent,
                   ),
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.fromLTRB(
-                        cardSidePadding,
-                        cardTopPadding,
-                        cardSidePadding,
-                        cardTopPadding,
+                        ref.read(openAirProvider).config.cardSidePadding,
+                        ref.read(openAirProvider).config.cardTopPadding,
+                        ref.read(openAirProvider).config.cardSidePadding,
+                        ref.read(openAirProvider).config.cardTopPadding,
                       ),
                       child: GestureDetector(
                         onTap: () {
@@ -383,16 +416,36 @@ class PodcastsCard extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: cardImageShadow,
-                                    blurRadius: blurRadius,
+                                    color: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardImageShadow,
+                                    blurRadius: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .blurRadius,
                                   )
                                 ],
                               ),
-                              height: cardImageHeight,
-                              width: cardImageWidth,
+                              height: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardImageHeight,
+                              width: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardImageWidth,
                               child: CachedNetworkImage(
-                                memCacheHeight: cardImageHeight.ceil(),
-                                memCacheWidth: cardImageWidth.ceil(),
+                                memCacheHeight: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardImageHeight
+                                    .ceil(),
+                                memCacheWidth: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardImageWidth
+                                    .ceil(),
                                 imageUrl: snapshot.feeds[index].artwork,
                                 fit: BoxFit.fill,
                                 errorWidget: (context, url, error) => Icon(
@@ -402,27 +455,57 @@ class PodcastsCard extends ConsumerWidget {
                               ),
                             ),
                             Container(
-                              height: cardLabelHeight,
-                              width: cardLabelWidth,
+                              height: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardLabelHeight,
+                              width: ref
+                                  .read(openAirProvider)
+                                  .config
+                                  .cardLabelWidth,
                               decoration: BoxDecoration(
-                                color: cardLabelBackground,
+                                color: ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardLabelBackground,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: cardLabelShadow,
-                                    blurRadius: blurRadius,
+                                    color: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardLabelShadow,
+                                    blurRadius: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .blurRadius,
                                   ),
                                 ],
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(cardLabelPadding),
+                                padding: EdgeInsets.all(ref
+                                    .read(openAirProvider)
+                                    .config
+                                    .cardLabelPadding),
                                 child: Text(
                                   snapshot.feeds[index].title,
-                                  maxLines: cardLabelMaxLines,
+                                  maxLines: ref
+                                      .read(openAirProvider)
+                                      .config
+                                      .cardLabelMaxLines,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: cardLabelTextColor,
-                                    fontSize: cardLabelFontSize,
-                                    fontWeight: cardLabelFontWeight,
+                                    color: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardLabelTextColor,
+                                    fontSize: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardLabelFontSize,
+                                    fontWeight: ref
+                                        .read(openAirProvider)
+                                        .config
+                                        .cardLabelFontWeight,
                                   ),
                                 ),
                               ),
