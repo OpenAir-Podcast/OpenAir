@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
@@ -22,8 +23,12 @@ class _SettingsState extends ConsumerState<Settings> {
             ListTile(
               leading: Icon(Icons.display_settings_rounded),
               title: Text('User Interface'),
-              subtitle: Text('Apperance and theme'),
-              onTap: () {},
+              subtitle: Text('Apperance , Theme, Font Size, Language, Voice'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserInterface(),
+                ),
+              ),
             ),
             ListTile(
               leading: Icon(Icons.play_arrow_rounded),
@@ -38,10 +43,12 @@ class _SettingsState extends ConsumerState<Settings> {
                   'Update Interval, Automactic Downloads, Automactic Delete'),
               onTap: () {},
             ),
+            Divider(),
             ListTile(
               leading: Icon(Icons.cloud_download_outlined),
               title: Text('Synchronization'),
-              subtitle: Text('Synchronize podcasts'),
+              subtitle:
+                  Text('Synchronize Subscriptions,  Queue, History, Settings'),
               onTap: () {},
             ),
             ListTile(
@@ -50,6 +57,7 @@ class _SettingsState extends ConsumerState<Settings> {
               subtitle: Text('Move subscriptions, queue, and history'),
               onTap: () {},
             ),
+            Divider(),
             ListTile(
               leading: Icon(Icons.notifications_none_rounded),
               title: Text('Notificatins'),

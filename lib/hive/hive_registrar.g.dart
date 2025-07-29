@@ -2,7 +2,17 @@
 // Do not modify
 // Check in to version control
 
-part of 'hive_adapters.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:openair/models/completed_episode_model.dart';
+import 'package:openair/models/download_model.dart';
+import 'package:openair/models/episode_model.dart';
+import 'package:openair/models/feed_model.dart';
+import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/models/history_model.dart';
+import 'package:openair/models/podcast_model.dart';
+import 'package:openair/models/queue_model.dart';
+import 'package:openair/models/settings_model.dart';
+import 'package:openair/models/subscription_model.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {

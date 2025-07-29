@@ -20,7 +20,7 @@ class FetchDataModelAdapter extends TypeAdapter<FetchDataModel> {
       count: (fields[2] as num).toInt(),
       feeds: (fields[1] as List).cast<PodcastModel>(),
       status: fields[0] as String,
-      max: (fields[3] as num).toInt(),
+      max: (fields[3] as num?)?.toInt(),
       since: (fields[4] as num).toInt(),
       description: fields[5] as String,
     );

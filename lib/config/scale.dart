@@ -55,3 +55,5 @@ double cardLabelPadding = 8.0;
 double cacheExtent = 500.0;
 
 int max = 150;
+
+double settingsSpacer = 8.0;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 
 AppBar mainAppBar(WidgetRef ref, BuildContext context) {
   return AppBar(
@@ -16,21 +15,9 @@ AppBar mainAppBar(WidgetRef ref, BuildContext context) {
         child: IconButton(
           tooltip: 'Refreash',
           onPressed: () {
-            // TODO Implement refreash mechanic 
+            // TODO Implement refreash mechanic
           },
           icon: const Icon(Icons.refresh_rounded),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          tooltip: 'Search Podcasts',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => AddPodcast(),
-            ),
-          ),
-          icon: const Icon(Icons.search),
         ),
       ),
     ],

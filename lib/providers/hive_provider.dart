@@ -12,11 +12,12 @@ import 'package:openair/models/podcast_model.dart';
 import 'package:openair/models/queue_model.dart';
 import 'package:openair/models/download_model.dart';
 import 'package:openair/models/history_model.dart';
-import 'package:openair/models/settings_model.dart';
 import 'package:openair/models/fetch_data_model.dart';
+import 'package:openair/models/settings_model.dart';
 import 'package:openair/models/subscription_model.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -60,7 +61,7 @@ class HiveService extends ChangeNotifier {
   late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
-  late final Future<CollectionBox<SettingsModel>> settingsBox;
+  late final Future<CollectionBox> settingsBox;
 
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
@@ -437,21 +438,18 @@ class HiveService extends ChangeNotifier {
   }
 
   // Settings Operations:
-  Future<void> saveSettings(SettingsModel settings) async {
+  void saveSettings(SettingsModel settings) async {
     final box = await settingsBox;
     await box.put('settings', settings);
+    ref.invalidate(settingsDataProvider);
   }
 
-  Future<SettingsModel?> getSettings() async {
+  Future<SettingsModel> getSettings() async {
     final box = await settingsBox;
-    return box.get('settings');
+    return await box.get('settings');
   }
 
-  Future<void> deleteSettings() async {
-    final box = await settingsBox;
-    await box.delete('settings'); // Add await
-  }
-
+  // Counts
   Future<int> podcastSubscribedEpisodeCount(String title) async {
     final box = await subscriptionBox;
     final SubscriptionModel? allEpisodes = await box.get(title);

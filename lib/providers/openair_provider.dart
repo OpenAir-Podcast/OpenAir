@@ -868,9 +868,12 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
-    return await ref
-        .read(hiveServiceProvider)
-        .podcastAccumulatedSubscribedEpisodes();
+    // FIXME Rework this
+    // return await ref
+    //     .read(hiveServiceProvider)
+    //     .podcastAccumulatedSubscribedEpisodes();
+
+    return 'rework';
   }
 
   Future<String> getFeedsCount() async {

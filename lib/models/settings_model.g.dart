@@ -17,19 +17,34 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SettingsModel(
-      language: fields[0] as String,
-      theme: fields[1] as String,
+      themeMode: fields[0] as String,
+      accentColor: fields[1] as String,
+      fontSize: fields[2] as String,
+      language: fields[3] as String,
+      voice: fields[4] as String,
+      speechRate: fields[5] as String,
+      pitch: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, SettingsModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.language)
+      ..write(obj.themeMode)
       ..writeByte(1)
-      ..write(obj.theme);
+      ..write(obj.accentColor)
+      ..writeByte(2)
+      ..write(obj.fontSize)
+      ..writeByte(3)
+      ..write(obj.language)
+      ..writeByte(4)
+      ..write(obj.voice)
+      ..writeByte(5)
+      ..write(obj.speechRate)
+      ..writeByte(6)
+      ..write(obj.pitch);
   }
 
   @override
