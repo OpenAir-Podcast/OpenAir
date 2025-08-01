@@ -1,16 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:openair/models/settings_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/nav_pages/settings_page.dart';
 import 'package:theme_provider/theme_provider.dart';
-
-final settingsDataProvider = FutureProvider(
-  (ref) async {
-    SettingsModel? settings = await ref.read(hiveServiceProvider).getSettings();
-    return settings;
-  },
-);
 
 class UserInterface extends ConsumerStatefulWidget {
   const UserInterface({super.key});
@@ -23,6 +16,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsDataProvider);
+    late String fontSize;
 
     return Scaffold(
       appBar: AppBar(
@@ -30,6 +24,24 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
       ),
       body: settings.when(
         data: (data) {
+          switch (data!.getFontSizeFactor) {
+            case 0.875:
+              fontSize = 'Small';
+              break;
+            case 1.0:
+              fontSize = 'Medium';
+              break;
+            case 1.125:
+              fontSize = 'Large';
+              break;
+            case 1.25:
+              fontSize = 'Extra Large';
+              break;
+            default:
+              fontSize = 'Medium';
+              break;
+          }
+
           return ListView(
             children: [
               ListTile(
@@ -53,10 +65,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.themeModeString,
+                    value: data.getThemeMode,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.themeModeString = newValue!;
+                        data.setThemeMode = newValue!;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
 
@@ -66,244 +78,29 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             .platformBrightness;
 
                         if (platformBrightness == Brightness.dark) {
-                          switch (data.accentColorString) {
-                            case 'Blue':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark');
-                              break;
-                            case 'Red':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('red_accent_dark');
-                              break;
-                            case 'Green':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('green_accent_dark');
-                              break;
-                            case 'Yellow':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('yellow_accent_dark');
-                              break;
-                            case 'Orange':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('orange_accent_dark');
-                              break;
-                            case 'Purple':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('purple_accent_dark');
-                              break;
-                            case 'Pink':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('pink_accent_dark');
-                              break;
-                            case 'Teal':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('teal_accent_dark');
-                              break;
-                            case 'Cyan':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('cyan_accent_dark');
-                              break;
-                            case 'Indigo':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('indigo_accent_dark');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark');
-                          }
+                          ThemeProvider.controllerOf(context)
+                              .setTheme('blue_accent_dark');
                         } else {
-                          switch (data.accentColorString) {
-                            case 'Blue':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light');
-                              break;
-                            case 'Red':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('red_accent_light');
-                              break;
-                            case 'Green':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('green_accent_light');
-                              break;
-                            case 'Yellow':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('yellow_accent_light');
-                              break;
-                            case 'Orange':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('orange_accent_light');
-                              break;
-                            case 'Purple':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('purple_accent_light');
-                              break;
-                            case 'Pink':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('pink_accent_light');
-                              break;
-                            case 'Teal':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('teal_accent_light');
-                              break;
-                            case 'Cyan':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('cyan_accent_light');
-                              break;
-                            case 'Indigo':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('indigo_accent_light');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light');
-                          }
+                          ThemeProvider.controllerOf(context)
+                              .setTheme('blue_accent_light');
                         }
 
-                        ThemeProvider.controllerOf(context).forgetSavedTheme();
+                        ThemeProvider.controllerOf(context).saveThemeToDisk();
                       } else if (newValue == 'Light') {
-                        switch (data.accentColorString) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_light');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_light');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_light');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_light');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_light');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_light');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_light');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_light');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_light');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light');
-                        }
+                        ThemeProvider.controllerOf(context)
+                            .setTheme('blue_accent_light');
 
-                        ThemeProvider.controllerOf(context).forgetSavedTheme();
+                        ThemeProvider.controllerOf(context).saveThemeToDisk();
                       } else if (newValue == 'Dark') {
-                        switch (data.accentColorString) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_dark');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_dark');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_dark');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_dark');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_dark');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_dark');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_dark');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_dark');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_dark');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark');
-                        }
+                        ThemeProvider.controllerOf(context)
+                            .setTheme('blue_accent_dark');
 
-                        ThemeProvider.controllerOf(context).forgetSavedTheme();
+                        ThemeProvider.controllerOf(context).saveThemeToDisk();
                       } else if (newValue == 'Black/AMOLED') {
-                        switch (data.accentColorString) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_amoled');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_amoled');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_amoled');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_amoled');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_amoled');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_amoled');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_amoled');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_amoled');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_amoled');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_amoled');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_amoled');
-                        }
+                        ThemeProvider.controllerOf(context)
+                            .setTheme('blue_accent_amoled');
 
-                        ThemeProvider.controllerOf(context).forgetSavedTheme();
+                        ThemeProvider.controllerOf(context).saveThemeToDisk();
                       }
                     },
                     items: <String>[
@@ -311,283 +108,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       'Light',
                       'Dark',
                       'Black/AMOLED',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              SizedBox(height: ref.read(openAirProvider).config.settingsSpacer),
-              ListTile(
-                title: Text('Accent Color'),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    value: data.accentColorString,
-                    onChanged: (String? newValue) {
-                      data.accentColorString = newValue!;
-                      ref.watch(hiveServiceProvider).saveSettings(data);
-
-                      if (data.themeModeString == 'System') {
-                        Brightness platformBrightness = View.of(context)
-                            .platformDispatcher
-                            .platformBrightness;
-
-                        if (platformBrightness == Brightness.dark) {
-                          switch (newValue) {
-                            case 'Blue':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark');
-                              break;
-                            case 'Red':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('red_accent_dark');
-                              break;
-                            case 'Green':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('green_accent_dark');
-                              break;
-                            case 'Yellow':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('yellow_accent_dark');
-                              break;
-                            case 'Orange':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('orange_accent_dark');
-                              break;
-                            case 'Purple':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('purple_accent_dark');
-                              break;
-                            case 'Pink':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('pink_accent_dark');
-                              break;
-                            case 'Teal':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('teal_accent_dark');
-                              break;
-                            case 'Cyan':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('cyan_accent_dark');
-                              break;
-                            case 'Indigo':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('indigo_accent_dark');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark');
-                          }
-                        } else {
-                          switch (newValue) {
-                            case 'Blue':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light');
-                              break;
-                            case 'Red':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('red_accent_light');
-                              break;
-                            case 'Green':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('green_accent_light');
-                              break;
-                            case 'Yellow':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('yellow_accent_light');
-                              break;
-                            case 'Orange':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('orange_accent_light');
-                              break;
-                            case 'Purple':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('purple_accent_light');
-                              break;
-                            case 'Pink':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('pink_accent_light');
-                              break;
-                            case 'Teal':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('teal_accent_light');
-                              break;
-                            case 'Cyan':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('cyan_accent_light');
-                              break;
-                            case 'Indigo':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('indigo_accent_light');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light');
-                          }
-                        }
-                      } else if (data.themeModeString == 'Light') {
-                        switch (newValue) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_light');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_light');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_light');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_light');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_light');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_light');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_light');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_light');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_light');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light');
-                        }
-                      } else if (data.themeModeString == 'Dark') {
-                        switch (newValue) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_dark');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_dark');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_dark');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_dark');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_dark');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_dark');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_dark');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_dark');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_dark');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark');
-                        }
-                      } else if (data.themeModeString == 'Black/AMOLED') {
-                        switch (newValue) {
-                          case 'Blue':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_amoled');
-                            break;
-                          case 'Red':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('red_accent_amoled');
-                            break;
-                          case 'Green':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('green_accent_amoled');
-                            break;
-                          case 'Yellow':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('yellow_accent_amoled');
-                            break;
-                          case 'Orange':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('orange_accent_amoled');
-                            break;
-                          case 'Purple':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('purple_accent_amoled');
-                            break;
-                          case 'Pink':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('pink_accent_amoled');
-                            break;
-                          case 'Teal':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('teal_accent_amoled');
-                            break;
-                          case 'Cyan':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('cyan_accent_amoled');
-                            break;
-                          case 'Indigo':
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('indigo_accent_amoled');
-                            break;
-                          default:
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_amoled');
-                        }
-                      }
-                    },
-                    items: <String>[
-                      'Blue',
-                      'Red',
-                      'Green',
-                      'Yellow',
-                      'Orange',
-                      'Purple',
-                      'Pink',
-                      'Teal',
-                      'Cyan',
-                      'Indigo'
                     ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -611,10 +131,31 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.fontSizeString,
+                    value: fontSize,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.fontSizeString = newValue!;
+                        fontSize = newValue!;
+
+                        double scaleFactor;
+
+                        switch (newValue) {
+                          case 'Small':
+                            scaleFactor = 0.875;
+                            break;
+                          case 'Medium':
+                            scaleFactor = 1.0;
+                            break;
+                          case 'Large':
+                            scaleFactor = 1.125;
+                            break;
+                          case 'Extra Large':
+                            scaleFactor = 1.25;
+                            break;
+                          default:
+                            scaleFactor = 1.0;
+                        }
+
+                        data.setFontSizeFactor = scaleFactor;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
                     },
@@ -646,10 +187,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.languageString,
+                    value: data.setLanguage,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.languageString = newValue!;
+                        data.setLanguage = newValue!;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
                     },
@@ -702,10 +243,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.voiceString,
+                    value: data.getVoice,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.voiceString = newValue!;
+                        data.setVoice = newValue!;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
                     },
@@ -733,10 +274,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.speechRateString,
+                    value: data.getSpeechRate,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.speechRateString = newValue!;
+                        data.setSpeechRate = newValue!;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
                     },
@@ -768,10 +309,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.pitchString,
+                    value: data.getPitch,
                     onChanged: (String? newValue) {
                       setState(() {
-                        data.pitchString = newValue!;
+                        data.setPitch = newValue!;
                         ref.watch(hiveServiceProvider).saveSettings(data);
                       });
                     },

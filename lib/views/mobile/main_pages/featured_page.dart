@@ -10,8 +10,8 @@ import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:theme_provider/theme_provider.dart';
 
-// TODO Rework to only fetch the data once then store it using hive
 // Add a button to refresh data
 
 final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
@@ -348,18 +348,12 @@ class PodcastsCard extends ConsumerWidget {
                         ref.read(openAirProvider).config.cardTopCornersRatio),
                   ),
                 ),
-                tileColor: ref.read(openAirProvider).config.cardHeaderColor,
+                tileColor: ThemeProvider.themeOf(context).data.primaryColor,
                 leading: Text(
                   title,
-                  style: TextStyle(
-                      color:
-                          ref.read(openAirProvider).config.cardHeaderTextColor),
                 ),
                 trailing: Text(
                   'See All',
-                  style: TextStyle(
-                      color:
-                          ref.read(openAirProvider).config.cardHeaderTextColor),
                 ),
                 onTap: () {
                   Navigator.of(context).push(

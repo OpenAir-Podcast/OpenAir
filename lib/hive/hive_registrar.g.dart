@@ -25,6 +25,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(FeedModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FetchDataModelAdapter());
+    registerAdapter(FetchDataModelAdapter());
     registerAdapter(HistoryModelAdapter());
     registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
@@ -33,6 +34,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(QueueModelAdapter());
     registerAdapter(SettingsModelAdapter());
     registerAdapter(SettingsModelAdapter());
+    registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }
 }
@@ -48,6 +50,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(FeedModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FetchDataModelAdapter());
+    registerAdapter(FetchDataModelAdapter());
     registerAdapter(HistoryModelAdapter());
     registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
@@ -56,6 +59,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(QueueModelAdapter());
     registerAdapter(SettingsModelAdapter());
     registerAdapter(SettingsModelAdapter());
+    registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }
 }

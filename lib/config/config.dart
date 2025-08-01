@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:theme_provider/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 class Config {
   Color? cardBackgroundColor = Colors.blueGrey[100];
@@ -9,7 +10,8 @@ class Config {
   double cardElevation = 5.0;
 
   Color cardHeaderColor = Colors.blue;
-  Color cardHeaderTextColor = Colors.white;
+
+  late Color cardHeaderTextColor = Colors.black;
 
   Color cardImageShadow = Colors.brown;
   Color cardLabelShadow = Colors.brown;
@@ -60,12 +62,12 @@ class Config {
   double settingsSpacer = 8.0;
 
   BuildContext context;
-  Config(this.context);
+  Ref<OpenAirProvider> ref;
 
-  Color get textColor {
-    return ThemeProvider.themeOf(context).data.scaffoldBackgroundColor ==
-            Colors.black
-        ? Colors.white
-        : Colors.black;
-  }
+  Config(this.context, this.ref);
+
+  double fontSizeSmall = 0.875;
+  double fontSizeMedium = 1.0;
+  double fontSizeLarge = 1.125;
+  double fontSizeExtraLarge = 1.25;
 }

@@ -17,7 +17,7 @@ import 'package:openair/models/settings_model.dart';
 import 'package:openair/models/subscription_model.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
+import 'package:openair/views/mobile/nav_pages/settings_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -444,11 +444,9 @@ class HiveService extends ChangeNotifier {
     ref.invalidate(settingsDataProvider);
   }
 
-  Future<SettingsModel> getSettings() async {
+  Future<SettingsModel?> getSettings() async {
     final box = await settingsBox;
-    var i = await box.get('settings');
-    debugPrint('Settings: $i');
-    return i;
+    return await box.get('settings');
   }
 
   // Counts

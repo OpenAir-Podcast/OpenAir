@@ -127,7 +127,7 @@ class OpenAirProvider with ChangeNotifier {
     }
 
     if (context.mounted) {
-      config = Config(context);
+      config = Config(context, ref);
     }
   }
 
@@ -1263,4 +1263,8 @@ class OpenAirProvider with ChangeNotifier {
   }
 
   void exportPodcastToOpml() async {}
+
+  void updateFontSize(String size){
+    
+  }
 }

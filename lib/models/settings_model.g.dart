@@ -19,7 +19,7 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
     return SettingsModel(
       themeMode: fields[0] as String,
       accentColor: fields[1] as String,
-      fontSize: fields[2] as String,
+      fontSizeFactor: (fields[2] as num).toDouble(),
       language: fields[3] as String,
       voice: fields[4] as String,
       speechRate: fields[5] as String,
@@ -36,7 +36,7 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       ..writeByte(1)
       ..write(obj.accentColor)
       ..writeByte(2)
-      ..write(obj.fontSize)
+      ..write(obj.fontSizeFactor)
       ..writeByte(3)
       ..write(obj.language)
       ..writeByte(4)

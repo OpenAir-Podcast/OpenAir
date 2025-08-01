@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/models/settings_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
+
+final settingsDataProvider = FutureProvider(
+  (ref) async {
+    SettingsModel? settings = await ref.read(hiveServiceProvider).getSettings();
+
+    if (settings == null) {
+      debugPrint('Here');
+      SettingsModel newSettings = SettingsModel.defaultSettings();
+      ref.read(hiveServiceProvider).saveSettings(newSettings);
+    }
+
+    return settings;
+  },
+);
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});

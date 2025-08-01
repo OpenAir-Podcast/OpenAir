@@ -8,7 +8,7 @@ class SettingsModel extends HiveObject {
   SettingsModel({
     required this.themeMode,
     required this.accentColor,
-    required this.fontSize,
+    required this.fontSizeFactor,
     required this.language,
     required this.voice,
     required this.speechRate,
@@ -22,7 +22,7 @@ class SettingsModel extends HiveObject {
   String accentColor;
 
   @HiveField(2)
-  String fontSize;
+  double fontSizeFactor;
 
   @HiveField(3)
   String language;
@@ -40,7 +40,7 @@ class SettingsModel extends HiveObject {
     return SettingsModel(
       themeMode: 'System',
       accentColor: 'Blue',
-      fontSize: 'Medium',
+      fontSizeFactor: 1.0,
       language: 'English',
       voice: 'System',
       speechRate: 'Medium',
@@ -48,24 +48,24 @@ class SettingsModel extends HiveObject {
     );
   }
 
-  String get themeModeString => themeMode;
-  String get accentColorString => accentColor;
-  String get fontSizeString => fontSize;
-  String get languageString => language;
-  String get voiceString => voice;
-  String get speechRateString => speechRate;
-  String get pitchString => pitch;
+  String get getThemeMode => themeMode;
+  String get getAccentColor => accentColor;
+  double get getFontSizeFactor => fontSizeFactor;
+  String get setLanguage => language;
+  String get getVoice => voice;
+  String get getSpeechRate => speechRate;
+  String get getPitch => pitch;
 
-  set themeModeString(String value) => themeMode = value;
-  set accentColorString(String value) => accentColor = value;
-  set fontSizeString(String value) => fontSize = value;
-  set languageString(String value) => language = value;
-  set voiceString(String value) => voice = value;
-  set speechRateString(String value) => speechRate = value;
-  set pitchString(String value) => pitch = value;
+  set setThemeMode(String value) => themeMode = value;
+  set setAccentColor(String value) => accentColor = value;
+  set setFontSizeFactor(double value) => fontSizeFactor = value;
+  set setLanguage(String value) => language = value;
+  set setVoice(String value) => voice = value;
+  set setSpeechRate(String value) => speechRate = value;
+  set setPitch(String value) => pitch = value;
 
   @override
   String toString() {
-    return 'themeMode: $themeMode, accentColor: $accentColor, fontSize: $fontSize, language: $language, voice: $voice, speechRate: $speechRate, pitch: $pitch';
+    return 'themeMode: $themeMode, accentColor: $accentColor, fontSize: $fontSizeFactor, language: $language, voice: $voice, speechRate: $speechRate, pitch: $pitch';
   }
 }
