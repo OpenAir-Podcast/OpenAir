@@ -1,14 +1,14 @@
 import 'package:hive_ce/hive.dart';
-import 'package:openair/models/completed_episode_model.dart';
-import 'package:openair/models/download_model.dart';
-import 'package:openair/models/episode_model.dart';
-import 'package:openair/models/feed_model.dart';
-import 'package:openair/models/fetch_data_model.dart';
-import 'package:openair/models/history_model.dart';
-import 'package:openair/models/queue_model.dart';
-import 'package:openair/models/podcast_model.dart';
-import 'package:openair/models/settings_model.dart';
-import 'package:openair/models/subscription_model.dart';
+import 'package:openair/hive_models/completed_episode_model.dart';
+import 'package:openair/hive_models/download_model.dart';
+import 'package:openair/hive_models/episode_model.dart';
+import 'package:openair/hive_models/feed_model.dart';
+import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/hive_models/history_model.dart';
+import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/hive_models/settings_model.dart';
+import 'package:openair/hive_models/subscription_model.dart';
 
 @GenerateAdapters([
   AdapterSpec<PodcastModel>(),
@@ -18,8 +18,8 @@ import 'package:openair/models/subscription_model.dart';
   AdapterSpec<DownloadModel>(),
   AdapterSpec<HistoryModel>(),
   AdapterSpec<CompletedEpisodeModel>(),
-  AdapterSpec<SettingsModelAdapter>(),
   AdapterSpec<FetchDataModelAdapter>(),
   AdapterSpec<SubscriptionModelAdapter>(),
+  AdapterSpec<SettingsModelAdapter>(),
 ])
 class HiveAdapters {}

@@ -167,7 +167,15 @@ types:
     typeId: 15
     nextIndex: 2
     fields:
-      language:
+      themeMode:
         index: 0
-      theme:
+      fontSizeFactor:
         index: 1
+      language:
+        index: 2
+      voice:
+        index: 3
+      speechRate:
+        index: 4
+      pitch:
+        index: 5

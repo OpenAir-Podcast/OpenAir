@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
-import 'package:openair/models/history_model.dart';
-import 'package:openair/models/podcast_model.dart';
+import 'package:openair/hive_models/history_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';

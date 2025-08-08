@@ -87,16 +87,17 @@ class _MyAppState extends ConsumerState<MyApp> {
           final settings = ref.watch(settingsDataProvider);
 
           return settings.when(
+            skipLoadingOnReload: true,
+            skipLoadingOnRefresh: true,
             data: (data) {
-              debugPrint(data!.getFontSizeFactor.toString());
-
               return ThemeProvider(
-                defaultThemeId: 'blue_accent_light',
+                defaultThemeId: 'blue_accent_light_medium',
                 saveThemesOnChange: true,
                 loadThemeOnInit: true,
                 themes: [
+                  // Light Theme
                   AppTheme(
-                    id: "blue_accent_light",
+                    id: "blue_accent_light_small",
                     description: "Light theme with blue accent",
                     data: ThemeData(
                       brightness: Brightness.light,
@@ -123,12 +124,109 @@ class _MyAppState extends ConsumerState<MyApp> {
                         onError: Colors.white,
                       ),
                       textTheme: Theme.of(context).textTheme.apply(
-                            fontSizeFactor: data.getFontSizeFactor,
+                            fontSizeFactor: 0.875,
                           ),
                     ),
                   ),
                   AppTheme(
-                    id: "blue_accent_dark",
+                    id: "blue_accent_light_medium",
+                    description: "Light theme with blue accent",
+                    data: ThemeData(
+                      brightness: Brightness.light,
+                      scaffoldBackgroundColor: Colors.white,
+                      primaryColor: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue,
+                      ),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      cardColor: Colors.grey[50],
+                      colorScheme: ColorScheme.light(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        secondary: Colors.blueAccent,
+                        onSecondary: Colors.white,
+                        surface: Colors.grey[100]!,
+                        onSurface: Colors.black,
+                        error: Colors.red[700]!,
+                        onError: Colors.white,
+                      ),
+                      textTheme: Theme.of(context).textTheme.apply(
+                            fontSizeFactor: 1.0,
+                          ),
+                    ),
+                  ),
+                  AppTheme(
+                    id: "blue_accent_light_large",
+                    description: "Light theme with blue accent",
+                    data: ThemeData(
+                      brightness: Brightness.light,
+                      scaffoldBackgroundColor: Colors.white,
+                      primaryColor: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue,
+                      ),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      cardColor: Colors.grey[50],
+                      colorScheme: ColorScheme.light(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        secondary: Colors.blueAccent,
+                        onSecondary: Colors.white,
+                        surface: Colors.grey[100]!,
+                        onSurface: Colors.black,
+                        error: Colors.red[700]!,
+                        onError: Colors.white,
+                      ),
+                      textTheme: Theme.of(context).textTheme.apply(
+                            fontSizeFactor: 1.125,
+                          ),
+                    ),
+                  ),
+                  AppTheme(
+                    id: "blue_accent_light_extra_large",
+                    description: "Light theme with blue accent",
+                    data: ThemeData(
+                      brightness: Brightness.light,
+                      scaffoldBackgroundColor: Colors.white,
+                      primaryColor: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue,
+                      ),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      cardColor: Colors.grey[50],
+                      colorScheme: ColorScheme.light(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        secondary: Colors.blueAccent,
+                        onSecondary: Colors.white,
+                        surface: Colors.grey[100]!,
+                        onSurface: Colors.black,
+                        error: Colors.red[700]!,
+                        onError: Colors.white,
+                      ),
+                      textTheme: Theme.of(context).textTheme.apply(
+                            fontSizeFactor: 1.25,
+                          ),
+                    ),
+                  ),
+                  // Dark Theme
+                  AppTheme(
+                    id: "blue_accent_dark_small",
                     description: "Dark theme with blue accent",
                     data: ThemeData(
                       brightness: Brightness.dark,
@@ -155,13 +253,13 @@ class _MyAppState extends ConsumerState<MyApp> {
                         onError: Colors.black,
                       ),
                       textTheme: Theme.of(context).textTheme.apply(
-                            fontSizeFactor: data.getFontSizeFactor,
+                            fontSizeFactor: 0.875,
                           ),
                     ),
                   ),
                   AppTheme(
-                    id: "blue_accent_amoled",
-                    description: "AMOLED theme with blue accent",
+                    id: "blue_accent_dark_medium",
+                    description: "Dark theme with blue accent",
                     data: ThemeData(
                       brightness: Brightness.dark,
                       scaffoldBackgroundColor: Colors.black,
@@ -175,7 +273,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                       ),
-                      cardColor: Colors.black,
+                      cardColor: Colors.grey[900],
                       colorScheme: ColorScheme.dark(
                         primary: Colors.blue,
                         onPrimary: Colors.white,
@@ -183,11 +281,75 @@ class _MyAppState extends ConsumerState<MyApp> {
                         onSecondary: Colors.white,
                         surface: Colors.grey[850]!,
                         onSurface: Colors.white,
-                        error: Colors.redAccent,
+                        error: Colors.red[400]!,
                         onError: Colors.black,
                       ),
                       textTheme: Theme.of(context).textTheme.apply(
-                            fontSizeFactor: data.getFontSizeFactor,
+                            fontSizeFactor: 1.0,
+                          ),
+                    ),
+                  ),
+                  AppTheme(
+                    id: "blue_accent_dark_large",
+                    description: "Dark theme with blue accent",
+                    data: ThemeData(
+                      brightness: Brightness.dark,
+                      scaffoldBackgroundColor: Colors.black,
+                      primaryColor: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.blue,
+                      ),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      cardColor: Colors.grey[900],
+                      colorScheme: ColorScheme.dark(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        secondary: Colors.blueAccent,
+                        onSecondary: Colors.white,
+                        surface: Colors.grey[850]!,
+                        onSurface: Colors.white,
+                        error: Colors.red[400]!,
+                        onError: Colors.black,
+                      ),
+                      textTheme: Theme.of(context).textTheme.apply(
+                            fontSizeFactor: 1.125,
+                          ),
+                    ),
+                  ),
+                  AppTheme(
+                    id: "blue_accent_dark_extra_large",
+                    description: "Dark theme with blue accent",
+                    data: ThemeData(
+                      brightness: Brightness.dark,
+                      scaffoldBackgroundColor: Colors.black,
+                      primaryColor: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.blue,
+                      ),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      cardColor: Colors.grey[900],
+                      colorScheme: ColorScheme.dark(
+                        primary: Colors.blue,
+                        onPrimary: Colors.white,
+                        secondary: Colors.blueAccent,
+                        onSecondary: Colors.white,
+                        surface: Colors.grey[850]!,
+                        onSurface: Colors.white,
+                        error: Colors.red[400]!,
+                        onError: Colors.black,
+                      ),
+                      textTheme: Theme.of(context).textTheme.apply(
+                            fontSizeFactor: 1.25,
                           ),
                     ),
                   ),

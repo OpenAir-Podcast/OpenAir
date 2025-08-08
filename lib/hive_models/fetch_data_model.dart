@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/hive_types.dart';
-import 'package:openair/models/podcast_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
 
 part 'fetch_data_model.g.dart';
 

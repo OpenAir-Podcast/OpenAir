@@ -18,6 +18,9 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
     final settings = ref.watch(settingsDataProvider);
     late String fontSize;
 
+    Brightness platformBrightness =
+        View.of(context).platformDispatcher.platformBrightness;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Interface'),
@@ -69,45 +72,105 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         data.setThemeMode = newValue!;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
                       });
 
                       if (newValue == 'System') {
-                        Brightness platformBrightness = View.of(context)
-                            .platformDispatcher
-                            .platformBrightness;
-
                         if (platformBrightness == Brightness.dark) {
-                          ThemeProvider.controllerOf(context)
-                              .setTheme('blue_accent_dark');
-                        } else {
-                          ThemeProvider.controllerOf(context)
-                              .setTheme('blue_accent_light');
+                          switch (data.getFontSizeFactor) {
+                            case 0.875:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_small');
+                              break;
+                            case 1.0:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_medium');
+                              break;
+                            case 1.125:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_large');
+                              break;
+                            case 1.25:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_extra_large');
+                              break;
+                            default:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_medium');
+                          }
+                        } else if (platformBrightness == Brightness.light) {
+                          switch (data.getFontSizeFactor) {
+                            case 0.875:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_small');
+                              break;
+                            case 1.0:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_medium');
+                              break;
+                            case 1.125:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_large');
+                              break;
+                            case 1.25:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_extra_large');
+                              break;
+                            default:
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_medium');
+                          }
                         }
-
-                        ThemeProvider.controllerOf(context).saveThemeToDisk();
                       } else if (newValue == 'Light') {
-                        ThemeProvider.controllerOf(context)
-                            .setTheme('blue_accent_light');
-
-                        ThemeProvider.controllerOf(context).saveThemeToDisk();
+                        switch (data.getFontSizeFactor) {
+                          case 0.875:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_small');
+                            break;
+                          case 1.0:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_medium');
+                            break;
+                          case 1.125:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_large');
+                            break;
+                          case 1.25:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_extra_large');
+                            break;
+                          default:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_medium');
+                        }
                       } else if (newValue == 'Dark') {
-                        ThemeProvider.controllerOf(context)
-                            .setTheme('blue_accent_dark');
-
-                        ThemeProvider.controllerOf(context).saveThemeToDisk();
-                      } else if (newValue == 'Black/AMOLED') {
-                        ThemeProvider.controllerOf(context)
-                            .setTheme('blue_accent_amoled');
-
-                        ThemeProvider.controllerOf(context).saveThemeToDisk();
+                        switch (data.getFontSizeFactor) {
+                          case 0.875:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_small');
+                            break;
+                          case 1.0:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_medium');
+                            break;
+                          case 1.125:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_large');
+                            break;
+                          case 1.25:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_extra_large');
+                            break;
+                          default:
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_medium');
+                        }
                       }
                     },
                     items: <String>[
                       'System',
                       'Light',
                       'Dark',
-                      'Black/AMOLED',
                     ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -135,7 +198,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         fontSize = newValue!;
-
                         double scaleFactor;
 
                         switch (newValue) {
@@ -156,7 +218,57 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         }
 
                         data.setFontSizeFactor = scaleFactor;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
+
+                        switch (
+                            ThemeProvider.themeOf(context).data.brightness) {
+                          case Brightness.dark:
+                            switch (scaleFactor) {
+                              case 0.875:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_dark_small');
+                                break;
+                              case 1.0:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_dark_medium');
+                                break;
+                              case 1.125:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_dark_large');
+                                break;
+                              case 1.25:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_dark_extra_large');
+                                break;
+                              default:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_dark_medium');
+                            }
+                            break;
+                          case Brightness.light:
+                            switch (scaleFactor) {
+                              case 0.875:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_light_small');
+                                break;
+                              case 1.0:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_light_medium');
+                                break;
+                              case 1.125:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_light_large');
+                                break;
+                              case 1.25:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_light_extra_large');
+                                break;
+                              default:
+                                ThemeProvider.controllerOf(context)
+                                    .setTheme('blue_accent_light_medium');
+                            }
+                            break;
+                        }
                       });
                     },
                     items: <String>[
@@ -187,11 +299,11 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: data.setLanguage,
+                    value: data.getLanguage,
                     onChanged: (String? newValue) {
                       setState(() {
                         data.setLanguage = newValue!;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
                       });
                     },
                     items: <String>[
@@ -247,11 +359,14 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         data.setVoice = newValue!;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
                       });
                     },
-                    items: <String>['System', 'Male', 'Female']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: <String>[
+                      'System',
+                      'Male',
+                      'Female',
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(
@@ -278,7 +393,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         data.setSpeechRate = newValue!;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
                       });
                     },
                     items: <String>[
@@ -313,7 +428,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         data.setPitch = newValue!;
-                        ref.watch(hiveServiceProvider).saveSettings(data);
+                        ref.read(hiveServiceProvider).saveSettings(data);
                       });
                     },
                     items: <String>[

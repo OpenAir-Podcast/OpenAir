@@ -5,19 +5,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 
-import 'package:openair/models/completed_episode_model.dart';
-import 'package:openair/models/episode_model.dart';
-import 'package:openair/models/feed_model.dart';
-import 'package:openair/models/podcast_model.dart';
-import 'package:openair/models/queue_model.dart';
-import 'package:openair/models/download_model.dart';
-import 'package:openair/models/history_model.dart';
-import 'package:openair/models/fetch_data_model.dart';
-import 'package:openair/models/settings_model.dart';
-import 'package:openair/models/subscription_model.dart';
+import 'package:openair/hive_models/completed_episode_model.dart';
+import 'package:openair/hive_models/episode_model.dart';
+import 'package:openair/hive_models/feed_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/hive_models/download_model.dart';
+import 'package:openair/hive_models/history_model.dart';
+import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/hive_models/settings_model.dart';
+import 'package:openair/hive_models/subscription_model.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/nav_pages/settings_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -61,7 +60,7 @@ class HiveService extends ChangeNotifier {
   late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
-  late final Future<CollectionBox> settingsBox;
+  late final Future<CollectionBox<SettingsModel>> settingsBox;
 
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
@@ -83,10 +82,11 @@ class HiveService extends ChangeNotifier {
     Hive.registerAdapter(DownloadModelAdapter());
     Hive.registerAdapter(HistoryModelAdapter());
     Hive.registerAdapter(CompletedEpisodeModelAdapter());
-    Hive.registerAdapter(SettingsModelAdapter());
     Hive.registerAdapter(SubscriptionModelAdapter());
 
     Hive.registerAdapter(FetchDataModelAdapter());
+
+    Hive.registerAdapter(SettingsModelAdapter());
 
     // Get the application documents directory
     if (!kIsWeb) {
@@ -129,14 +129,19 @@ class HiveService extends ChangeNotifier {
     completedEpisodeBox =
         collection.openBox<CompletedEpisodeModel>('completed_episodes');
 
-    settingsBox = collection.openBox<SettingsModel>('settings');
+    settingsBox = collection.openBox('settings');
+
+    final settings = await settingsBox;
+
+    if (await settings.get('settings') == null) {
+      debugPrint('Settings box is empty. Initializing default settings.');
+      await settings.put('settings', SettingsModel.defaultSettings());
+    }
 
     // Trending page
-
     trendingBox = collection.openBox<FetchDataModel>('trending');
 
     // Featured page
-
     topFeaturedBox = collection.openBox<FetchDataModel>('top_featured');
 
     // Category page
@@ -441,7 +446,6 @@ class HiveService extends ChangeNotifier {
   void saveSettings(SettingsModel settings) async {
     final box = await settingsBox;
     await box.put('settings', settings);
-    ref.invalidate(settingsDataProvider);
   }
 
   Future<SettingsModel?> getSettings() async {
