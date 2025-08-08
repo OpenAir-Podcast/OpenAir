@@ -398,6 +398,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_localizations_plus:
+    dependency: "direct main"
+    description:
+      name: flutter_localizations_plus
+      sha256: "826b009bf61fbdd794f9160af27826082bd56087b734d098a8f09cb33cedbcfd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

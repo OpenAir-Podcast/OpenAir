@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:flutter_localizations_plus/localization.dart';
+import 'package:flutter_localizations_plus/src/locale_config.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -49,6 +54,24 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
   }
+
+  // [{locale, name, abbr, region, i10n, fallback}] e.g. [{locale: "en_US", name: "English (United States)", abbr: "en", region: "US"}]
+  List<LocaleConfig> formatted = Translations.support([
+    Localization.en_US,
+    Localization.es_ES,
+    Localization.fr_CA,
+    Localization.de_DE,
+    Localization.it_IT,
+    Localization.pt_BR,
+    Localization.ru_RU,
+    Localization.zh_CN,
+    Localization.ja_JP,
+    Localization.ko_KR,
+    Localization.ar,
+    Localization.he,
+    Localization.nl,
+    Localization.sv,
+  ], selected: Platform.localeName, fallback: Localization.en_US);
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +381,11 @@ class _MyAppState extends ConsumerState<MyApp> {
                   child: Builder(
                     builder: (themeContext) {
                       return MaterialApp(
+                        supportedLocales: Translations.supportedLocales,
+                        localizationsDelegates: const [
+                          LocalizationsPlusDelegate(),
+                          FallbackCupertinoLocalizationsDelegate()
+                        ],
                         debugShowCheckedModeBanner: false,
                         title: 'OpenAir',
                         theme: ThemeProvider.themeOf(themeContext).data,
