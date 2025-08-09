@@ -55,7 +55,6 @@ class _MyAppState extends ConsumerState<MyApp> {
     if (mounted) await ref.read(openAirProvider).initial(context);
   }
 
-  // [{locale, name, abbr, region, i10n, fallback}] e.g. [{locale: "en_US", name: "English (United States)", abbr: "en", region: "US"}]
   List<LocaleConfig> formatted = Translations.support([
     Localization.en_US,
     Localization.es_ES,
