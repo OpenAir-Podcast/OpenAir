@@ -517,6 +517,9 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       setState(() {
                         settingsModel.setLanguage = saveValue;
                         settingsModel.setLocale = locale;
+                        localeSettings = locale;
+                        onChanged = false;
+
                         Translations.changeLanguage(locale);
 
                         ref
@@ -691,7 +694,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
           );
         },
         error: (error, stackTrace) {
-          return Text(error.toString());
+          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());

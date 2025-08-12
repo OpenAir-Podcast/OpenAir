@@ -3,17 +3,21 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
-import 'package:openair/views/mobile/main_pages/featured_page.dart';
 import 'package:openair/components/no_connection.dart';
 
+final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
+  final apiService = ref.read(openAirProvider);
+  return await apiService.getConnectionStatus();
+});
+
 class CategoriesPage extends ConsumerStatefulWidget {
-  CategoriesPage({super.key});
+  const CategoriesPage({super.key});
 
-  final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-    final apiService = ref.read(openAirProvider);
-    return await apiService.getConnectionStatus();
-  });
+  @override
+  ConsumerState<CategoriesPage> createState() => _CategoriesPageState();
+}
 
+class _CategoriesPageState extends ConsumerState<CategoriesPage> {
   final List<IconData> sortedIcons = [
     Icons.pets_rounded, // Animals
     Icons.animation_rounded, // Animation
@@ -93,11 +97,6 @@ class CategoriesPage extends ConsumerStatefulWidget {
     Icons.tv_rounded // TV
   ];
 
-  @override
-  ConsumerState<CategoriesPage> createState() => _CategoriesPageState();
-}
-
-class _CategoriesPageState extends ConsumerState<CategoriesPage> {
   @override
   Widget build(BuildContext context) {
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
@@ -202,7 +201,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                     sortedCategories[index],
                   ),
                   leading: Icon(
-                    widget.sortedIcons[index],
+                    sortedIcons[index],
                   ),
                   onTap: () {
                     Navigator.of(context).push(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/hive_models/settings_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/categories_page.dart';
@@ -17,80 +18,112 @@ class MobileScaffold extends ConsumerStatefulWidget {
   ConsumerState<MobileScaffold> createState() => _MobileScaffoldState();
 }
 
-class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
+class _MobileScaffoldState extends ConsumerState<MobileScaffold>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: ref.read(hiveServiceProvider).getSettings(),
-        builder: (context, asyncSnapshot) {
-          if (asyncSnapshot.hasData) {
-            String? currentRouteName = ModalRoute.of(context)?.settings.name;
+    TabController? tabController = TabController(length: 3, vsync: this);
 
-            if (!onChanged) {
-              onChanged = true;
-              debugPrint('Current route: $currentRouteName');
-              Translations.changeLanguage(
-                asyncSnapshot.data!.locale,
-              );
-            }
-          }
-
-          return DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                elevation: 4.0,
-                shadowColor: Colors.grey,
-                title: Text(
-                  Translations.of(context).text('openAir'),
-                  textAlign: TextAlign.left,
-                ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
-                      tooltip: Translations.of(context).text('refresh'),
-                      onPressed: () {
-                        // TODO Implement refreash mechanic
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                    ),
-                  ),
-                ],
-                bottom: TabBar(
-                  tabs: [
-                    Tab(
-                      icon: Icon(Icons.home_rounded),
-                    ),
-                    Tab(
-                      icon: Icon(Icons.trending_up_rounded),
-                    ),
-                    Tab(
-                      icon: Icon(Icons.category_rounded),
-                    )
-                  ],
-                ),
-              ),
-              drawer: const AppDrawer(),
-              body: TabBarView(
-                children: [
-                  const FeaturedPage(),
-                  const TrendingPage(),
-                  CategoriesPage(),
-                ],
-              ),
-              bottomNavigationBar: SizedBox(
-                height: ref.watch(
-                        openAirProvider.select((p) => p.isPodcastSelected))
-                    ? 80.0
-                    : 0.0,
-                child: ref.watch(
-                        openAirProvider.select((p) => p.isPodcastSelected))
-                    ? const BannerAudioPlayer()
-                    : const SizedBox.shrink(),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 4.0,
+          shadowColor: Colors.grey,
+          title: Text(
+            Translations.of(context).text('openAir'),
+            textAlign: TextAlign.left,
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                tooltip: Translations.of(context).text('refresh'),
+                onPressed: () {
+                  // TODO Implement refreash mechanic
+                },
+                icon: const Icon(Icons.refresh_rounded),
               ),
             ),
-          );
-        });
+          ],
+          bottom: TabBar(
+            controller: tabController,
+            tabs: [
+              Tab(
+                icon: Icon(Icons.home_rounded),
+              ),
+              Tab(
+                icon: Icon(Icons.trending_up_rounded),
+              ),
+              Tab(
+                icon: Icon(Icons.category_rounded),
+              )
+            ],
+          ),
+        ),
+        drawer: AppDrawer(),
+        onDrawerChanged: (isOpened) {
+          if (!isOpened && !onChanged) {
+            int currentIndex = tabController.index;
+            const int durationTime = 1000;
+
+            switch (currentIndex) {
+              case 0:
+                tabController.index = 1;
+                // tabController.animateTo(1);
+                Future.delayed(
+                  const Duration(milliseconds: durationTime),
+                  () {
+                    tabController.index = 0;
+                    // tabController.animateTo(0);
+                  },
+                );
+
+                break;
+              case 1:
+                tabController.index = 2;
+                // tabController.animateTo(2);
+                Future.delayed(
+                  const Duration(milliseconds: durationTime),
+                  () {
+                    tabController.index = 1;
+                    // tabController.animateTo(1);
+                  },
+                );
+                break;
+              case 2:
+                tabController.index = 0;
+                // tabController.animateTo(0);
+                Future.delayed(
+                  const Duration(milliseconds: durationTime),
+                  () {
+                    tabController.index = 2;
+                    // tabController.animateTo(2);
+                  },
+                );
+                break;
+            }
+
+            onChanged = true;
+          }
+        },
+        body: TabBarView(
+          controller: tabController,
+          children: [
+            const FeaturedPage(),
+            const TrendingPage(),
+            const CategoriesPage(),
+          ],
+        ),
+        bottomNavigationBar: SizedBox(
+          height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+              ? 80.0
+              : 0.0,
+          child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+              ? const BannerAudioPlayer()
+              : const SizedBox.shrink(),
+        ),
+      ),
+    );
   }
 }

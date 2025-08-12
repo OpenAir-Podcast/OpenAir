@@ -33,10 +33,16 @@ class _SettingsState extends ConsumerState<Settings> {
               title: Text(Translations.of(context).text('userInterface')),
               subtitle:
                   Text(Translations.of(context).text('userInterfaceSubtitle')),
-              onTap: () => Navigator.of(context).push(
+              onTap: () => Navigator.of(context)
+                  .push(
                 MaterialPageRoute(
                   builder: (context) => const UserInterface(),
                 ),
+              )
+                  .then(
+                (value) {
+                  setState(() {});
+                },
               ),
             ),
             ListTile(

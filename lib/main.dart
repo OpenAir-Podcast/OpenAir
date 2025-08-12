@@ -372,11 +372,25 @@ class _MyAppState extends ConsumerState<MyApp> {
                       debugShowCheckedModeBanner: false,
                       title: 'OpenAir',
                       theme: themeData,
-                      home: ResponsiveLayout(
-                        mobileScaffold: MobileScaffold(),
-                        tabletScaffold: TabletScaffold(),
-                        desktopScaffold: DesktopScaffold(),
-                      ),
+                      home: FutureBuilder(
+                          future: ref.read(hiveServiceProvider).getLocale(),
+                          builder: (context, asyncSnapshot) {
+                            if (asyncSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Scaffold(
+                                body:
+                                    Center(child: CircularProgressIndicator()),
+                              );
+                            }
+
+                            Translations.changeLanguage(asyncSnapshot.data!);
+
+                            return ResponsiveLayout(
+                              mobileScaffold: MobileScaffold(),
+                              tabletScaffold: TabletScaffold(),
+                              desktopScaffold: DesktopScaffold(),
+                            );
+                          }),
                     );
                   } catch (e, stack) {
                     debugPrint(

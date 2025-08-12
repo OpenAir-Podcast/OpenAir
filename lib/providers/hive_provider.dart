@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -145,12 +144,6 @@ class HiveService extends ChangeNotifier {
 
     if (await settings.get('settings') == null) {
       await settings.put('settings', SettingsModel.defaultSettings());
-    } else {
-      SettingsModel? settingsModel = await settings.get('settings');
-      String locale = settingsModel!.locale;
-
-      Translations.changeLanguage(locale);
-      debugPrint('HiveService: Language set to $locale');
     }
   }
 
@@ -457,6 +450,22 @@ class HiveService extends ChangeNotifier {
   Future<SettingsModel?> getSettings() async {
     final box = await settingsBox;
     return await box.get('settings');
+  }
+
+  Future<String> getLocale() async {
+    final box = await settingsBox;
+    final settings = await box.get('settings');
+    return settings?.getLocale ?? 'en_US';
+  }
+
+  Future<void> setLocale(String locale) async {
+    final box = await settingsBox;
+    final settings = await box.get('settings');
+    
+    if (settings != null) {
+      settings.setLocale = locale;
+      await box.put('settings', settings);
+    }
   }
 
   // Counts

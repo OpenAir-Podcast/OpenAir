@@ -1,7 +1,6 @@
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
@@ -33,7 +32,9 @@ final downloadsCountProvider = FutureProvider.autoDispose<String>((ref) async {
 });
 
 class AppDrawer extends ConsumerStatefulWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({
+    super.key,
+  });
 
   @override
   ConsumerState<AppDrawer> createState() => _AppDrawerState();
@@ -47,10 +48,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
     final AsyncValue<String> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
-
-    setState(() {
-      onChanged = false;
-    });
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -282,9 +279,15 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             leading: const Icon(Icons.settings_rounded),
             title: Text(Translations.of(context).text('settings')),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.of(context).push(
+              // Navigator.pop(context);
+              Navigator.of(context)
+                  .push(
                 MaterialPageRoute(builder: (context) => Settings()),
+              )
+                  .then(
+                (value) {
+                  if (context.mounted) Navigator.pop(context);
+                },
               );
             },
           ),

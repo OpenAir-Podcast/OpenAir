@@ -63,4 +63,5 @@ double fontSizeMedium = 1.0;
 double fontSizeLarge = 1.125;
 double fontSizeExtraLarge = 1.25;
 
-bool onChanged = false;
+bool onChanged = true;
+String localeSettings = 'en_US';
