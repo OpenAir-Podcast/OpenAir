@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
@@ -52,7 +54,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                   imageUrl: widget.podcastItem.imageUrl,
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Container(
-                    color: ref.read(openAirProvider).config.cardImageShadow,
+                    color: cardImageShadow,
                     child: Icon(
                       Icons.error,
                       size: 56.0,
@@ -82,9 +84,8 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 120.0,
                           child: Text(
-                            widget.podcastItem.author.isNotEmpty
-                                ? widget.podcastItem.author
-                                : 'Unknown',
+                            widget.podcastItem.author ??
+                                Translations.of(context).text('unknown'),
                             maxLines: 2,
                             style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
@@ -118,8 +119,9 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: IconButton(
                       tooltip: snapshot.data!
-                          ? 'Unsubscribe to podcast'
-                          : 'Subscribe to podcast',
+                          ? Translations.of(context)
+                              .text('unsubscribeToPodcast')
+                          : Translations.of(context).text('subscribeToPodcast'),
                       onPressed: () async {
                         snapshot.data!
                             ? ref
@@ -133,8 +135,8 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? 'Unsubscribed from ${widget.podcastItem.title}'
-                                  : 'Subscribed to ${widget.podcastItem.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                             ),
                           ),
                         );

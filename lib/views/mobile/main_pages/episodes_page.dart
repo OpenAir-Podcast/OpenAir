@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
@@ -33,8 +35,6 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
 
-    bool once = false;
-
     return podcastDataAsyncValue.when(
       loading: () => Scaffold(
         appBar: AppBar(),
@@ -54,14 +54,14 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               ),
               const SizedBox(height: 20.0),
               Text(
-                'Oops, an error occurred...',
+                Translations.of(context).text('oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '$error',
+                Translations.of(context).text('oopsTryAgainLater'),
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 20.0),
@@ -77,7 +77,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   onPressed: () async {
                     ref.invalidate(podcastIndexProvider);
                   },
-                  child: const Text('Retry'),
+                  child: Text(Translations.of(context).text('retry')),
                 ),
               ),
             ],
@@ -90,8 +90,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             title: Text(ref.watch(openAirProvider).currentPodcast!.title),
             actions: [
               IconButton(
-                tooltip: 'Podcast details',
-                onPressed: () {
+                tooltip: Translations.of(context).text('podcastDetails'),
+                onPressed: () async {
                   // TODO Go to a screen that shows the details of the podcast
                 },
                 icon: Icon(
@@ -104,22 +104,15 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                     .watch(openAirProvider)
                     .isSubscribed(widget.podcast.title),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData == false && !once) {
-                    once = true;
-
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text('...'),
-                    );
-                  }
-
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: IconButton(
                       tooltip: snapshot.hasData
                           ? snapshot.data!
-                              ? 'Unsubscribe to podcast'
-                              : 'Subscribe to podcast'
+                              ? Translations.of(context)
+                                  .text('unsubscribeToPodcast')
+                              : Translations.of(context)
+                                  .text('subscribeToPodcast')
                           : '...',
                       onPressed: () async {
                         snapshot.data! && snapshot.hasData
@@ -134,8 +127,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? 'Unsubscribed from ${widget.podcast.title}'
-                                  : 'Subscribed to ${widget.podcast.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
                             ),
                           ),
                         );
@@ -159,7 +152,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               onRefresh: () async =>
                   ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
               child: ListView.builder(
-                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+                cacheExtent: cacheExtent,
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => EpisodeCard(
                   title: snapshot['items'][index]['title'],

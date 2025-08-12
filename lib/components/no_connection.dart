@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 
@@ -21,7 +22,7 @@ class NoConnection extends ConsumerWidget {
           ),
           const SizedBox(height: 20.0),
           Text(
-            'Oops, an error occurred...',
+            Translations.of(context).text('oopsAnErrorOccurred'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20.0,
@@ -29,7 +30,7 @@ class NoConnection extends ConsumerWidget {
             ),
           ),
           Text(
-            'Please connect to network and try again',
+            Translations.of(context).text('pleaseConnectToNetwork'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16.0),
           ),
@@ -46,7 +47,7 @@ class NoConnection extends ConsumerWidget {
               onPressed: () async {
                 ref.read(openAirProvider).getConnectionStatusTriggered();
               },
-              child: const Text('Retry'),
+              child: Text(Translations.of(context).text('retry')),
             ),
           ),
         ],

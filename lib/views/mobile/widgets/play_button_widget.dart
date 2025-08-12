@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 
@@ -93,7 +94,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       );
     }
 
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
@@ -102,7 +103,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           ),
           child: Icon(Icons.stream_rounded),
         ),
-        Text('Playing'),
+        Text(Translations.of(context).text('playing')),
       ],
     );
   }

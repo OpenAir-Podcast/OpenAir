@@ -1,5 +1,7 @@
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
@@ -46,6 +48,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<String> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
 
+    setState(() {
+      onChanged = false;
+    });
+
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
@@ -62,6 +68,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // TODO: Replace with OpenAir logo
                         Icon(Icons.person_rounded, size: 80.0),
                         ElevatedButton(
                           onPressed: () {
@@ -72,7 +79,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                               ),
                             );
                           },
-                          child: const Text('Login'),
+                          child: Text(Translations.of(context).text('signIn')),
                         ),
                       ],
                     ),
@@ -81,7 +88,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 // Home button
                 ListTile(
                   leading: const Icon(Icons.home_rounded),
-                  title: const Text('Home'),
+                  title: Text(Translations.of(context).text('home')),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, '/');
@@ -93,7 +100,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   loading: () {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscriptions'),
+                      title:
+                          Text(Translations.of(context).text('subscriptions')),
                       trailing: const Text('...'),
                       onTap: () {
                         Navigator.pop(context);
@@ -107,7 +115,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   error: (error, stackTrace) {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscriptions'),
+                      title:
+                          Text(Translations.of(context).text('subscriptions')),
                       trailing: ElevatedButton(
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(subCountProvider),
@@ -124,7 +133,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   data: (String data) {
                     return ListTile(
                       leading: const Icon(Icons.subscriptions_rounded),
-                      title: const Text('Subscriptions'),
+                      title:
+                          Text(Translations.of(context).text('subscriptions')),
                       trailing: Text(data),
                       onTap: () {
                         Navigator.pop(context);
@@ -142,14 +152,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   loading: () {
                     return ListTile(
                       leading: const Icon(Icons.feed_rounded),
-                      title: const Text('Feeds'),
+                      title: Text(Translations.of(context).text('feeds')),
                       trailing: const Text('...'),
                     );
                   },
                   error: (error, stackTrace) {
                     return ListTile(
                       leading: const Icon(Icons.feed_rounded),
-                      title: const Text('Feeds'),
+                      title: Text(Translations.of(context).text('feeds')),
                       trailing: ElevatedButton(
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(feedCountProvider),
@@ -159,7 +169,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   data: (String data) {
                     return ListTile(
                       leading: const Icon(Icons.feed_rounded),
-                      title: const Text('Feeds'),
+                      title: Text(Translations.of(context).text('feeds')),
                       trailing: Text(data),
                       onTap: () {
                         Navigator.pop(context);
@@ -176,14 +186,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   loading: () {
                     return ListTile(
                       leading: const Icon(Icons.queue_music_rounded),
-                      title: const Text('Queue'),
+                      title: Text(Translations.of(context).text('queue')),
                       trailing: const Text('...'),
                     );
                   },
                   error: (error, stackTrace) {
                     return ListTile(
                       leading: const Icon(Icons.queue_music_rounded),
-                      title: const Text('Queue'),
+                      title: Text(Translations.of(context).text('queue')),
                       trailing: ElevatedButton(
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(queueCountProvider),
@@ -193,7 +203,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   data: (String data) {
                     return ListTile(
                       leading: const Icon(Icons.queue_music_rounded),
-                      title: const Text('Queue'),
+                      title: Text(Translations.of(context).text('queue')),
                       trailing: Text(data),
                       onTap: () {
                         Navigator.pop(context);
@@ -210,14 +220,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   loading: () {
                     return ListTile(
                       leading: const Icon(Icons.download_rounded),
-                      title: const Text('Downloads'),
+                      title: Text(Translations.of(context).text('downloads')),
                       trailing: const Text('...'),
                     );
                   },
                   error: (error, stackTrace) {
                     return ListTile(
                       leading: const Icon(Icons.download_rounded),
-                      title: const Text('Downloads'),
+                      title: Text(Translations.of(context).text('downloads')),
                       trailing: ElevatedButton(
                         child: const Text('Retry'),
                         onPressed: () => ref.invalidate(queueCountProvider),
@@ -227,7 +237,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   data: (String data) {
                     return ListTile(
                       leading: const Icon(Icons.download_rounded),
-                      title: const Text('Downloads'),
+                      title: Text(Translations.of(context).text('downloads')),
                       trailing: Text(data),
                       onTap: () {
                         Navigator.pop(context);
@@ -243,7 +253,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 // History button
                 ListTile(
                   leading: const Icon(Icons.history_rounded),
-                  title: const Text('History'),
+                  title: Text(Translations.of(context).text('history')),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
@@ -255,7 +265,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 // Settings button
                 ListTile(
                   leading: const Icon(Icons.add_rounded),
-                  title: const Text('Add podcast'),
+                  title: Text(Translations.of(context).text('addPodcast')),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
@@ -270,7 +280,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           // Settings button
           ListTile(
             leading: const Icon(Icons.settings_rounded),
-            title: const Text('Settings'),
+            title: Text(Translations.of(context).text('settings')),
             onTap: () {
               Navigator.pop(context);
               Navigator.of(context).push(

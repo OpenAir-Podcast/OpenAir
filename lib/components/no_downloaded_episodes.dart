@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 
 class NoDownloadedEpisodes extends StatelessWidget {
   const NoDownloadedEpisodes({
@@ -9,7 +10,7 @@ class NoDownloadedEpisodes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('No Downloaded Episodes'),
+        title: Text(Translations.of(context).text('noDownloadedEpisodes')),
       ),
       body: Center(
         child: Column(
@@ -22,7 +23,7 @@ class NoDownloadedEpisodes extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Oops, looks like you have no episodes downloaded...',
+              Translations.of(context).text('oopsNoEpisodesDownloaded'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.0,
@@ -30,7 +31,7 @@ class NoDownloadedEpisodes extends StatelessWidget {
               ),
             ),
             Text(
-              'Please download some episodes and try again',
+              Translations.of(context).text('pleaseDownloadSomeEpisodes'),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16.0),
             ),

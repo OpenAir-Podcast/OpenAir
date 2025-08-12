@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
@@ -37,7 +39,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Podcast'),
+        title: Text(Translations.of(context).text('addPodcast')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -58,7 +60,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   Icons.search_rounded,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                labelText: 'Search Podcast (fyyd)',
+                labelText: Translations.of(context).text('searchPodcastFyyd'),
                 suffix: IconButton(
                   onPressed: () {
                     setState(() {
@@ -84,8 +86,9 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   if (podcasts.isEmpty) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('No podcasts was found.'),
+                        SnackBar(
+                          content: Text(
+                              Translations.of(context).text('noPodcastsFound')),
                         ),
                       );
                     }
@@ -109,7 +112,9 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to find podcasts.'),
+                        content: Text(
+                          Translations.of(context).text('failedToFindPodcasts'),
+                        ),
                       ),
                     );
                   }
@@ -131,15 +136,10 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     ),
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
-                        baseColor: ref
-                            .read(openAirProvider)
-                            .config
-                            .cardBackgroundColor!,
-                        highlightColor:
-                            ref.read(openAirProvider).config.highlightColor!,
+                        baseColor: cardBackgroundColor!,
+                        highlightColor: highlightColor!,
                         child: Container(
-                          color:
-                              ref.read(openAirProvider).config.highlightColor,
+                          color: highlightColor,
                         ),
                       );
                     },
@@ -161,14 +161,14 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                       ),
                       const SizedBox(height: 20.0),
                       Text(
-                        'Oops, an error occurred...',
+                        Translations.of(context).text('oopsAnErrorOccurred'),
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        '$error',
+                        Translations.of(context).text('oopsTryAgainLater'),
                         style: TextStyle(fontSize: 16.0),
                       ),
                       const SizedBox(height: 20.0),
@@ -184,7 +184,9 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                           onPressed: () async {
                             ref.invalidate(podcastDataFeaturedProvider);
                           },
-                          child: const Text('Retry'),
+                          child: Text(
+                            Translations.of(context).text('retry'),
+                          ),
                         ),
                       ),
                     ],
@@ -241,36 +243,16 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardImageShadow,
-                                    blurRadius: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .blurRadius,
+                                    color: cardImageShadow,
+                                    blurRadius: blurRadius,
                                   )
                                 ],
                               ),
-                              height: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardImageHeight,
-                              width: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardImageWidth,
+                              height: cardImageHeight,
+                              width: cardImageWidth,
                               child: CachedNetworkImage(
-                                memCacheHeight: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardImageHeight
-                                    .ceil(),
-                                memCacheWidth: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardImageWidth
-                                    .ceil(),
+                                memCacheHeight: cardImageHeight.ceil(),
+                                memCacheWidth: cardImageWidth.ceil(),
                                 imageUrl: snapshot[index]['imgURL'],
                                 fit: BoxFit.fill,
                                 errorWidget: (context, url, error) => Icon(
@@ -290,7 +272,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
             Row(
               children: [
                 Text(
-                  'Discovery Powered by fyyd',
+                  Translations.of(context).text('discoveryPoweredByFyyd'),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
@@ -305,7 +287,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'Discover More',
+                        Translations.of(context).text('discoverMore'),
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
@@ -336,7 +318,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                 size: 36.0,
               ),
               title: Text(
-                'Add podcast by RSS URL',
+                Translations.of(context).text('addPodcastByRssUrl'),
                 style: TextStyle(
                   fontSize: 18.0,
                 ),
@@ -349,7 +331,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                   return AlertDialog(
                     title: Text(
-                      'Add podcast by RSS URL',
+                      Translations.of(context).text('addPodcastByRssUrl'),
                       textAlign: TextAlign.start,
                     ),
                     content: SizedBox(
@@ -368,7 +350,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             Icons.link_rounded,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          labelText: 'RSS URL',
+                          labelText: Translations.of(context).text('rssUrl'),
                           suffix: IconButton(
                             onPressed: () {
                               setState(() {
@@ -386,8 +368,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'Cancel',
+                          child: Text(
+                            Translations.of(context).text('cancel'),
                             style: TextStyle(
                               color: Colors.blueAccent,
                               fontWeight: FontWeight.bold,
@@ -415,22 +397,25 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Subscribed',
+                                      Translations.of(context)
+                                          .text('subscribed'),
                                     ),
                                   ),
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                        'An unexpected error occurred while adding podcast.'),
+                                      Translations.of(context)
+                                          .text('errorAddingPodcast'),
+                                    ),
                                   ),
                                 );
                               }
                             }
                           },
-                          child: const Text(
-                            'Add',
+                          child: Text(
+                            Translations.of(context).text('add'),
                             style: TextStyle(
                               color: Colors.blueAccent,
                               fontWeight: FontWeight.bold,
@@ -451,7 +436,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                 size: 36.0,
               ),
               title: Text(
-                'Search Podcast Index',
+                Translations.of(context).text('searchPodcastIndex'),
                 style: TextStyle(
                   fontSize: 18.0,
                 ),
@@ -464,7 +449,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
 
                   return AlertDialog(
                     title: Text(
-                      'Search Podcast Index',
+                      Translations.of(context).text('searchPodcastIndex'),
                       textAlign: TextAlign.start,
                     ),
                     content: SizedBox(
@@ -483,7 +468,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             Icons.title_rounded,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          labelText: 'Title',
+                          labelText: Translations.of(context).text('title'),
                           suffix: IconButton(
                             onPressed: () {
                               setState(() {
@@ -535,8 +520,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'Cancel',
+                          child: Text(
+                            Translations.of(context).text('cancel'),
                             style: TextStyle(
                               color: Colors.blueAccent,
                               fontWeight: FontWeight.bold,
@@ -583,8 +568,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                               );
                             }
                           },
-                          child: const Text(
-                            'Search',
+                          child: Text(
+                            Translations.of(context).text('search'),
                             style: TextStyle(
                               color: Colors.blueAccent,
                               fontWeight: FontWeight.bold,
@@ -605,7 +590,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                 size: 36.0,
               ),
               title: Text(
-                'Import podcast list (OPML)',
+                Translations.of(context).text('importPodcastListOpml'),
                 style: TextStyle(
                   fontSize: 18.0,
                 ),
@@ -619,7 +604,8 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Imported podcasts from OPML file.',
+                          Translations.of(context)
+                              .text('importedPodcastsFromOpml'),
                         ),
                       ),
                     );

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
@@ -87,10 +89,7 @@ class _SubscriptionEpisodeCardState
                             width: 62.0,
                             height: 62.0,
                             decoration: BoxDecoration(
-                              color: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardImageShadow,
+                              color: cardImageShadow,
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                             child: CachedNetworkImage(
@@ -139,10 +138,9 @@ class _SubscriptionEpisodeCardState
                                     ref
                                             .watch(openAirProvider)
                                             .currentPodcast!
-                                            .author
-                                            .isNotEmpty
-                                        ? widget.podcast.author
-                                        : "Unknown", // Use widget.podcast author
+                                            .author ??
+                                        Translations.of(context)
+                                            .text('unknown'),
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,

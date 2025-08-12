@@ -8,8 +8,8 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/episode_model.dart';
@@ -83,8 +83,6 @@ class OpenAirProvider with ChangeNotifier {
 
   List downloadingPodcasts = [];
 
-  late Config config;
-
   Future<void> initial(
     BuildContext context,
   ) async {
@@ -124,10 +122,6 @@ class OpenAirProvider with ChangeNotifier {
     } catch (e) {
       debugPrint(e.toString());
       hasConnection = false;
-    }
-
-    if (context.mounted) {
-      config = Config(context, ref);
     }
   }
 
@@ -584,9 +578,7 @@ class OpenAirProvider with ChangeNotifier {
     // int seconds = dateTime.second;
 
     String result =
-        "${hours != 0 ? hours < 10 ? '0$hours hr ' : '$hours hr ' : '00 hrs '}${minutes != 0 ? minutes < 10 ? '0$minutes min ' : '$minutes min ' : '00 min '}";
-
-    // ${seconds != 0 ? seconds < 10 ? '0$seconds secs' : '$seconds' : '00 secs'}
+        "${hours != 0 ? hours < 10 ? '0$hours ${Translations.of(context).text('hour')} ' : '$hours ${Translations.of(context).text('hour')} ' : '00 ${Translations.of(context).text('hour')} '}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minute')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')} '}";
 
     return result;
   }
@@ -606,7 +598,7 @@ class OpenAirProvider with ChangeNotifier {
         Duration(seconds: remainingSeconds).inSeconds % 60;
 
     currentPodcastTimeRemaining =
-        "${remainingHours != 0 ? '$remainingHours hr ' : ''}${remainingMinutes != 0 ? '$remainingMinutes min' : '< 1 min'} left";
+        "${remainingHours != 0 ? '$remainingHours ${Translations.of(context).text('hour')} ' : ''}${remainingMinutes != 0 ? '$remainingMinutes ${Translations.of(context).text('minute')}' : '< 1 ${Translations.of(context).text('minute')}'} ${Translations.of(context).text('left')}";
 
     String result =
         "${remainingHours != 0 ? remainingHours < 10 ? '0$remainingHours:' : '$remainingHours:' : '00:'}${remainingMinutes != 0 ? remainingMinutes < 10 ? '0$remainingMinutes:' : '$remainingMinutes:' : '00:'}${remainingSecondsAdjusted != 0 ? remainingSecondsAdjusted < 10 ? '0$remainingSecondsAdjusted' : '$remainingSecondsAdjusted' : '00'}";
@@ -700,9 +692,9 @@ class OpenAirProvider with ChangeNotifier {
 
       final downloadModel = DownloadModel(
         guid: guid,
-        image: item['image'],
+        image: item['image'] ?? item['feedImage'],
         title: item['title'],
-        author: item['author'] ?? 'Unknown',
+        author: item['author'],
         datePublished: item['datePublished'],
         description: item['description'],
         feedUrl: item['feedUrl'],
@@ -736,13 +728,13 @@ class OpenAirProvider with ChangeNotifier {
         await file.delete();
       }
 
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to download ${item['title']}.'),
-          ),
-        );
-      }
+      // if (context.mounted) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('An error has occurred while downloading.'),
+      //     ),
+      //   );
+      // }
     } finally {
       downloadingPodcasts.remove(guid);
       notifyListeners();
@@ -983,14 +975,13 @@ class OpenAirProvider with ChangeNotifier {
 
     String historyPodcastId;
     String historyPodcastImage;
-    String historyPodcastAuthor;
+    String? historyPodcastAuthor;
 
     // Determine the correct podcast ID, image, and author based on the 'podcast' map structure
     if (podcast != null) {
       historyPodcastId = podcast.id.toString();
       historyPodcastImage = podcast.imageUrl;
-      historyPodcastAuthor =
-          podcast.author.isNotEmpty ? podcast.author : 'Unknown';
+      historyPodcastAuthor = podcast.author ?? 'Unknown';
     } else {
       debugPrint(
           'Warning: Podcast map is null in addToHistory. Using episode author/image.');
@@ -1003,7 +994,7 @@ class OpenAirProvider with ChangeNotifier {
       guid: episode['guid'],
       image: historyPodcastImage,
       title: episode['title'],
-      author: historyPodcastAuthor,
+      author: historyPodcastAuthor!,
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],
@@ -1048,7 +1039,7 @@ class OpenAirProvider with ChangeNotifier {
       SubscriptionModel subscription = SubscriptionModel(
         id: podcast.id,
         title: podcast.title,
-        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        author: podcast.author,
         feedUrl: podcast.feedUrl,
         imageUrl: podcast.imageUrl,
         episodeCount: podcastEpisodeCount,
@@ -1098,7 +1089,7 @@ class OpenAirProvider with ChangeNotifier {
       SubscriptionModel subscription = SubscriptionModel(
         id: podcast.id,
         title: podcast.title,
-        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        author: podcast.author,
         feedUrl: podcast.feedUrl,
         imageUrl: podcast.imageUrl,
         episodeCount: podcastEpisodeCount,
@@ -1146,7 +1137,7 @@ class OpenAirProvider with ChangeNotifier {
         podcastId: podcast.id.toString(),
         guid: episodes['items'][i]['guid'],
         title: episodes['items'][i]['title'],
-        author: podcast.author.isNotEmpty ? podcast.author : 'Unknown',
+        author: podcast.author,
         image: episodes['items'][i]['feedImage'],
         datePublished: episodes['items'][i]['datePublished'],
         description: episodes['items'][i]['description'],
@@ -1264,7 +1255,5 @@ class OpenAirProvider with ChangeNotifier {
 
   void exportPodcastToOpml() async {}
 
-  void updateFontSize(String size){
-    
-  }
+  void updateFontSize(String size) {}
 }

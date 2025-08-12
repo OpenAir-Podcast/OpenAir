@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -33,29 +35,31 @@ class _HistoryState extends ConsumerState<HistoryPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('History'),
+            title: Text(Translations.of(context).text('history')),
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: IconButton(
                   icon: const Icon(Icons.delete_sweep_rounded),
-                  tooltip: 'Clear History',
+                  tooltip: Translations.of(context).text('clearHistory'),
                   onPressed: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) => AlertDialog(
-                        title: const Text('Clear History'),
-                        content: const Text(
-                            'Are you sure you want to clear your entire listening history? This action cannot be undone.'),
+                        title:
+                            Text(Translations.of(context).text('clearHistory')),
+                        content: Text(Translations.of(context)
+                            .text('areYouSureClearHistory')),
                         actions: <Widget>[
                           TextButton(
-                            child: const Text('Cancel'),
+                            child:
+                                Text(Translations.of(context).text('cancel')),
                             onPressed: () {
                               Navigator.of(dialogContext).pop();
                             },
                           ),
                           TextButton(
-                            child: const Text('Clear'),
+                            child: Text(Translations.of(context).text('clear')),
                             onPressed: () async {
                               Navigator.of(dialogContext).pop();
                               await ref
@@ -64,8 +68,12 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                               ref.invalidate(getHistoryProvider);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Listening history cleared.'),
+                                  SnackBar(
+                                    // FIXME: Localization issue. Does not translate.
+                                    content: Text(
+                                      Translations.of(context)
+                                          .text('historyCleared'),
+                                    ),
                                   ),
                                 );
                               }
@@ -84,7 +92,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getHistoryProvider),
               child: ListView.builder(
-                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+                cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(

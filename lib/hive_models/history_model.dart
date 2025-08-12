@@ -31,7 +31,7 @@ class HistoryModel extends HiveObject {
   String title;
 
   @HiveField(3)
-  String author;
+  String? author;
 
   @HiveField(4)
   int datePublished;

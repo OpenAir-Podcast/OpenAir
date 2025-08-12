@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -38,7 +40,7 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: Text('Subscriptions'),
+            title: Text(Translations.of(context).text('subscriptions')),
             actions: [
               IconButton(
                 onPressed: () {
@@ -60,14 +62,10 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           ),
           body: GridView.builder(
             itemCount: subs.length,
-            cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+            cacheExtent: cacheExtent,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  ref.read(openAirProvider).config.mobileCrossAxisCount,
-              mainAxisExtent: ref
-                  .read(openAirProvider)
-                  .config
-                  .subscribedMobileMainAxisExtent,
+              crossAxisCount: mobileCrossAxisCount,
+              mainAxisExtent: subscribedMobileMainAxisExtent,
             ),
             itemBuilder: (context, index) {
               return SubscriptionCard(

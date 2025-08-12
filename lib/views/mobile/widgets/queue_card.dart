@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
@@ -75,7 +76,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 width: 62.0,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  color: ref.read(openAirProvider).config.cardImageShadow,
+                  color: cardImageShadow,
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: CachedNetworkImage(

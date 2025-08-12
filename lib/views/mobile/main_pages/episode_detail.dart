@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
@@ -90,9 +91,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref
-                                    .watch(openAirProvider)
-                                    .currentPodcast!.author,
+                            ref.watch(openAirProvider).currentPodcast!.author ??
+                                Translations.of(context).text('unknown'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
@@ -150,7 +150,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             (item) => item.guid == widget.episodeItem!['guid']);
 
                         return IconButton(
-                          tooltip: "Add to Queue",
+                          tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: () {
                             isQueued
                                 ? ref.read(openAirProvider).removeFromQueue(
@@ -164,8 +164,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               SnackBar(
                                 content: Text(
                                   isQueued
-                                      ? 'Removed ${widget.episodeItem!['title']} from queue'
-                                      : 'Added ${widget.episodeItem!['title']} to queue',
+                                      ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem!['title']}'
+                                      : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem!['title']}',
                                 ),
                               ),
                             );
@@ -178,7 +178,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       error: (error, stackTrace) {
                         debugPrint('Error in queueListAsync: $error');
                         return IconButton(
-                          tooltip: "Add to Queue",
+                          tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: () {},
                           icon: const Icon(Icons.error_outline_rounded),
                         );
@@ -191,7 +191,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             false;
 
                         return IconButton(
-                          tooltip: "Add to Queue",
+                          tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: null, // Disable button while loading
                           icon: isQueuedPreviously
                               ? const Icon(Icons.playlist_add_check_rounded)
@@ -216,30 +216,35 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
                           if (isDownloading) {
                             iconData = Icons.downloading_rounded;
-                            tooltip = 'Downloading...';
+                            tooltip =
+                                Translations.of(context).text('downloading');
                             onPressed = null;
                           } else if (isDownloaded) {
                             iconData = Icons.download_done_rounded;
-                            tooltip = 'Delete Download';
+                            tooltip =
+                                Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext dialogContext) =>
                                     AlertDialog(
-                                  title: const Text('Confirm Deletion'),
+                                  title: Text(Translations.of(context)
+                                      .text('confirmDeletion')),
                                   content: Text(
-                                      'Are you sure you want to remove the download for \'${widget.episodeItem!['title']}\'?'),
+                                      '${Translations.of(context).text('AreYouSureYouWantToRemoveDownload')} \'${widget.episodeItem!['title']}\'?'),
                                   actions: <Widget>[
                                     TextButton(
-                                      child: const Text('Cancel'),
+                                      child: Text(Translations.of(context)
+                                          .text('cancel')),
                                       onPressed: () {
                                         Navigator.of(dialogContext)
                                             .pop(); // Dismiss the dialog
                                       },
                                     ),
                                     TextButton(
-                                      child: const Text('Remove'),
+                                      child: Text(Translations.of(context)
+                                          .text('removed')),
                                       onPressed: () async {
                                         // Pop the dialog first
                                         Navigator.of(dialogContext).pop();
@@ -256,7 +261,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                               .showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                  'Removed \'${widget.episodeItem!['title']}\''),
+                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\''),
                                             ),
                                           );
                                         }
@@ -270,7 +275,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           // Episode not downloaded
                           else {
                             iconData = Icons.download_rounded;
-                            tooltip = 'Download Episode';
+                            tooltip =
+                                Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
                               ref
@@ -283,7 +289,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      'Downloading \'${widget.episodeItem!['title']}\''),
+                                      '${Translations.of(context).text('downloading')} \'${widget.episodeItem!['title']}\''),
                                 ),
                               );
                             };
@@ -307,7 +313,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       ),
                     // Share Button
                     IconButton(
-                      tooltip: "Share",
+                      tooltip: Translations.of(context).text('share'),
                       onPressed: () => ref.watch(openAirProvider).share(),
                       icon: const Icon(Icons.share_rounded),
                     ),

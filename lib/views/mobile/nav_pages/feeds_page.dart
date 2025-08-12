@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -35,14 +37,14 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Feeds'),
+            title: Text(Translations.of(context).text('feeds')),
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getFeedsProvider),
               child: ListView.builder(
-                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+                cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(

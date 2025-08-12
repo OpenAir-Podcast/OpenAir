@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -18,13 +20,9 @@ final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
 
-  // debugPrint(topFeaturedPodcastData.toString());
-
   if (topFeaturedPodcastData != null) {
     return topFeaturedPodcastData;
   }
-
-  debugPrint('Fetching podcasts from Podcast Index');
 
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getTopPodcasts();
@@ -54,8 +52,6 @@ final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
     return healthPodcastData;
   }
 
-  debugPrint('Fetching podcasts from Podcast Index');
-
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getHealthPodcasts();
   return FetchDataModel.fromJson(data);
@@ -70,8 +66,6 @@ final podcastDataByTechnologyProvider =
     return tehnologyPodcastData;
   }
 
-  debugPrint('Fetching podcasts from Podcast Index');
-
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getTechnologyPodcasts();
   return FetchDataModel.fromJson(data);
@@ -84,8 +78,6 @@ final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
   if (sportsPodcastData != null) {
     return sportsPodcastData;
   }
-
-  debugPrint('Fetching podcasts from Podcast Index');
 
   final apiService = ref.read(podcastIndexProvider);
   final data = await apiService.getSportsPodcasts();
@@ -104,14 +96,9 @@ class FeaturedPage extends ConsumerStatefulWidget {
   ConsumerState<FeaturedPage> createState() => _FeaturedPageState();
 }
 
-class _FeaturedPageState extends ConsumerState<FeaturedPage>
-    with AutomaticKeepAliveClientMixin<FeaturedPage> {
-  @override
-  bool get wantKeepAlive => true;
-
+class _FeaturedPageState extends ConsumerState<FeaturedPage> {
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Important for AutomaticKeepAliveClientMixin
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return getConnectionStatusValue.when(
@@ -151,35 +138,35 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage>
               // Top Podcasts
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncTopValue,
-                title: 'Top Podcasts',
+                title: Translations.of(context).text('topPodcasts'),
                 podcastDataProvider: podcastDataByTopProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Education
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncEducationValue,
-                title: 'Education',
+                title: Translations.of(context).text('education'),
                 podcastDataProvider: podcastDataByEducationProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Health
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncHealthValue,
-                title: 'Health',
+                title: Translations.of(context).text('health'),
                 podcastDataProvider: podcastDataByHealthProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Technology
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncTechnologyValue,
-                title: 'Technology',
+                title: Translations.of(context).text('technology'),
                 podcastDataProvider: podcastDataByTechnologyProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
               // Sports
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncSportsValue,
-                title: 'Sports',
+                title: Translations.of(context).text('sports'),
                 podcastDataProvider: podcastDataBySportsProvider,
               ),
               SizedBox.fromSize(size: const Size(0, 10)),
@@ -188,12 +175,7 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage>
         );
       },
       error: (error, stackTrace) => NoConnection(),
-      loading: () => Container(
-        color: Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
+      loading: () => Text(''),
     );
   }
 }
@@ -213,80 +195,54 @@ class PodcastsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: ref.read(openAirProvider).config.cardBackgroundColor,
-      elevation: ref.read(openAirProvider).config.cardElevation,
+      color: cardBackgroundColor ?? Colors.white,
+      elevation: cardElevation ?? 0.0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-            ref.read(openAirProvider).config.cardBottomCornersRatio),
+        borderRadius: BorderRadius.circular(cardBottomCornersRatio),
       ),
       child: podcastDataAsyncValue.when(
         loading: () => Column(
           children: [
             ListTile(
               leading: Text(title),
-              trailing: const Text('See All'),
+              trailing: Text(Translations.of(context).text('seeAll')),
             ),
             SizedBox(
-              height: ref.read(openAirProvider).config.featuredCardHeight,
+              height: featuredCardHeight,
               width: double.infinity,
               child: GridView.builder(
-                itemCount:
-                    ref.read(openAirProvider).config.mobileItemCountPortrait,
+                itemCount: mobileItemCountPortrait,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      ref.read(openAirProvider).config.mobileCrossAxisCount,
-                  mainAxisExtent:
-                      ref.read(openAirProvider).config.mobileMainAxisExtent,
+                  crossAxisCount: mobileCrossAxisCount,
+                  mainAxisExtent: mobileMainAxisExtent,
                 ),
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
-                    baseColor:
-                        ref.read(openAirProvider).config.cardBackgroundColor!,
-                    highlightColor:
-                        ref.read(openAirProvider).config.highlightColor!,
+                    baseColor: cardBackgroundColor!,
+                    highlightColor: highlightColor!,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        ref.read(openAirProvider).config.cardSidePadding,
-                        ref.read(openAirProvider).config.cardTopPadding,
-                        ref.read(openAirProvider).config.cardSidePadding,
-                        ref.read(openAirProvider).config.cardTopPadding,
+                        cardSidePadding,
+                        cardTopPadding,
+                        cardSidePadding,
+                        cardTopPadding,
                       ),
                       child: Column(
                         children: [
                           Container(
-                            color: ref
-                                .read(openAirProvider)
-                                .config
-                                .highlightColor2,
-                            height: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardImageHeight -
-                                14.0,
-                            width:
-                                ref.read(openAirProvider).config.cardImageWidth,
+                            color: highlightColor2,
+                            height: cardImageHeight - 14.0,
+                            width: cardImageWidth,
                           ),
                           Container(
-                            color:
-                                ref.read(openAirProvider).config.highlightColor,
-                            height: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardLabelHeight -
-                                14.0,
-                            width:
-                                ref.read(openAirProvider).config.cardLabelWidth,
+                            color: highlightColor,
+                            height: cardLabelHeight - 14.0,
+                            width: cardLabelWidth,
                           ),
                           Container(
-                            color:
-                                ref.read(openAirProvider).config.highlightColor,
-                            height: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardLabelHeight -
-                                14.0,
-                            width:
-                                ref.read(openAirProvider).config.cardLabelWidth,
+                            color: highlightColor,
+                            height: cardLabelHeight - 14.0,
+                            width: cardLabelWidth,
                           ),
                         ],
                       ),
@@ -308,14 +264,14 @@ class PodcastsCard extends ConsumerWidget {
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Oops, an error occurred...',
+              Translations.of(context).text('oopsAnErrorOccurred'),
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '$error',
+              Translations.of(context).text('oopsTryAgainLater'),
               style: TextStyle(fontSize: 16.0),
             ),
             const SizedBox(height: 20.0),
@@ -331,7 +287,7 @@ class PodcastsCard extends ConsumerWidget {
                 onPressed: () async {
                   ref.invalidate(podcastDataProvider);
                 },
-                child: const Text('Retry'),
+                child: Text(Translations.of(context).text('retry')),
               ),
             ),
           ],
@@ -342,10 +298,8 @@ class PodcastsCard extends ConsumerWidget {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                        ref.read(openAirProvider).config.cardTopCornersRatio),
-                    topRight: Radius.circular(
-                        ref.read(openAirProvider).config.cardTopCornersRatio),
+                    topLeft: Radius.circular(cardTopCornersRatio),
+                    topRight: Radius.circular(cardTopCornersRatio),
                   ),
                 ),
                 tileColor: ThemeProvider.themeOf(context).data.primaryColor,
@@ -353,44 +307,40 @@ class PodcastsCard extends ConsumerWidget {
                   title,
                 ),
                 trailing: Text(
-                  'See All',
+                  Translations.of(context).text('seeAll'),
                 ),
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {
-                        if (title == 'Top Podcasts') {
+                        if (title ==
+                            Translations.of(context).text('topPodcasts')) {
                           return TopPodcastsPage();
+                        } else {
+                          return CategoryPage(category: title);
                         }
-
-                        return CategoryPage(
-                          category: title,
-                        );
                       },
                     ),
                   );
                 },
               ),
               SizedBox(
-                height: ref.read(openAirProvider).config.featuredCardHeight,
+                height: featuredCardHeight,
                 width: double.infinity,
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount:
-                      ref.read(openAirProvider).config.mobileItemCountPortrait,
+                  itemCount: mobileItemCountPortrait,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        ref.read(openAirProvider).config.mobileCrossAxisCount,
-                    mainAxisExtent:
-                        ref.read(openAirProvider).config.mobileMainAxisExtent,
+                    crossAxisCount: mobileCrossAxisCount,
+                    mainAxisExtent: mobileMainAxisExtent,
                   ),
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.fromLTRB(
-                        ref.read(openAirProvider).config.cardSidePadding,
-                        ref.read(openAirProvider).config.cardTopPadding,
-                        ref.read(openAirProvider).config.cardSidePadding,
-                        ref.read(openAirProvider).config.cardTopPadding,
+                        cardSidePadding,
+                        cardTopPadding,
+                        cardSidePadding,
+                        cardTopPadding,
                       ),
                       child: GestureDetector(
                         onTap: () {
@@ -410,36 +360,16 @@ class PodcastsCard extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
-                                    color: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardImageShadow,
-                                    blurRadius: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .blurRadius,
+                                    color: cardImageShadow,
+                                    blurRadius: blurRadius,
                                   )
                                 ],
                               ),
-                              height: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardImageHeight,
-                              width: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardImageWidth,
+                              height: cardImageHeight,
+                              width: cardImageWidth,
                               child: CachedNetworkImage(
-                                memCacheHeight: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardImageHeight
-                                    .ceil(),
-                                memCacheWidth: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardImageWidth
-                                    .ceil(),
+                                memCacheHeight: cardImageHeight.ceil(),
+                                memCacheWidth: cardImageWidth.ceil(),
                                 imageUrl: snapshot.feeds[index].artwork,
                                 fit: BoxFit.fill,
                                 errorWidget: (context, url, error) => Icon(
@@ -449,57 +379,27 @@ class PodcastsCard extends ConsumerWidget {
                               ),
                             ),
                             Container(
-                              height: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardLabelHeight,
-                              width: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .cardLabelWidth,
+                              height: cardLabelHeight,
+                              width: cardLabelWidth,
                               decoration: BoxDecoration(
-                                color: ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardLabelBackground,
+                                color: cardLabelBackground,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardLabelShadow,
-                                    blurRadius: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .blurRadius,
+                                    color: cardLabelShadow,
+                                    blurRadius: blurRadius,
                                   ),
                                 ],
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(ref
-                                    .read(openAirProvider)
-                                    .config
-                                    .cardLabelPadding),
+                                padding: EdgeInsets.all(cardLabelPadding),
                                 child: Text(
                                   snapshot.feeds[index].title,
-                                  maxLines: ref
-                                      .read(openAirProvider)
-                                      .config
-                                      .cardLabelMaxLines,
+                                  maxLines: cardLabelMaxLines,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardLabelTextColor,
-                                    fontSize: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardLabelFontSize,
-                                    fontWeight: ref
-                                        .read(openAirProvider)
-                                        .config
-                                        .cardLabelFontWeight,
+                                    color: cardLabelTextColor,
+                                    fontSize: cardLabelFontSize,
+                                    fontWeight: cardLabelFontWeight,
                                   ),
                                 ),
                               ),

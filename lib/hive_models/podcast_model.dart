@@ -25,7 +25,7 @@ class PodcastModel extends HiveObject {
   String title;
 
   @HiveField(3)
-  String author;
+  String? author;
 
   @HiveField(4)
   String imageUrl;
@@ -40,10 +40,10 @@ class PodcastModel extends HiveObject {
         id: json['id'],
         feedUrl: json['url'] ?? json['feedUrl'],
         title: json['title'],
-        author: json['author'] ?? json['subtitle'] ?? 'unknown',
+        author: json['author'] ?? json['subtitle'],
         imageUrl: json['image'] ?? json['imgURL'],
         artwork: json['artwork'] ?? json['image'] ?? json['imgURL'],
-        description: json['description'] ?? 'unknown',
+        description: json['description'],
       );
 
   Map<String, dynamic> toJson() => {

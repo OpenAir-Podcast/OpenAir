@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
@@ -64,7 +66,7 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                   imageUrl: widget.podcastItem['imgURL'],
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Container(
-                    color: ref.read(openAirProvider).config.cardImageShadow,
+                    color: cardImageShadow,
                     child: Icon(
                       Icons.error,
                       size: 56.0,
@@ -128,9 +130,11 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: IconButton(
                       tooltip: snapshot.data!
-                          ? 'Unsubscribe to podcast'
-                          : 'Subscribe to podcast',
+                          ? Translations.of(context)
+                              .text('unsubscribeToPodcast')
+                          : Translations.of(context).text('subscribeToPodcast'),
                       onPressed: () async {
+                        // FIXME: Doesn't subscribe/unsubscribe immediately
                         snapshot.data!
                             ? ref.read(openAirProvider).unsubscribe(podcast)
                             : ref.read(openAirProvider).subscribe(podcast);
@@ -139,8 +143,8 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? 'Unsubscribed from ${podcast.title}'
-                                  : 'Subscribed to ${podcast.title}',
+                                  ? '${Translations.of(context).text('unsubscribed')} ${podcast.title}'
+                                  : '${Translations.of(context).text('subscribed')} ${podcast.title}',
                             ),
                           ),
                         );

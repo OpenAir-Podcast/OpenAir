@@ -179,3 +179,5 @@ types:
         index: 4
       pitch:
         index: 5
+      locale:
+        index: 6

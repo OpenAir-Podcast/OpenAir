@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -41,10 +42,10 @@ class SubscriptionCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        ref.read(openAirProvider).config.cardSidePadding,
-        ref.read(openAirProvider).config.cardTopPadding,
-        ref.read(openAirProvider).config.cardSidePadding,
-        ref.read(openAirProvider).config.cardTopPadding,
+        cardSidePadding,
+        cardTopPadding,
+        cardSidePadding,
+        cardTopPadding,
       ),
       child: GestureDetector(
         onLongPress: () {
@@ -71,18 +72,16 @@ class SubscriptionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: ref.read(openAirProvider).config.cardImageShadow,
-                        blurRadius: ref.read(openAirProvider).config.blurRadius,
+                        color: cardImageShadow,
+                        blurRadius: blurRadius,
                       )
                     ],
                   ),
-                  height: ref.read(openAirProvider).config.cardImageHeight,
-                  width: ref.read(openAirProvider).config.cardImageWidth,
+                  height: cardImageHeight,
+                  width: cardImageWidth,
                   child: CachedNetworkImage(
-                    memCacheHeight:
-                        ref.read(openAirProvider).config.cardImageHeight.ceil(),
-                    memCacheWidth:
-                        ref.read(openAirProvider).config.cardImageWidth.ceil(),
+                    memCacheHeight: cardImageHeight.ceil(),
+                    memCacheWidth: cardImageWidth.ceil(),
                     imageUrl: subs[index].imageUrl,
                   ),
                 ),
@@ -90,37 +89,19 @@ class SubscriptionCard extends StatelessWidget {
                   right: 0.0,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: ref
-                          .read(openAirProvider)
-                          .config
-                          .subscriptionCountBoxColor,
+                      color: subscriptionCountBoxColor,
                     ),
-                    height: ref
-                        .read(openAirProvider)
-                        .config
-                        .subscriptionCountBoxSize,
-                    width: ref
-                        .read(openAirProvider)
-                        .config
-                        .subscriptionCountBoxSize,
+                    height: subscriptionCountBoxSize,
+                    width: subscriptionCountBoxSize,
                     child: subCountDataAsyncValue.when(
                       data: (data) {
                         return Center(
                           child: Text(
                             data,
                             style: TextStyle(
-                              color: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxTextColor,
-                              fontSize: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxFontSize,
-                              fontWeight: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxFontWeight,
+                              color: subscriptionCountBoxTextColor,
+                              fontSize: subscriptionCountBoxFontSize,
+                              fontWeight: subscriptionCountBoxFontWeight,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -140,11 +121,7 @@ class SubscriptionCard extends StatelessWidget {
                             icon: Icon(
                               Icons.error_outline_rounded,
                               color: Colors.white,
-                              size: ref
-                                      .read(openAirProvider)
-                                      .config
-                                      .subscriptionCountBoxSize -
-                                  12,
+                              size: subscriptionCountBoxSize - 12,
                             ),
                           ),
                         );
@@ -154,18 +131,9 @@ class SubscriptionCard extends StatelessWidget {
                           child: Text(
                             '...',
                             style: TextStyle(
-                              color: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxTextColor,
-                              fontSize: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxFontSize,
-                              fontWeight: ref
-                                  .read(openAirProvider)
-                                  .config
-                                  .subscriptionCountBoxFontWeight,
+                              color: subscriptionCountBoxTextColor,
+                              fontSize: subscriptionCountBoxFontSize,
+                              fontWeight: subscriptionCountBoxFontWeight,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -177,30 +145,27 @@ class SubscriptionCard extends StatelessWidget {
               ],
             ),
             Container(
-              height: ref.read(openAirProvider).config.cardLabelHeight,
-              width: ref.read(openAirProvider).config.cardLabelWidth,
+              height: cardLabelHeight,
+              width: cardLabelWidth,
               decoration: BoxDecoration(
-                color: ref.read(openAirProvider).config.cardLabelBackground,
+                color: cardLabelBackground,
                 boxShadow: [
                   BoxShadow(
-                    color: ref.read(openAirProvider).config.cardLabelShadow,
-                    blurRadius: ref.read(openAirProvider).config.blurRadius,
+                    color: cardLabelShadow,
+                    blurRadius: blurRadius,
                   ),
                 ],
               ),
               child: Padding(
-                padding: EdgeInsets.all(
-                    ref.read(openAirProvider).config.cardLabelPadding),
+                padding: EdgeInsets.all(cardLabelPadding),
                 child: Text(
                   subs[index].title,
-                  maxLines: ref.read(openAirProvider).config.cardLabelMaxLines,
+                  maxLines: cardLabelMaxLines,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: ref.read(openAirProvider).config.cardLabelTextColor,
-                    fontSize:
-                        ref.read(openAirProvider).config.cardLabelFontSize,
-                    fontWeight:
-                        ref.read(openAirProvider).config.cardLabelFontWeight,
+                    color: cardLabelTextColor,
+                    fontSize: cardLabelFontSize,
+                    fontWeight: cardLabelFontWeight,
                   ),
                 ),
               ),

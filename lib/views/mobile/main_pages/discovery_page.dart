@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
@@ -21,13 +23,14 @@ class DiscoveryPage extends ConsumerStatefulWidget {
 
 class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
   @override
-  @override
   Widget build(BuildContext context) {
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discovery'),
+        title: Text(
+          Translations.of(context).text('discovery'),
+        ),
       ),
       body: getConnectionStatusValue.when(
         data: (connectionData) {
@@ -54,14 +57,14 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                         ),
                         const SizedBox(height: 20.0),
                         Text(
-                          'Oops, an error occurred...',
+                          Translations.of(context).text('oopsAnErrorOccurred'),
                           style: TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '$error',
+                          Translations.of(context).text('oopsTryAgainLater'),
                           style: TextStyle(fontSize: 16.0),
                         ),
                         const SizedBox(height: 20.0),
@@ -77,7 +80,9 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                             onPressed: () async {
                               ref.invalidate(podcastDataFeaturedProvider);
                             },
-                            child: const Text('Retry'),
+                            child: Text(
+                              Translations.of(context).text('retry'),
+                            ),
                           ),
                         ),
                       ],
@@ -87,7 +92,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView.builder(
-                    cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+                    cacheExtent: cacheExtent,
                     itemCount: data.length,
                     itemBuilder: (context, index) {
                       return DiscoveryPodcastCard(
@@ -112,7 +117,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                 ),
                 const SizedBox(height: 20.0),
                 Text(
-                  'Oops, an error occurred...',
+                  Translations.of(context).text('oopsAnErrorOccurred'),
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
@@ -122,7 +127,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      '$error',
+                      Translations.of(context).text('oopsTryAgainLater'),
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -140,7 +145,9 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                     onPressed: () async {
                       ref.invalidate(getConnectionStatusProvider);
                     },
-                    child: const Text('Retry'),
+                    child: Text(
+                      Translations.of(context).text('retry'),
+                    ),
                   ),
                 ),
               ],

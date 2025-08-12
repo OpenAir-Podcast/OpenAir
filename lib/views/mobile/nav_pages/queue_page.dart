@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -24,7 +25,7 @@ class QueuePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Queue'),
+        title: Text(Translations.of(context).text('queue')),
       ),
       body: queueStream.when(
         data: (queueData) {

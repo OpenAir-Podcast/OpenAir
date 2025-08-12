@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
 
 final podcastIndexProvider = Provider(
   (ref) => PodcastIndexProvider(ref),
@@ -70,8 +70,9 @@ class PodcastIndexProvider {
           rethrow;
         }
 
-        debugPrint(
-            'DioError attempt $attempt, retrying in $delay: ${e.message}');
+        debugPrint('DioError attempt $attempt, retrying in $delay');
+
+        // : ${e.message}
 
         await Future.delayed(delay);
         // Exponential backoff for subsequent retries
@@ -152,8 +153,10 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
+    debugPrint('Getting trending podcasts...');
+
     String url =
-        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=${ref.read(openAirProvider).config.max}&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref.read(hiveServiceProvider).putTrendingPodcast(response.data);
@@ -219,7 +222,7 @@ class PodcastIndexProvider {
         .trim();
 
     String url =
-        'https://api.podcastindex.org/api/1.0/search/byterm?max=${ref.read(openAirProvider).config.max}&q=$cat';
+        'https://api.podcastindex.org/api/1.0/search/byterm?max=$max&q=$cat';
     String fullUrl = '$url&pretty';
     debugPrint(fullUrl);
 

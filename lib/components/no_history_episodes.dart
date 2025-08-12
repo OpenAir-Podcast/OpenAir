@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 
 class NoHistoryEpisodes extends StatelessWidget {
   const NoHistoryEpisodes({
@@ -9,7 +10,7 @@ class NoHistoryEpisodes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('History'),
+        title: Text(Translations.of(context).text('history')),
       ),
       body: Center(
         child: Column(
@@ -22,7 +23,7 @@ class NoHistoryEpisodes extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Oops, looks like you have not listened to any episodes...',
+              Translations.of(context).text('oopsNoHistory'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.0,
@@ -30,7 +31,7 @@ class NoHistoryEpisodes extends StatelessWidget {
               ),
             ),
             Text(
-              'Please play some episodes and try again',
+              Translations.of(context).text('pleasePlaySomeEpisodes'),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16.0),
             ),

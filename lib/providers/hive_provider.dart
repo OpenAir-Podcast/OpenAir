@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -131,13 +132,6 @@ class HiveService extends ChangeNotifier {
 
     settingsBox = collection.openBox('settings');
 
-    final settings = await settingsBox;
-
-    if (await settings.get('settings') == null) {
-      debugPrint('Settings box is empty. Initializing default settings.');
-      await settings.put('settings', SettingsModel.defaultSettings());
-    }
-
     // Trending page
     trendingBox = collection.openBox<FetchDataModel>('trending');
 
@@ -146,6 +140,18 @@ class HiveService extends ChangeNotifier {
 
     // Category page
     categoryBox = collection.openBox<FetchDataModel>('category');
+
+    final settings = await settingsBox;
+
+    if (await settings.get('settings') == null) {
+      await settings.put('settings', SettingsModel.defaultSettings());
+    } else {
+      SettingsModel? settingsModel = await settings.get('settings');
+      String locale = settingsModel!.locale;
+
+      Translations.changeLanguage(locale);
+      debugPrint('HiveService: Language set to $locale');
+    }
   }
 
   // Subscription Operations:

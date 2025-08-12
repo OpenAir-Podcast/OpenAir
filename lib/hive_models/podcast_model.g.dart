@@ -20,7 +20,7 @@ class PodcastModelAdapter extends TypeAdapter<PodcastModel> {
       id: (fields[0] as num).toInt(),
       feedUrl: fields[1] as String,
       title: fields[2] as String,
-      author: fields[3] as String,
+      author: fields[3] as String?,
       imageUrl: fields[4] as String,
       artwork: fields[5] as String,
       description: fields[6] as String,

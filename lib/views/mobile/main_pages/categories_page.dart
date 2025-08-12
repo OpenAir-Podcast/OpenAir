@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
@@ -12,85 +13,6 @@ class CategoriesPage extends ConsumerStatefulWidget {
     final apiService = ref.read(openAirProvider);
     return await apiService.getConnectionStatus();
   });
-
-  final List<String> sortedCategories = [
-    'Animals',
-    'Animation',
-    'Arts',
-    'Astronomy',
-    'Automotive',
-    'Aviation',
-    'Beauty',
-    'Books',
-    'Business',
-    'Careers',
-    'Chemistry',
-    'Christianity',
-    'Comedy',
-    'Commentary',
-    'Courses',
-    'Crafts',
-    'Daily',
-    'Design',
-    'Drama',
-    'Earth',
-    'Education',
-    'Entertainment',
-    'Entrepreneurship',
-    'Family',
-    'Fashion',
-    'Fiction',
-    'Fitness',
-    'Food',
-    'Games',
-    'Garden',
-    'Government',
-    'Health',
-    'Hinduism',
-    'History',
-    'Hobbies',
-    'Home',
-    'How To',
-    'Interviews',
-    'Investing',
-    'Islam',
-    'Judaism',
-    'Kids',
-    'Language',
-    'Learning',
-    'Leisure',
-    'Life',
-    'Management',
-    'Manga',
-    'Marketing',
-    'Mathematics',
-    'Medicine',
-    'Mental',
-    'Music',
-    'Natural',
-    'Nature',
-    'News',
-    'Non-Profit',
-    'Nutrition',
-    'Parenting',
-    'Performing',
-    'Pets',
-    'Physics',
-    'Politics',
-    'Religion',
-    'Science',
-    'Self Improvement',
-    'Sexuality',
-    'Social',
-    'Spirituality',
-    'Sports',
-    'Stand-Up',
-    'Stories',
-    'Video Games',
-    'Visual',
-    'True Crime',
-    'TV',
-  ];
 
   final List<IconData> sortedIcons = [
     Icons.pets_rounded, // Animals
@@ -180,6 +102,85 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
   Widget build(BuildContext context) {
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
+    final List<String> sortedCategories = [
+      Translations.of(context).text('categoryAnimals'),
+      Translations.of(context).text('categoryAnimation'),
+      Translations.of(context).text('categoryArts'),
+      Translations.of(context).text('categoryAstronomy'),
+      Translations.of(context).text('categoryAutomotive'),
+      Translations.of(context).text('categoryAviation'),
+      Translations.of(context).text('categoryBeauty'),
+      Translations.of(context).text('categoryBooks'),
+      Translations.of(context).text('categoryBusiness'),
+      Translations.of(context).text('categoryCareers'),
+      Translations.of(context).text('categoryChemistry'),
+      Translations.of(context).text('categoryChristianity'),
+      Translations.of(context).text('categoryComedy'),
+      Translations.of(context).text('categoryCommentary'),
+      Translations.of(context).text('categoryCourses'),
+      Translations.of(context).text('categoryCrafts'),
+      Translations.of(context).text('categoryDaily'),
+      Translations.of(context).text('categoryDesign'),
+      Translations.of(context).text('categoryDrama'),
+      Translations.of(context).text('categoryEarth'),
+      Translations.of(context).text('categoryEducation'),
+      Translations.of(context).text('categoryEntertainment'),
+      Translations.of(context).text('categoryEntrepreneurship'),
+      Translations.of(context).text('categoryFamily'),
+      Translations.of(context).text('categoryFashion'),
+      Translations.of(context).text('categoryFiction'),
+      Translations.of(context).text('categoryFitness'),
+      Translations.of(context).text('categoryFood'),
+      Translations.of(context).text('categoryGames'),
+      Translations.of(context).text('categoryGarden'),
+      Translations.of(context).text('categoryGovernment'),
+      Translations.of(context).text('categoryHealth'),
+      Translations.of(context).text('categoryHinduism'),
+      Translations.of(context).text('categoryHistory'),
+      Translations.of(context).text('categoryHobbies'),
+      Translations.of(context).text('categoryHome'),
+      Translations.of(context).text('categoryHowTo'),
+      Translations.of(context).text('categoryInterviews'),
+      Translations.of(context).text('categoryInvesting'),
+      Translations.of(context).text('categoryIslam'),
+      Translations.of(context).text('categoryJudaism'),
+      Translations.of(context).text('categoryKids'),
+      Translations.of(context).text('categoryLanguage'),
+      Translations.of(context).text('categoryLearning'),
+      Translations.of(context).text('categoryLeisure'),
+      Translations.of(context).text('categoryLife'),
+      Translations.of(context).text('categoryManagement'),
+      Translations.of(context).text('categoryManga'),
+      Translations.of(context).text('categoryMarketing'),
+      Translations.of(context).text('categoryMathematics'),
+      Translations.of(context).text('categoryMedicine'),
+      Translations.of(context).text('categoryMental'),
+      Translations.of(context).text('categoryMusic'),
+      Translations.of(context).text('categoryNatural'),
+      Translations.of(context).text('categoryNature'),
+      Translations.of(context).text('categoryNews'),
+      Translations.of(context).text('categoryNonProfit'),
+      Translations.of(context).text('categoryNutrition'),
+      Translations.of(context).text('categoryParenting'),
+      Translations.of(context).text('categoryPerforming'),
+      Translations.of(context).text('categoryPets'),
+      Translations.of(context).text('categoryPhysics'),
+      Translations.of(context).text('categoryPolitics'),
+      Translations.of(context).text('categoryReligion'),
+      Translations.of(context).text('categoryScience'),
+      Translations.of(context).text('categorySelfImprovement'),
+      Translations.of(context).text('categorySexuality'),
+      Translations.of(context).text('categorySocial'),
+      Translations.of(context).text('categorySpirituality'),
+      Translations.of(context).text('categorySports'),
+      Translations.of(context).text('categoryStandUp'),
+      Translations.of(context).text('categoryStories'),
+      Translations.of(context).text('categoryVideoGames'),
+      Translations.of(context).text('categoryVisual'),
+      Translations.of(context).text('categoryTrueCrime'),
+      Translations.of(context).text('categoryTV'),
+    ];
+
     return getConnectionStatusValue.when(
       data: (data) {
         if (data == false) {
@@ -192,13 +193,13 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
             separatorBuilder: (context, index) {
               return const Divider();
             },
-            itemCount: widget.sortedCategories.length,
+            itemCount: sortedCategories.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
                 child: ListTile(
                   title: Text(
-                    widget.sortedCategories[index],
+                    sortedCategories[index],
                   ),
                   leading: Icon(
                     widget.sortedIcons[index],
@@ -207,7 +208,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => CategoryPage(
-                          category: widget.sortedCategories[index],
+                          category: sortedCategories[index],
                         ),
                       ),
                     );
@@ -232,14 +233,14 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
               ),
               const SizedBox(height: 20.0),
               Text(
-                'Oops, an error occurred...',
+                Translations.of(context).text('oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '$error',
+                Translations.of(context).text('oopsTryAgainLater'),
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 20.0),
@@ -255,7 +256,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                   onPressed: () async {
                     ref.invalidate(getConnectionStatusProvider);
                   },
-                  child: const Text('Retry'),
+                  child: Text(Translations.of(context).text('retey')),
                 ),
               ),
             ],

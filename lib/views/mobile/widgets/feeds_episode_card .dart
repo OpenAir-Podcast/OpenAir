@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
@@ -73,7 +75,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                       width: 62.0,
                       height: 62.0,
                       decoration: BoxDecoration(
-                        color: ref.read(openAirProvider).config.cardImageShadow,
+                        color: cardImageShadow,
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: CachedNetworkImage(
@@ -113,9 +115,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              widget.podcast.author.isNotEmpty
-                                  ? widget.podcast.author
-                                  : "Unknown",
+                              widget.podcast.author ??
+                                  Translations.of(context).text('unknown'),
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -185,7 +186,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                           (item) => item.guid == widget.episodeItem['guid']);
 
                       return IconButton(
-                        tooltip: "Add to Queue",
+                        tooltip: Translations.of(context).text('addToQueue'),
                         onPressed: () {
                           isQueued
                               ? ref
@@ -200,8 +201,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                             SnackBar(
                               content: Text(
                                 isQueued
-                                    ? 'Removed ${widget.episodeItem['title']} from queue'
-                                    : 'Added ${widget.episodeItem['title']} to queue',
+                                    ? '${Translations.of(context).text('removed')} ${widget.episodeItem['title']}'
+                                    : '${Translations.of(context).text('add')} ${widget.episodeItem['title']}',
                               ),
                             ),
                           );
@@ -215,7 +216,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                       debugPrint(
                           'Error in queueListAsync for EpisodeCard: $error');
                       return IconButton(
-                        tooltip: "Add to Queue",
+                        tooltip:
+                            Translations.of(context).text('errorAddingToQueue'),
                         onPressed: () {},
                         icon: const Icon(Icons.error_outline_rounded),
                       );
@@ -228,7 +230,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                           false;
 
                       return IconButton(
-                        tooltip: "Add to Queue",
+                        tooltip: Translations.of(context).text('addingToQueue'),
                         onPressed: null, // Disable button while loading
                         icon: isQueuedPreviously
                             ? const Icon(Icons.playlist_add_check_rounded)
@@ -253,30 +255,35 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
 
                         if (isDownloading) {
                           iconData = Icons.downloading_rounded;
-                          tooltip = 'Downloading...';
+                          tooltip =
+                              Translations.of(context).text('downloading');
                           onPressed = null;
                         } else if (isDownloaded) {
                           iconData = Icons.download_done_rounded;
-                          tooltip = 'Delete Download';
+                          tooltip =
+                              Translations.of(context).text('deleteDownload');
 
                           onPressed = () {
                             showDialog(
                               context: context,
                               builder: (BuildContext dialogContext) =>
                                   AlertDialog(
-                                title: const Text('Confirm Deletion'),
+                                title: Text(Translations.of(context)
+                                    .text('confirmDeletion')),
                                 content: Text(
-                                    'Are you sure you want to remove the download for \'${widget.episodeItem['title']}\'?'),
+                                    '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: const Text('Cancel'),
+                                    child: Text(Translations.of(context)
+                                        .text('cancel')),
                                     onPressed: () {
                                       Navigator.of(dialogContext)
                                           .pop(); // Dismiss the dialog
                                     },
                                   ),
                                   TextButton(
-                                    child: const Text('Remove'),
+                                    child: Text(Translations.of(context)
+                                        .text('remove')),
                                     onPressed: () async {
                                       // Pop the dialog first
                                       Navigator.of(dialogContext).pop();
@@ -292,7 +299,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                                             .showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                                'Removed \'${widget.episodeItem['title']}\''),
+                                                '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\''),
                                           ),
                                         );
                                       }
@@ -306,7 +313,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         // Not downloaded
                         else {
                           iconData = Icons.download_rounded;
-                          tooltip = 'Download Episode';
+                          tooltip =
+                              Translations.of(context).text('downloadEpisode');
 
                           onPressed = () {
                             ref.read(openAirProvider.notifier).downloadEpisode(
@@ -317,7 +325,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    'Downloading \'${widget.episodeItem['title']}\''),
+                                    '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
                               ),
                             );
                           };
@@ -341,7 +349,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                           onPressed: null),
                     ),
                   IconButton(
-                    tooltip: "Share",
+                    tooltip: Translations.of(context).text('share'),
                     onPressed: () => ref.watch(openAirProvider).share(),
                     icon: const Icon(Icons.share_rounded),
                   ),

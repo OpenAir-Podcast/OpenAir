@@ -23,13 +23,14 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       voice: fields[3] as String,
       speechRate: fields[4] as String,
       pitch: fields[5] as String,
+      locale: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, SettingsModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.themeMode)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
       ..writeByte(4)
       ..write(obj.speechRate)
       ..writeByte(5)
-      ..write(obj.pitch);
+      ..write(obj.pitch)
+      ..writeByte(6)
+      ..write(obj.locale);
   }
 
   @override

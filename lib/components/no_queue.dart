@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 
 class NoQueue extends StatelessWidget {
   const NoQueue({
@@ -18,14 +19,14 @@ class NoQueue extends StatelessWidget {
           ),
           const SizedBox(height: 20.0),
           Text(
-            'Oops, looks like you have no queue...',
+            Translations.of(context).text('oopsNoQueue'),
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            'Please adding an episode to your queue and try again',
+            Translations.of(context).text('pleaseAddEpisodeToQueue'),
             style: TextStyle(fontSize: 16.0),
           ),
         ],

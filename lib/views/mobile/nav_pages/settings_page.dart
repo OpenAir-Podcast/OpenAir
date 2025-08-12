@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/settings_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -22,15 +23,16 @@ class _SettingsState extends ConsumerState<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(Translations.of(context).text('settings')),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             ListTile(
               leading: Icon(Icons.display_settings_rounded),
-              title: Text('User Interface'),
-              subtitle: Text('Apperance , Theme, Font Size, Language, Voice'),
+              title: Text(Translations.of(context).text('userInterface')),
+              subtitle:
+                  Text(Translations.of(context).text('userInterfaceSubtitle')),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const UserInterface(),
@@ -39,55 +41,58 @@ class _SettingsState extends ConsumerState<Settings> {
             ),
             ListTile(
               leading: Icon(Icons.play_arrow_rounded),
-              title: Text('Playback'),
-              subtitle: Text('Skip Inteveral, Queue, Speed, Timer'),
+              title: Text(Translations.of(context).text('playback')),
+              subtitle: Text(Translations.of(context).text('playbackSubtitle')),
               onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.download_rounded),
-              title: Text('Downloads'),
-              subtitle: Text(
-                  'Update Interval, Automactic Downloads, Automactic Delete'),
+              title: Text(Translations.of(context).text('downloads')),
+              subtitle:
+                  Text(Translations.of(context).text('downloadsSubtitle')),
               onTap: () {},
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.cloud_download_outlined),
-              title: Text('Synchronization'),
-              subtitle:
-                  Text('Synchronize Subscriptions,  Queue, History, Settings'),
+              title: Text(Translations.of(context).text('synchronization')),
+              subtitle: Text(
+                  Translations.of(context).text('synchronizationSubtitle')),
               onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.sd_card_rounded),
-              title: Text('Import/Export'),
-              subtitle: Text('Move subscriptions, queue, and history'),
+              title: Text(Translations.of(context).text('importExport')),
+              subtitle:
+                  Text(Translations.of(context).text('importExportSubtitle')),
               onTap: () {},
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.notifications_none_rounded),
-              title: Text('Notificatins'),
-              subtitle: Text('New Episode, Playback, Download'),
+              title: Text(Translations.of(context).text('notifications')),
+              subtitle:
+                  Text(Translations.of(context).text('notificationsSubtitle')),
               onTap: () {},
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.thumb_up_alt_rounded),
-              title: Text('Donate'),
-              subtitle: Text('Support the developers'),
+              title: Text(Translations.of(context).text('donate')),
+              subtitle: Text(Translations.of(context).text('donateSubtitle')),
               onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.help_outline_rounded),
-              title: Text('Help & Feedback'),
-              subtitle: Text('Report a bug, Request a feature'),
+              title: Text(Translations.of(context).text('helpAndFeedback')),
+              subtitle: Text(
+                  Translations.of(context).text('helpAndFeedbackSubtitle')),
               onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.info_outline_rounded),
-              title: Text('About'),
-              subtitle: Text('Version, Licenses, Third-Party'),
+              title: Text(Translations.of(context).text('about')),
+              subtitle: Text(Translations.of(context).text('aboutSubtitle')),
               onTap: () {},
             ),
           ],

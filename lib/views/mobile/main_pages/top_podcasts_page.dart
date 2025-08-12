@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -14,6 +15,7 @@ final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     return topFeaturedPodcastData;
   }
 
+  debugPrint('Getting Top podcast from PodcastIndex');
   final apiService = ref.watch(podcastIndexProvider);
   final data = await apiService.getTrendingPodcasts();
   return FetchDataModel.fromJson(data);
@@ -47,14 +49,14 @@ class TopPodcastsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 20.0),
               Text(
-                'Oops, an error occurred...',
+                Translations.of(context).text('oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '$error',
+                Translations.of(context).text('oopsTryAgainLater'),
                 style: TextStyle(fontSize: 16.0),
               ),
               const SizedBox(height: 20.0),
@@ -70,7 +72,7 @@ class TopPodcastsPage extends ConsumerWidget {
                   onPressed: () async {
                     ref.invalidate(podcastIndexProvider);
                   },
-                  child: const Text('Retry'),
+                  child: Text(Translations.of(context).text('retry')),
                 ),
               ),
             ],
@@ -80,7 +82,7 @@ class TopPodcastsPage extends ConsumerWidget {
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Top Podcasts'),
+            title: Text(Translations.of(context).text('topPodcasts')),
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -12,6 +12,7 @@ class SettingsModel extends HiveObject {
     required this.voice,
     required this.speechRate,
     required this.pitch,
+    required this.locale,
   });
 
   @HiveField(0)
@@ -32,6 +33,9 @@ class SettingsModel extends HiveObject {
   @HiveField(5)
   String pitch;
 
+  @HiveField(6)
+  String locale;
+
   factory SettingsModel.defaultSettings() {
     return SettingsModel(
       themeMode: 'Light',
@@ -40,6 +44,7 @@ class SettingsModel extends HiveObject {
       voice: 'System',
       speechRate: 'Medium',
       pitch: 'Medium',
+      locale: 'en_US',
     );
   }
 
@@ -50,6 +55,7 @@ class SettingsModel extends HiveObject {
         voice: json['voice'],
         speechRate: json['speechRate'],
         pitch: json['pitch'],
+        locale: json['locale'] ?? 'en_US',
       );
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +65,7 @@ class SettingsModel extends HiveObject {
         'voice': voice,
         'speechRate': speechRate,
         'pitch': pitch,
+        'locale': locale,
       };
 
   @override
@@ -70,6 +77,7 @@ class SettingsModel extends HiveObject {
     voice: $voice,
     speechRate: $speechRate,
     pitch: $pitch,
+    locale: $locale
     ''';
   }
 
@@ -107,5 +115,11 @@ class SettingsModel extends HiveObject {
 
   set setPitch(String value) {
     pitch = value;
+  }
+
+  get getLocale => locale;
+
+  set setLocale(String value) {
+    locale = value;
   }
 }

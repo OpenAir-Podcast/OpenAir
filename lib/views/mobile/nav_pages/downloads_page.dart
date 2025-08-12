@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_downloaded_episodes.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -32,29 +34,31 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Downloads'),
+            title: Text(Translations.of(context).text('downloads')),
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: IconButton(
                   icon: const Icon(Icons.delete_sweep_rounded),
-                  tooltip: 'Clear Downloads',
+                  tooltip: Translations.of(context).text('clearDownloads'),
                   onPressed: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) => AlertDialog(
-                        title: const Text('Clear Downloads'),
-                        content: const Text(
-                            'Are you sure you want to clear all downloaded episodes? This action cannot be undone.'),
+                        title: Text(
+                            Translations.of(context).text('clearDownloads')),
+                        content: Text(Translations.of(context)
+                            .text('areYouSureClearDownloads')),
                         actions: <Widget>[
                           TextButton(
-                            child: const Text('Cancel'),
+                            child:
+                                Text(Translations.of(context).text('cancel')),
                             onPressed: () {
                               Navigator.of(dialogContext).pop();
                             },
                           ),
                           TextButton(
-                            child: const Text('Clear'),
+                            child: Text(Translations.of(context).text('clear')),
                             onPressed: () async {
                               Navigator.of(dialogContext).pop();
                               await ref
@@ -75,7 +79,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getDownloadsProvider),
               child: ListView.builder(
-                cacheExtent: ref.read(openAirProvider).config.cacheExtent,
+                cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(
