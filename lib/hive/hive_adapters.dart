@@ -7,7 +7,6 @@ import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/settings_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 
 @GenerateAdapters([
@@ -20,6 +19,5 @@ import 'package:openair/hive_models/subscription_model.dart';
   AdapterSpec<CompletedEpisodeModel>(),
   AdapterSpec<FetchDataModelAdapter>(),
   AdapterSpec<SubscriptionModelAdapter>(),
-  AdapterSpec<SettingsModelAdapter>(),
 ])
 class HiveAdapters {}

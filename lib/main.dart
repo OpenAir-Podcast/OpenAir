@@ -10,6 +10,7 @@ import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
 import 'package:openair/responsive/tablet_scaffold.dart';
+import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 void main() async {
@@ -22,7 +23,14 @@ void main() async {
   }
 
   await Hive.initFlutter('OpenAir/.hive_config');
-  runApp(const ProviderScope(child: MyApp()));
+
+  // Create a ProviderContainer
+  final container = ProviderContainer();
+
+  // Initialize HiveService
+  await container.read(hiveServiceProvider).initial();
+
+  runApp(ProviderScope(parent: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -44,15 +52,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   /// Initializes all necessary app services.
   Future<void> _initApp() async {
-    // Initialize Hive first, as other providers might depend on it.
-    await ref.read(hiveServiceProvider).initial();
-
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    AsyncValue<Map?> userInterfaceSettings =
+        ref.watch(userInterfaceSettingsDataProvider);
+
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -344,25 +352,9 @@ class _MyAppState extends ConsumerState<MyApp> {
             child: ThemeConsumer(
               child: Builder(
                 builder: (themeContext) {
-                  try {
-                    final themeData = ThemeProvider.themeOf(themeContext).data;
+                  final themeData = ThemeProvider.themeOf(themeContext).data;
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return MaterialApp(
-                        supportedLocales: Translations.supportedLocales,
-                        localizationsDelegates: const [
-                          LocalizationsPlusDelegate(),
-                          FallbackCupertinoLocalizationsDelegate()
-                        ],
-                        debugShowCheckedModeBanner: false,
-                        title: 'OpenAir',
-                        theme: themeData,
-                        home: Scaffold(
-                          body: Center(child: CircularProgressIndicator()),
-                        ),
-                      );
-                    }
-
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return MaterialApp(
                       supportedLocales: Translations.supportedLocales,
                       localizationsDelegates: const [
@@ -372,35 +364,55 @@ class _MyAppState extends ConsumerState<MyApp> {
                       debugShowCheckedModeBanner: false,
                       title: 'OpenAir',
                       theme: themeData,
-                      home: FutureBuilder(
-                          future: ref.read(hiveServiceProvider).getLocale(),
-                          builder: (context, asyncSnapshot) {
-                            if (asyncSnapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Scaffold(
-                                body:
-                                    Center(child: CircularProgressIndicator()),
-                              );
-                            }
-
-                            Translations.changeLanguage(asyncSnapshot.data!);
-
-                            return ResponsiveLayout(
-                              mobileScaffold: MobileScaffold(),
-                              tabletScaffold: TabletScaffold(),
-                              desktopScaffold: DesktopScaffold(),
-                            );
-                          }),
-                    );
-                  } catch (e, stack) {
-                    debugPrint(
-                        'ThemeProvider or MaterialApp error: $e\n$stack');
-                    return MaterialApp(
                       home: Scaffold(
                         body: Center(child: CircularProgressIndicator()),
                       ),
                     );
                   }
+
+                  Future.delayed(
+                    const Duration(milliseconds: 5000),
+                  );
+
+                  return MaterialApp(
+                    supportedLocales: Translations.supportedLocales,
+                    localizationsDelegates: const [
+                      LocalizationsPlusDelegate(),
+                      FallbackCupertinoLocalizationsDelegate()
+                    ],
+                    debugShowCheckedModeBanner: false,
+                    title: 'OpenAir',
+                    theme: themeData,
+                    home: userInterfaceSettings.when(
+                      data: (data) {
+                        Translations.changeLanguage(data!['locale']);
+
+                        return ResponsiveLayout(
+                          mobileScaffold: MobileScaffold(),
+                          tabletScaffold: TabletScaffold(),
+                          desktopScaffold: DesktopScaffold(),
+                        );
+                      },
+                      error: (error, stackTrace) {
+                        debugPrint(
+                            'Error loading user interface settings: $error\n$stackTrace');
+
+                        return Scaffold(
+                          body: Center(
+                            child: Text(
+                                textAlign: TextAlign.center,
+                                'Error loading user interface settings: $error\n$stackTrace',
+                                style: TextStyle(
+                                  color: Colors.red[700],
+                                )),
+                          ),
+                        );
+                      },
+                      loading: () => Scaffold(
+                        body: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  );
                 },
               ),
             ),

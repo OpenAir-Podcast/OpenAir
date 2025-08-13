@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/hive_models/settings_model.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
-
-final FutureProvider<SettingsModel?> settingsDataProvider =
-    FutureProvider<SettingsModel?>((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return await hiveService.getSettings();
-});
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});

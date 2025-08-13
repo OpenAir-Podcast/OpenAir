@@ -13,7 +13,6 @@ import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
-import 'package:openair/hive_models/settings_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
@@ -60,7 +59,7 @@ class HiveService extends ChangeNotifier {
   late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
-  late final Future<CollectionBox<SettingsModel>> settingsBox;
+  late final Future<CollectionBox<Map>> settingsBox;
 
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
@@ -85,8 +84,6 @@ class HiveService extends ChangeNotifier {
     Hive.registerAdapter(SubscriptionModelAdapter());
 
     Hive.registerAdapter(FetchDataModelAdapter());
-
-    Hive.registerAdapter(SettingsModelAdapter());
 
     // Get the application documents directory
     if (!kIsWeb) {
@@ -129,7 +126,7 @@ class HiveService extends ChangeNotifier {
     completedEpisodeBox =
         collection.openBox<CompletedEpisodeModel>('completed_episodes');
 
-    settingsBox = collection.openBox('settings');
+    settingsBox = collection.openBox<Map>('settings');
 
     // Trending page
     trendingBox = collection.openBox<FetchDataModel>('trending');
@@ -139,12 +136,6 @@ class HiveService extends ChangeNotifier {
 
     // Category page
     categoryBox = collection.openBox<FetchDataModel>('category');
-
-    final settings = await settingsBox;
-
-    if (await settings.get('settings') == null) {
-      await settings.put('settings', SettingsModel.defaultSettings());
-    }
   }
 
   // Subscription Operations:
@@ -442,30 +433,34 @@ class HiveService extends ChangeNotifier {
   }
 
   // Settings Operations:
-  void saveSettings(SettingsModel settings) async {
+  void saveUserInterfaceSettings(Map userInterfaceSettings) async {
     final box = await settingsBox;
-    await box.put('settings', settings);
+    await box.put('userInterface', userInterfaceSettings);
   }
 
-  Future<SettingsModel?> getSettings() async {
-    final box = await settingsBox;
-    return await box.get('settings');
-  }
+  Future<Map<String, dynamic>?> getUserInterfaceSettings() async {
+    debugPrint('Fetching user interface settings from Hive.');
 
-  Future<String> getLocale() async {
     final box = await settingsBox;
-    final settings = await box.get('settings');
-    return settings?.getLocale ?? 'en_US';
-  }
+    Map? userInterfaceSettings = await box.get('userInterface');
 
-  Future<void> setLocale(String locale) async {
-    final box = await settingsBox;
-    final settings = await box.get('settings');
-    
-    if (settings != null) {
-      settings.setLocale = locale;
-      await box.put('settings', settings);
+    if (userInterfaceSettings == null) {
+      debugPrint(
+          'No user interface settings found, creating default settings.');
+
+      userInterfaceSettings = {
+        'fontSizeFactor': 1.0,
+        'language': 'English',
+        'locale': 'en_US',
+        'voice': 'System',
+        'speechRate': 'Medium',
+        'pitch': 'Medium',
+      };
+      await box.put('userInterface', userInterfaceSettings);
     }
+
+    // Cast to Map<String, dynamic> before returning
+    return userInterfaceSettings.cast<String, dynamic>();
   }
 
   // Counts

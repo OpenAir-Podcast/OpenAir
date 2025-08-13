@@ -163,21 +163,3 @@ types:
     fields:
       guid:
         index: 0
-  SettingsModel:
-    typeId: 15
-    nextIndex: 2
-    fields:
-      themeMode:
-        index: 0
-      fontSizeFactor:
-        index: 1
-      language:
-        index: 2
-      voice:
-        index: 3
-      speechRate:
-        index: 4
-      pitch:
-        index: 5
-      locale:
-        index: 6

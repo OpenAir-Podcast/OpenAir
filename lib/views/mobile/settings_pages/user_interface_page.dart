@@ -3,10 +3,31 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/settings_model.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/views/mobile/nav_pages/settings_page.dart';
 import 'package:theme_provider/theme_provider.dart';
+
+final FutureProvider<Map?> userInterfaceSettingsDataProvider =
+    FutureProvider((ref) async {
+  final hiveService = ref.watch(hiveServiceProvider);
+
+  Map? userInterfaceSettings = await hiveService.getUserInterfaceSettings();
+
+  if (userInterfaceSettings == null) {
+    userInterfaceSettings = {
+      'fontSizeFactor': 1.0,
+      'themeMode': 'System',
+      'language': 'English',
+      'locale': 'en_US',
+      'voice': 'System',
+      'speechRate': 'Medium',
+      'pitch': 'Medium',
+    };
+
+    hiveService.saveUserInterfaceSettings(userInterfaceSettings);
+  }
+
+  return userInterfaceSettings;
+});
 
 enum ThemeMode {
   system,
@@ -22,7 +43,7 @@ class UserInterface extends ConsumerStatefulWidget {
 }
 
 class _UserInterfaceState extends ConsumerState<UserInterface> {
-  late SettingsModel settingsModel;
+  late Map userInterface;
 
   late String fontSize;
   late String themeMode;
@@ -34,7 +55,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = ref.watch(settingsDataProvider);
+    final settings = ref.watch(userInterfaceSettingsDataProvider);
 
     Brightness platformBrightness =
         View.of(context).platformDispatcher.platformBrightness;
@@ -45,9 +66,9 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
       ),
       body: settings.when(
         data: (data) {
-          settingsModel = data!;
+          userInterface = data!;
 
-          switch (settingsModel.getFontSizeFactor) {
+          switch (userInterface['fontSizeFactor']) {
             case 0.875:
               fontSize = Translations.of(context).text('small');
               break;
@@ -65,7 +86,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               break;
           }
 
-          switch (settingsModel.getThemeMode) {
+          switch (userInterface['themeMode']) {
             case 'System':
               themeMode = Translations.of(context).text('system');
               break;
@@ -79,7 +100,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               themeMode = Translations.of(context).text('system');
           }
 
-          switch (settingsModel.getLanguage) {
+          switch (userInterface['language']) {
             case 'English':
               language = Translations.of(context).text('english');
               break;
@@ -126,7 +147,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               language = Translations.of(context).text('english');
           }
 
-          switch (settingsModel.getVoice) {
+          switch (userInterface['voice']) {
             case 'System':
               voice = Translations.of(context).text('system');
               break;
@@ -140,7 +161,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               voice = Translations.of(context).text('system');
           }
 
-          switch (settingsModel.getSpeechRate) {
+          switch (userInterface['speechRate']) {
             case 'Slow':
               speechRate = Translations.of(context).text('slow');
               break;
@@ -157,7 +178,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               speechRate = Translations.of(context).text('medium');
           }
 
-          switch (settingsModel.getPitch) {
+          switch (userInterface['pitch']) {
             case 'Low':
               pitch = Translations.of(context).text('low');
               break;
@@ -214,16 +235,16 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           saveValue = 'System';
                         }
 
-                        settingsModel.setThemeMode = saveValue;
+                        userInterface['themeMode'] = saveValue;
 
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
                       });
 
                       if (newValue == Translations.of(context).text('system')) {
                         if (platformBrightness == Brightness.dark) {
-                          switch (data.getFontSizeFactor) {
+                          switch (data['fontSizeFactor']) {
                             case 0.875:
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_small');
@@ -245,7 +266,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                                   .setTheme('blue_accent_dark_medium');
                           }
                         } else if (platformBrightness == Brightness.light) {
-                          switch (data.getFontSizeFactor) {
+                          switch (data['fontSizeFactor']) {
                             case 0.875:
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_small');
@@ -269,7 +290,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         }
                       } else if (newValue ==
                           Translations.of(context).text('light')) {
-                        switch (settingsModel.getFontSizeFactor) {
+                        switch (userInterface['fontSizeFactor']) {
                           case 0.875:
                             ThemeProvider.controllerOf(context)
                                 .setTheme('blue_accent_light_small');
@@ -292,7 +313,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         }
                       } else if (newValue ==
                           Translations.of(context).text('dark')) {
-                        switch (settingsModel.getFontSizeFactor) {
+                        switch (userInterface['fontSizeFactor']) {
                           case 0.875:
                             ThemeProvider.controllerOf(context)
                                 .setTheme('blue_accent_dark_small');
@@ -364,10 +385,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           scaleFactor = 1.0;
                         }
 
-                        settingsModel.setFontSizeFactor = scaleFactor;
+                        userInterface['fontSizeFactor'] = scaleFactor;
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
 
                         switch (
                             ThemeProvider.themeOf(context).data.brightness) {
@@ -515,8 +536,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       }
 
                       setState(() {
-                        settingsModel.setLanguage = saveValue;
-                        settingsModel.setLocale = locale;
+                        userInterface['language'] = saveValue;
+                        userInterface['locale'] = locale;
                         localeSettings = locale;
                         onChanged = false;
 
@@ -524,7 +545,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
                       });
                     },
                     items: <String>[
@@ -594,11 +615,11 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           saveValue = 'System';
                         }
 
-                        settingsModel.setVoice = saveValue;
+                        userInterface['voice'] = saveValue;
 
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
                       });
                     },
                     items: <String>[
@@ -631,10 +652,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     value: speechRate,
                     onChanged: (String? newValue) {
                       setState(() {
-                        settingsModel.setSpeechRate = newValue!;
+                        userInterface['speechRate'] = newValue!;
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
                       });
                     },
                     items: <String>[
@@ -668,10 +689,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     value: pitch,
                     onChanged: (String? newValue) {
                       setState(() {
-                        settingsModel.setPitch = newValue!;
+                        userInterface['pitch'] = newValue!;
                         ref
                             .read(hiveServiceProvider)
-                            .saveSettings(settingsModel);
+                            .saveUserInterfaceSettings(userInterface);
                       });
                     },
                     items: <String>[
