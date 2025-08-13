@@ -51,6 +51,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           Expanded(
@@ -59,8 +60,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 // TODO: check if the user is logged in
                 DrawerHeader(
                   decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
+                      // color: Colors.grey,
+                      ),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
