@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -18,10 +19,10 @@ class QueuePage extends ConsumerWidget {
     final queueStream = ref.watch(sortedQueueListProvider);
 
     final isPodcastSelected =
-        ref.watch(openAirProvider.select((p) => p.isPodcastSelected));
+        ref.watch(auidoProvider.select((p) => p.isPodcastSelected));
 
     final currentPlayingGuid =
-        ref.watch(openAirProvider.select((p) => p.currentEpisode?['guid']));
+        ref.watch(auidoProvider.select((p) => p.currentEpisode?['guid']));
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +50,7 @@ class QueuePage extends ConsumerWidget {
             itemCount: queueData.length,
             onReorder: (oldIndex, newIndex) {
               // This should trigger an update on the stream from the provider.
-              ref.read(hiveServiceProvider).reorderQueue(oldIndex, newIndex);
+              ref.watch(openAirProvider).hiveService.reorderQueue(oldIndex, newIndex);
             },
           );
         },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/categories_page.dart';
 import 'package:openair/views/mobile/main_pages/featured_page.dart';
 import 'package:openair/views/mobile/main_pages/trending_page.dart';
@@ -114,10 +114,10 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold>
           ],
         ),
         bottomNavigationBar: SizedBox(
-          height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+          height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
               ? 80.0
               : 0.0,
-          child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+          child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
               ? const BannerAudioPlayer()
               : const SizedBox.shrink(),
         ),

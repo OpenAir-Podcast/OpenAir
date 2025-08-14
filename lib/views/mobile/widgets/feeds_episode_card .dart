@@ -7,6 +7,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
@@ -35,7 +36,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
-        .read(openAirProvider)
+        .read(auidoProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue<List<QueueModel>> queueListAsync =
@@ -165,10 +166,10 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         ),
                       ),
                       onPressed: () {
-                        if (ref.read(openAirProvider).currentEpisode !=
+                        if (ref.read(auidoProvider).currentEpisode !=
                             widget.episodeItem) {
                           ref
-                              .read(openAirProvider.notifier)
+                              .read(auidoProvider.notifier)
                               .playerPlayButtonClicked(
                                 widget.episodeItem,
                               );
@@ -190,9 +191,9 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         onPressed: () {
                           isQueued
                               ? ref
-                                  .read(openAirProvider)
+                                  .read(auidoProvider)
                                   .removeFromQueue(widget.episodeItem['guid'])
-                              : ref.read(openAirProvider).addToQueue(
+                              : ref.read(auidoProvider).addToQueue(
                                     widget.episodeItem,
                                     widget.podcast,
                                   );
@@ -245,7 +246,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         final isDownloaded = downloads
                             .any((d) => d.guid == widget.episodeItem['guid']);
 
-                        final isDownloading = ref.watch(openAirProvider.select(
+                        final isDownloading = ref.watch(auidoProvider.select(
                             (p) => p.downloadingPodcasts
                                 .contains(widget.episodeItem['guid'])));
 
@@ -290,7 +291,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
 
                                       // Then perform the removal
                                       await ref
-                                          .read(openAirProvider.notifier)
+                                          .read(auidoProvider.notifier)
                                           .removeDownload(widget.episodeItem);
 
                                       // Show feedback
@@ -317,7 +318,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                               Translations.of(context).text('downloadEpisode');
 
                           onPressed = () {
-                            ref.read(openAirProvider.notifier).downloadEpisode(
+                            ref.read(auidoProvider.notifier).downloadEpisode(
                                   widget.episodeItem,
                                   widget.podcast,
                                 );

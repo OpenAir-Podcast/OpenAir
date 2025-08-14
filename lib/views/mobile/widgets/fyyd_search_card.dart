@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
@@ -43,7 +44,7 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
           description: rssFeed.description!,
         );
 
-        ref.read(openAirProvider).currentPodcast = podcastModel;
+        ref.read(auidoProvider).currentPodcast = podcastModel;
 
         if (context.mounted) {
           Navigator.of(context).push(
@@ -162,12 +163,12 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
                         );
 
                         if (snapshot.data!) {
-                          ref.read(openAirProvider).unsubscribe(podcastModel);
+                          ref.read(auidoProvider).unsubscribe(podcastModel);
                           setState(() {
                             isSub = false;
                           });
                         } else {
-                          ref.read(openAirProvider).subscribe(podcastModel);
+                          ref.read(auidoProvider).subscribe(podcastModel);
                           setState(() {
                             isSub = true;
                           });

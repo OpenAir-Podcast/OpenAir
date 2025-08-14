@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/queue_model.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 
 class QueueCard extends ConsumerStatefulWidget {
@@ -25,9 +25,9 @@ class QueueCard extends ConsumerStatefulWidget {
 class _QueueCardState extends ConsumerState<QueueCard> {
   @override
   Widget build(BuildContext context) {
-    final openAirNotifier = ref.read(openAirProvider.notifier);
+    final audioProviderNotifier = ref.read(auidoProvider.notifier);
     // Watch the provider to get live updates for the active card.
-    final openAir = ref.watch(openAirProvider);
+    final openAir = ref.watch(auidoProvider);
 
     final double currentPositionMilliseconds;
     final String currentPositionString;
@@ -98,7 +98,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
             Row(
               children: [
                 Text(
-                  ref.read(openAirProvider).getPodcastPublishedDateFromEpoch(
+                  ref.read(auidoProvider).getPodcastPublishedDateFromEpoch(
                         widget.episodeItem.datePublished,
                       ),
                   style: const TextStyle(fontSize: 12),
@@ -171,15 +171,15 @@ class _QueueCardState extends ConsumerState<QueueCard> {
           onPressed: () {
             if (widget.isQueueSelected &&
                 openAir.isPlaying == PlayingStatus.playing) {
-              openAirNotifier.playerPauseButtonClicked();
+              audioProviderNotifier.playerPauseButtonClicked();
               debugPrint('Pausing');
             } else if (widget.isQueueSelected &&
                 openAir.isPlaying == PlayingStatus.paused) {
               debugPrint('Resuming');
-              openAirNotifier.playerResumeButtonClicked();
+              audioProviderNotifier.playerResumeButtonClicked();
             } else if (!widget.isQueueSelected) {
               if (openAir.currentEpisode!.isNotEmpty) {
-                openAirNotifier.updateCurrentQueueCard(
+                audioProviderNotifier.updateCurrentQueueCard(
                   openAir.currentEpisode!['guid'],
                   openAir.podcastCurrentPositionInMilliseconds,
                   openAir.currentPlaybackPositionString,
@@ -193,7 +193,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               openAir.currentPodcast = widget.episodeItem.podcast;
               openAir.currentEpisode = widget.episodeItem.toJson();
 
-              openAirNotifier.playNewQueueItem(widget.episodeItem);
+              audioProviderNotifier.playNewQueueItem(widget.episodeItem);
             }
           },
         ),

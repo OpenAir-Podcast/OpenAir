@@ -3,12 +3,12 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 final FutureProvider<Map?> userInterfaceSettingsDataProvider =
     FutureProvider((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
+  final hiveService = ref.watch(openAirProvider).hiveService;
 
   Map? userInterfaceSettings = await hiveService.getUserInterfaceSettings();
 
@@ -238,7 +238,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         userInterface['themeMode'] = saveValue;
 
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
                       });
 
@@ -369,6 +370,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         fontSize = newValue!;
                         double scaleFactor;
 
+                        // TODO: Research system font size scaling
                         if (newValue ==
                             Translations.of(context).text('small')) {
                           scaleFactor = 0.875;
@@ -387,7 +389,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
                         userInterface['fontSizeFactor'] = scaleFactor;
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
 
                         switch (
@@ -544,7 +547,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         Translations.changeLanguage(locale);
 
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
                       });
                     },
@@ -618,7 +622,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         userInterface['voice'] = saveValue;
 
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
                       });
                     },
@@ -654,7 +659,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       setState(() {
                         userInterface['speechRate'] = newValue!;
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
                       });
                     },
@@ -690,8 +696,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     onChanged: (String? newValue) {
                       setState(() {
                         userInterface['pitch'] = newValue!;
+
                         ref
-                            .read(hiveServiceProvider)
+                            .watch(openAirProvider)
+                            .hiveService
                             .saveUserInterfaceSettings(userInterface);
                       });
                     },

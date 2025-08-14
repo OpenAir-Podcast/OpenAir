@@ -6,7 +6,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
@@ -226,7 +226,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                                 artwork: snapshot[index]['imgURL'],
                               );
 
-                              ref.read(openAirProvider).currentPodcast =
+                              ref.read(auidoProvider).currentPodcast =
                                   PodcastModel.fromJson(podcast.toJson());
 
                               if (context.mounted) {
@@ -389,7 +389,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                             }
 
                             bool i = await ref
-                                .watch(openAirProvider)
+                                .watch(auidoProvider)
                                 .addPodcastByRssUrl(textInputControl.text);
 
                             if (context.mounted) {
@@ -596,8 +596,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                 ),
               ),
               onTap: () async {
-                bool i =
-                    await ref.watch(openAirProvider).importPodcastFromOpml();
+                bool i = await ref.watch(auidoProvider).importPodcastFromOpml();
 
                 if (context.mounted) {
                   if (i == true) {
@@ -617,10 +616,10 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+        height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
             ? 80.0
             : 0.0,
-        child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+        child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),
       ),

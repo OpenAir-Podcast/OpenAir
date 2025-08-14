@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 
@@ -40,7 +40,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         memCacheHeight: imageSize.ceil(),
                         memCacheWidth: imageSize.ceil(),
                         imageUrl:
-                            ref.watch(openAirProvider).currentPodcast!.imageUrl,
+                            ref.watch(auidoProvider).currentPodcast!.imageUrl,
                       ),
                     ),
                   ),
@@ -49,13 +49,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => EpisodeDetail(
-                          episodeItem:
-                              ref.watch(openAirProvider).currentEpisode!,
+                          episodeItem: ref.watch(auidoProvider).currentEpisode!,
                         ),
                       ),
                     ),
                     child: Text(
-                      ref.watch(openAirProvider).currentEpisode!['title'],
+                      ref.watch(auidoProvider).currentEpisode!['title'],
                       style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -73,12 +72,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         MaterialPageRoute(
                           builder: (context) => EpisodesPage(
                               podcast:
-                                  ref.watch(openAirProvider).currentPodcast!),
+                                  ref.watch(auidoProvider).currentPodcast!),
                         ),
                       );
                     },
                     child: Text(
-                      ref.watch(openAirProvider).currentEpisode!['author'] ??
+                      ref.watch(auidoProvider).currentEpisode!['author'] ??
                           'Unknown',
                       style: const TextStyle(
                         fontSize: 14.0,
@@ -99,10 +98,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     min: 0.0,
                     max: 1.0,
                     value: ref
-                        .watch(openAirProvider)
+                        .watch(auidoProvider)
                         .podcastCurrentPositionInMilliseconds,
                     onChanged: (value) {
-                      ref.read(openAirProvider).mainPlayerSliderClicked(
+                      ref.read(auidoProvider).mainPlayerSliderClicked(
                           value); // Use read for actions
                     },
                   ),
@@ -114,14 +113,14 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       children: [
                         Text(
                           ref
-                              .watch(openAirProvider)
+                              .watch(auidoProvider)
                               .currentPlaybackPositionString,
                         ),
                         //
                         // Spacer
                         //
                         Text(
-                          '-${ref.watch(openAirProvider).currentPlaybackRemainingTimeString}',
+                          '-${ref.watch(auidoProvider).currentPlaybackRemainingTimeString}',
                         ),
                       ],
                     ),
@@ -141,7 +140,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Rewind button
                   IconButton(
                     onPressed: ref
-                        .read(openAirProvider)
+                        .read(auidoProvider)
                         .rewindButtonClicked, // Use read for actions
                     icon: const SizedBox(
                       width: 52.0,
@@ -163,17 +162,17 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.read(openAirProvider).audioState ==
+                      ref.read(auidoProvider).audioState ==
                               'Play' // Use read for state check in action
                           ? ref
-                              .read(openAirProvider) // Use read for actions
+                              .read(auidoProvider) // Use read for actions
                               .playerPauseButtonClicked()
-                          : ref.read(openAirProvider).playerPlayButtonClicked(
+                          : ref.read(auidoProvider).playerPlayButtonClicked(
                                 // Use read for actions
-                                ref.read(openAirProvider).currentEpisode!,
+                                ref.read(auidoProvider).currentEpisode!,
                               );
                     }, // Add play/pause functionality
-                    icon: ref.watch(openAirProvider).audioState == 'Play'
+                    icon: ref.watch(auidoProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
                         : const Icon(Icons.play_arrow_rounded),
                     iconSize: 48.0,
@@ -181,7 +180,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Fast forward button
                   IconButton(
                     onPressed: ref
-                        .read(openAirProvider)
+                        .read(auidoProvider)
                         .fastForwardButtonClicked, // Use read for actions
                     icon: const SizedBox(
                       width: 52.0,
@@ -212,10 +211,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Playback speed
                   TextButton(
                     onPressed: () => ref
-                        .read(openAirProvider.notifier)
+                        .read(auidoProvider.notifier)
                         .audioSpeedButtonClicked(),
                     child: Text(
-                      ref.watch(openAirProvider).audioSpeedButtonLabel,
+                      ref.watch(auidoProvider).audioSpeedButtonLabel,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

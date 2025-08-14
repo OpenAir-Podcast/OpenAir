@@ -4,7 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
@@ -23,14 +23,7 @@ void main() async {
   }
 
   await Hive.initFlutter('OpenAir/.hive_config');
-
-  // Create a ProviderContainer
-  final container = ProviderContainer();
-
-  // Initialize HiveService
-  await container.read(hiveServiceProvider).initial();
-
-  runApp(ProviderScope(parent: container, child: const MyApp()));
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -54,13 +47,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initApp() async {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
+    if (mounted) await ref.read(auidoProvider).initAudio(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<Map?> userInterfaceSettings =
-        ref.watch(userInterfaceSettingsDataProvider);
-
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -81,8 +72,6 @@ class _MyAppState extends ConsumerState<MyApp> {
               Localization.sv_SE,
               Localization.zh_CN,
             ],
-            // selected: Localization.en_US,
-            // fallback: Localization.en_US,
           );
 
           return ThemeProvider(
@@ -369,6 +358,10 @@ class _MyAppState extends ConsumerState<MyApp> {
                       ),
                     );
                   }
+
+                  // Load user interface settings
+                  AsyncValue<Map?> userInterfaceSettings =
+                      ref.watch(userInterfaceSettingsDataProvider);
 
                   Future.delayed(
                     const Duration(milliseconds: 5000),

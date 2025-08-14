@@ -14,21 +14,16 @@ import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-final hiveServiceProvider = ChangeNotifierProvider<HiveService>(
-  (ref) {
-    return HiveService(ref);
-  },
-);
-
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
     StreamProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async* {
-  final hiveService = ref.watch(hiveServiceProvider);
+  final hiveService = ref.watch(openAirProvider).hiveService;
   final box = await hiveService.subscriptionBox;
 
   // Emit the initial state
@@ -38,19 +33,19 @@ final subscriptionsProvider =
 // FutureProvider for sorted Queue List
 final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
   (ref) {
-    ref.watch(hiveServiceProvider);
-    return ref.read(hiveServiceProvider).getSortedQueue().asStream();
+    final hiveService = ref.watch(openAirProvider).hiveService;
+    return hiveService.getSortedQueue().asStream();
   },
 );
 
 final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
   (ref) {
-    ref.watch(hiveServiceProvider);
-    return ref.read(hiveServiceProvider).getSortedDownloads().asStream();
+    final hiveService = ref.watch(openAirProvider).hiveService;
+    return hiveService.getSortedDownloads().asStream();
   },
 );
 
-class HiveService extends ChangeNotifier {
+class HiveService {
   late final BoxCollection collection;
   late final Future<CollectionBox<SubscriptionModel>> subscriptionBox;
   late final Future<CollectionBox<EpisodeModel>> episodeBox;
@@ -70,7 +65,7 @@ class HiveService extends ChangeNotifier {
   late final Directory openAirDir;
 
   HiveService(this.ref);
-  final Ref<HiveService> ref;
+  final Ref<OpenAirProvider> ref;
 
   Future<void> initial() async {
     // Register all adapters
@@ -145,14 +140,11 @@ class HiveService extends ChangeNotifier {
       subscription.title,
       subscription,
     );
-
-    notifyListeners();
   }
 
   Future<void> unsubscribe(String title) async {
     final box = await subscriptionBox;
     await box.delete(title);
-    notifyListeners();
   }
 
   Future<Map<String, SubscriptionModel>> getSubscriptions() async {
@@ -264,9 +256,7 @@ class HiveService extends ChangeNotifier {
   Future<void> addToQueue(QueueModel queue, {bool notify = true}) async {
     final box = await queueBox;
     await box.put(queue.guid, queue);
-    if (notify) {
-      notifyListeners();
-    }
+    if (notify) {}
   }
 
   Future<void> removeFromQueue({required String guid}) async {
@@ -278,8 +268,6 @@ class HiveService extends ChangeNotifier {
     for (var item in newQueueList) {
       await box.put(item.guid, item);
     }
-
-    notifyListeners();
   }
 
   Future<List<QueueModel>> getSortedQueue() async {
@@ -335,15 +323,12 @@ class HiveService extends ChangeNotifier {
     for (var item in queue) {
       await box.put(item.guid, item);
     }
-
-    notifyListeners();
   }
 
   // Download Operations:
   Future<void> addToDownloads(DownloadModel download) async {
     final box = await downloadBox;
     await box.put(download.guid, download);
-    notifyListeners();
   }
 
   Future<Map<String, DownloadModel>> getDownloads() async {
@@ -381,7 +366,6 @@ class HiveService extends ChangeNotifier {
   Future<void> deleteDownload(String guid) async {
     final box = await downloadBox;
     await box.delete(guid);
-    notifyListeners();
   }
 
   Future<void> clearDownloads() async {

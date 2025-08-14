@@ -4,6 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 
@@ -26,7 +27,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ref.read(openAirProvider).currentPodcast = widget.podcastItem;
+        ref.read(auidoProvider).currentPodcast = widget.podcastItem;
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -125,10 +126,10 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                       onPressed: () async {
                         snapshot.data!
                             ? ref
-                                .read(openAirProvider)
+                                .read(auidoProvider)
                                 .unsubscribe(widget.podcastItem)
                             : ref
-                                .read(openAirProvider)
+                                .read(auidoProvider)
                                 .subscribe(widget.podcastItem);
 
                         ScaffoldMessenger.of(context).showSnackBar(

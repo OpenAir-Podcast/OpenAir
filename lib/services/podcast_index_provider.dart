@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 final podcastIndexProvider = Provider(
   (ref) => PodcastIndexProvider(ref),
@@ -147,7 +147,8 @@ class PodcastIndexProvider {
 
     final response = await _retry(() => _dio.get(url));
     ref
-        .read(hiveServiceProvider)
+        .watch(openAirProvider)
+        .hiveService
         .putCategoryPodcast(category.replaceAll(' ', ''), response.data);
     return response.data;
   }
@@ -159,7 +160,7 @@ class PodcastIndexProvider {
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putTrendingPodcast(response.data);
+    ref.watch(openAirProvider).hiveService.putTrendingPodcast(response.data);
     return response.data;
   }
 
@@ -168,7 +169,7 @@ class PodcastIndexProvider {
         'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putTopFeaturedPodcast(response.data);
+    ref.watch(openAirProvider).hiveService.putTopFeaturedPodcast(response.data);
     return response.data;
   }
 
@@ -178,7 +179,8 @@ class PodcastIndexProvider {
 
     final response = await _retry(() => _dio.get(url));
     ref
-        .read(hiveServiceProvider)
+        .watch(openAirProvider)
+        .hiveService
         .putCategoryPodcast('Education', response.data);
     return response.data;
   }
@@ -188,7 +190,10 @@ class PodcastIndexProvider {
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=health&lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putCategoryPodcast('Health', response.data);
+    ref
+        .watch(openAirProvider)
+        .hiveService
+        .putCategoryPodcast('Health', response.data);
     return response.data;
   }
 
@@ -198,7 +203,8 @@ class PodcastIndexProvider {
 
     final response = await _retry(() => _dio.get(url));
     ref
-        .read(hiveServiceProvider)
+        .watch(openAirProvider)
+        .hiveService
         .putCategoryPodcast('Technology', response.data);
     return response.data;
   }
@@ -208,7 +214,10 @@ class PodcastIndexProvider {
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=sports&lang=en&pretty';
 
     final response = await _retry(() => _dio.get(url));
-    ref.read(hiveServiceProvider).putCategoryPodcast('Sports', response.data);
+    ref
+        .watch(openAirProvider)
+        .hiveService
+        .putCategoryPodcast('Sports', response.data);
     return response.data;
   }
 

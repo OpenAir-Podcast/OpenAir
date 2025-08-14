@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 
 class PlayButtonWidget extends ConsumerStatefulWidget {
   const PlayButtonWidget({
@@ -23,20 +23,20 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
     const double paddingSpace = 8.0;
 
     if (widget.episodeItem['guid'] !=
-        ref.watch(openAirProvider).currentEpisode!['guid']) {
-      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
+        ref.watch(auidoProvider).currentEpisode!['guid']) {
+      if (ref.watch(auidoProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }
     }
     // EpisodeItem is the same as currentEpisode
     else {
-      if (ref.watch(openAirProvider).isPlaying == PlayingStatus.playing) {
+      if (ref.watch(auidoProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
-      } else if (ref.watch(openAirProvider).isPlaying == PlayingStatus.paused) {
+      } else if (ref.watch(auidoProvider).isPlaying == PlayingStatus.paused) {
         playStatus = PlayingStatus.paused;
-      } else if (ref.watch(openAirProvider).isPlaying == PlayingStatus.stop) {
+      } else if (ref.watch(auidoProvider).isPlaying == PlayingStatus.stop) {
         playStatus = PlayingStatus.detail;
-      } else if (ref.watch(openAirProvider).isPlaying ==
+      } else if (ref.watch(auidoProvider).isPlaying ==
           PlayingStatus.buffering) {
         playStatus = PlayingStatus.buffering;
       }
@@ -54,7 +54,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           ),
           Text(
             ref
-                .watch(openAirProvider)
+                .watch(auidoProvider)
                 .getPodcastDuration(widget.episodeItem['enclosureLength']),
             overflow: TextOverflow.ellipsis,
           ),
@@ -71,7 +71,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             child: Icon(Icons.timelapse_rounded),
           ),
           Text(
-            ref.watch(openAirProvider).currentPodcastTimeRemaining!,
+            ref.watch(auidoProvider).currentPodcastTimeRemaining!,
             overflow: TextOverflow.ellipsis,
           ),
         ],

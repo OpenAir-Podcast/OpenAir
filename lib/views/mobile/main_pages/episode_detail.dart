@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -91,7 +92,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(openAirProvider).currentPodcast!.author ??
+                            ref.watch(auidoProvider).currentPodcast!.author ??
                                 Translations.of(context).text('unknown'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -105,7 +106,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         // Podcast Published Date
                         Text(
                           ref
-                              .watch(openAirProvider)
+                              .watch(auidoProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!['datePublished']),
                           style: const TextStyle(
@@ -136,7 +137,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           ),
                         ),
                         onPressed: () => ref
-                            .read(openAirProvider)
+                            .read(auidoProvider)
                             .playerPlayButtonClicked(widget.episodeItem!),
                         child: PlayButtonWidget(
                           episodeItem: widget.episodeItem!,
@@ -153,9 +154,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: () {
                             isQueued
-                                ? ref.read(openAirProvider).removeFromQueue(
+                                ? ref.read(auidoProvider).removeFromQueue(
                                     widget.episodeItem!['guid'])
-                                : ref.read(openAirProvider).addToQueue(
+                                : ref.read(auidoProvider).addToQueue(
                                       widget.episodeItem!,
                                       widget.podcast,
                                     );
@@ -206,7 +207,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           final isDownloaded = downloads.any(
                               (d) => d.guid == widget.episodeItem!['guid']);
 
-                          final isDownloading = ref.watch(openAirProvider
+                          final isDownloading = ref.watch(auidoProvider
                               .select((p) => p.downloadingPodcasts
                                   .contains(widget.episodeItem!['guid'])));
 
@@ -251,7 +252,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
                                         // Then perform the removal
                                         await ref
-                                            .read(openAirProvider.notifier)
+                                            .read(auidoProvider.notifier)
                                             .removeDownload(
                                                 widget.episodeItem!);
 
@@ -280,7 +281,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
                             onPressed = () {
                               ref
-                                  .read(openAirProvider.notifier)
+                                  .read(auidoProvider.notifier)
                                   .downloadEpisode(
                                     widget.episodeItem!,
                                     widget.podcast!,
@@ -339,8 +340,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(openAirProvider).isPodcastSelected ? 75.0 : 0.0,
-        child: ref.watch(openAirProvider).isPodcastSelected
+        height: ref.watch(auidoProvider).isPodcastSelected ? 75.0 : 0.0,
+        child: ref.watch(auidoProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),
