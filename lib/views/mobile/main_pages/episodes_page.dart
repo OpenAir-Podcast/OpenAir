@@ -120,9 +120,10 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                             ? ref
                                 .read(auidoProvider)
                                 .unsubscribe(widget.podcast)
-                            : ref
-                                .read(auidoProvider)
-                                .subscribe(widget.podcast);
+                            : ref.read(auidoProvider).subscribe(
+                                  widget.podcast,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

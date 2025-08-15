@@ -128,9 +128,10 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                             ? ref
                                 .read(auidoProvider)
                                 .unsubscribe(widget.podcastItem)
-                            : ref
-                                .read(auidoProvider)
-                                .subscribe(widget.podcastItem);
+                            : ref.read(auidoProvider).subscribe(
+                                  widget.podcastItem,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

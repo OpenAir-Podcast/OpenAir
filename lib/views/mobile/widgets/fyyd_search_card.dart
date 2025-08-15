@@ -168,7 +168,12 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
                             isSub = false;
                           });
                         } else {
-                          ref.read(auidoProvider).subscribe(podcastModel);
+                          if (context.mounted) {
+                            ref.read(auidoProvider).subscribe(
+                                  podcastModel,
+                                  context,
+                                );
+                          }
                           setState(() {
                             isSub = true;
                           });

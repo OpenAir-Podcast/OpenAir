@@ -287,6 +287,7 @@ class HiveService {
       debugPrint('HiveService: Stacktrace for sorting error: $s');
       // Depending on requirements, you might return the unsorted list or handle otherwise.
     }
+    
     return queueList;
   }
 

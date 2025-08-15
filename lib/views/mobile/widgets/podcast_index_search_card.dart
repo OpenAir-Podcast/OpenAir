@@ -138,9 +138,10 @@ class _PodcastIndexSearchCardState
                             isSub = false;
                           });
                         } else {
-                          ref
-                              .read(auidoProvider)
-                              .subscribe(widget.podcastItem);
+                          ref.read(auidoProvider).subscribe(
+                                widget.podcastItem,
+                                context,
+                              );
                           setState(() {
                             isSub = true;
                           });

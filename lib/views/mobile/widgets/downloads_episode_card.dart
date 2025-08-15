@@ -321,6 +321,7 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                             ref.read(auidoProvider.notifier).downloadEpisode(
                                   widget.episodeItem,
                                   widget.podcast,
+                                  context,
                                 );
 
                             ScaffoldMessenger.of(context).showSnackBar(

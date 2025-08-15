@@ -138,7 +138,10 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                         // FIXME: Doesn't subscribe/unsubscribe immediately
                         snapshot.data!
                             ? ref.read(auidoProvider).unsubscribe(podcast)
-                            : ref.read(auidoProvider).subscribe(podcast);
+                            : ref.read(auidoProvider).subscribe(
+                                  podcast,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

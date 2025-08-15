@@ -15,6 +15,7 @@ import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
@@ -274,18 +275,8 @@ class AudioProvider extends ChangeNotifier {
   Future<void> downloadEpisode(
     Map<String, dynamic> item,
     PodcastModel podcast,
+    BuildContext context,
   ) async {
-    if (kIsWeb) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Downloading is not available on the web.'),
-          ),
-        );
-      }
-      return;
-    }
-
     final dio = Dio();
 
     final guid = item['guid'] as String;
@@ -330,15 +321,16 @@ class AudioProvider extends ChangeNotifier {
           .hiveService
           .addToDownloads(downloadModel);
 
+      ref.invalidate(sortedDownloadsProvider);
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Downloaded \'${item['title']}\''),
+            content: Text(
+                '${Translations.of(context).text('downloadEpisode')}: \'${item['title']}\''),
           ),
         );
       }
-
-      notifyListeners();
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
 
@@ -349,13 +341,13 @@ class AudioProvider extends ChangeNotifier {
         await file.delete();
       }
 
-      // if (context.mounted) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text('An error has occurred while downloading.'),
-      //     ),
-      //   );
-      // }
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An error has occurred while downloading.'),
+          ),
+        );
+      }
     } finally {
       downloadingPodcasts.remove(guid);
       notifyListeners();
@@ -826,6 +818,7 @@ class AudioProvider extends ChangeNotifier {
 
   void subscribe(
     PodcastModel podcast,
+    BuildContext context,
   ) async {
     try {
       int podcastEpisodeCount = await ref
@@ -850,14 +843,12 @@ class AudioProvider extends ChangeNotifier {
       // as it watches hiveServiceProvider, which is notified by the subscribe call.
       ref.invalidate(getFeedsProvider);
       notifyListeners();
-    } on DioException catch (e) {
-      debugPrint(
-          'OP:Failed to subscribe to ${podcast.title}. DioError: ${e.message}\nStack trace: ${e.stackTrace}');
-
+    } on DioException {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to subscribe: ${e.message}'),
+            content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')}}'),
           ),
         );
       }

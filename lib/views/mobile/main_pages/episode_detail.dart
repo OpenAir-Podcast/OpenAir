@@ -170,6 +170,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 ),
                               ),
                             );
+
+                            ref.invalidate(sortedQueueListProvider);
                           },
                           icon: isQueued
                               ? const Icon(Icons.playlist_add_check_rounded)
@@ -207,8 +209,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           final isDownloaded = downloads.any(
                               (d) => d.guid == widget.episodeItem!['guid']);
 
-                          final isDownloading = ref.watch(auidoProvider
-                              .select((p) => p.downloadingPodcasts
+                          final isDownloading = ref.watch(auidoProvider.select(
+                              (p) => p.downloadingPodcasts
                                   .contains(widget.episodeItem!['guid'])));
 
                           IconData iconData;
@@ -266,11 +268,15 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                             ),
                                           );
                                         }
+
+                                        ref.invalidate(sortedDownloadsProvider);
                                       },
                                     ),
                                   ],
                                 ),
                               );
+
+                              ref.invalidate(sortedDownloadsProvider);
                             };
                           }
                           // Episode not downloaded
@@ -280,11 +286,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
-                              ref
-                                  .read(auidoProvider.notifier)
-                                  .downloadEpisode(
+                              ref.read(auidoProvider.notifier).downloadEpisode(
                                     widget.episodeItem!,
                                     widget.podcast!,
+                                    context,
                                   );
 
                               ScaffoldMessenger.of(context).showSnackBar(

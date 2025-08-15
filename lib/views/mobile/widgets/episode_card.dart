@@ -43,7 +43,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
     final AsyncValue<List<QueueModel>> queueListAsync =
         ref.watch(sortedQueueListProvider);
 
-    final AsyncValue<List<DownloadModel>> downloadedListAsync =
+    final AsyncValue<List<DownloadModel>> downloadedListProvider =
         ref.watch(sortedDownloadsProvider);
 
     return GestureDetector(
@@ -208,6 +208,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ),
                             ),
                           );
+
+                          ref.invalidate(sortedQueueListProvider);
                         },
                         icon: isQueued
                             ? const Icon(Icons.playlist_add_check_rounded)
@@ -241,7 +243,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   ),
                   // Download button
                   if (!kIsWeb)
-                    downloadedListAsync.when(
+                    downloadedListProvider.when(
                       data: (downloads) {
                         final isDownloaded = downloads
                             .any((d) => d.guid == widget.episodeItem['guid']);
@@ -304,11 +306,15 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                           ),
                                         );
                                       }
+
+                                      ref.invalidate(sortedDownloadsProvider);
                                     },
                                   ),
                                 ],
                               ),
                             );
+
+                            ref.invalidate(sortedDownloadsProvider);
                           };
                         }
                         // Not downloaded
@@ -318,17 +324,29 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               Translations.of(context).text('downloadEpisode');
 
                           onPressed = () {
-                            ref.read(auidoProvider.notifier).downloadEpisode(
-                                  widget.episodeItem,
-                                  widget.podcast,
+                            if (kIsWeb) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Downloading is not available on the web.'),
+                                  ),
                                 );
+                              }
+                            } else {
+                              ref.read(auidoProvider.notifier).downloadEpisode(
+                                    widget.episodeItem,
+                                    widget.podcast,
+                                    context,
+                                  );
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Downloading \'${widget.episodeItem['title']}\''),
-                              ),
-                            );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Downloading \'${widget.episodeItem['title']}\''),
+                                ),
+                              );
+                            }
                           };
                         }
 

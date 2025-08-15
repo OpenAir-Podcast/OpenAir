@@ -347,6 +347,7 @@ class _SubscriptionEpisodeCardState
                                       .downloadEpisode(
                                         widget.episodeItem,
                                         widget.podcast,
+                                        context,
                                       );
 
                                   ScaffoldMessenger.of(context).showSnackBar(
