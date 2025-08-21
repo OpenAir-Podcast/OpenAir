@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/history_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
@@ -159,14 +157,11 @@ class OpenAirProvider extends ChangeNotifier {
     return await hiveService.downloadsCount();
   }
 
-  Future<Queue<QueueModel>> getQueue() async {
-    Queue<QueueModel> queue = Queue();
-    List<QueueModel> queueList = await hiveService.getSortedQueue();
-    queue.addAll(queueList);
-    return queue;
+  Future getQueue() async {
+    return await hiveService.getQueue();
   }
 
-  Future<QueueModel?> getQueueByGuid(String guid) async {
+  Future getQueueByGuid(String guid) async {
     return await hiveService.getQueueByGuid(guid);
   }
 

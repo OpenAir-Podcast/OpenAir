@@ -28,7 +28,6 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
     return GestureDetector(
       onTap: () {
         ref.read(auidoProvider).currentPodcast = widget.podcastItem;
-
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => EpisodesPage(podcast: widget.podcastItem),
@@ -36,7 +35,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
         );
       },
       child: Card(
-        color: Colors.blueGrey[100],
+        color: Theme.of(context).cardColor,
         elevation: 2.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -76,7 +75,11 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                           child: Text(
                             widget.podcastItem.title,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
+                            style: TextStyle(
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.bold,
                               overflow: TextOverflow.ellipsis,
                             ),

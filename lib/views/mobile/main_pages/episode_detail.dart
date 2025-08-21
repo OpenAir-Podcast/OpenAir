@@ -1,16 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
+import 'package:styled_text/widgets/styled_text.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
@@ -29,8 +28,7 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<QueueModel>> queueListAsync =
-        ref.watch(sortedQueueListProvider);
+    final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
@@ -81,9 +79,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
                             widget.podcast!.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
@@ -146,9 +148,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     ),
                     // Queue Button
                     queueListAsync.when(
-                      data: (list) {
-                        final isQueued = list.any(
-                            (item) => item.guid == widget.episodeItem!['guid']);
+                      data: (data) {
+                        final isQueued =
+                            data.containsKey(widget.episodeItem!['guid']);
 
                         return IconButton(
                           tooltip: Translations.of(context).text('addToQueue'),
@@ -171,7 +173,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               ),
                             );
 
-                            ref.invalidate(sortedQueueListProvider);
+                            ref.invalidate(getQueueProvider);
                           },
                           icon: isQueued
                               ? const Icon(Icons.playlist_add_check_rounded)
@@ -189,8 +191,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       loading: () {
                         // Handle loading by showing previous state's icon, disabled
                         final previousList = queueListAsync.valueOrNull;
-                        final isQueuedPreviously = previousList?.any((item) =>
-                                item.guid == widget.episodeItem!['guid']) ??
+                        final isQueuedPreviously = previousList
+                                ?.containsKey(widget.episodeItem!['guid']) ??
                             false;
 
                         return IconButton(
@@ -329,15 +331,15 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
               // Episode Description
               // TODO: Use a rich text widget to display the description
               SingleChildScrollView(
-                child: Html(
-                  data: widget.episodeItem!['description'],
-                  style: {
-                    "br": Style(
-                      display: Display.block,
-                      backgroundColor: Colors.black,
-                    ),
-                  },
-                  shrinkWrap: true,
+                child: StyledText(
+                  text: widget.episodeItem!['description'],
+                  maxLines: 4,
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    color: Brightness.dark == Theme.of(context).brightness
+                        ? Colors.white
+                        : Colors.black,
+                  ),
                 ),
               ),
             ],

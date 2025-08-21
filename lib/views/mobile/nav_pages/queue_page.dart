@@ -3,20 +3,32 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/queue_card.dart';
 
-class QueuePage extends ConsumerWidget {
+// FutureProvider for sorted Queue List
+final sortedProvider = FutureProvider(
+  (ref) {
+    final hiveService = ref.watch(openAirProvider).hiveService;
+    return hiveService.getQueue();
+  },
+);
+
+class QueuePage extends ConsumerStatefulWidget {
   const QueuePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // By using a StreamProvider for the queue, the UI will automatically
-    // update when the queue changes (e.g., after reordering). We use .stream
-    // because sortedQueueListProvider is a StreamProvider.
-    final queueStream = ref.watch(sortedQueueListProvider);
+  ConsumerState<QueuePage> createState() => _QueuePageState();
+}
+
+class _QueuePageState extends ConsumerState<QueuePage> {
+  Map queueMap = {};
+  bool once = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final queueStream = ref.watch(sortedProvider);
 
     final isPodcastSelected =
         ref.watch(auidoProvider.select((p) => p.isPodcastSelected));
@@ -34,14 +46,22 @@ class QueuePage extends ConsumerWidget {
             return NoQueue();
           }
 
+          if (!once) {
+            once = true;
+            queueMap = queueData;
+          }
+
           return ReorderableListView.builder(
             buildDefaultDragHandles: false,
             itemBuilder: (context, index) {
-              final item = queueData[index];
-              final bool isQueueSelected = currentPlayingGuid == item.guid;
+              final Map<String, dynamic> item =
+                  (queueData.entries.elementAt(index).value)
+                      .cast<String, dynamic>();
+
+              final bool isQueueSelected = currentPlayingGuid == item['guid'];
 
               return QueueCard(
-                key: ValueKey(item.guid),
+                key: ValueKey(item['guid']),
                 episodeItem: item,
                 index: index,
                 isQueueSelected: isQueueSelected,
@@ -49,8 +69,14 @@ class QueuePage extends ConsumerWidget {
             },
             itemCount: queueData.length,
             onReorder: (oldIndex, newIndex) {
-              // This should trigger an update on the stream from the provider.
-              ref.watch(openAirProvider).hiveService.reorderQueue(oldIndex, newIndex);
+              // perform reorder in storage then refresh the provider so the UI updates
+              final hive = ref.read(openAirProvider).hiveService;
+              hive.reorderQueue(oldIndex, newIndex).then((_) {
+                ref.invalidate(sortedProvider);
+              }).catchError((e) {
+                // optional: handle errors (kept minimal)
+                debugPrint('Failed to reorder queue: $e');
+              });
             },
           );
         },

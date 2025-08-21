@@ -136,7 +136,7 @@ class _AddPodcastState extends ConsumerState<AddPodcast> {
                     ),
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
-                        baseColor: cardBackgroundColor!,
+                        baseColor: Theme.of(context).cardColor,
                         highlightColor: highlightColor!,
                         child: Container(
                           color: highlightColor,

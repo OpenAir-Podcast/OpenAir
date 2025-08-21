@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -9,7 +10,6 @@ import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
@@ -17,6 +17,7 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -31,10 +32,10 @@ final subscriptionsProvider =
 });
 
 // FutureProvider for sorted Queue List
-final sortedQueueListProvider = StreamProvider.autoDispose<List<QueueModel>>(
+final getQueueProvider = StreamProvider.autoDispose(
   (ref) {
     final hiveService = ref.watch(openAirProvider).hiveService;
-    return hiveService.getSortedQueue().asStream();
+    return hiveService.getQueue().asStream();
   },
 );
 
@@ -50,7 +51,7 @@ class HiveService {
   late final Future<CollectionBox<SubscriptionModel>> subscriptionBox;
   late final Future<CollectionBox<EpisodeModel>> episodeBox;
   late final Future<CollectionBox<FeedModel>> feedBox;
-  late final Future<CollectionBox<QueueModel>> queueBox;
+  late final Future<CollectionBox<Map>> queueBox;
   late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
@@ -72,7 +73,6 @@ class HiveService {
     Hive.registerAdapter(PodcastModelAdapter());
     Hive.registerAdapter(EpisodeModelAdapter());
     Hive.registerAdapter(FeedModelAdapter());
-    Hive.registerAdapter(QueueModelAdapter());
     Hive.registerAdapter(DownloadModelAdapter());
     Hive.registerAdapter(HistoryModelAdapter());
     Hive.registerAdapter(CompletedEpisodeModelAdapter());
@@ -114,7 +114,7 @@ class HiveService {
     subscriptionBox = collection.openBox<SubscriptionModel>('subscriptions');
     episodeBox = collection.openBox<EpisodeModel>('episodes');
     feedBox = collection.openBox<FeedModel>('feed');
-    queueBox = collection.openBox<QueueModel>('queue');
+    queueBox = collection.openBox<Map>('queue');
     downloadBox = collection.openBox<DownloadModel>('download');
     historyBox = collection.openBox<HistoryModel>('history');
 
@@ -253,76 +253,68 @@ class HiveService {
   }
 
   // Queue Operations:
-  Future<void> addToQueue(QueueModel queue, {bool notify = true}) async {
+  Future<void> addToQueue(Map queue) async {
     final box = await queueBox;
-    await box.put(queue.guid, queue);
-    if (notify) {}
+    await box.put(queue['guid'], queue);
   }
 
   Future<void> removeFromQueue({required String guid}) async {
     final box = await queueBox;
-    final queueList = await getSortedQueue();
-    final newQueueList = queueList.where((item) => item.guid != guid).toList();
-    await box.clear();
-
-    for (var item in newQueueList) {
-      await box.put(item.guid, item);
-    }
+    await box.delete(guid);
   }
 
-  Future<List<QueueModel>> getSortedQueue() async {
+  Future<Map> getQueue() async {
     final box = await queueBox;
-    final List<QueueModel> queueList = [];
-    final Map<String, QueueModel> allKeys = await box.getAllValues();
-
-    for (final entry in allKeys.entries) {
-      queueList.add(entry.value);
-    }
-
-    // Sort the list by datePublished in descending order (newest first)
-    try {
-      queueList.sort((a, b) => a.pos.compareTo(b.pos));
-    } catch (e, s) {
-      debugPrint('HiveService: Error sorting queueList by pos: $e');
-      debugPrint('HiveService: Stacktrace for sorting error: $s');
-      // Depending on requirements, you might return the unsorted list or handle otherwise.
-    }
-    
-    return queueList;
+    return await box.getAllValues();
   }
 
-  Future<QueueModel?> getQueueByGuid(String guid) async {
+  Future<Map?> getQueueByGuid(String guid) async {
     final box = await queueBox;
     return box.get(guid);
   }
 
   Future<void> clearQueue() async {
     final box = await queueBox;
-    await box.clear(); // Add await
+    await box.clear();
   }
 
   // This should get the fetch the list then sort it in ASC order
-  void reorderQueue(int oldIndex, int newIndex) async {
+  Future<void> reorderQueue(int oldIndex, int newIndex) async {
     final box = await queueBox;
-    List<QueueModel> queue = await getSortedQueue();
+    final queueMap = await box.getAllValues();
 
+    if (queueMap.isEmpty) return;
+
+    // Convert to list and sort by position
+    final List<MapEntry<String, Map>> queueList = queueMap.entries.toList()
+      ..sort(
+          (a, b) => (a.value['pos'] as int).compareTo(b.value['pos'] as int));
+
+    // Adjust newIndex as per Flutter's ReorderableListView behavior
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
 
-    final QueueModel item = queue.removeAt(oldIndex);
-    queue.insert(newIndex, item);
-
-    // Update the 'pos' field for all items in the reordered list
-    for (int i = 0; i < queue.length; i++) {
-      queue[i].pos = i + 1;
+    // Validate indices
+    if (oldIndex < 0 ||
+        oldIndex >= queueList.length ||
+        newIndex < 0 ||
+        newIndex >= queueList.length) {
+      return;
     }
 
-    // Clear the box and re-add the reordered items
+    // Perform the reorder
+    final item = queueList.removeAt(oldIndex);
+    queueList.insert(newIndex, item);
+
+    // Update positions
     await box.clear();
 
-    for (var item in queue) {
-      await box.put(item.guid, item);
+    for (int i = 0; i < queueList.length; i++) {
+      final entry = queueList[i];
+      final updatedValue = Map<String, dynamic>.from(entry.value)..['pos'] = i;
+      debugPrint('Reordered item: ${entry.key} to position $i');
+      await box.put(entry.key, updatedValue);
     }
   }
 
@@ -424,15 +416,10 @@ class HiveService {
   }
 
   Future<Map<String, dynamic>?> getUserInterfaceSettings() async {
-    debugPrint('Fetching user interface settings from Hive.');
-
     final box = await settingsBox;
     Map? userInterfaceSettings = await box.get('userInterface');
 
     if (userInterfaceSettings == null) {
-      debugPrint(
-          'No user interface settings found, creating default settings.');
-
       userInterfaceSettings = {
         'fontSizeFactor': 1.0,
         'language': 'English',
@@ -446,6 +433,36 @@ class HiveService {
 
     // Cast to Map<String, dynamic> before returning
     return userInterfaceSettings.cast<String, dynamic>();
+  }
+
+  // Playback
+  void savePlaybackSettings(Map playbackSettings) async {
+    final box = await settingsBox;
+    await box.put('playback', playbackSettings);
+  }
+
+  Future<Map<String, dynamic>?> getPlaybackSettings() async {
+    final box = await settingsBox;
+    Map? playbackSettings = await box.get('playback');
+
+    if (playbackSettings == null) {
+      playbackSettings = {
+        // Playback control
+        'fastForwardInterval': '10 seconds', // Seconds
+        'rewindInterval': '10 seconds', // Seconds
+        'playbackSpeed': '1.0x', // Medium
+
+        // Queue
+        'enqueuePosition': 'Last',
+        'enqueueDownloaded': false,
+        'continuePlayback': true,
+        'smartMarkAsCompleted': '30 seconds', // Seconds
+        'keepSkippedEpisodes': false,
+      };
+      await box.put('playback', playbackSettings);
+    }
+
+    return playbackSettings.cast<String, dynamic>();
   }
 
   // Counts
@@ -509,7 +526,7 @@ class HiveService {
 
   Future<String> queueCount() async {
     final box = await queueBox;
-    final Map<String, QueueModel> allEpisodes = await box.getAllValues();
+    final Map allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();

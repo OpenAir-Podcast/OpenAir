@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 
@@ -14,7 +13,7 @@ class QueueCard extends ConsumerStatefulWidget {
     required this.isQueueSelected,
   });
 
-  final QueueModel episodeItem;
+  final Map<String, dynamic> episodeItem;
   final int index;
   final bool isQueueSelected;
 
@@ -45,22 +44,23 @@ class _QueueCardState extends ConsumerState<QueueCard> {
     } else {
       // This is an inactive item in the queue. Show its saved progress.
       currentPositionMilliseconds =
-          widget.episodeItem.podcastCurrentPositionInMilliseconds;
-      currentPositionString = widget.episodeItem.currentPlaybackPositionString;
+          widget.episodeItem['podcastCurrentPositionInMilliseconds'];
+      currentPositionString =
+          widget.episodeItem['currentPlaybackPositionString'];
       currentRemainingString =
-          widget.episodeItem.currentPlaybackRemainingTimeString;
+          widget.episodeItem['currentPlaybackRemainingTimeString'];
       audioState = 'Pause'; // Represents a "playable" state
     }
 
     return Card(
-      key: ValueKey(widget.episodeItem.guid),
+      key: ValueKey(widget.episodeItem['guid']),
       child: ListTile(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => EpisodeDetail(
-                episodeItem: widget.episodeItem.toJson(),
-                podcast: widget.episodeItem.podcast,
+                episodeItem: (widget.episodeItem).cast<String, dynamic>(),
+                podcast: widget.episodeItem['podcast'],
               ),
             ),
           );
@@ -82,7 +82,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 child: CachedNetworkImage(
                   memCacheHeight: 52,
                   memCacheWidth: 52,
-                  imageUrl: widget.episodeItem.image,
+                  imageUrl: widget.episodeItem['image'],
                   fit: BoxFit.fill,
                   errorWidget: (context, url, error) => Icon(
                     Icons.error,
@@ -99,7 +99,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               children: [
                 Text(
                   ref.read(auidoProvider).getPodcastPublishedDateFromEpoch(
-                        widget.episodeItem.datePublished,
+                        widget.episodeItem['datePublished'],
                       ),
                   style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
@@ -108,7 +108,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 ),
                 const Text(' | '),
                 Text(
-                  widget.episodeItem.downloadSize,
+                  widget.episodeItem['downloadSize'],
                   style: const TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -116,7 +116,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               ],
             ),
             Text(
-              widget.episodeItem.title,
+              widget.episodeItem['title'],
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -149,9 +149,6 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                   Text(
                     currentPositionString,
                   ),
-                  //
-                  // Spacer
-                  //
                   Text(
                     '-$currentRemainingString',
                   ),
@@ -188,10 +185,10 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 );
               }
 
-              openAir.playerPosition = widget.episodeItem.playerPosition!;
+              openAir.playerPosition = widget.episodeItem['playerPosition'];
 
-              openAir.currentPodcast = widget.episodeItem.podcast;
-              openAir.currentEpisode = widget.episodeItem.toJson();
+              openAir.currentPodcast = widget.episodeItem['podcast'];
+              openAir.currentEpisode = widget.episodeItem;
 
               audioProviderNotifier.playNewQueueItem(widget.episodeItem);
             }

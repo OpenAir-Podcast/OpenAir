@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -39,8 +38,7 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
         .read(auidoProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
-    final AsyncValue<List<QueueModel>> queueListAsync =
-        ref.watch(sortedQueueListProvider);
+    final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
@@ -184,9 +182,9 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                   ),
                   // Playlist button
                   queueListAsync.when(
-                    data: (list) {
-                      final isQueued = list.any(
-                          (item) => item.guid == widget.episodeItem['guid']);
+                    data: (data) {
+                      final isQueued =
+                          data.containsKey(widget.episodeItem['guid']);
 
                       return IconButton(
                         tooltip: Translations.of(context).text('addToQueue'),
@@ -227,8 +225,8 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                     loading: () {
                       // Handle loading by showing previous state's icon, disabled
                       final previousList = queueListAsync.valueOrNull;
-                      final isQueuedPreviously = previousList?.any((item) =>
-                              item.guid == widget.episodeItem['guid']) ??
+                      final isQueuedPreviously = previousList
+                              ?.containsKey(widget.episodeItem['guid']) ??
                           false;
 
                       return IconButton(

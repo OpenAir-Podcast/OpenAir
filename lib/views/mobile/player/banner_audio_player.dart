@@ -18,7 +18,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.teal,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).bottomAppBarTheme.color
+          : Theme.of(context).colorScheme.primaryContainer,
       child: Column(
         children: [
           ListTile(
@@ -41,8 +43,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               child: CachedNetworkImage(
                 memCacheHeight: 62,
                 memCacheWidth: 62,
-                // FIXME: This should be replaced with the current podcast image URL
-                imageUrl: ref.watch(auidoProvider).currentPodcast!.imageUrl,
+                imageUrl:
+                    ref.watch(auidoProvider).currentEpisode!['feedImage'] ??
+                        ref.watch(auidoProvider).currentEpisode!['image'],
                 fit: BoxFit.fill,
                 errorWidget: (context, url, error) => Icon(
                   Icons.error,
@@ -52,14 +55,27 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             ),
             title: SizedBox(
               height: 42.0,
-              child: Text(
-                ref.watch(auidoProvider).currentEpisode!['title'],
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                maxLines: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ref.watch(auidoProvider).currentEpisode!['title'],
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
+                  ),
+                  Text(
+                    ref.watch(auidoProvider).currentEpisode!['author'],
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
               ),
             ),
             trailing: IconButton(

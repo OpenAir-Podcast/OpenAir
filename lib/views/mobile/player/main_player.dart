@@ -39,8 +39,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       child: CachedNetworkImage(
                         memCacheHeight: imageSize.ceil(),
                         memCacheWidth: imageSize.ceil(),
-                        imageUrl:
-                            ref.watch(auidoProvider).currentPodcast!.imageUrl,
+                        imageUrl: ref
+                            .watch(auidoProvider)
+                            .currentEpisode!['feedImage'],
+                        fit: BoxFit.fill,
                       ),
                     ),
                   ),

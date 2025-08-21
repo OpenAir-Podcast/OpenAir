@@ -13,7 +13,6 @@ import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -21,6 +20,7 @@ import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -225,7 +225,7 @@ class AudioProvider extends ChangeNotifier {
     return File(filePath).exists();
   }
 
-  Future<void> removeAllDownloadedPodcasts() async {
+  Future<void> removeAllDownloadedPodcasts(BuildContext context) async {
     if (kIsWeb) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -534,7 +534,7 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> playNewQueueItem(QueueModel newItem) async {
+  Future<void> playNewQueueItem(Map<String, dynamic> newItem) async {
     // 1. Save progress of the current episode if one is active.
     if ((isPlaying == PlayingStatus.playing ||
             isPlaying == PlayingStatus.paused) &&
@@ -551,8 +551,8 @@ class AudioProvider extends ChangeNotifier {
 
     // 2. Play the new item from its saved position.
     await queuePlayButtonClicked(
-      newItem.toJson(),
-      newItem.playerPosition!,
+      newItem,
+      newItem['playerPosition'],
     );
   }
 
@@ -591,11 +591,11 @@ class AudioProvider extends ChangeNotifier {
       // 3. Get the updated queue to determine the next episode.
       // The sortedQueueListProvider will also update reactively for the UI.
       final updatedQueue =
-          await ref.watch(openAirProvider).hiveService.getSortedQueue();
+          await ref.watch(openAirProvider).hiveService.getQueue();
 
       if (updatedQueue.isNotEmpty) {
         // 4. If the queue is not empty, play the next episode.
-        final nextEpisodeToPlay = updatedQueue.first;
+        final nextEpisodeToPlay = updatedQueue.entries.first.value;
 
         currentEpisode = nextEpisodeToPlay.toJson();
         currentPodcast = nextEpisodeToPlay.podcast;
@@ -707,19 +707,25 @@ class AudioProvider extends ChangeNotifier {
 
   void mainPlayerMoreOptionsClicked() {}
 
+  void removeFromQueue(String guid) async {
+    ref.watch(openAirProvider).hiveService.removeFromQueue(guid: guid);
+    ref.invalidate(sortedProvider);
+    ref.invalidate(getQueueProvider);
+    notifyListeners();
+  }
+
   void addToQueue(
     Map<String, dynamic> episode,
     PodcastModel? podcast,
   ) async {
     int pos;
 
-    List<QueueModel> queue =
-        await ref.watch(openAirProvider).hiveService.getSortedQueue();
+    Map queue = await ref.watch(openAirProvider).hiveService.getQueue();
 
     if (queue.isEmpty) {
       pos = 1;
     } else {
-      int lastPos = queue.last.pos;
+      int lastPos = queue.entries.last.value['pos'];
 
       pos = lastPos + 1;
     }
@@ -749,29 +755,30 @@ class AudioProvider extends ChangeNotifier {
     final String formattedTotalDurationString =
         formatCurrentPlaybackRemainingTime(Duration.zero, episodeTotalDuration);
 
-    QueueModel queueMod = QueueModel(
-      guid: episode['guid'],
-      title: episode['title'],
-      author: episode['author'] ?? 'Unknown',
-      image: episode['feedImage'] ?? episode['image'],
-      datePublished: episode['datePublished'],
-      description: episode['description'],
-      feedUrl: episode['feedUrl'],
-      duration: episodeTotalDuration,
-      downloadSize: downloadSize,
-      enclosureType: episode['enclosureType'] ??
-          'audio/mpeg', // Store enclosureType, provide a default if null
-      enclosureLength: episode['enclosureLength'],
-      enclosureUrl: episode['enclosureUrl'],
-      podcast: podcast!,
-      pos: pos,
-      podcastCurrentPositionInMilliseconds: initialPositionMilliseconds,
-      currentPlaybackPositionString: initialPositionString,
-      currentPlaybackRemainingTimeString: formattedTotalDurationString,
-      playerPosition: Duration.zero,
-    );
+    ref.watch(openAirProvider).hiveService.addToQueue({
+      'guid': episode['guid'],
+      'title': episode['title'],
+      'author': episode['author'] ?? 'Unknown',
+      'image': episode['feedImage'] ?? episode['image'],
+      'datePublished': episode['datePublished'],
+      'description': episode['description'],
+      'feedUrl': episode['feedUrl'],
+      'duration': episodeTotalDuration,
+      'downloadSize': downloadSize,
+      'enclosureType': episode['enclosureType'] ?? 'audio/mpeg',
+      'enclosureLength': episode['enclosureLength'],
+      'enclosureUrl': episode['enclosureUrl'],
+      'podcast': podcast!,
+      'pos': pos,
+      'podcastCurrentPositionInMilliseconds': initialPositionMilliseconds,
+      'currentPlaybackPositionString': initialPositionString,
+      'currentPlaybackRemainingTimeString': formattedTotalDurationString,
+      'playerPosition': Duration.zero,
+    });
 
-    ref.watch(openAirProvider).hiveService.addToQueue(queueMod);
+    ref.invalidate(sortedProvider);
+    ref.invalidate(getQueueProvider);
+    notifyListeners();
   }
 
   Future<void> addPodcastEpisodes(SubscriptionModel podcast) async {
@@ -980,13 +987,6 @@ class AudioProvider extends ChangeNotifier {
     return Duration(hours: hours, minutes: minutes, seconds: seconds);
   }
 
-  void removeFromQueue(String guid) async {
-    ref.watch(openAirProvider).hiveService.removeFromQueue(guid: guid);
-    // queueProvider will update reactively as it watches hiveServiceProvider,
-    // which is notified by the removeFromQueue call above.
-    notifyListeners();
-  }
-
   String getEpisodeSize(int size) {
     // Check if size is in bytes, kilobytes, or megabytes
     if (size < 1024) {
@@ -1061,28 +1061,21 @@ class AudioProvider extends ChangeNotifier {
     final hiveService = ref.watch(openAirProvider).hiveService;
 
     // Retrieve the existing QueueModel from Hive
-    QueueModel? existingQueueItem = await hiveService.getQueueByGuid(guid);
+    Map? existingQueueItem = await hiveService.getQueueByGuid(guid);
 
     if (existingQueueItem != null) {
       // Update the properties of the existing item
-      existingQueueItem.podcastCurrentPositionInMilliseconds =
+      existingQueueItem['podcastCurrentPositionInMilliseconds'] =
           podcastCurrentPositionInMilliseconds;
 
-      existingQueueItem.currentPlaybackPositionString =
+      existingQueueItem['currentPlaybackPositionString'] =
           currentPlaybackPositionString;
 
-      existingQueueItem.currentPlaybackRemainingTimeString =
+      existingQueueItem['currentPlaybackRemainingTimeString'] =
           currentPlaybackRemainingTimeString;
 
-      existingQueueItem.playerPosition = position;
-
-      // Save the updated item back to Hive.
-      // The `addToQueue` method is used here because it handles both
-      // insertion and updating (if the key already exists).
-      await hiveService.addToQueue(existingQueueItem, notify: true);
-      // notify: false is important here to prevent an infinite loop
-      // if this method is called from within a listener that triggers
-      // a UI rebuild which then re-reads the queue.
+      existingQueueItem['playerPosition'] = position;
+      await hiveService.addToQueue(existingQueueItem);
     }
   }
 }

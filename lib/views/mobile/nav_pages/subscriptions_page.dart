@@ -38,7 +38,6 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
         final List<SubscriptionModel> subs = data.values.toList();
 
         return Scaffold(
-          backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text(Translations.of(context).text('subscriptions')),
             actions: [

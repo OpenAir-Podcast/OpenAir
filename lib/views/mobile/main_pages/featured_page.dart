@@ -199,7 +199,7 @@ class PodcastsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: cardBackgroundColor ?? Colors.white,
+      color: Theme.of(context).cardColor,
       elevation: cardElevation ?? 0.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardBottomCornersRatio),
@@ -222,7 +222,7 @@ class PodcastsCard extends ConsumerWidget {
                 ),
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
-                    baseColor: cardBackgroundColor!,
+                    baseColor: Theme.of(context).cardColor,
                     highlightColor: highlightColor!,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(

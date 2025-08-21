@@ -78,7 +78,15 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   onPressed: () async {
                     ref.invalidate(podcastIndexProvider);
                   },
-                  child: Text(Translations.of(context).text('retry')),
+                  child: Text(
+                    Translations.of(context).text('retry'),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Brightness.dark == Theme.of(context).brightness
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -64,7 +64,9 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                               Navigator.of(dialogContext).pop();
                               await ref
                                   .read(auidoProvider.notifier)
-                                  .removeAllDownloadedPodcasts();
+                                  .removeAllDownloadedPodcasts(context);
+
+                              ref.invalidate(getDownloadsProvider);
                             },
                           ),
                         ],
@@ -103,10 +105,9 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height:
-                ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
-                    ? 80.0
-                    : 0.0,
+            height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+                ? 80.0
+                : 0.0,
             child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
                 : const SizedBox.shrink(),
