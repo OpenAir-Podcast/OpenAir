@@ -263,5 +263,22 @@
     "enqueueDownloaded": "将已下载的入队",
     "autoPlayNextInQueue": "自动播放播放列表中的下一个",
     "autoMarkEpisodesAsComppleted": "自动将单集标记为已完成",
-    "keepSkippedEpisodes": "保留跳过的单集"
+    "keepSkippedEpisodes": "保留跳过的单集",
+    "removeEpisodesFromQueue": "从播放列表中移除单集",
+    "automatic": "自动",
+    "refreshPodcasts": "刷新播客",
+    "never": "从不",
+    "everyHour": "每小时",
+    "every2Hours": "每2小时",
+    "every4Hours": "每4小时",
+    "every8Hours": "每8小时",
+    "every12Hours": "每12小时",
+    "everyDay": "每天",
+    "everyDay3": "每3天",
+    "downloadNewEpisodes": "下载新单集",
+    "downloadQueuedEpisodes": "下载队列中的单集",
+    "downloadEpisodeLimit": "下载单集限制",
+    "unlimited": "无限制",
+    "deletePlayedEpisodes": "删除已播放的单集",
+    "keepFavourteEpisodes": "保留收藏的单集"
 }

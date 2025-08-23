@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
 import 'package:openair/views/mobile/settings_pages/playback_page.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 
@@ -55,7 +56,13 @@ class _SettingsState extends ConsumerState<Settings> {
               title: Text(Translations.of(context).text('downloads')),
               subtitle:
                   Text(Translations.of(context).text('downloadsSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const DownloadsPage(),
+                  ),
+                );
+              },
             ),
             Divider(),
             ListTile(

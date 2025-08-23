@@ -263,5 +263,22 @@
     "enqueueDownloaded": "ダウンロード済みをキューに追加",
     "autoPlayNextInQueue": "キュー内の次を自動再生",
     "autoMarkEpisodesAsComppleted": "エピソードを自動的に完了としてマーク",
-    "keepSkippedEpisodes": "スキップしたエピソードを保持"
+    "keepSkippedEpisodes": "スキップしたエピソードを保持",
+    "removeEpisodesFromQueue": "キューからエピソードを削除",
+    "automatic": "自動",
+    "refreshPodcasts": "ポッドキャストを更新",
+    "never": "しない",
+    "everyHour": "1時間ごと",
+    "every2Hours": "2時間ごと",
+    "every4Hours": "4時間ごと",
+    "every8Hours": "8時間ごと",
+    "every12Hours": "12時間ごと",
+    "everyDay": "毎日",
+    "everyDay3": "3日ごと",
+    "downloadNewEpisodes": "新しいエピソードをダウンロード",
+    "downloadQueuedEpisodes": "キューに入っているエピソードをダウンロード",
+    "downloadEpisodeLimit": "エピソードダウンロード制限",
+    "unlimited": "無制限",
+    "deletePlayedEpisodes": "再生済みエピソードを削除",
+    "keepFavourteEpisodes": "お気に入りのエピソードを保持"
 }

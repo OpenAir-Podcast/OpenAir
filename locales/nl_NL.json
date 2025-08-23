@@ -263,5 +263,22 @@
     "enqueueDownloaded": "Gedownloade afleveringen in wachtrij plaatsen",
     "autoPlayNextInQueue": "Volgende in wachtrij automatisch afspelen",
     "autoMarkEpisodesAsComppleted": "Afleveringen automatisch als voltooid markeren",
-    "keepSkippedEpisodes": "Overgeslagen afleveringen behouden"
+    "keepSkippedEpisodes": "Overgeslagen afleveringen behouden",
+    "removeEpisodesFromQueue": "Afleveringen uit wachtrij verwijderen",
+    "automatic": "Automatisch",
+    "refreshPodcasts": "Podcasts vernieuwen",
+    "never": "Nooit",
+    "everyHour": "Elk uur",
+    "every2Hours": "Elke 2 uur",
+    "every4Hours": "Elke 4 uur",
+    "every8Hours": "Elke 8 uur",
+    "every12Hours": "Elke 12 uur",
+    "everyDay": "Elke dag",
+    "everyDay3": "Elke 3 dagen",
+    "downloadNewEpisodes": "Nieuwe afleveringen downloaden",
+    "downloadQueuedEpisodes": "Afleveringen in wachtrij downloaden",
+    "downloadEpisodeLimit": "Downloadlimiet afleveringen",
+    "unlimited": "Onbeperkt",
+    "deletePlayedEpisodes": "Afgespeelde afleveringen verwijderen",
+    "keepFavourteEpisodes": "Favoriete afleveringen behouden"
 }

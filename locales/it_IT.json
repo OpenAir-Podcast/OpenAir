@@ -263,5 +263,22 @@
     "enqueueDownloaded": "Metti in coda gli scaricati",
     "autoPlayNextInQueue": "Riproduci automaticamente il prossimo in coda",
     "autoMarkEpisodesAsComppleted": "Contrassegna automaticamente gli episodi come completati",
-    "keepSkippedEpisodes": "Mantieni gli episodi saltati"
+    "keepSkippedEpisodes": "Mantieni gli episodi saltati",
+    "removeEpisodesFromQueue": "Rimuovi episodi dalla coda",
+    "automatic": "Automatico",
+    "refreshPodcasts": "Aggiorna podcast",
+    "never": "Mai",
+    "everyHour": "Ogni ora",
+    "every2Hours": "Ogni 2 ore",
+    "every4Hours": "Ogni 4 ore",
+    "every8Hours": "Ogni 8 ore",
+    "every12Hours": "Ogni 12 ore",
+    "everyDay": "Ogni giorno",
+    "everyDay3": "Ogni 3 giorni",
+    "downloadNewEpisodes": "Scarica nuovi episodi",
+    "downloadQueuedEpisodes": "Scarica episodi in coda",
+    "downloadEpisodeLimit": "Limite episodi scaricati",
+    "unlimited": "Illimitato",
+    "deletePlayedEpisodes": "Elimina episodi riprodotti",
+    "keepFavourteEpisodes": "Mantieni episodi preferiti"
 }

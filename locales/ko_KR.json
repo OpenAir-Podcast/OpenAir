@@ -263,5 +263,22 @@
     "enqueueDownloaded": "다운로드된 항목 대기열에 추가",
     "autoPlayNextInQueue": "대기열의 다음 항목 자동 재생",
     "autoMarkEpisodesAsComppleted": "에피소드를 자동으로 완료로 표시",
-    "keepSkippedEpisodes": "건너뛴 에피소드 유지"
+    "keepSkippedEpisodes": "건너뛴 에피소드 유지",
+    "removeEpisodesFromQueue": "대기열에서 에피소드 제거",
+    "automatic": "자동",
+    "refreshPodcasts": "팟캐스트 새로 고침",
+    "never": "안 함",
+    "everyHour": "매시간",
+    "every2Hours": "2시간마다",
+    "every4Hours": "4시간마다",
+    "every8Hours": "8시간마다",
+    "every12Hours": "12시간마다",
+    "everyDay": "매일",
+    "everyDay3": "3일마다",
+    "downloadNewEpisodes": "새 에피소드 다운로드",
+    "downloadQueuedEpisodes": "대기열에 있는 에피소드 다운로드",
+    "downloadEpisodeLimit": "에피소드 다운로드 제한",
+    "unlimited": "무제한",
+    "deletePlayedEpisodes": "재생한 에피소드 삭제",
+    "keepFavourteEpisodes": "즐겨찾는 에피소드 유지"
 }

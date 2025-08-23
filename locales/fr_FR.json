@@ -263,5 +263,22 @@
     "enqueueDownloaded": "Mettre en file d'attente les téléchargements",
     "autoPlayNextInQueue": "Lire automatiquement le suivant dans la file d'attente",
     "autoMarkEpisodesAsComppleted": "Marquer automatiquement les épisodes comme terminés",
-    "keepSkippedEpisodes": "Conserver les épisodes ignorés"
+    "keepSkippedEpisodes": "Conserver les épisodes ignorés",
+    "removeEpisodesFromQueue": "Supprimer les épisodes de la file d'attente",
+    "automatic": "Automatique",
+    "refreshPodcasts": "Actualiser les podcasts",
+    "never": "Jamais",
+    "everyHour": "Toutes les heures",
+    "every2Hours": "Toutes les 2 heures",
+    "every4Hours": "Toutes les 4 heures",
+    "every8Hours": "Toutes les 8 heures",
+    "every12Hours": "Toutes les 12 heures",
+    "everyDay": "Tous les jours",
+    "everyDay3": "Tous les 3 jours",
+    "downloadNewEpisodes": "Télécharger les nouveaux épisodes",
+    "downloadQueuedEpisodes": "Télécharger les épisodes en file d'attente",
+    "downloadEpisodeLimit": "Limite d'épisodes à télécharger",
+    "unlimited": "Illimité",
+    "deletePlayedEpisodes": "Supprimer les épisodes lus",
+    "keepFavourteEpisodes": "Conserver les épisodes favoris"
 }

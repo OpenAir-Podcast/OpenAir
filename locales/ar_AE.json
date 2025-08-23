@@ -263,5 +263,22 @@
     "enqueueDownloaded": "إضافة التنزيلات إلى قائمة الانتظار",
     "autoPlayNextInQueue": "تشغيل التالي تلقائيًا في قائمة الانتظار",
     "autoMarkEpisodesAsComppleted": "تحديد الحلقات كمكتملة تلقائيًا",
-    "keepSkippedEpisodes": "الاحتفاظ بالحلقات التي تم تخطيها"
+    "keepSkippedEpisodes": "الاحتفاظ بالحلقات التي تم تخطيها",
+    "automatic": "تلقائي",
+    "refreshPodcasts": "تحديث البودكاست",
+    "never": "أبدًا",
+    "everyHour": "كل ساعة",
+    "every2Hours": "كل ساعتين",
+    "every4Hours": "كل 4 ساعات",
+    "every8Hours": "كل 8 ساعات",
+    "every12Hours": "كل 12 ساعة",
+    "everyDay": "كل يوم",
+    "everyDay3": "كل 3 أيام",
+    "downloadNewEpisodes": "تنزيل حلقات جديدة",
+    "downloadQueuedEpisodes": "تنزيل الحلقات في قائمة الانتظار",
+    "downloadEpisodeLimit": "حد تنزيل الحلقات",
+    "unlimited": "غير محدود",
+    "deletePlayedEpisodes": "حذف الحلقات التي تم تشغيلها",
+    "keepFavourteEpisodes": "الاحتفاظ بالحلقات المفضلة",
+    "removeEpisodesFromQueue": "إزالة الحلقات من قائمة الانتظار"
 }

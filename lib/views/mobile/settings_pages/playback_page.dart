@@ -43,9 +43,9 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
         data: (data) {
           playbackData = data!;
 
-          enqueueDownloaded = playbackData['enqueueDownloaded'];
-          autoplayNextInQueue = playbackData['continuePlayback'];
-          keepSkippedEpisodes = playbackData['keepSkippedEpisodes'];
+          enqueueDownloaded = playbackData['enqueueDownloaded'] ??= false;
+          autoplayNextInQueue = playbackData['continuePlayback'] ??= false;
+          keepSkippedEpisodes = playbackData['keepSkippedEpisodes'] ??= false;
 
           switch (playbackData['fastForwardInterval']) {
             case '3 seconds':
@@ -136,6 +136,9 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
               enqueuePosition =
                   Translations.of(context).text('afterCurrentEpisode');
               break;
+            default:
+              enqueuePosition = Translations.of(context).text('last');
+              break;
           }
 
           switch (playbackData['smartMarkAsCompleted']) {
@@ -162,7 +165,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
               break;
           }
 
-          return ListView(
+          return Column(
+            spacing: settingsSpacer,
             children: [
               ListTile(
                 title: Text(
@@ -238,7 +242,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('rewindSkipTime')),
                 trailing: SizedBox(
@@ -303,7 +306,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('playbackSpeed')),
                 trailing: SizedBox(
@@ -364,7 +366,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               Divider(),
               ListTile(
                 title: Text(
@@ -424,7 +425,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('enqueueDownloaded')),
                 trailing: SizedBox(
@@ -457,7 +457,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ],
                 )),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title:
                     Text(Translations.of(context).text('autoPlayNextInQueue')),
@@ -491,7 +490,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ],
                 )),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context)
                     .text('autoMarkEpisodesAsComppleted')),
@@ -553,7 +551,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title:
                     Text(Translations.of(context).text('keepSkippedEpisodes')),

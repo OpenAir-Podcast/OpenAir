@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -17,7 +16,6 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -463,6 +461,35 @@ class HiveService {
     }
 
     return playbackSettings.cast<String, dynamic>();
+  }
+
+  // Downloads
+  void saveDownloadSettings(Map downloadSettings) async {
+    final box = await settingsBox;
+    await box.put('downloads', downloadSettings);
+  }
+
+  Future<Map<String, dynamic>?> getDownloadSettings() async {
+    final box = await settingsBox;
+    Map? downloadSettings = await box.get('downloads');
+
+    if (downloadSettings == null) {
+      downloadSettings = {
+        'refreshPodcasts': 'Never',
+        'downloadNewEpisodes': true,
+        'downloadQueuedEpisodes': true,
+        'downloadEpisodeLimit': '25',
+        //
+        'deletePlayedEpisodes': true,
+        "keepFavourteEpisodes": true,
+        //
+        "removeEpisodesFromQueue": false,
+      };
+
+      await box.put('downloads', downloadSettings);
+    }
+
+    return downloadSettings.cast<String, dynamic>();
   }
 
   // Counts

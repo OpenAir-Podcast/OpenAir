@@ -263,5 +263,22 @@
     "enqueueDownloaded": "Lägg nedladdade i kö",
     "autoPlayNextInQueue": "Spela nästa i kö automatiskt",
     "autoMarkEpisodesAsComppleted": "Markera avsnitt som slutförda automatiskt",
-    "keepSkippedEpisodes": "Behåll överhoppade avsnitt"
+    "keepSkippedEpisodes": "Behåll överhoppade avsnitt",
+    "removeEpisodesFromQueue": "Ta bort avsnitt från kö",
+    "automatic": "Automatisk",
+    "refreshPodcasts": "Uppdatera podcaster",
+    "never": "Aldrig",
+    "everyHour": "Varje timme",
+    "every2Hours": "Var 2:a timme",
+    "every4Hours": "Var 4:e timme",
+    "every8Hours": "Var 8:e timme",
+    "every12Hours": "Var 12:e timme",
+    "everyDay": "Varje dag",
+    "everyDay3": "Var 3:e dag",
+    "downloadNewEpisodes": "Ladda ner nya avsnitt",
+    "downloadQueuedEpisodes": "Ladda ner köade avsnitt",
+    "downloadEpisodeLimit": "Begränsa antal nedladdade avsnitt",
+    "unlimited": "Obegränsat",
+    "deletePlayedEpisodes": "Ta bort spelade avsnitt",
+    "keepFavourteEpisodes": "Behåll favoritavsnitt"
 }

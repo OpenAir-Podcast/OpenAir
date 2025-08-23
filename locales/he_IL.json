@@ -263,5 +263,22 @@
     "enqueueDownloaded": "הכנס הורדות לתור",
     "autoPlayNextInQueue": "הפעל אוטומטית את הבא בתור",
     "autoMarkEpisodesAsComppleted": "סמן פרקים אוטומטית כהושלמו",
-    "keepSkippedEpisodes": "שמור פרקים שדלגו"
+    "keepSkippedEpisodes": "שמור פרקים שדלגו",
+    "removeEpisodesFromQueue": "הסר פרקים מהתור",
+    "automatic": "אוטומטי",
+    "refreshPodcasts": "רענן פודקאסטים",
+    "never": "אף פעם",
+    "everyHour": "כל שעה",
+    "every2Hours": "כל שעתיים",
+    "every4Hours": "כל 4 שעות",
+    "every8Hours": "כל 8 שעות",
+    "every12Hours": "כל 12 שעות",
+    "everyDay": "כל יום",
+    "everyDay3": "כל 3 ימים",
+    "downloadNewEpisodes": "הורד פרקים חדשים",
+    "downloadQueuedEpisodes": "הורד פרקים בתור",
+    "downloadEpisodeLimit": "מגבלת פרקים להורדה",
+    "unlimited": "ללא הגבלה",
+    "deletePlayedEpisodes": "מחק פרקים שהושמעו",
+    "keepFavourteEpisodes": "שמור פרקים מועדפים"
 }

@@ -195,7 +195,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
               pitch = Translations.of(context).text('medium');
           }
 
-          return ListView(
+          return Column(
+            spacing: settingsSpacer,
             children: [
               ListTile(
                 title: Text(
@@ -348,154 +349,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   ],
                 )),
               ),
-              SizedBox(height: settingsSpacer),
-              // ListTile(
-              //   title: Text(Translations.of(context).text('themeMode')),
-              //   trailing: SizedBox(
-              //     width: 200.0,
-              //     child: DropdownButton<String>(
-              //       isExpanded: true,
-              //       style: TextStyle(
-              //         color: ThemeProvider.themeOf(context).data.primaryColor,
-              //         fontSize: 16.0,
-              //         fontWeight: FontWeight.w400,
-              //       ),
-              //       value: themeMode,
-              //       onChanged: (String? newValue) {
-              //         setState(() {
-              //           String saveValue;
-
-              //           if (newValue ==
-              //               Translations.of(context).text('system')) {
-              //             saveValue = 'System';
-              //           } else if (newValue ==
-              //               Translations.of(context).text('light')) {
-              //             saveValue = 'Light';
-              //           } else if (newValue ==
-              //               Translations.of(context).text('dark')) {
-              //             saveValue = 'Dark';
-              //           } else {
-              //             saveValue = 'System';
-              //           }
-
-              //           userInterface['themeMode'] = saveValue;
-
-              //           ref
-              //               .watch(openAirProvider)
-              //               .hiveService
-              //               .saveUserInterfaceSettings(userInterface);
-              //         });
-
-              //         if (newValue == Translations.of(context).text('system')) {
-              //           if (platformBrightness == Brightness.dark) {
-              //             switch (data['fontSizeFactor']) {
-              //               case 0.875:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_dark_small');
-              //                 break;
-              //               case 1.0:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_dark_medium');
-              //                 break;
-              //               case 1.125:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_dark_large');
-              //                 break;
-              //               case 1.25:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_dark_extra_large');
-              //                 break;
-              //               default:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_dark_medium');
-              //             }
-              //           } else if (platformBrightness == Brightness.light) {
-              //             switch (data['fontSizeFactor']) {
-              //               case 0.875:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_light_small');
-              //                 break;
-              //               case 1.0:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_light_medium');
-              //                 break;
-              //               case 1.125:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_light_large');
-              //                 break;
-              //               case 1.25:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_light_extra_large');
-              //                 break;
-              //               default:
-              //                 ThemeProvider.controllerOf(context)
-              //                     .setTheme('blue_accent_light_medium');
-              //             }
-              //           }
-              //         } else if (newValue ==
-              //             Translations.of(context).text('light')) {
-              //           switch (userInterface['fontSizeFactor']) {
-              //             case 0.875:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_light_small');
-              //               break;
-              //             case 1.0:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_light_medium');
-              //               break;
-              //             case 1.125:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_light_large');
-              //               break;
-              //             case 1.25:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_light_extra_large');
-              //               break;
-              //             default:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_light_medium');
-              //           }
-              //         } else if (newValue ==
-              //             Translations.of(context).text('dark')) {
-              //           switch (userInterface['fontSizeFactor']) {
-              //             case 0.875:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_dark_small');
-              //               break;
-              //             case 1.0:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_dark_medium');
-              //               break;
-              //             case 1.125:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_dark_large');
-              //               break;
-              //             case 1.25:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_dark_extra_large');
-              //               break;
-              //             default:
-              //               ThemeProvider.controllerOf(context)
-              //                   .setTheme('blue_accent_dark_medium');
-              //           }
-              //         }
-              //       },
-              //       items: <String>[
-              //         Translations.of(context).text('system'),
-              //         Translations.of(context).text('light'),
-              //         Translations.of(context).text('dark'),
-              //       ].map<DropdownMenuItem<String>>((String value) {
-              //         return DropdownMenuItem<String>(
-              //           value: value,
-              //           child: Text(
-              //             value,
-              //           ),
-              //         );
-              //       }).toList(),
-              //     ),
-              //   ),
-              // ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('fontSize')),
                 trailing: SizedBox(
@@ -603,7 +456,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('language')),
                 trailing: SizedBox(
@@ -721,7 +573,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               Divider(),
               ListTile(
                 title: Text(
@@ -732,7 +583,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   width: 200.0,
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('voice')),
                 trailing: SizedBox(
@@ -785,7 +635,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('speechRate')),
                 trailing: SizedBox(
@@ -823,7 +672,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   ),
                 ),
               ),
-              SizedBox(height: settingsSpacer),
               ListTile(
                 title: Text(Translations.of(context).text('pitch')),
                 trailing: SizedBox(
