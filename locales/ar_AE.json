@@ -280,5 +280,11 @@
     "unlimited": "غير محدود",
     "deletePlayedEpisodes": "حذف الحلقات التي تم تشغيلها",
     "keepFavourteEpisodes": "الاحتفاظ بالحلقات المفضلة",
-    "removeEpisodesFromQueue": "إزالة الحلقات من قائمة الانتظار"
+    "removeEpisodesFromQueue": "إزالة الحلقات من قائمة الانتظار",
+    "syncFavourites": "مزامنة المفضلة",
+    "syncQueue": "مزامنة قائمة الانتظار",
+    "syncHistory": "مزامنة السجل",
+    "syncSettings": "مزامنة الإعدادات",
+    "syncPlaybackPosition": "مزامنة موضع التشغيل",
+    "synchronizeNow": "مزامنة الآن"
 }

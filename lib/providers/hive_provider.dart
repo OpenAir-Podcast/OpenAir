@@ -492,6 +492,30 @@ class HiveService {
     return downloadSettings.cast<String, dynamic>();
   }
 
+  // Synchronization
+  void saveSynchronizationSettings(Map synchronizationSettings) async {
+    final box = await settingsBox;
+    await box.put('synchronization', synchronizationSettings);
+  }
+
+  Future<Map<String, dynamic>?> getSynchronizationSettings() async {
+    final box = await settingsBox;
+    Map? synchronizationSettings = await box.get('synchronization');
+
+    if (synchronizationSettings == null) {
+      synchronizationSettings = {
+        'syncFavourites': true,
+        'syncQueue': true,
+        'syncHistory': true,
+        'syncPlaybackPosition': true,
+      };
+
+      await box.put('synchronization', synchronizationSettings);
+    }
+
+    return synchronizationSettings.cast<String, dynamic>();
+  }
+
   // Counts
   Future<int> podcastSubscribedEpisodeCount(String title) async {
     final box = await subscriptionBox;

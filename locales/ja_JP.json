@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "エピソードダウンロード制限",
     "unlimited": "無制限",
     "deletePlayedEpisodes": "再生済みエピソードを削除",
-    "keepFavourteEpisodes": "お気に入りのエピソードを保持"
+    "keepFavourteEpisodes": "お気に入りのエピソードを保持",
+    "syncFavourites": "お気に入りを同期",
+    "syncQueue": "キューを同期",
+    "syncHistory": "履歴を同期",
+    "syncSettings": "設定を同期",
+    "syncPlaybackPosition": "再生位置を同期",
+    "synchronizeNow": "今すぐ同期"
 }

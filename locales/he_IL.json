@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "מגבלת פרקים להורדה",
     "unlimited": "ללא הגבלה",
     "deletePlayedEpisodes": "מחק פרקים שהושמעו",
-    "keepFavourteEpisodes": "שמור פרקים מועדפים"
+    "keepFavourteEpisodes": "שמור פרקים מועדפים",
+    "syncFavourites": "סנכרן מועדפים",
+    "syncQueue": "סנכרן תור",
+    "syncHistory": "סנכרן היסטוריה",
+    "syncSettings": "סנכרן הגדרות",
+    "syncPlaybackPosition": "סנכרן מיקום השמעה",
+    "synchronizeNow": "סנכרן עכשיו"
 }

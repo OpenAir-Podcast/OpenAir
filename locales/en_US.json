@@ -280,5 +280,11 @@
     "unlimited": "Unlimited",
     "deletePlayedEpisodes": "Delete played episodes",
     "keepFavourteEpisodes": "Keep favourite episodes",
-    "removeEpisodesFromQueue": "Remove episodes from queue"
+    "removeEpisodesFromQueue": "Remove episodes from queue",
+    "syncFavourites": "Synchronize favourites",
+    "syncQueue": "Synchronize queue",
+    "syncHistory": "Synchronize history",
+    "syncSettings": "Synchronize settings",
+    "syncPlaybackPosition": "Synchronize playback position",
+    "synchronizeNow": "Synchronize now"
 }

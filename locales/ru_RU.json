@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "Лимит загрузки эпизодов",
     "unlimited": "Безлимитно",
     "deletePlayedEpisodes": "Удалять прослушанные эпизоды",
-    "keepFavourteEpisodes": "Сохранять избранные эпизоды"
+    "keepFavourteEpisodes": "Сохранять избранные эпизоды",
+    "syncFavourites": "Синхронизировать избранное",
+    "syncQueue": "Синхронизировать очередь",
+    "syncHistory": "Синхронизировать историю",
+    "syncSettings": "Синхронизировать настройки",
+    "syncPlaybackPosition": "Синхронизировать позицию воспроизведения",
+    "synchronizeNow": "Синхронизировать сейчас"
 }

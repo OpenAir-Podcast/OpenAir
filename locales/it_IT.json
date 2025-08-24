@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "Limite episodi scaricati",
     "unlimited": "Illimitato",
     "deletePlayedEpisodes": "Elimina episodi riprodotti",
-    "keepFavourteEpisodes": "Mantieni episodi preferiti"
+    "keepFavourteEpisodes": "Mantieni episodi preferiti",
+    "syncFavourites": "Sincronizza preferiti",
+    "syncQueue": "Sincronizza coda",
+    "syncHistory": "Sincronizza cronologia",
+    "syncSettings": "Sincronizza impostazioni",
+    "syncPlaybackPosition": "Sincronizza posizione di riproduzione",
+    "synchronizeNow": "Sincronizza ora"
 }

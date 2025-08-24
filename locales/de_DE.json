@@ -280,5 +280,11 @@
     "unlimited": "Unbegrenzt",
     "deletePlayedEpisodes": "Abgespielte Episoden löschen",
     "keepFavourteEpisodes": "Lieblingsepisoden behalten",
-    "removeEpisodesFromQueue": "Episoden aus Warteschlange entfernen"
+    "removeEpisodesFromQueue": "Episoden aus Warteschlange entfernen",
+    "syncFavourites": "Favoriten synchronisieren",
+    "syncQueue": "Warteschlange synchronisieren",
+    "syncHistory": "Verlauf synchronisieren",
+    "syncSettings": "Einstellungen synchronisieren",
+    "syncPlaybackPosition": "Wiedergabeposition synchronisieren",
+    "synchronizeNow": "Jetzt synchronisieren"
 }

@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "Begränsa antal nedladdade avsnitt",
     "unlimited": "Obegränsat",
     "deletePlayedEpisodes": "Ta bort spelade avsnitt",
-    "keepFavourteEpisodes": "Behåll favoritavsnitt"
+    "keepFavourteEpisodes": "Behåll favoritavsnitt",
+    "syncFavourites": "Synkronisera favoriter",
+    "syncQueue": "Synkronisera kö",
+    "syncHistory": "Synkronisera historik",
+    "syncSettings": "Synkronisera inställningar",
+    "syncPlaybackPosition": "Synkronisera uppspelningsposition",
+    "synchronizeNow": "Synkronisera nu"
 }

@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "下载单集限制",
     "unlimited": "无限制",
     "deletePlayedEpisodes": "删除已播放的单集",
-    "keepFavourteEpisodes": "保留收藏的单集"
+    "keepFavourteEpisodes": "保留收藏的单集",
+    "syncFavourites": "同步收藏夹",
+    "syncQueue": "同步播放列表",
+    "syncHistory": "同步历史记录",
+    "syncSettings": "同步设置",
+    "syncPlaybackPosition": "同步播放位置",
+    "synchronizeNow": "立即同步"
 }

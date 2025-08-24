@@ -280,5 +280,11 @@
     "downloadEpisodeLimit": "Downloadlimiet afleveringen",
     "unlimited": "Onbeperkt",
     "deletePlayedEpisodes": "Afgespeelde afleveringen verwijderen",
-    "keepFavourteEpisodes": "Favoriete afleveringen behouden"
+    "keepFavourteEpisodes": "Favoriete afleveringen behouden",
+    "syncFavourites": "Favorieten synchroniseren",
+    "syncQueue": "Wachtrij synchroniseren",
+    "syncHistory": "Geschiedenis synchroniseren",
+    "syncSettings": "Instellingen synchroniseren",
+    "syncPlaybackPosition": "Afspeelpositie synchroniseren",
+    "synchronizeNow": "Nu synchroniseren"
 }
