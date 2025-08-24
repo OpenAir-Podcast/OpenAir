@@ -508,6 +508,7 @@ class HiveService {
         'syncQueue': true,
         'syncHistory': true,
         'syncPlaybackPosition': true,
+        'syncSettings': true,
       };
 
       await box.put('synchronization', synchronizationSettings);

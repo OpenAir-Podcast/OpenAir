@@ -25,6 +25,7 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
   late bool syncQueue;
   late bool syncHistory;
   late bool syncPlaybackPosition;
+  late bool syncSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +44,7 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
           syncHistory = synchronizationData['syncHistory'] ?? true;
           syncPlaybackPosition =
               synchronizationData['syncPlaybackPosition'] ?? true;
+          syncSettings = synchronizationData['syncSettings'] ?? true;
 
           return Column(
             spacing: settingsSpacer,
@@ -164,6 +166,39 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                         syncPlaybackPosition = !syncPlaybackPosition;
                         synchronizationData['syncPlaybackPosition'] =
                             syncPlaybackPosition;
+
+                        ref
+                            .watch(openAirProvider)
+                            .hiveService
+                            .saveSynchronizationSettings(synchronizationData);
+                      });
+                    },
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          Translations.of(context).text('on'),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          Translations.of(context).text('off'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Text(Translations.of(context).text('syncSettings')),
+                trailing: SizedBox(
+                  child: ToggleButtons(
+                    isSelected: [syncSettings, !syncSettings],
+                    onPressed: (int index) {
+                      setState(() {
+                        syncSettings = !syncSettings;
+                        synchronizationData['syncSettings'] = syncSettings;
 
                         ref
                             .watch(openAirProvider)
