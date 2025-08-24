@@ -286,5 +286,12 @@
     "syncHistory": "Synchronize history",
     "syncSettings": "Synchronize settings",
     "syncPlaybackPosition": "Synchronize playback position",
-    "synchronizeNow": "Synchronize now"
+    "synchronizeNow": "Synchronize now",
+    "database": "Database",
+    "exportDatabase": "Export Database",
+    "importDatabase": "Import Database",
+    "exportDatabaseSubtitle": "Export podcast subscriptions",
+    "importDatabaseSubtitle": "Import podcast subscriptions",
+    "automaticExportDatabase": "Automactically export database",
+    "opml": "OPML"
 }

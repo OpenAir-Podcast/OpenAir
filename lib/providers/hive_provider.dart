@@ -517,6 +517,28 @@ class HiveService {
     return synchronizationSettings.cast<String, dynamic>();
   }
 
+  // ImportExport
+  void saveImportExportSettings(Map importExportSettings) async {
+    final box = await settingsBox;
+    await box.put('importExport', importExportSettings);
+  }
+
+  Future<Map<String, dynamic>?> getImportExportSettings() async {
+    final box = await settingsBox;
+    Map? importExportSettings = await box.get('importExport');
+
+    if (importExportSettings == null) {
+      importExportSettings = {
+        'autoBackup': true,
+        'autoBackupFrequency': 'Daily',
+      };
+
+      await box.put('importExport', importExportSettings);
+    }
+
+    return importExportSettings.cast<String, dynamic>();
+  }
+
   // Counts
   Future<int> podcastSubscribedEpisodeCount(String title) async {
     final box = await subscriptionBox;
