@@ -6,6 +6,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/categories_page.dart';
 import 'package:openair/views/mobile/main_pages/featured_page.dart';
 import 'package:openair/views/mobile/main_pages/trending_page.dart';
+import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/navigation/app_drawer.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 
@@ -33,6 +34,21 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold>
             textAlign: TextAlign.left,
           ),
           actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                tooltip: Translations.of(context).text('refresh'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddPodcastPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.search_rounded),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: IconButton(

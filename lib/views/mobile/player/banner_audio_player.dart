@@ -68,7 +68,8 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                     maxLines: 2,
                   ),
                   Text(
-                    ref.watch(auidoProvider).currentEpisode!['author'],
+                    ref.watch(auidoProvider).currentEpisode!['author'] ??
+                        'Unknown',
                     style: const TextStyle(
                       fontSize: 14.0,
                       overflow: TextOverflow.ellipsis,

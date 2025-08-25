@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 final FutureProvider<Map?> importExportSettingsDataProvider =
@@ -125,6 +126,145 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 title: Text(Translations.of(context).text('exportDatabase')),
                 subtitle: Text(
                   Translations.of(context).text('exportDatabaseSubtitle'),
+                ),
+                onTap: () {
+                  // TODO: Add file picker here
+                },
+              ),
+              Divider(),
+              ListTile(
+                title: Text(
+                  Translations.of(context).text('rssUrl'),
+                  style: TextStyle(color: Colors.blueGrey),
+                ),
+                trailing: SizedBox(
+                  width: 200.0,
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  Translations.of(context).text('addPodcastByRssUrl'),
+                ),
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) {
+                    TextEditingController textInputControl =
+                        TextEditingController();
+
+                    return AlertDialog(
+                      title: Text(
+                        Translations.of(context).text('addPodcastByRssUrl'),
+                        textAlign: TextAlign.start,
+                      ),
+                      content: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: TextField(
+                          maxLength: 256,
+                          autofocus: true,
+                          controller: textInputControl,
+                          keyboardType: TextInputType.url,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.link_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            labelText: Translations.of(context).text('rssUrl'),
+                            suffix: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  textInputControl.text = '';
+                                  textInputControl.clear();
+                                });
+                              },
+                              icon: Icon(Icons.clear_rounded),
+                            ),
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              Translations.of(context).text('cancel'),
+                              style: TextStyle(
+                                color: Colors.blueAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: TextButton(
+                            onPressed: () async {
+                              Navigator.pop(context);
+
+                              if (textInputControl.text.isEmpty) {
+                                return;
+                              }
+
+                              bool i = await ref
+                                  .watch(auidoProvider)
+                                  .addPodcastByRssUrl(textInputControl.text);
+
+                              if (context.mounted) {
+                                if (i == true) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('subscribed'),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('errorAddingPodcast'),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: Text(
+                              Translations.of(context).text('add'),
+                              style: TextStyle(
+                                color: Colors.blueAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              Divider(),
+              ListTile(
+                title: Text(
+                  Translations.of(context).text('userData'),
+                  style: TextStyle(color: Colors.blueGrey),
+                ),
+                trailing: SizedBox(
+                  width: 200.0,
+                ),
+              ),
+              ListTile(
+                title: Text(Translations.of(context).text('deleteAllEpisode')),
+                subtitle: Text(
+                  Translations.of(context).text('deleteAllEpisodeSubtitle'),
                 ),
                 onTap: () {
                   // TODO: Add file picker here

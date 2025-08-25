@@ -293,5 +293,16 @@
     "exportDatabaseSubtitle": "Export podcast subscriptions",
     "importDatabaseSubtitle": "Import podcast subscriptions",
     "automaticExportDatabase": "Automactically export database",
-    "opml": "OPML"
+    "opml": "OPML",
+    "userData": "User Data",
+    "deleteAllEpisode": "Delete all episodes",
+    "deleteAllEpisodeSubtitle": "Delete all episodes from the database",
+    "deleteAllEpisodeConfirmation": "Are you sure you want to delete all episodes? This action cannot be undone.",
+    "alerts": "Alerts",
+    "receiveNotificationsForNewEpisodes": "Receive notifications for new episodes",
+    "receiveNotificationsForNewEpisodesSubtitle": "Receive notifications for new episodes",
+    "receiveNotificationsWhenPlaying": "Receive notifications when playing",
+    "receiveNotificationsWhenPlayingSubtitle": "Receive notifications when playing",
+    "receiveNotificationsWhenDownloading": "Receive notifications when downloading",
+    "receiveNotificationsWhenDownloadingSubtitle": "Receive notifications when downloading"
 }

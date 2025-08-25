@@ -3,6 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
 import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/settings_pages/playback_page.dart';
 import 'package:openair/views/mobile/settings_pages/synchronization_page.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
@@ -99,7 +100,13 @@ class _SettingsState extends ConsumerState<Settings> {
               title: Text(Translations.of(context).text('notifications')),
               subtitle:
                   Text(Translations.of(context).text('notificationsSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsPage(),
+                  ),
+                );
+              },
             ),
             Divider(),
             ListTile(

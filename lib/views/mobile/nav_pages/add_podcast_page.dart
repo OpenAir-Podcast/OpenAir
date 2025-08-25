@@ -23,14 +23,14 @@ final podcastDataFeaturedProvider = FutureProvider<List<dynamic>>((ref) async {
   return await apiService.getFeaturedPodcasts();
 });
 
-class AddPodcast extends ConsumerStatefulWidget {
-  const AddPodcast({super.key});
+class AddPodcastPage extends ConsumerStatefulWidget {
+  const AddPodcastPage({super.key});
 
   @override
-  ConsumerState createState() => _AddPodcastState();
+  ConsumerState createState() => _AddPodcastPageState();
 }
 
-class _AddPodcastState extends ConsumerState<AddPodcast> {
+class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
   TextEditingController textInputControl = TextEditingController();
 
   @override

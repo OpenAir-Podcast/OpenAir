@@ -539,6 +539,29 @@ class HiveService {
     return importExportSettings.cast<String, dynamic>();
   }
 
+  // Notifications
+  void saveNotificationsSettings(Map notificationsSettings) async {
+    final box = await settingsBox;
+    await box.put('notifications', notificationsSettings);
+  }
+
+  Future<Map<String, dynamic>?> getNotificationsSettings() async {
+    final box = await settingsBox;
+    Map? notificationsSettings = await box.get('notifications');
+
+    if (notificationsSettings == null) {
+      notificationsSettings = {
+        'receiveNotificationsForNewEpisodes': true,
+        'receiveNotificationsWhenPlaying': true,
+        'receiveNotificationsWhenDownloading': true,
+      };
+
+      await box.put('notifications', notificationsSettings);
+    }
+
+    return notificationsSettings.cast<String, dynamic>();
+  }
+
   // Counts
   Future<int> podcastSubscribedEpisodeCount(String title) async {
     final box = await subscriptionBox;
