@@ -79,3 +79,13 @@ OpenAir is provided "as is" without warranty of any kind, express or implied. Th
 ## About OpenAir
 
 OpenAir is proudly developed and maintained by its contributors—who are enthusiastic podcast listeners themselves. Dedicated to building open-source tools for the community, by the community, we hope you enjoy using OpenAir!
+
+## Screenshots
+<img width="330" alt="Screenshot_20250826_115019" src="https://github.com/user-attachments/assets/6fe45f83-9d82-4195-9f7d-ee9fad4e78c0" />
+<img width="330" alt="Screenshot_20250826_120748" src="https://github.com/user-attachments/assets/5a6f7e9a-d2f0-4f59-bbd2-06c0968d3abb" />
+<img width="330" alt="Screenshot_20250826_120811" src="https://github.com/user-attachments/assets/ff93f19f-88ed-49ef-86be-01b5dbe9b96a" />
+
+<img width="330" alt="Screenshot_20250826_120831" src="https://github.com/user-attachments/assets/64996ad3-3ffe-40bc-92bd-564ac0fc01fd" />
+<img width="330" alt="Screenshot_20250826_122518" src="https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168" />
+<img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />
+
