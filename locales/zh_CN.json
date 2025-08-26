@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "播放时接收通知",
     "receiveNotificationsWhenPlayingSubtitle": "播放时接收通知",
     "receiveNotificationsWhenDownloading": "下载时接收通知",
-    "receiveNotificationsWhenDownloadingSubtitle": "下载时接收通知"
+    "receiveNotificationsWhenDownloadingSubtitle": "下载时接收通知",
+    "donateDescription": "OpenAir 是一款免费的开源应用程序。如果您喜欢使用它，请考虑捐赠以支持开发。谢谢！",
+    "donateWithPayPal": "使用 PayPal 捐赠",
+    "buyMeACoffee": "给我买杯咖啡",
+    "donateWithKofi": "使用 Ko-fi 捐赠"
 }

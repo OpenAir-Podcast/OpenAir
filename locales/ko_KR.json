@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "재생 중 알림 받기",
     "receiveNotificationsWhenPlayingSubtitle": "재생 중 알림 받기",
     "receiveNotificationsWhenDownloading": "다운로드 중 알림 받기",
-    "receiveNotificationsWhenDownloadingSubtitle": "다운로드 중 알림 받기"
+    "receiveNotificationsWhenDownloadingSubtitle": "다운로드 중 알림 받기",
+    "donateDescription": "OpenAir는 무료 오픈 소스 앱입니다. 사용이 즐거우시다면 개발을 지원하기 위해 기부를 고려해 주십시오. 감사합니다!",
+    "donateWithPayPal": "PayPal로 기부",
+    "buyMeACoffee": "커피 사주기",
+    "donateWithKofi": "Ko-fi로 기부"
 }

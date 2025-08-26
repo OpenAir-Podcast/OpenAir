@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "Получать уведомления во время воспроизведения",
     "receiveNotificationsWhenPlayingSubtitle": "Получать уведомления во время воспроизведения",
     "receiveNotificationsWhenDownloading": "Получать уведомления во время загрузки",
-    "receiveNotificationsWhenDownloadingSubtitle": "Получать уведомления во время загрузки"
+    "receiveNotificationsWhenDownloadingSubtitle": "Получать уведомления во время загрузки",
+    "donateDescription": "OpenAir — бесплатное приложение с открытым исходным кодом. Если вам нравится им пользоваться, пожалуйста, рассмотрите возможность пожертвования для поддержки разработки. Спасибо!",
+    "donateWithPayPal": "Пожертвовать через PayPal",
+    "buyMeACoffee": "Купи мне кофе",
+    "donateWithKofi": "Пожертвовать через Ko-fi"
 }

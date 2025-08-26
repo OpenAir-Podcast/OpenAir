@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "Receber notificações durante a reprodução",
     "receiveNotificationsWhenPlayingSubtitle": "Receber notificações durante a reprodução",
     "receiveNotificationsWhenDownloading": "Receber notificações durante o download",
-    "receiveNotificationsWhenDownloadingSubtitle": "Receber notificações durante o download"
+    "receiveNotificationsWhenDownloadingSubtitle": "Receber notificações durante o download",
+    "donateDescription": "OpenAir é um aplicativo gratuito e de código aberto. Se você gosta de usá-lo, considere fazer uma doação para apoiar o desenvolvimento. Obrigado!",
+    "donateWithPayPal": "Doar com PayPal",
+    "buyMeACoffee": "Compre-me um café",
+    "donateWithKofi": "Doar com Ko-fi"
 }

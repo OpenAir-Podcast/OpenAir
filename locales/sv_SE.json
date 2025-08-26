@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "Ta emot aviseringar under uppspelning",
     "receiveNotificationsWhenPlayingSubtitle": "Ta emot aviseringar under uppspelning",
     "receiveNotificationsWhenDownloading": "Ta emot aviseringar under nedladdning",
-    "receiveNotificationsWhenDownloadingSubtitle": "Ta emot aviseringar under nedladdning"
+    "receiveNotificationsWhenDownloadingSubtitle": "Ta emot aviseringar under nedladdning",
+    "donateDescription": "OpenAir är en gratis och öppen källkodsapp. Om du gillar att använda den, överväg att donera för att stödja utvecklingen. Tack!",
+    "donateWithPayPal": "Donera med PayPal",
+    "buyMeACoffee": "Köp mig en kaffe",
+    "donateWithKofi": "Donera med Ko-fi"
 }

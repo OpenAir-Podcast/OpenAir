@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "再生中に通知を受け取る",
     "receiveNotificationsWhenPlayingSubtitle": "再生中に通知を受け取る",
     "receiveNotificationsWhenDownloading": "ダウンロード中に通知を受け取る",
-    "receiveNotificationsWhenDownloadingSubtitle": "ダウンロード中に通知を受け取る"
+    "receiveNotificationsWhenDownloadingSubtitle": "ダウンロード中に通知を受け取る",
+    "donateDescription": "OpenAirは無料のオープンソースアプリです。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます！",
+    "donateWithPayPal": "PayPalで寄付",
+    "buyMeACoffee": "コーヒーを買う",
+    "donateWithKofi": "Ko-fiで寄付"
 }

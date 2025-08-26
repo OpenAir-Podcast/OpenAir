@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "קבל התראות בעת השמעה",
     "receiveNotificationsWhenPlayingSubtitle": "קבל התראות בעת השמעה",
     "receiveNotificationsWhenDownloading": "קבל התראות בעת הורדה",
-    "receiveNotificationsWhenDownloadingSubtitle": "קבל התראות בעת הורדה"
+    "receiveNotificationsWhenDownloadingSubtitle": "קבל התראות בעת הורדה",
+    "donateDescription": "OpenAir היא אפליקציה חינמית וקוד פתוח. אם אתה נהנה להשתמש בה, אנא שקול לתרום כדי לתמוך בפיתוח. תודה!",
+    "donateWithPayPal": "תרום באמצעות PayPal",
+    "buyMeACoffee": "קנה לי קפה",
+    "donateWithKofi": "תרום באמצעות Ko-fi"
 }

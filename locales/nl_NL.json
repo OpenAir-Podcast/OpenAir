@@ -304,5 +304,9 @@
     "receiveNotificationsWhenPlaying": "Meldingen ontvangen tijdens het afspelen",
     "receiveNotificationsWhenPlayingSubtitle": "Meldingen ontvangen tijdens het afspelen",
     "receiveNotificationsWhenDownloading": "Meldingen ontvangen tijdens het downloaden",
-    "receiveNotificationsWhenDownloadingSubtitle": "Meldingen ontvangen tijdens het downloaden"
+    "receiveNotificationsWhenDownloadingSubtitle": "Meldingen ontvangen tijdens het downloaden",
+    "donateDescription": "OpenAir is een gratis en open-source app. Als je het graag gebruikt, overweeg dan om te doneren om de ontwikkeling te ondersteunen. Bedankt!",
+    "donateWithPayPal": "Doneren met PayPal",
+    "buyMeACoffee": "Koop me een kop koffie",
+    "donateWithKofi": "Doneren met Ko-fi"
 }
