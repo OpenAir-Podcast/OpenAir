@@ -34,7 +34,7 @@ class DonatePageState extends ConsumerState<DonatePage> {
           ),
           ListTile(
             leading: Icon(Icons.paypal_rounded),
-            title: Text(Translations.of(context).text('donateWithPaypal')),
+            title: Text(Translations.of(context).text('donateWithPayPal')),
             onTap: () async {
               try {
                 await launchUrl(Uri.parse(paypalUrl));
@@ -56,6 +56,24 @@ class DonatePageState extends ConsumerState<DonatePage> {
             onTap: () async {
               try {
                 await launchUrl(Uri.parse(buyMeACoffeeUrl));
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.local_drink_outlined),
+            title: Text(Translations.of(context).text('donateWithKofi')),
+            onTap: () async {
+              try {
+                await launchUrl(Uri.parse(donateWithKofiUrl));
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

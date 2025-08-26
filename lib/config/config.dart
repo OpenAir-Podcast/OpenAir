@@ -122,3 +122,5 @@ String paypalUrl =
     'https://www.paypal.com/donate/?hosted_button_id=F2UVR7PBQM5XQ';
 
 String buyMeACoffeeUrl = 'https://buymeacoffee.com/theobviouschico';
+
+String donateWithKofiUrl = 'https://ko-fi.com/theobviouschico';

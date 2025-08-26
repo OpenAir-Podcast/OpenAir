@@ -306,6 +306,7 @@
     "receiveNotificationsWhenDownloading": "Receive notifications when downloading",
     "receiveNotificationsWhenDownloadingSubtitle": "Receive notifications when downloading",
     "donateDescription": "OpenAir is a free and open-source app. If you enjoy using it, please consider donating to help support the development. Thank you!",
-    "Donate with PayPal": "Donate with PayPal",
-    "buyMeACoffee": "Buy Me a Coffee"
+    "donateWithPayPal": "Donate with PayPal",
+    "buyMeACoffee": "Buy Me a Coffee",
+    "donateWithKofi": "Donate with Ko-fi"
 }
