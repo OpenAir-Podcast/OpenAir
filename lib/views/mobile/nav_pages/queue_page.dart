@@ -23,9 +23,6 @@ class QueuePage extends ConsumerStatefulWidget {
 }
 
 class _QueuePageState extends ConsumerState<QueuePage> {
-  Map queueMap = {};
-  bool once = false;
-
   @override
   Widget build(BuildContext context) {
     final queueStream = ref.watch(sortedProvider);
@@ -46,17 +43,20 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             return NoQueue();
           }
 
-          if (!once) {
-            once = true;
-            queueMap = queueData;
-          }
+          // Convert to list and sort by position for consistent ordering
+          final List<MapEntry<String, Map>> sortedQueueList = queueData.entries
+              .map(
+                  (e) => MapEntry<String, Map>(e.key as String, e.value as Map))
+              .toList()
+            ..sort((a, b) =>
+                (a.value['pos'] as int).compareTo(b.value['pos'] as int));
 
           return ReorderableListView.builder(
             buildDefaultDragHandles: false,
             itemBuilder: (context, index) {
+              final MapEntry<String, Map> entry = sortedQueueList[index];
               final Map<String, dynamic> item =
-                  (queueData.entries.elementAt(index).value)
-                      .cast<String, dynamic>();
+                  entry.value.cast<String, dynamic>();
 
               final bool isQueueSelected = currentPlayingGuid == item['guid'];
 
@@ -67,16 +67,22 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                 isQueueSelected: isQueueSelected,
               );
             },
-            itemCount: queueData.length,
-            onReorder: (oldIndex, newIndex) {
-              // perform reorder in storage then refresh the provider so the UI updates
-              final hive = ref.read(openAirProvider).hiveService;
-              hive.reorderQueue(oldIndex, newIndex).then((_) {
+            itemCount: sortedQueueList.length,
+            onReorder: (oldIndex, newIndex) async {
+              // Show loading indicator or disable interaction during reorder
+              try {
+                final hive = ref.read(openAirProvider).hiveService;
+                await hive.reorderQueue(oldIndex, newIndex);
+                // Refresh the provider to update the UI
                 ref.invalidate(sortedProvider);
-              }).catchError((e) {
-                // optional: handle errors (kept minimal)
-                debugPrint('Failed to reorder queue: $e');
-              });
+              } catch (e) {
+                // Optionally show a snackbar or error message to the user
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to reorder queue: $e')),
+                  );
+                }
+              }
             },
           );
         },

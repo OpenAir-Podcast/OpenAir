@@ -276,7 +276,7 @@ class HiveService {
     await box.clear();
   }
 
-  // This should get the fetch the list then sort it in ASC order
+// Improved reorderQueue method for HiveService
   Future<void> reorderQueue(int oldIndex, int newIndex) async {
     final box = await queueBox;
     final queueMap = await box.getAllValues();
@@ -297,22 +297,29 @@ class HiveService {
     if (oldIndex < 0 ||
         oldIndex >= queueList.length ||
         newIndex < 0 ||
-        newIndex >= queueList.length) {
-      return;
+        newIndex >= queueList.length ||
+        oldIndex == newIndex) {
+      return; // No change needed
     }
 
     // Perform the reorder
     final item = queueList.removeAt(oldIndex);
     queueList.insert(newIndex, item);
 
-    // Update positions
-    await box.clear();
+    // Update positions in a transaction-like manner
+    final Map<String, Map> updatedItems = {};
 
     for (int i = 0; i < queueList.length; i++) {
       final entry = queueList[i];
       final updatedValue = Map<String, dynamic>.from(entry.value)..['pos'] = i;
-      debugPrint('Reordered item: ${entry.key} to position $i');
-      await box.put(entry.key, updatedValue);
+      updatedItems[entry.key] = updatedValue;
+    }
+
+    // Clear and repopulate the box
+    await box.clear();
+
+    for (final entry in updatedItems.entries) {
+      await box.put(entry.key, entry.value);
     }
   }
 
