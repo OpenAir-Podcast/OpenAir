@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/settings_pages/donate_page.dart';
 import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
 import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
@@ -113,7 +114,13 @@ class _SettingsState extends ConsumerState<Settings> {
               leading: Icon(Icons.thumb_up_alt_rounded),
               title: Text(Translations.of(context).text('donate')),
               subtitle: Text(Translations.of(context).text('donateSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const DonatePage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.help_outline_rounded),

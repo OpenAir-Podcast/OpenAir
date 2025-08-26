@@ -117,3 +117,8 @@ Color cardColorLight = Colors.white;
 Color cardColorDark = Colors.grey[850]!;
 Color primaryColorLight = Colors.blue;
 Color primaryColorDark = Colors.blue;
+
+String paypalUrl =
+    'https://www.paypal.com/donate/?hosted_button_id=F2UVR7PBQM5XQ';
+
+String buyMeACoffeeUrl = 'https://buymeacoffee.com/theobviouschico';
