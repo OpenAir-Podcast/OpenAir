@@ -308,5 +308,10 @@
     "donateDescription": "OpenAirは無料のオープンソースアプリです。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます！",
     "donateWithPayPal": "PayPalで寄付",
     "buyMeACoffee": "コーヒーを買う",
-    "donateWithKofi": "Ko-fiで寄付"
+    "donateWithKofi": "Ko-fiで寄付",
+    "helpAndFeedbackDescription": "ご質問、ご提案、バグレポートがありましたら、お気軽にお問い合わせください。フィードバックをお待ちしております！",
+    "joinOurDiscord": "Discordに参加する",
+    "reportABug": "バグを報告",
+    "suggestAFeature": "機能を提案",
+    "privacyPolicy": "プライバシーポリシー"
 }

@@ -308,5 +308,10 @@
     "donateDescription": "OpenAir היא אפליקציה חינמית וקוד פתוח. אם אתה נהנה להשתמש בה, אנא שקול לתרום כדי לתמוך בפיתוח. תודה!",
     "donateWithPayPal": "תרום באמצעות PayPal",
     "buyMeACoffee": "קנה לי קפה",
-    "donateWithKofi": "תרום באמצעות Ko-fi"
+    "donateWithKofi": "תרום באמצעות Ko-fi",
+    "helpAndFeedbackDescription": "אם יש לך שאלות, הצעות או דיווחי באגים, אל תהסס לפנות אלינו. אנו מעריכים את המשוב שלך!",
+    "joinOurDiscord": "הצטרף לדיסקורד שלנו",
+    "reportABug": "דווח על באג",
+    "suggestAFeature": "הצע תכונה",
+    "privacyPolicy": "מדיניות פרטיות"
 }

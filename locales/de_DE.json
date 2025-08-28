@@ -308,5 +308,10 @@
     "donateDescription": "OpenAir ist eine kostenlose und quelloffene App. Wenn Sie sie gerne nutzen, ziehen Sie bitte eine Spende in Betracht, um die Entwicklung zu unterstützen. Vielen Dank!",
     "donateWithPayPal": "Mit PayPal spenden",
     "buyMeACoffee": "Kauf mir einen Kaffee",
-    "donateWithKofi": "Mit Ko-fi spenden"
+    "donateWithKofi": "Mit Ko-fi spenden",
+    "helpAndFeedbackDescription": "Wenn Sie Fragen, Anregungen oder Fehlerberichte haben, können Sie uns gerne kontaktieren. Wir freuen uns über Ihr Feedback!",
+    "joinOurDiscord": "Treten Sie unserem Discord bei",
+    "reportABug": "Fehler melden",
+    "suggestAFeature": "Funktion vorschlagen",
+    "privacyPolicy": "Datenschutzrichtlinie"
 }

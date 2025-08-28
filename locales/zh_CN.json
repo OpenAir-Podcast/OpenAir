@@ -308,5 +308,10 @@
     "donateDescription": "OpenAir 是一款免费的开源应用程序。如果您喜欢使用它，请考虑捐赠以支持开发。谢谢！",
     "donateWithPayPal": "使用 PayPal 捐赠",
     "buyMeACoffee": "给我买杯咖啡",
-    "donateWithKofi": "使用 Ko-fi 捐赠"
+    "donateWithKofi": "使用 Ko-fi 捐赠",
+    "helpAndFeedbackDescription": "如果您有任何问题、建议或错误报告，请随时与我们联系。我们感谢您的反馈！",
+    "joinOurDiscord": "加入我们的 Discord",
+    "reportABug": "报告错误",
+    "suggestAFeature": "建议功能",
+    "privacyPolicy": "隐私政策"
 }

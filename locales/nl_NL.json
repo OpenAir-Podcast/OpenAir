@@ -308,5 +308,10 @@
     "donateDescription": "OpenAir is een gratis en open-source app. Als je het graag gebruikt, overweeg dan om te doneren om de ontwikkeling te ondersteunen. Bedankt!",
     "donateWithPayPal": "Doneren met PayPal",
     "buyMeACoffee": "Koop me een kop koffie",
-    "donateWithKofi": "Doneren met Ko-fi"
+    "donateWithKofi": "Doneren met Ko-fi",
+    "helpAndFeedbackDescription": "Als je vragen, suggesties of bugrapporten hebt, neem dan gerust contact met ons op. We waarderen je feedback!",
+    "joinOurDiscord": "Word lid van onze Discord",
+    "reportABug": "Een bug melden",
+    "suggestAFeature": "Een functie voorstellen",
+    "privacyPolicy": "Privacybeleid"
 }

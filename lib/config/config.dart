@@ -124,3 +124,13 @@ String paypalUrl =
 String buyMeACoffeeUrl = 'https://buymeacoffee.com/theobviouschico';
 
 String donateWithKofiUrl = 'https://ko-fi.com/theobviouschico';
+
+String discordUrl = 'https://discord.gg/cxy9AmMaYS';
+
+String gitHubIssuesUrl = 'https://github.com/OpenAir-Podcast/OpenAir/issues';
+
+String gitHubDiscussionsUrl =
+    'https://github.com/OpenAir-Podcast/OpenAir/discussions';
+
+String privacyPolicyUrl =
+    'https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md';
