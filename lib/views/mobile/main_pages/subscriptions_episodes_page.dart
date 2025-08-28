@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 
@@ -93,7 +94,7 @@ class _SubscriptionsEpisodesPageState
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(ref.watch(openAirProvider).currentPodcast!.title),
+            title: Text(ref.watch(auidoProvider).currentPodcast!.title),
             actions: [
               FutureBuilder(
                 future: ref
@@ -120,11 +121,12 @@ class _SubscriptionsEpisodesPageState
                       onPressed: () async {
                         snapshot.data! && snapshot.hasData
                             ? ref
-                                .read(openAirProvider)
+                                .read(auidoProvider)
                                 .unsubscribe(widget.podcast)
-                            : ref
-                                .read(openAirProvider)
-                                .subscribe(widget.podcast);
+                            : ref.read(auidoProvider).subscribe(
+                                  widget.podcast,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -166,8 +168,8 @@ class _SubscriptionsEpisodesPageState
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-            child: ref.watch(openAirProvider).isPodcastSelected
+            height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
+            child: ref.watch(auidoProvider).isPodcastSelected
                 ? const BannerAudioPlayer()
                 : const SizedBox(),
           ),

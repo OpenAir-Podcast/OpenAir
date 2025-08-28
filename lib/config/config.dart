@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-Color? cardBackgroundColor = Colors.blueGrey[100];
 Color? highlightColor = Colors.grey[100];
 Color? highlightColor2 = Colors.grey[400];
 
@@ -65,3 +64,73 @@ double fontSizeExtraLarge = 1.25;
 
 bool onChanged = true;
 String localeSettings = 'en_US';
+
+AppBarTheme appBarThemeLight = AppBarTheme(
+  backgroundColor: Colors.white,
+  foregroundColor: Colors.blue,
+);
+
+AppBarTheme appBarThemeDark = AppBarTheme(
+  backgroundColor: Colors.black,
+  foregroundColor: Colors.blue,
+);
+
+FloatingActionButtonThemeData floatingActionButtonTheme =
+    FloatingActionButtonThemeData(
+  backgroundColor: Colors.blue,
+  foregroundColor: Colors.white,
+);
+
+ColorScheme colorSchemeLight = ColorScheme.light(
+  primary: Colors.blue,
+  onPrimary: Colors.white,
+  secondary: Colors.blueAccent,
+  onSecondary: Colors.white,
+  surface: Colors.grey[100]!,
+  onSurface: Colors.black,
+  error: Colors.red[700]!,
+  onError: Colors.white,
+  primaryContainer: Colors.white,
+  onPrimaryContainer: Colors.black,
+  secondaryContainer: Colors.white,
+  onSecondaryContainer: Colors.black,
+);
+
+ColorScheme colorSchemeDark = ColorScheme.dark(
+  primary: Colors.blue,
+  onPrimary: Colors.white,
+  secondary: Colors.blueAccent,
+  onSecondary: Colors.white,
+  surface: Colors.grey[850]!,
+  onSurface: Colors.white,
+  error: Colors.red[400]!,
+  onError: Colors.black,
+  primaryContainer: Colors.grey[900]!,
+  onPrimaryContainer: Colors.white,
+  secondaryContainer: Colors.grey[900]!,
+  onSecondaryContainer: Colors.white,
+);
+
+Color scaffoldBackgroundColorLight = Colors.grey[100]!;
+Color scaffoldBackgroundColorDark = Colors.black;
+Color cardColorLight = Colors.white;
+Color cardColorDark = Colors.grey[850]!;
+Color primaryColorLight = Colors.blue;
+Color primaryColorDark = Colors.blue;
+
+String paypalUrl =
+    'https://www.paypal.com/donate/?hosted_button_id=F2UVR7PBQM5XQ';
+
+String buyMeACoffeeUrl = 'https://buymeacoffee.com/theobviouschico';
+
+String donateWithKofiUrl = 'https://ko-fi.com/theobviouschico';
+
+String discordUrl = 'https://discord.gg/cxy9AmMaYS';
+
+String gitHubIssuesUrl = 'https://github.com/OpenAir-Podcast/OpenAir/issues';
+
+String gitHubDiscussionsUrl =
+    'https://github.com/OpenAir-Podcast/OpenAir/discussions';
+
+String privacyPolicyUrl =
+    'https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md';

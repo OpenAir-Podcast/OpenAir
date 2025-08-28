@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/settings_pages/donate_page.dart';
+import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
+import 'package:openair/views/mobile/settings_pages/help_and_feedback.dart';
+import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/mobile/settings_pages/playback_page.dart';
+import 'package:openair/views/mobile/settings_pages/synchronization_page.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 
 class Settings extends ConsumerStatefulWidget {
@@ -41,14 +48,26 @@ class _SettingsState extends ConsumerState<Settings> {
               leading: Icon(Icons.play_arrow_rounded),
               title: Text(Translations.of(context).text('playback')),
               subtitle: Text(Translations.of(context).text('playbackSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const PlaybackPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.download_rounded),
               title: Text(Translations.of(context).text('downloads')),
               subtitle:
                   Text(Translations.of(context).text('downloadsSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const DownloadsPage(),
+                  ),
+                );
+              },
             ),
             Divider(),
             ListTile(
@@ -56,14 +75,26 @@ class _SettingsState extends ConsumerState<Settings> {
               title: Text(Translations.of(context).text('synchronization')),
               subtitle: Text(
                   Translations.of(context).text('synchronizationSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const SynchronizationPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.sd_card_rounded),
               title: Text(Translations.of(context).text('importExport')),
               subtitle:
                   Text(Translations.of(context).text('importExportSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ImportExportPage(),
+                  ),
+                );
+              },
             ),
             Divider(),
             ListTile(
@@ -71,21 +102,39 @@ class _SettingsState extends ConsumerState<Settings> {
               title: Text(Translations.of(context).text('notifications')),
               subtitle:
                   Text(Translations.of(context).text('notificationsSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsPage(),
+                  ),
+                );
+              },
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.thumb_up_alt_rounded),
               title: Text(Translations.of(context).text('donate')),
               subtitle: Text(Translations.of(context).text('donateSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const DonatePage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.help_outline_rounded),
               title: Text(Translations.of(context).text('helpAndFeedback')),
               subtitle: Text(
                   Translations.of(context).text('helpAndFeedbackSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const HelpAndFeedbackPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.info_outline_rounded),

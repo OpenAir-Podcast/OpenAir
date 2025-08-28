@@ -4,6 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 
@@ -26,8 +27,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ref.read(openAirProvider).currentPodcast = widget.podcastItem;
-
+        ref.read(auidoProvider).currentPodcast = widget.podcastItem;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => EpisodesPage(podcast: widget.podcastItem),
@@ -35,7 +35,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
         );
       },
       child: Card(
-        color: Colors.blueGrey[100],
+        color: Theme.of(context).cardColor,
         elevation: 2.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -75,7 +75,11 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                           child: Text(
                             widget.podcastItem.title,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
+                            style: TextStyle(
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.bold,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -125,11 +129,12 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                       onPressed: () async {
                         snapshot.data!
                             ? ref
-                                .read(openAirProvider)
+                                .read(auidoProvider)
                                 .unsubscribe(widget.podcastItem)
-                            : ref
-                                .read(openAirProvider)
-                                .subscribe(widget.podcastItem);
+                            : ref.read(auidoProvider).subscribe(
+                                  widget.podcastItem,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

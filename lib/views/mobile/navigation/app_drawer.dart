@@ -267,7 +267,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => AddPodcast()),
+                      MaterialPageRoute(builder: (context) => AddPodcastPage()),
                     );
                   },
                 ),

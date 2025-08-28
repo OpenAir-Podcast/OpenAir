@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
@@ -11,9 +12,11 @@ import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart
 
 final getSubscriptionsCountProvider =
     FutureProvider.family.autoDispose<String, String>((ref, title) async {
+  HiveService hiveService = ref.watch(openAirProvider).hiveService;
+
   // Gets episodes count from last stored index of episodes
   int currentSubEpCount =
-      await ref.read(hiveServiceProvider).podcastSubscribedEpisodeCount(title);
+      await hiveService.podcastSubscribedEpisodeCount(title);
 
   // Gets episodes count from PodcastIndex
   int podcastEpisodeCount =
@@ -52,7 +55,7 @@ class SubscriptionCard extends StatelessWidget {
           // TODO Add a dropmenu here
         },
         onTap: () {
-          ref.read(openAirProvider.notifier).currentPodcast =
+          ref.read(auidoProvider.notifier).currentPodcast =
               PodcastModel.fromJson(subs[index].toJson());
 
           Navigator.of(context).push(

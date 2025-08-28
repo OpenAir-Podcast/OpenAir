@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/categories_page.dart';
 import 'package:openair/views/mobile/main_pages/featured_page.dart';
 import 'package:openair/views/mobile/main_pages/trending_page.dart';
+import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/navigation/app_drawer.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 
@@ -33,6 +34,21 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold>
             textAlign: TextAlign.left,
           ),
           actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                tooltip: Translations.of(context).text('refresh'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddPodcastPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.search_rounded),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
@@ -114,10 +130,10 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold>
           ],
         ),
         bottomNavigationBar: SizedBox(
-          height: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+          height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
               ? 80.0
               : 0.0,
-          child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+          child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
               ? const BannerAudioPlayer()
               : const SizedBox.shrink(),
         ),

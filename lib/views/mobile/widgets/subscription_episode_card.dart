@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
@@ -46,14 +46,13 @@ class _SubscriptionEpisodeCardState
         ref.watch(isEpisodeNewProvider(widget.episodeItem['guid'].toString()));
 
     podcastDate = ref
-        .read(openAirProvider) // Date for item is static
+        .read(auidoProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
 
-    final AsyncValue<List<QueueModel>> queueListAsync =
-        ref.watch(sortedQueueListProvider);
+    final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     return GestureDetector(
       onTap: () {
@@ -71,7 +70,7 @@ class _SubscriptionEpisodeCardState
         child: Stack(
           children: [
             Card(
-              color: Colors.blueGrey[100],
+              color: Theme.of(context).cardColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
@@ -96,7 +95,7 @@ class _SubscriptionEpisodeCardState
                               memCacheHeight: 62,
                               memCacheWidth: 62,
                               imageUrl: ref
-                                      .watch(openAirProvider)
+                                      .watch(auidoProvider)
                                       .currentPodcast
                                       ?.imageUrl ??
                                   widget.podcast.imageUrl,
@@ -122,10 +121,14 @@ class _SubscriptionEpisodeCardState
                                   // Podcast title
                                   child: Text(
                                     widget.episodeItem['title'],
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14.0,
                                       overflow: TextOverflow.ellipsis,
                                       fontWeight: FontWeight.bold,
+                                      color: Brightness.dark ==
+                                              Theme.of(context).brightness
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                     maxLines: 2,
                                   ),
@@ -136,7 +139,7 @@ class _SubscriptionEpisodeCardState
                                   // Podcast title
                                   child: Text(
                                     ref
-                                            .watch(openAirProvider)
+                                            .watch(auidoProvider)
                                             .currentPodcast!
                                             .author ??
                                         Translations.of(context)
@@ -170,8 +173,12 @@ class _SubscriptionEpisodeCardState
                         child: StyledText(
                           text: widget.episodeItem['description'],
                           maxLines: 4,
-                          style: const TextStyle(
+                          style: TextStyle(
                             overflow: TextOverflow.ellipsis,
+                            color:
+                                Brightness.dark == Theme.of(context).brightness
+                                    ? Colors.white
+                                    : Colors.black,
                           ),
                         ),
                       ),
@@ -192,10 +199,10 @@ class _SubscriptionEpisodeCardState
                               ),
                             ),
                             onPressed: () {
-                              if (ref.read(openAirProvider).currentEpisode !=
+                              if (ref.read(auidoProvider).currentEpisode !=
                                   widget.episodeItem) {
                                 ref
-                                    .read(openAirProvider.notifier)
+                                    .read(auidoProvider.notifier)
                                     .playerPlayButtonClicked(
                                       widget.episodeItem,
                                     );
@@ -208,19 +215,17 @@ class _SubscriptionEpisodeCardState
                         ),
                         // Playlist button
                         queueListAsync.when(
-                          data: (list) {
-                            final isQueued = list.any((item) =>
-                                item.guid == widget.episodeItem['guid']);
+                          data: (data) {
+                            final isQueued =
+                                data.containsKey(widget.episodeItem['guid']);
 
                             return IconButton(
                               tooltip: "Add to Queue",
                               onPressed: () {
                                 isQueued
-                                    ? ref
-                                        .watch(openAirProvider)
-                                        .removeFromQueue(
-                                            widget.episodeItem['guid'])
-                                    : ref.watch(openAirProvider).addToQueue(
+                                    ? ref.watch(auidoProvider).removeFromQueue(
+                                        widget.episodeItem['guid'])
+                                    : ref.watch(auidoProvider).addToQueue(
                                           widget.episodeItem,
                                           widget.podcast,
                                         );
@@ -255,11 +260,10 @@ class _SubscriptionEpisodeCardState
                           loading: () {
                             // Handle loading by showing previous state's icon, disabled
                             final previousList = queueListAsync.valueOrNull;
-                            final isQueuedPreviously = previousList?.any(
-                                    (item) =>
-                                        item.guid ==
-                                        widget.episodeItem['guid']) ??
+                            final isQueuedPreviously = previousList
+                                    ?.containsKey(widget.episodeItem['guid']) ??
                                 false;
+
                             return IconButton(
                               tooltip: "Add to Queue",
                               onPressed: null, // Disable button while loading
@@ -276,7 +280,7 @@ class _SubscriptionEpisodeCardState
                               final isDownloaded = downloads.any(
                                   (d) => d.guid == widget.episodeItem['guid']);
 
-                              final isDownloading = ref.watch(openAirProvider
+                              final isDownloading = ref.watch(auidoProvider
                                   .select((p) => p.downloadingPodcasts
                                       .contains(widget.episodeItem['guid'])));
 
@@ -316,7 +320,7 @@ class _SubscriptionEpisodeCardState
 
                                             // Then perform the removal
                                             await ref
-                                                .read(openAirProvider.notifier)
+                                                .read(auidoProvider.notifier)
                                                 .removeDownload(
                                                     widget.episodeItem);
 
@@ -344,10 +348,11 @@ class _SubscriptionEpisodeCardState
 
                                 onPressed = () {
                                   ref
-                                      .read(openAirProvider.notifier)
+                                      .read(auidoProvider.notifier)
                                       .downloadEpisode(
                                         widget.episodeItem,
                                         widget.podcast,
+                                        context,
                                       );
 
                                   ScaffoldMessenger.of(context).showSnackBar(

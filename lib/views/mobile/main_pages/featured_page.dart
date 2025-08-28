@@ -4,7 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
@@ -18,7 +18,7 @@ import 'package:theme_provider/theme_provider.dart';
 
 final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
-      await ref.read(hiveServiceProvider).getTopFeaturedPodcast();
+      await ref.watch(openAirProvider).hiveService.getTopFeaturedPodcast();
 
   if (topFeaturedPodcastData != null) {
     return topFeaturedPodcastData;
@@ -32,8 +32,10 @@ final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByEducationProvider =
     FutureProvider<FetchDataModel>((ref) async {
-  final FetchDataModel? educationPodcastData =
-      await ref.read(hiveServiceProvider).getCategoryPodcast('Education');
+  final FetchDataModel? educationPodcastData = await ref
+      .watch(openAirProvider)
+      .hiveService
+      .getCategoryPodcast('Education');
 
   if (educationPodcastData != null) {
     return educationPodcastData;
@@ -46,7 +48,7 @@ final podcastDataByEducationProvider =
 
 final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? healthPodcastData =
-      await ref.read(hiveServiceProvider).getCategoryPodcast('Health');
+      await ref.watch(openAirProvider).hiveService.getCategoryPodcast('Health');
 
   if (healthPodcastData != null) {
     return healthPodcastData;
@@ -59,8 +61,10 @@ final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
 
 final podcastDataByTechnologyProvider =
     FutureProvider<FetchDataModel>((ref) async {
-  final FetchDataModel? tehnologyPodcastData =
-      await ref.read(hiveServiceProvider).getCategoryPodcast('Technology');
+  final FetchDataModel? tehnologyPodcastData = await ref
+      .watch(openAirProvider)
+      .hiveService
+      .getCategoryPodcast('Technology');
 
   if (tehnologyPodcastData != null) {
     return tehnologyPodcastData;
@@ -73,7 +77,7 @@ final podcastDataByTechnologyProvider =
 
 final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? sportsPodcastData =
-      await ref.read(hiveServiceProvider).getCategoryPodcast('Sports');
+      await ref.watch(openAirProvider).hiveService.getCategoryPodcast('Sports');
 
   if (sportsPodcastData != null) {
     return sportsPodcastData;
@@ -195,7 +199,7 @@ class PodcastsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      color: cardBackgroundColor ?? Colors.white,
+      color: Theme.of(context).cardColor,
       elevation: cardElevation ?? 0.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardBottomCornersRatio),
@@ -218,7 +222,7 @@ class PodcastsCard extends ConsumerWidget {
                 ),
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
-                    baseColor: cardBackgroundColor!,
+                    baseColor: Theme.of(context).cardColor,
                     highlightColor: highlightColor!,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
@@ -344,7 +348,7 @@ class PodcastsCard extends ConsumerWidget {
                       ),
                       child: GestureDetector(
                         onTap: () {
-                          ref.read(openAirProvider).currentPodcast =
+                          ref.read(auidoProvider).currentPodcast =
                               snapshot.feeds[index];
 
                           Navigator.of(context).push(

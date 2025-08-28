@@ -2,26 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/queue_card.dart';
 
-class QueuePage extends ConsumerWidget {
+// FutureProvider for sorted Queue List
+final sortedProvider = FutureProvider(
+  (ref) {
+    final hiveService = ref.watch(openAirProvider).hiveService;
+    return hiveService.getQueue();
+  },
+);
+
+class QueuePage extends ConsumerStatefulWidget {
   const QueuePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // By using a StreamProvider for the queue, the UI will automatically
-    // update when the queue changes (e.g., after reordering). We use .stream
-    // because sortedQueueListProvider is a StreamProvider.
-    final queueStream = ref.watch(sortedQueueListProvider);
+  ConsumerState<QueuePage> createState() => _QueuePageState();
+}
+
+class _QueuePageState extends ConsumerState<QueuePage> {
+  @override
+  Widget build(BuildContext context) {
+    final queueStream = ref.watch(sortedProvider);
 
     final isPodcastSelected =
-        ref.watch(openAirProvider.select((p) => p.isPodcastSelected));
+        ref.watch(auidoProvider.select((p) => p.isPodcastSelected));
 
     final currentPlayingGuid =
-        ref.watch(openAirProvider.select((p) => p.currentEpisode?['guid']));
+        ref.watch(auidoProvider.select((p) => p.currentEpisode?['guid']));
 
     return Scaffold(
       appBar: AppBar(
@@ -33,23 +43,46 @@ class QueuePage extends ConsumerWidget {
             return NoQueue();
           }
 
+          // Convert to list and sort by position for consistent ordering
+          final List<MapEntry<String, Map>> sortedQueueList = queueData.entries
+              .map(
+                  (e) => MapEntry<String, Map>(e.key as String, e.value as Map))
+              .toList()
+            ..sort((a, b) =>
+                (a.value['pos'] as int).compareTo(b.value['pos'] as int));
+
           return ReorderableListView.builder(
             buildDefaultDragHandles: false,
             itemBuilder: (context, index) {
-              final item = queueData[index];
-              final bool isQueueSelected = currentPlayingGuid == item.guid;
+              final MapEntry<String, Map> entry = sortedQueueList[index];
+              final Map<String, dynamic> item =
+                  entry.value.cast<String, dynamic>();
+
+              final bool isQueueSelected = currentPlayingGuid == item['guid'];
 
               return QueueCard(
-                key: ValueKey(item.guid),
+                key: ValueKey(item['guid']),
                 episodeItem: item,
                 index: index,
                 isQueueSelected: isQueueSelected,
               );
             },
-            itemCount: queueData.length,
-            onReorder: (oldIndex, newIndex) {
-              // This should trigger an update on the stream from the provider.
-              ref.read(hiveServiceProvider).reorderQueue(oldIndex, newIndex);
+            itemCount: sortedQueueList.length,
+            onReorder: (oldIndex, newIndex) async {
+              // Show loading indicator or disable interaction during reorder
+              try {
+                final hive = ref.read(openAirProvider).hiveService;
+                await hive.reorderQueue(oldIndex, newIndex);
+                // Refresh the provider to update the UI
+                ref.invalidate(sortedProvider);
+              } catch (e) {
+                // Optionally show a snackbar or error message to the user
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to reorder queue: $e')),
+                  );
+                }
+              }
             },
           );
         },

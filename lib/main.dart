@@ -4,7 +4,8 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/config/config.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
@@ -23,14 +24,7 @@ void main() async {
   }
 
   await Hive.initFlutter('OpenAir/.hive_config');
-
-  // Create a ProviderContainer
-  final container = ProviderContainer();
-
-  // Initialize HiveService
-  await container.read(hiveServiceProvider).initial();
-
-  runApp(ProviderScope(parent: container, child: const MyApp()));
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -54,13 +48,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initApp() async {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
+    if (mounted) await ref.read(auidoProvider).initAudio(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<Map?> userInterfaceSettings =
-        ref.watch(userInterfaceSettingsDataProvider);
-
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -81,8 +73,6 @@ class _MyAppState extends ConsumerState<MyApp> {
               Localization.sv_SE,
               Localization.zh_CN,
             ],
-            // selected: Localization.en_US,
-            // fallback: Localization.en_US,
           );
 
           return ThemeProvider(
@@ -96,28 +86,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
-                  scaffoldBackgroundColor: Colors.white,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[50],
-                  colorScheme: ColorScheme.light(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[100]!,
-                    onSurface: Colors.black,
-                    error: Colors.red[700]!,
-                    onError: Colors.white,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+                  primaryColor: primaryColorLight,
+                  appBarTheme: appBarThemeLight,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorLight,
+                  colorScheme: colorSchemeLight,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 0.875,
                       ),
@@ -128,28 +102,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
-                  scaffoldBackgroundColor: Colors.white,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[50],
-                  colorScheme: ColorScheme.light(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[100]!,
-                    onSurface: Colors.black,
-                    error: Colors.red[700]!,
-                    onError: Colors.white,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+                  primaryColor: primaryColorLight,
+                  appBarTheme: appBarThemeLight,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorLight,
+                  colorScheme: colorSchemeLight,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.0,
                       ),
@@ -160,28 +118,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
-                  scaffoldBackgroundColor: Colors.white,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[50],
-                  colorScheme: ColorScheme.light(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[100]!,
-                    onSurface: Colors.black,
-                    error: Colors.red[700]!,
-                    onError: Colors.white,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+                  primaryColor: primaryColorLight,
+                  appBarTheme: appBarThemeLight,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorLight,
+                  colorScheme: colorSchemeLight,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.125,
                       ),
@@ -192,28 +134,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
-                  scaffoldBackgroundColor: Colors.white,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[50],
-                  colorScheme: ColorScheme.light(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[100]!,
-                    onSurface: Colors.black,
-                    error: Colors.red[700]!,
-                    onError: Colors.white,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+                  primaryColor: primaryColorLight,
+                  appBarTheme: appBarThemeLight,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorLight,
+                  colorScheme: colorSchemeLight,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.25,
                       ),
@@ -225,28 +151,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: Colors.black,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[900],
-                  colorScheme: ColorScheme.dark(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[850]!,
-                    onSurface: Colors.white,
-                    error: Colors.red[400]!,
-                    onError: Colors.black,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+                  primaryColor: primaryColorDark,
+                  appBarTheme: appBarThemeDark,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorDark,
+                  colorScheme: colorSchemeDark,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 0.875,
                       ),
@@ -257,28 +167,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: Colors.black,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[900],
-                  colorScheme: ColorScheme.dark(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[850]!,
-                    onSurface: Colors.white,
-                    error: Colors.red[400]!,
-                    onError: Colors.black,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+                  primaryColor: primaryColorDark,
+                  appBarTheme: appBarThemeDark,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorDark,
+                  colorScheme: colorSchemeDark,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.0,
                       ),
@@ -289,28 +183,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: Colors.black,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[900],
-                  colorScheme: ColorScheme.dark(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[850]!,
-                    onSurface: Colors.white,
-                    error: Colors.red[400]!,
-                    onError: Colors.black,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+                  primaryColor: primaryColorDark,
+                  appBarTheme: appBarThemeDark,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorDark,
+                  colorScheme: colorSchemeDark,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.125,
                       ),
@@ -321,28 +199,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
-                  scaffoldBackgroundColor: Colors.black,
-                  primaryColor: Colors.blue,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.blue,
-                  ),
-                  floatingActionButtonTheme:
-                      const FloatingActionButtonThemeData(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  cardColor: Colors.grey[900],
-                  colorScheme: ColorScheme.dark(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
-                    secondary: Colors.blueAccent,
-                    onSecondary: Colors.white,
-                    surface: Colors.grey[850]!,
-                    onSurface: Colors.white,
-                    error: Colors.red[400]!,
-                    onError: Colors.black,
-                  ),
+                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+                  primaryColor: primaryColorDark,
+                  appBarTheme: appBarThemeDark,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorDark,
+                  colorScheme: colorSchemeDark,
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.25,
                       ),
@@ -369,6 +231,10 @@ class _MyAppState extends ConsumerState<MyApp> {
                       ),
                     );
                   }
+
+                  // Load user interface settings
+                  AsyncValue<Map?> userInterfaceSettings =
+                      ref.watch(userInterfaceSettingsDataProvider);
 
                   Future.delayed(
                     const Duration(milliseconds: 5000),

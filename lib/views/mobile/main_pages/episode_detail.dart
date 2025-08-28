@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
+import 'package:styled_text/widgets/styled_text.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
@@ -28,8 +28,7 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<QueueModel>> queueListAsync =
-        ref.watch(sortedQueueListProvider);
+    final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
@@ -80,9 +79,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
                             widget.podcast!.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
@@ -91,7 +94,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(openAirProvider).currentPodcast!.author ??
+                            ref.watch(auidoProvider).currentPodcast!.author ??
                                 Translations.of(context).text('unknown'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -105,7 +108,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         // Podcast Published Date
                         Text(
                           ref
-                              .watch(openAirProvider)
+                              .watch(auidoProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!['datePublished']),
                           style: const TextStyle(
@@ -136,7 +139,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           ),
                         ),
                         onPressed: () => ref
-                            .read(openAirProvider)
+                            .read(auidoProvider)
                             .playerPlayButtonClicked(widget.episodeItem!),
                         child: PlayButtonWidget(
                           episodeItem: widget.episodeItem!,
@@ -145,17 +148,17 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                     ),
                     // Queue Button
                     queueListAsync.when(
-                      data: (list) {
-                        final isQueued = list.any(
-                            (item) => item.guid == widget.episodeItem!['guid']);
+                      data: (data) {
+                        final isQueued =
+                            data.containsKey(widget.episodeItem!['guid']);
 
                         return IconButton(
                           tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: () {
                             isQueued
-                                ? ref.read(openAirProvider).removeFromQueue(
+                                ? ref.read(auidoProvider).removeFromQueue(
                                     widget.episodeItem!['guid'])
-                                : ref.read(openAirProvider).addToQueue(
+                                : ref.read(auidoProvider).addToQueue(
                                       widget.episodeItem!,
                                       widget.podcast,
                                     );
@@ -169,6 +172,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 ),
                               ),
                             );
+
+                            ref.invalidate(getQueueProvider);
                           },
                           icon: isQueued
                               ? const Icon(Icons.playlist_add_check_rounded)
@@ -186,8 +191,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       loading: () {
                         // Handle loading by showing previous state's icon, disabled
                         final previousList = queueListAsync.valueOrNull;
-                        final isQueuedPreviously = previousList?.any((item) =>
-                                item.guid == widget.episodeItem!['guid']) ??
+                        final isQueuedPreviously = previousList
+                                ?.containsKey(widget.episodeItem!['guid']) ??
                             false;
 
                         return IconButton(
@@ -206,8 +211,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           final isDownloaded = downloads.any(
                               (d) => d.guid == widget.episodeItem!['guid']);
 
-                          final isDownloading = ref.watch(openAirProvider
-                              .select((p) => p.downloadingPodcasts
+                          final isDownloading = ref.watch(auidoProvider.select(
+                              (p) => p.downloadingPodcasts
                                   .contains(widget.episodeItem!['guid'])));
 
                           IconData iconData;
@@ -251,7 +256,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
                                         // Then perform the removal
                                         await ref
-                                            .read(openAirProvider.notifier)
+                                            .read(auidoProvider.notifier)
                                             .removeDownload(
                                                 widget.episodeItem!);
 
@@ -265,11 +270,15 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                             ),
                                           );
                                         }
+
+                                        ref.invalidate(sortedDownloadsProvider);
                                       },
                                     ),
                                   ],
                                 ),
                               );
+
+                              ref.invalidate(sortedDownloadsProvider);
                             };
                           }
                           // Episode not downloaded
@@ -279,11 +288,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
-                              ref
-                                  .read(openAirProvider.notifier)
-                                  .downloadEpisode(
+                              ref.read(auidoProvider.notifier).downloadEpisode(
                                     widget.episodeItem!,
                                     widget.podcast!,
+                                    context,
                                   );
 
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -323,15 +331,15 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
               // Episode Description
               // TODO: Use a rich text widget to display the description
               SingleChildScrollView(
-                child: Html(
-                  data: widget.episodeItem!['description'],
-                  style: {
-                    "br": Style(
-                      display: Display.block,
-                      backgroundColor: Colors.black,
-                    ),
-                  },
-                  shrinkWrap: true,
+                child: StyledText(
+                  text: widget.episodeItem!['description'],
+                  maxLines: 4,
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    color: Brightness.dark == Theme.of(context).brightness
+                        ? Colors.white
+                        : Colors.black,
+                  ),
                 ),
               ),
             ],
@@ -339,8 +347,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(openAirProvider).isPodcastSelected ? 75.0 : 0.0,
-        child: ref.watch(openAirProvider).isPodcastSelected
+        height: ref.watch(auidoProvider).isPodcastSelected ? 75.0 : 0.0,
+        child: ref.watch(auidoProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/fyyd_search_card.dart';
 
@@ -42,8 +42,8 @@ class FyydSearchPage extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-        child: ref.watch(openAirProvider).isPodcastSelected
+        height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
+        child: ref.watch(auidoProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

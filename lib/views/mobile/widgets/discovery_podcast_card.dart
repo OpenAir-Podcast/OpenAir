@@ -4,6 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
@@ -36,7 +37,7 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
 
     return GestureDetector(
       onTap: () async {
-        ref.read(openAirProvider).currentPodcast = podcast;
+        ref.read(auidoProvider).currentPodcast = podcast;
 
         if (context.mounted) {
           Navigator.of(context).push(
@@ -136,8 +137,11 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                       onPressed: () async {
                         // FIXME: Doesn't subscribe/unsubscribe immediately
                         snapshot.data!
-                            ? ref.read(openAirProvider).unsubscribe(podcast)
-                            : ref.read(openAirProvider).subscribe(podcast);
+                            ? ref.read(auidoProvider).unsubscribe(podcast)
+                            : ref.read(auidoProvider).subscribe(
+                                  podcast,
+                                  context,
+                                );
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

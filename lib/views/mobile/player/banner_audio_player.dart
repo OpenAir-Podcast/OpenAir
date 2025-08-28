@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/player/main_player.dart';
 
 class BannerAudioPlayer extends ConsumerStatefulWidget {
@@ -18,7 +18,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.teal,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).bottomAppBarTheme.color
+          : Theme.of(context).colorScheme.primaryContainer,
       child: Column(
         children: [
           ListTile(
@@ -41,7 +43,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               child: CachedNetworkImage(
                 memCacheHeight: 62,
                 memCacheWidth: 62,
-                imageUrl: ref.watch(openAirProvider).currentPodcast!.imageUrl,
+                imageUrl:
+                    ref.watch(auidoProvider).currentEpisode!['feedImage'] ??
+                        ref.watch(auidoProvider).currentEpisode!['image'],
                 fit: BoxFit.fill,
                 errorWidget: (context, url, error) => Icon(
                   Icons.error,
@@ -51,30 +55,44 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             ),
             title: SizedBox(
               height: 42.0,
-              child: Text(
-                ref.watch(openAirProvider).currentEpisode!['title'],
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                maxLines: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ref.watch(auidoProvider).currentEpisode!['title'],
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
+                  ),
+                  Text(
+                    ref.watch(auidoProvider).currentEpisode!['author'] ??
+                        'Unknown',
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
               ),
             ),
             trailing: IconButton(
               onPressed: () {
-                ref.read(openAirProvider).audioState == 'Play'
-                    ? ref.read(openAirProvider).playerPauseButtonClicked()
-                    : ref.read(openAirProvider).playerPlayButtonClicked(
-                        ref.read(openAirProvider).currentEpisode!);
+                ref.read(auidoProvider).audioState == 'Play'
+                    ? ref.read(auidoProvider).playerPauseButtonClicked()
+                    : ref.read(auidoProvider).playerPlayButtonClicked(
+                        ref.read(auidoProvider).currentEpisode!);
               },
-              icon: ref.watch(openAirProvider).audioState == 'Play'
+              icon: ref.watch(auidoProvider).audioState == 'Play'
                   ? const Icon(Icons.pause_rounded)
                   : const Icon(Icons.play_arrow_rounded),
             ),
           ),
           LinearProgressIndicator(
-            value: ref.watch(openAirProvider
+            value: ref.watch(auidoProvider
                 .select((p) => p.podcastCurrentPositionInMilliseconds)),
           ),
         ],

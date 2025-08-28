@@ -10,7 +10,6 @@ import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 
 extension HiveRegistrar on HiveInterface {
@@ -29,8 +28,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
     registerAdapter(PodcastModelAdapter());
-    registerAdapter(QueueModelAdapter());
-    registerAdapter(QueueModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }
@@ -52,8 +49,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
     registerAdapter(PodcastModelAdapter());
-    registerAdapter(QueueModelAdapter());
-    registerAdapter(QueueModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }

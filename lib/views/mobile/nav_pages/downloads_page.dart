@@ -5,6 +5,7 @@ import 'package:openair/components/no_downloaded_episodes.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
@@ -62,8 +63,10 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                             onPressed: () async {
                               Navigator.of(dialogContext).pop();
                               await ref
-                                  .read(openAirProvider.notifier)
-                                  .removeAllDownloadedPodcasts();
+                                  .read(auidoProvider.notifier)
+                                  .removeAllDownloadedPodcasts(context);
+
+                              ref.invalidate(getDownloadsProvider);
                             },
                           ),
                         ],
@@ -102,11 +105,10 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height:
-                ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
-                    ? 80.0
-                    : 0.0,
-            child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+            height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+                ? 80.0
+                : 0.0,
+            child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
                 : const SizedBox.shrink(),
           ),

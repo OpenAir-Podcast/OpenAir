@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/components/no_connection.dart';
@@ -13,7 +12,7 @@ import 'package:openair/views/mobile/widgets/podcast_card.dart';
 final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     FutureProvider.autoDispose((ref) async {
   final FetchDataModel? trendingPodcastData =
-      await ref.read(hiveServiceProvider).getTrendingPodcast();
+      await ref.watch(openAirProvider).hiveService.getTrendingPodcast();
 
   if (trendingPodcastData != null) {
     return trendingPodcastData;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/podcast_index_search_card.dart';
 
@@ -43,8 +43,8 @@ class PodcastIndexSearchPage extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(openAirProvider).isPodcastSelected ? 80.0 : 0.0,
-        child: ref.watch(openAirProvider).isPodcastSelected
+        height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
+        child: ref.watch(auidoProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

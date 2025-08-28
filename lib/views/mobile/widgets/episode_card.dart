@@ -6,10 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/queue_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
+import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
@@ -32,17 +33,17 @@ class EpisodeCard extends ConsumerStatefulWidget {
 class _EpisodeCardState extends ConsumerState<EpisodeCard> {
   String podcastDate = "";
   bool cancel = false;
+  late bool isQueued;
 
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
-        .read(openAirProvider)
+        .read(auidoProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
-    final AsyncValue<List<QueueModel>> queueListAsync =
-        ref.watch(sortedQueueListProvider);
+    final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
-    final AsyncValue<List<DownloadModel>> downloadedListAsync =
+    final AsyncValue<List<DownloadModel>> downloadedListProvider =
         ref.watch(sortedDownloadsProvider);
 
     return GestureDetector(
@@ -166,10 +167,10 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                         ),
                       ),
                       onPressed: () {
-                        if (ref.read(openAirProvider).currentEpisode !=
+                        if (ref.read(auidoProvider).currentEpisode !=
                             widget.episodeItem) {
                           ref
-                              .read(openAirProvider.notifier)
+                              .read(auidoProvider.notifier)
                               .playerPlayButtonClicked(
                                 widget.episodeItem,
                               );
@@ -182,21 +183,24 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   ),
                   // Playlist button
                   queueListAsync.when(
-                    data: (list) {
-                      final isQueued = list.any(
-                          (item) => item.guid == widget.episodeItem['guid']);
+                    data: (data) {
+                      isQueued = data.containsKey(widget.episodeItem['guid']);
 
                       return IconButton(
                         tooltip: Translations.of(context).text('addToQueue'),
                         onPressed: () {
                           isQueued
                               ? ref
-                                  .read(openAirProvider)
+                                  .read(auidoProvider)
                                   .removeFromQueue(widget.episodeItem['guid'])
-                              : ref.read(openAirProvider).addToQueue(
+                              : ref.read(auidoProvider).addToQueue(
                                     widget.episodeItem,
                                     widget.podcast,
                                   );
+
+                          ref.invalidate(getQueueProvider);
+                          ref.invalidate(
+                              podcastDataByUrlProvider(widget.podcast.feedUrl));
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -225,8 +229,9 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                     loading: () {
                       // Handle loading by showing previous state's icon, disabled
                       final previousList = queueListAsync.valueOrNull;
-                      final isQueuedPreviously = previousList?.any((item) =>
-                              item.guid == widget.episodeItem['guid']) ??
+
+                      final isQueuedPreviously = previousList
+                              ?.containsKey(widget.episodeItem['guid']) ??
                           false;
 
                       return IconButton(
@@ -240,12 +245,12 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   ),
                   // Download button
                   if (!kIsWeb)
-                    downloadedListAsync.when(
+                    downloadedListProvider.when(
                       data: (downloads) {
                         final isDownloaded = downloads
                             .any((d) => d.guid == widget.episodeItem['guid']);
 
-                        final isDownloading = ref.watch(openAirProvider.select(
+                        final isDownloading = ref.watch(auidoProvider.select(
                             (p) => p.downloadingPodcasts
                                 .contains(widget.episodeItem['guid'])));
 
@@ -290,7 +295,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
 
                                       // Then perform the removal
                                       await ref
-                                          .read(openAirProvider.notifier)
+                                          .read(auidoProvider.notifier)
                                           .removeDownload(widget.episodeItem);
 
                                       // Show feedback
@@ -303,11 +308,15 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                           ),
                                         );
                                       }
+
+                                      ref.invalidate(sortedDownloadsProvider);
                                     },
                                   ),
                                 ],
                               ),
                             );
+
+                            ref.invalidate(sortedDownloadsProvider);
                           };
                         }
                         // Not downloaded
@@ -317,17 +326,29 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               Translations.of(context).text('downloadEpisode');
 
                           onPressed = () {
-                            ref.read(openAirProvider.notifier).downloadEpisode(
-                                  widget.episodeItem,
-                                  widget.podcast,
+                            if (kIsWeb) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Downloading is not available on the web.'),
+                                  ),
                                 );
+                              }
+                            } else {
+                              ref.read(auidoProvider.notifier).downloadEpisode(
+                                    widget.episodeItem,
+                                    widget.podcast,
+                                    context,
+                                  );
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Downloading \'${widget.episodeItem['title']}\''),
-                              ),
-                            );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Downloading \'${widget.episodeItem['title']}\''),
+                                ),
+                              );
+                            }
                           };
                         }
 

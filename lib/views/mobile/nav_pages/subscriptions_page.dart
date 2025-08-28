@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/subscription_model.dart';
-import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -12,7 +12,7 @@ import 'package:openair/views/mobile/widgets/subscription_card.dart';
 
 final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
   // Watch hiveServiceProvider as subscription data comes from Hive
-  ref.watch(hiveServiceProvider);
+  ref.watch(openAirProvider).hiveService;
   return await ref.read(openAirProvider).getSubscriptions();
 });
 
@@ -38,7 +38,6 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
         final List<SubscriptionModel> subs = data.values.toList();
 
         return Scaffold(
-          backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text(Translations.of(context).text('subscriptions')),
             actions: [
@@ -76,11 +75,10 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
             },
           ),
           bottomNavigationBar: SizedBox(
-            height:
-                ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
-                    ? 80.0
-                    : 0.0,
-            child: ref.watch(openAirProvider.select((p) => p.isPodcastSelected))
+            height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+                ? 80.0
+                : 0.0,
+            child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
                 : const SizedBox.shrink(),
           ),
