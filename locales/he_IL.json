@@ -313,5 +313,10 @@
     "joinOurDiscord": "הצטרף לדיסקורד שלנו",
     "reportABug": "דווח על באג",
     "suggestAFeature": "הצע תכונה",
-    "privacyPolicy": "מדיניות פרטיות"
+    "privacyPolicy": "מדיניות פרטיות",
+    "version": "גרסה",
+    "sourceCode": "קוד מקור",
+    "licenses": "רישיונות",
+    "thirdPartyLicenses": "רישיונות צד שלישי",
+    "aboutDescription": "OpenAir היא אפליקציה חינמית וקוד פתוח. היא נועדה להיות נגן פודקאסט פשוט וקל לשימוש עבור מכשירים שולחניים וניידים. OpenAir נבנתה עם Flutter וזמינה ב-GitHub. אם אתה נהנה להשתמש בה, אנא שקול לתרום כדי לתמוך בפיתוח. תודה!"
 }

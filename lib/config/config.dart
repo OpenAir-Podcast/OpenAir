@@ -134,3 +134,5 @@ String gitHubDiscussionsUrl =
 
 String privacyPolicyUrl =
     'https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md';
+
+String gitHubUrl = 'https://github.com/OpenAir-Podcast/OpenAir';

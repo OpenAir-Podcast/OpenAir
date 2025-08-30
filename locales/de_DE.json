@@ -313,5 +313,10 @@
     "joinOurDiscord": "Treten Sie unserem Discord bei",
     "reportABug": "Fehler melden",
     "suggestAFeature": "Funktion vorschlagen",
-    "privacyPolicy": "Datenschutzrichtlinie"
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "version": "Version",
+    "sourceCode": "Quellcode",
+    "licenses": "Lizenzen",
+    "thirdPartyLicenses": "Drittanbieter-Lizenzen",
+    "aboutDescription": "OpenAir ist eine kostenlose und quelloffene App. Sie wurde entwickelt, um ein einfacher und benutzerfreundlicher Podcast-Player für Desktop- und Mobilgeräte zu sein. OpenAir wurde mit Flutter erstellt und ist auf GitHub verfügbar. Wenn Sie es gerne nutzen, ziehen Sie bitte eine Spende in Betracht, um die Entwicklung zu unterstützen. Vielen Dank!"
 }

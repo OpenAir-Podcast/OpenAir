@@ -313,5 +313,10 @@
     "joinOurDiscord": "انضم إلى خادمنا على Discord",
     "reportABug": "الإبلاغ عن خطأ",
     "suggestAFeature": "اقتراح ميزة",
-    "privacyPolicy": "سياسة الخصوصية"
+    "privacyPolicy": "سياسة الخصوصية",
+    "version": "الإصدار",
+    "sourceCode": "شفرة المصدر",
+    "licenses": "التراخيص",
+    "thirdPartyLicenses": "تراخيص الطرف الثالث",
+    "aboutDescription": "OpenAir هو تطبيق مجاني ومفتوح المصدر. تم تصميمه ليكون مشغل بودكاست بسيط وسهل الاستخدام لأجهزة سطح المكتب والجوال. تم بناء OpenAir باستخدام Flutter وهو متاح على GitHub. إذا استمتعت باستخدامه، يرجى التفكير في التبرع لدعم التطوير. شكرًا لك!"
 }

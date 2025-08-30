@@ -313,5 +313,10 @@
     "joinOurDiscord": "Discordに参加する",
     "reportABug": "バグを報告",
     "suggestAFeature": "機能を提案",
-    "privacyPolicy": "プライバシーポリシー"
+    "privacyPolicy": "プライバシーポリシー",
+    "version": "バージョン",
+    "sourceCode": "ソースコード",
+    "licenses": "ライセンス",
+    "thirdPartyLicenses": "サードパーティライセンス",
+    "aboutDescription": "OpenAirは無料のオープンソースアプリです。デスクトップおよびモバイルデバイス向けのシンプルで使いやすいポッドキャストプレーヤーとして設計されています。OpenAirはFlutterで構築されており、GitHubで入手できます。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます！"
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/settings_pages/about_page.dart';
 import 'package:openair/views/mobile/settings_pages/donate_page.dart';
 import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
-import 'package:openair/views/mobile/settings_pages/help_and_feedback.dart';
+import 'package:openair/views/mobile/settings_pages/help_and_feedback_page.dart';
 import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/settings_pages/playback_page.dart';
@@ -140,7 +141,13 @@ class _SettingsState extends ConsumerState<Settings> {
               leading: Icon(Icons.info_outline_rounded),
               title: Text(Translations.of(context).text('about')),
               subtitle: Text(Translations.of(context).text('aboutSubtitle')),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AboutPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
