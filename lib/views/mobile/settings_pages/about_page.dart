@@ -31,21 +31,23 @@ class AboutPageState extends ConsumerState<AboutPage> {
             spacing: settingsSpacer,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
                   height: 150.0,
                   width: 150.0,
-                  child: Image.asset('assets/images/openair_logo.png'),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Image.asset('assets/images/openair_logo.png'),
+                  ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   Translations.of(context).text('aboutDescription'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
