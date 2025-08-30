@@ -12,6 +12,7 @@ migrate_working_dir/
 
 # Ignore API keys
 .env
+.env.local
 
 # IntelliJ related
 *.iml
