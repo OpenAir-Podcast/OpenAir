@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
@@ -137,12 +136,7 @@ class OpenAirProvider extends ChangeNotifier {
   }
 
   Future<String> getAccumulatedSubscriptionCount() async {
-    // FIXME Rework this
-    // return await ref
-    //     .read(hiveServiceProvider)
-    //     .podcastAccumulatedSubscribedEpisodes();
-
-    return 'rework';
+    return await hiveService.podcastAccumulatedSubscribedEpisodes();
   }
 
   Future<String> getFeedsCount() async {
@@ -166,7 +160,7 @@ class OpenAirProvider extends ChangeNotifier {
   }
 
   Future<bool> isEpisodeNew(String guid) async {
-    EpisodeModel? resultSet = await hiveService.getEpisode(guid);
+    Map? resultSet = await hiveService.getEpisode(guid);
 
     if (resultSet != null) {
       return false;
@@ -175,7 +169,7 @@ class OpenAirProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<List<EpisodeModel>> getSubscribedEpisodes() async {
+  Future<List<Map>> getSubscribedEpisodes() async {
     return hiveService.getEpisodes();
   }
 

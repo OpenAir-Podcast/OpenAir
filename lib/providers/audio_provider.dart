@@ -10,7 +10,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
@@ -787,31 +786,31 @@ class AudioProvider extends ChangeNotifier {
     Map<String, dynamic> episodes =
         await apiService.getEpisodesByFeedUrl(podcast.feedUrl);
 
-    EpisodeModel episode;
+    Map episode;
 
     for (int i = 0; i < episodes['count']; i++) {
       int enclosureLength = episodes['items'][i]['enclosureLength'];
       String duration = getPodcastDuration(enclosureLength);
       String size = getEpisodeSize(enclosureLength);
 
-      episode = EpisodeModel(
-        podcastId: podcast.id.toString(),
-        guid: episodes['items'][i]['guid'],
-        title: episodes['items'][i]['title'],
-        author: podcast.author,
-        image: episodes['items'][i]['feedImage'],
-        datePublished: episodes['items'][i]['datePublished'],
-        description: episodes['items'][i]['description'],
-        feedUrl: episodes['items'][i]['feedUrl'],
-        duration: duration,
-        size: size,
-        enclosureLength: enclosureLength,
-        enclosureUrl: episodes['items'][i]['enclosureUrl'],
-      );
+      episode = {
+        'podcastId': podcast.id.toString(),
+        'guid': episodes['items'][i]['guid'],
+        'title': episodes['items'][i]['title'],
+        'author': episodes['items'][i]['author'],
+        'image': episodes['items'][i]['feedImage'],
+        'datePublished': episodes['items'][i]['datePublished'],
+        'description': episodes['items'][i]['description'],
+        'feedUrl': episodes['items'][i]['feedUrl'],
+        'duration': duration,
+        'size': size,
+        'enclosureLength': enclosureLength,
+        'enclosureUrl': episodes['items'][i]['enclosureUrl'],
+      };
 
       ref.watch(openAirProvider).hiveService.insertEpisode(
             episode,
-            episode.guid,
+            episode['guid'],
           );
     }
 

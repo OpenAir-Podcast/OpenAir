@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 
 import 'package:openair/hive_models/completed_episode_model.dart';
-import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/download_model.dart';
@@ -47,13 +46,14 @@ final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
 class HiveService {
   late final BoxCollection collection;
   late final Future<CollectionBox<SubscriptionModel>> subscriptionBox;
-  late final Future<CollectionBox<EpisodeModel>> episodeBox;
+  late final Future<CollectionBox<Map>> episodeBox;
   late final Future<CollectionBox<FeedModel>> feedBox;
   late final Future<CollectionBox<Map>> queueBox;
   late final Future<CollectionBox<DownloadModel>> downloadBox;
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
   late final Future<CollectionBox<Map>> settingsBox;
+  late final Future<CollectionBox<Map>> persistence;
 
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
@@ -69,7 +69,6 @@ class HiveService {
   Future<void> initial() async {
     // Register all adapters
     Hive.registerAdapter(PodcastModelAdapter());
-    Hive.registerAdapter(EpisodeModelAdapter());
     Hive.registerAdapter(FeedModelAdapter());
     Hive.registerAdapter(DownloadModelAdapter());
     Hive.registerAdapter(HistoryModelAdapter());
@@ -102,6 +101,8 @@ class HiveService {
         'history',
         'completed_episodes',
         'settings',
+        'persistence',
+        'newEpisodesCount',
         'top_featured',
         'trending',
         'category',
@@ -110,7 +111,7 @@ class HiveService {
     );
 
     subscriptionBox = collection.openBox<SubscriptionModel>('subscriptions');
-    episodeBox = collection.openBox<EpisodeModel>('episodes');
+    episodeBox = collection.openBox<Map>('episodes');
     feedBox = collection.openBox<FeedModel>('feed');
     queueBox = collection.openBox<Map>('queue');
     downloadBox = collection.openBox<DownloadModel>('download');
@@ -120,6 +121,8 @@ class HiveService {
         collection.openBox<CompletedEpisodeModel>('completed_episodes');
 
     settingsBox = collection.openBox<Map>('settings');
+
+    persistence = collection.openBox<Map>('persistence');
 
     // Trending page
     trendingBox = collection.openBox<FetchDataModel>('trending');
@@ -167,7 +170,7 @@ class HiveService {
 
   // Episodes Operations:
   Future<void> insertEpisode(
-    EpisodeModel episode,
+    Map episode,
     String guid,
   ) async {
     final box = await episodeBox;
@@ -184,11 +187,11 @@ class HiveService {
   Future<void> deleteEpisodes(String podcastId) async {
     final box = await episodeBox;
 
-    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
+    final Map<String, Map> allEpisodes = await box.getAllValues();
     final List<String> keysToDelete = [];
 
     for (final entry in allEpisodes.entries) {
-      if (entry.value.podcastId == podcastId) {
+      if (entry.value['podcastId'] == podcastId) {
         keysToDelete.add(entry.key);
       }
     }
@@ -198,33 +201,34 @@ class HiveService {
     }
   }
 
-  Future<List<EpisodeModel>> getEpisodes() async {
+  Future<List<Map>> getEpisodes() async {
     final box = await episodeBox;
-    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
-    final List<EpisodeModel> episodesList = [];
+    final Map<String, Map> allEpisodes = await box.getAllValues();
+    final List<Map> episodesList = [];
 
     for (final entry in allEpisodes.entries) {
       episodesList.add(entry.value);
     }
     // Sort the list by datePublished in descending order (newest first)
-    episodesList.sort((a, b) => b.datePublished.compareTo(a.datePublished));
+    episodesList
+        .sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
     return episodesList;
   }
 
-  Future<EpisodeModel?> getEpisode(String guid) async {
+  Future<Map?> getEpisode(String guid) async {
     final box = await episodeBox;
     return box.get(guid);
   }
 
-  Future<Iterable<MapEntry<String, EpisodeModel>>> getEpisodesForPodcast(
+  Future<Iterable<MapEntry<String, Map>>> getEpisodesForPodcast(
       String podcastId) async {
     final box = await episodeBox;
     final allEpisodes = await box.getAllValues();
 
     return allEpisodes.entries.where(
       (element) {
-        return element.value.podcastId == podcastId;
+        return element.value['podcastId'] == podcastId;
       },
     );
   }
@@ -578,7 +582,9 @@ class HiveService {
   }
 
   Future<String> podcastAccumulatedSubscribedEpisodes() async {
+    final persistenceBox = await persistence;
     final box = await subscriptionBox;
+
     final Map<String, SubscriptionModel> allSubscriptions =
         await box.getAllValues();
 
@@ -617,12 +623,25 @@ class HiveService {
       }
     }
 
+    await persistenceBox
+        .put('subscriptions_count', {'total': totalNewEpisodes});
     return totalNewEpisodes.toString();
+  }
+
+  Future<int> getNewEpisodesCount() async {
+    final box = await persistence;
+    final Map? countData = await box.get('subscriptions_count');
+
+    if (countData != null && countData.containsKey('total')) {
+      return countData['total'] as int;
+    }
+
+    return -1;
   }
 
   Future<String> feedsCount() async {
     final box = await episodeBox;
-    final Map<String, EpisodeModel> allEpisodes = await box.getAllValues();
+    final Map<String, Map> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
     return result.toString();

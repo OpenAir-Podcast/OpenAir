@@ -12,6 +12,13 @@ import 'package:openair/views/mobile/nav_pages/sign_in_page.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
+  final hiveService = ref.watch(openAirProvider).hiveService;
+  var episiodes = await hiveService.getNewEpisodesCount();
+
+  if (episiodes != -1) {
+    return episiodes.toString();
+  }
+
   // Watch hiveServiceProvider as subscription counts depend on Hive data
   return await ref.read(openAirProvider).getAccumulatedSubscriptionCount();
 });

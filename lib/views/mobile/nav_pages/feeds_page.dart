@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -27,11 +26,10 @@ class FeedsPage extends ConsumerStatefulWidget {
 class _FeedsPageState extends ConsumerState<FeedsPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<EpisodeModel>> getEpisodesValue =
-        ref.watch(getFeedsProvider);
+    final AsyncValue<List<Map>> getEpisodesValue = ref.watch(getFeedsProvider);
 
     return getEpisodesValue.when(
-      data: (List<EpisodeModel> data) {
+      data: (List<Map> data) {
         if (data.isEmpty) {
           return NoSubscriptions(title: 'Feeds');
         }
@@ -49,18 +47,18 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(
-                    id: int.parse(data[index].podcastId),
-                    title: data[index].title,
-                    author: data[index].author,
-                    feedUrl: data[index].feedUrl,
-                    imageUrl: data[index].image,
-                    description: data[index].description,
-                    artwork: data[index].image,
+                    id: int.parse(data[index]['podcastId']),
+                    title: data[index]['title'],
+                    author: data[index]['author'],
+                    feedUrl: data[index]['feedUrl'],
+                    imageUrl: data[index]['image'],
+                    description: data[index]['description'],
+                    artwork: data[index]['image'],
                   );
 
                   return FeedsEpisodeCard(
-                    title: data[index].title,
-                    episodeItem: data[index].toJson(),
+                    title: data[index]['title'],
+                    episodeItem: data[index].cast<String, dynamic>(),
                     podcast: podcastModel,
                   );
                 },
@@ -68,10 +66,9 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height:
-                ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
-                    ? 80.0
-                    : 0.0,
+            height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+                ? 80.0
+                : 0.0,
             child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
                 : const SizedBox.shrink(),

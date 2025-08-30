@@ -5,7 +5,6 @@
 import 'package:hive_ce/hive.dart';
 import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/episode_model.dart';
 import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/history_model.dart';
@@ -18,8 +17,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(CompletedEpisodeModelAdapter());
     registerAdapter(DownloadModelAdapter());
     registerAdapter(DownloadModelAdapter());
-    registerAdapter(EpisodeModelAdapter());
-    registerAdapter(EpisodeModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FetchDataModelAdapter());
@@ -39,8 +36,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(CompletedEpisodeModelAdapter());
     registerAdapter(DownloadModelAdapter());
     registerAdapter(DownloadModelAdapter());
-    registerAdapter(EpisodeModelAdapter());
-    registerAdapter(EpisodeModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FeedModelAdapter());
     registerAdapter(FetchDataModelAdapter());
