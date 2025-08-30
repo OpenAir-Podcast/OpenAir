@@ -29,6 +29,7 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
 
 - Flutter development environment set up ([refer to official Flutter documentation](https://docs.flutter.dev/get-started/codelab))
 - A **PodcastIndex API Key** and **API Secret**. You can get these by creating a free account at [https://api.podcastindex.org/developer_home](https://api.podcastindex.org/developer_home).
+- A **Fyyd API Client ID** and **Client Secret**. You can get these by creating a free account at [https://fyyd.de/](https://fyyd.de/).
 
 **Running the App:**
 
