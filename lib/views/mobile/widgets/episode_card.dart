@@ -369,10 +369,16 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                           ),
                           onPressed: null),
                     ),
+
                   IconButton(
                     tooltip: Translations.of(context).text('share'),
                     onPressed: () => ref.watch(openAirProvider).share(),
                     icon: const Icon(Icons.share_rounded),
+                  ),
+                  IconButton(
+                    tooltip: Translations.of(context).text('favourite'),
+                    onPressed: () => ref.watch(openAirProvider).favourite(),
+                    icon: const Icon(Icons.favorite_border_rounded),
                   ),
                 ],
               ),
