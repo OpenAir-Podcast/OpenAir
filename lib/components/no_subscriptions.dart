@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 
 class NoSubscriptions extends StatelessWidget {
   const NoSubscriptions({
@@ -25,7 +26,7 @@ class NoSubscriptions extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Oops, looks like you have no subscription...',
+              Translations.of(context).text('noSubscriptions'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20.0,
@@ -33,7 +34,7 @@ class NoSubscriptions extends StatelessWidget {
               ),
             ),
             Text(
-              'Please subscribe to a podcast and try again',
+              Translations.of(context).text('noSubscriptionsSubtitle'),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16.0),
             ),
