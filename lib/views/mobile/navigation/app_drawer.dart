@@ -179,6 +179,16 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   },
                 ),
                 const Divider(),
+                // Inbox
+                // TODO: Display all the new episodes in one area
+                ListTile(
+                  leading: const Icon(Icons.inbox_rounded),
+                  title: Text(Translations.of(context).text('inbox')),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const Divider(),
                 // Queue button
                 getQueueCountValue.when(
                   loading: () {
