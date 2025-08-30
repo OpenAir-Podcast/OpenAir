@@ -11,14 +11,14 @@ final FutureProvider<Map?> downloadSettingsDataProvider =
   return await hiveService.getDownloadSettings();
 });
 
-class DownloadsPage extends ConsumerStatefulWidget {
-  const DownloadsPage({super.key});
+class AutomaticPage extends ConsumerStatefulWidget {
+  const AutomaticPage({super.key});
 
   @override
-  ConsumerState<DownloadsPage> createState() => DownloadsPageState();
+  ConsumerState<AutomaticPage> createState() => AutomaticPageState();
 }
 
-class DownloadsPageState extends ConsumerState<DownloadsPage> {
+class AutomaticPageState extends ConsumerState<AutomaticPage> {
   late Map downloadsData;
 
   late String refreshPodcasts;
@@ -37,7 +37,7 @@ class DownloadsPageState extends ConsumerState<DownloadsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('downloads')),
+        title: Text(Translations.of(context).text('automatic')),
       ),
       body: playback.when(
         data: (data) {

@@ -3,7 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/views/mobile/settings_pages/about_page.dart';
 import 'package:openair/views/mobile/settings_pages/donate_page.dart';
-import 'package:openair/views/mobile/settings_pages/downloads_page.dart';
+import 'package:openair/views/mobile/settings_pages/automatic_page.dart';
 import 'package:openair/views/mobile/settings_pages/help_and_feedback_page.dart';
 import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
@@ -58,14 +58,14 @@ class _SettingsState extends ConsumerState<Settings> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.download_rounded),
-              title: Text(Translations.of(context).text('downloads')),
+              leading: Icon(Icons.autorenew_rounded),
+              title: Text(Translations.of(context).text('automatic')),
               subtitle:
                   Text(Translations.of(context).text('downloadsSubtitle')),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const DownloadsPage(),
+                    builder: (context) => const AutomaticPage(),
                   ),
                 );
               },
