@@ -115,11 +115,6 @@ class SubscriptionCard extends StatelessWidget {
                           child: IconButton(
                             onPressed: () {
                               ref.invalidate(subscriptionsProvider);
-
-                              ref.invalidate(
-                                getSubscriptionsCountProvider(
-                                    subs[index].title),
-                              );
                             },
                             icon: Icon(
                               Icons.error_outline_rounded,

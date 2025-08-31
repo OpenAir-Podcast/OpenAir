@@ -324,5 +324,7 @@
     "noSubscriptions": "Sem assinaturas",
     "noSubscriptionsSubtitle": "Opa, parece que você não tem nenhuma assinatura...",
     "emptyInbox": "Caixa de entrada vazia",
-    "emptyInboxSubtitle": "Opa, parece que sua caixa de entrada está vazia..."
+    "emptyInboxSubtitle": "Opa, parece que sua caixa de entrada está vazia...",
+    "refreshAllPodcasts": "Atualizar todos os podcasts",
+    "clearAllPodcasts": "Limpar todos os podcasts"
 }

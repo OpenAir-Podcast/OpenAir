@@ -324,5 +324,7 @@
     "noSubscriptions": "구독 없음",
     "noSubscriptionsSubtitle": "おっと, 구독이 없는 것 같습니다...",
     "emptyInbox": "받은 편지함 비어 있음",
-    "emptyInboxSubtitle": "おっと, 받은 편지함이 비어 있는 것 같습니다..."
+    "emptyInboxSubtitle": "おっと, 받은 편지함이 비어 있는 것 같습니다...",
+    "refreshAllPodcasts": "모든 팟캐스트 새로 고침",
+    "clearAllPodcasts": "모든 팟캐스트 지우기"
 }

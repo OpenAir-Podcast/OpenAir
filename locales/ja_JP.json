@@ -324,5 +324,7 @@
     "noSubscriptions": "サブスクリプションなし",
     "noSubscriptionsSubtitle": "サブスクリプションがないようです...",
     "emptyInbox": "受信トレイは空です",
-    "emptyInboxSubtitle": "受信トレイが空のようです..."
+    "emptyInboxSubtitle": "受信トレイが空のようです...",
+    "refreshAllPodcasts": "すべてのポッドキャストを更新",
+    "clearAllPodcasts": "すべてのポッドキャストをクリア"
 }

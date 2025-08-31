@@ -324,5 +324,7 @@
     "noSubscriptions": "No Subscriptions",
     "noSubscriptionsSubtitle": "Oops, looks like you have no subscriptions...",
     "emptyInbox": "Empty Inbox",
-    "emptyInboxSubtitle": "Oops, looks like your inbox is empty..."
+    "emptyInboxSubtitle": "Oops, looks like your inbox is empty...",
+    "refreshAllPodcasts": "Refresh All Podcasts",
+    "clearAllPodcasts": "Clear All Podcasts"
 }

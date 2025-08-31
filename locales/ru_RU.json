@@ -324,5 +324,7 @@
     "noSubscriptions": "Нет подписок",
     "noSubscriptionsSubtitle": "Ой, похоже, у вас нет подписок...",
     "emptyInbox": "Пустые входящие",
-    "emptyInboxSubtitle": "Ой, похоже, ваши входящие пусты..."
+    "emptyInboxSubtitle": "Ой, похоже, ваши входящие пусты...",
+    "refreshAllPodcasts": "Обновить все подкасты",
+    "clearAllPodcasts": "Очистить все подкасты"
 }

@@ -177,28 +177,14 @@ class HiveService {
     await box.put(guid, episode);
   }
 
-  Future<void> deleteEpisode({
-    required String guid,
-  }) async {
+  Future<void> deleteEpisode(String guid) async {
     final box = await episodeBox;
     box.delete(guid);
   }
 
-  Future<void> deleteEpisodes(String podcastId) async {
+  Future<void> deleteEpisodes() async {
     final box = await episodeBox;
-
-    final Map<String, Map> allEpisodes = await box.getAllValues();
-    final List<String> keysToDelete = [];
-
-    for (final entry in allEpisodes.entries) {
-      if (entry.value['podcastId'] == podcastId) {
-        keysToDelete.add(entry.key);
-      }
-    }
-
-    if (keysToDelete.isNotEmpty) {
-      await box.deleteAll(keysToDelete);
-    }
+    box.clear();
   }
 
   Future<List<Map>> getEpisodes() async {

@@ -324,5 +324,7 @@
     "noSubscriptions": "没有订阅",
     "noSubscriptionsSubtitle": "哎呀，您似乎没有任何订阅...",
     "emptyInbox": "收件箱为空",
-    "emptyInboxSubtitle": "哎呀，您的收件箱似乎是空的..."
+    "emptyInboxSubtitle": "哎呀，您的收件箱似乎是空的...",
+    "refreshAllPodcasts": "刷新所有播客",
+    "clearAllPodcasts": "清除所有播客"
 }

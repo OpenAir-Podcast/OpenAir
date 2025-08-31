@@ -324,5 +324,7 @@
     "noSubscriptions": "Geen abonnementen",
     "noSubscriptionsSubtitle": "Oeps, het lijkt erop dat je geen abonnementen hebt...",
     "emptyInbox": "Lege inbox",
-    "emptyInboxSubtitle": "Oeps, het lijkt erop dat je inbox leeg is..."
+    "emptyInboxSubtitle": "Oeps, het lijkt erop dat je inbox leeg is...",
+    "refreshAllPodcasts": "Alle podcasts vernieuwen",
+    "clearAllPodcasts": "Alle podcasts wissen"
 }

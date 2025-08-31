@@ -324,5 +324,7 @@
     "noSubscriptions": "لا توجد اشتراكات",
     "noSubscriptionsSubtitle": "عفوًا، يبدو أنه ليس لديك أي اشتراكات...",
     "emptyInbox": "صندوق الوارد فارغ",
-    "emptyInboxSubtitle": "عفوًا، يبدو أن صندوق الوارد الخاص بك فارغ..."
+    "emptyInboxSubtitle": "عفوًا، يبدو أن صندوق الوارد الخاص بك فارغ...",
+    "refreshAllPodcasts": "تحديث جميع البودكاست",
+    "clearAllPodcasts": "مسح جميع البودكاست"
 }

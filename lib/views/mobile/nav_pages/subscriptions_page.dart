@@ -52,7 +52,51 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: () {
-                    // TODO Add dropdown menu here
+                    showMenu(
+                      context: context,
+                      position: RelativeRect.fromLTRB(
+                        MediaQuery.of(context).size.width - 100,
+                        58,
+                        0,
+                        0,
+                      ),
+                      items: [
+                        PopupMenuItem(
+                          value: 'refresh_all',
+                          child: Text(Translations.of(context)
+                              .text('refreshAllPodcasts')),
+                        ),
+                        PopupMenuItem(
+                          value: 'clear_all',
+                          child: Text(Translations.of(context)
+                              .text('clearAllPodcasts')),
+                        ),
+                      ],
+                    ).then(
+                      (value) {
+                        if (value == 'refresh_all') {
+                          ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .podcastAccumulatedSubscribedEpisodes();
+
+                          ref.invalidate(getSubscriptionsCountProvider);
+                          ref.invalidate(subscriptionsProvider);
+                        } else if (value == 'clear_all') {
+                          ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .deleteSubscriptions();
+
+                          ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .deleteEpisodes();
+
+                          ref.invalidate(subscriptionsProvider);
+                        }
+                      },
+                    );
                   },
                   icon: const Icon(Icons.more_vert_rounded),
                 ),

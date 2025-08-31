@@ -324,5 +324,7 @@
     "noSubscriptions": "אין מנויים",
     "noSubscriptionsSubtitle": "אופס, נראה שאין לך מנויים...",
     "emptyInbox": "תיבת דואר נכנס ריקה",
-    "emptyInboxSubtitle": "אופס, נראה שתיבת הדואר הנכנס שלך ריקה..."
+    "emptyInboxSubtitle": "אופס, נראה שתיבת הדואר הנכנס שלך ריקה...",
+    "refreshAllPodcasts": "רענן את כל הפודקאסטים",
+    "clearAllPodcasts": "נקה את כל הפודקאסטים"
 }

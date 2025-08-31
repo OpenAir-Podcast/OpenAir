@@ -324,5 +324,7 @@
     "noSubscriptions": "Inga prenumerationer",
     "noSubscriptionsSubtitle": "Hoppsan, det verkar som om du inte har några prenumerationer...",
     "emptyInbox": "Tom inkorg",
-    "emptyInboxSubtitle": "Hoppsan, det verkar som om din inkorg är tom..."
+    "emptyInboxSubtitle": "Hoppsan, det verkar som om din inkorg är tom...",
+    "refreshAllPodcasts": "Uppdatera alla podcaster",
+    "clearAllPodcasts": "Rensa alla podcaster"
 }

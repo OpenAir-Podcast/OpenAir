@@ -324,5 +324,7 @@
     "noSubscriptions": "Aucun abonnement",
     "noSubscriptionsSubtitle": "Oups, il semble que vous n'ayez aucun abonnement...",
     "emptyInbox": "Boîte de réception vide",
-    "emptyInboxSubtitle": "Oups, il semble que votre boîte de réception soit vide..."
+    "emptyInboxSubtitle": "Oups, il semble que votre boîte de réception soit vide...",
+    "refreshAllPodcasts": "Actualiser tous les podcasts",
+    "clearAllPodcasts": "Effacer tous les podcasts"
 }

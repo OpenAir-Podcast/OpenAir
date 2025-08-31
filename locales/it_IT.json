@@ -324,5 +324,7 @@
     "noSubscriptions": "Nessun abbonamento",
     "noSubscriptionsSubtitle": "Ops, sembra che tu non abbia nessun abbonamento...",
     "emptyInbox": "Posta in arrivo vuota",
-    "emptyInboxSubtitle": "Ops, sembra che la tua posta in arrivo sia vuota..."
+    "emptyInboxSubtitle": "Ops, sembra che la tua posta in arrivo sia vuota...",
+    "refreshAllPodcasts": "Aggiorna tutti i podcast",
+    "clearAllPodcasts": "Cancella tutti i podcast"
 }

@@ -28,6 +28,10 @@ class PodcastIndexProvider {
   final Ref ref;
 
   PodcastIndexProvider(this.ref) {
+    _dio = Dio();
+  }
+
+  void _generateHeaders() {
     unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     newUnixTime = unixTime.toString();
 
@@ -51,7 +55,7 @@ class PodcastIndexProvider {
       "User-Agent": podcastIndexUserAgent!,
     };
 
-    _dio = Dio(BaseOptions(headers: headers));
+    _dio.options.headers = headers;
   }
 
   Future<Response<T>> _retry<T>(
@@ -62,6 +66,7 @@ class PodcastIndexProvider {
     int attempt = 0;
     while (true) {
       try {
+        _generateHeaders();
         return await requestFactory();
       } on DioException catch (e) {
         attempt++;
@@ -71,8 +76,6 @@ class PodcastIndexProvider {
         }
 
         debugPrint('DioError attempt $attempt, retrying in $delay');
-
-        // : ${e.message}
 
         await Future.delayed(delay);
         // Exponential backoff for subsequent retries

@@ -818,7 +818,7 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void removePodcastEpisodes(PodcastModel podcast) async {
-    ref.watch(openAirProvider).hiveService.deleteEpisodes(podcast.title);
+    ref.watch(openAirProvider).hiveService.deleteEpisode(podcast.title);
     notifyListeners();
   }
 

@@ -324,5 +324,7 @@
     "noSubscriptions": "Keine Abonnements",
     "noSubscriptionsSubtitle": "Hoppla, anscheinend haben Sie keine Abonnements...",
     "emptyInbox": "Leerer Posteingang",
-    "emptyInboxSubtitle": "Hoppla, anscheinend ist Ihr Posteingang leer..."
+    "emptyInboxSubtitle": "Hoppla, anscheinend ist Ihr Posteingang leer...",
+    "refreshAllPodcasts": "Alle Podcasts aktualisieren",
+    "clearAllPodcasts": "Alle Podcasts löschen"
 }
