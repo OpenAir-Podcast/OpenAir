@@ -320,5 +320,9 @@
     "thirdPartyLicenses": "第三方许可证",
     "aboutDescription": "OpenAir 是一款免费的开源应用程序。它旨在成为桌面和移动设备上简单易用的播客播放器。OpenAir 使用 Flutter 构建，并在 GitHub 上提供。如果您喜欢使用它，请考虑捐赠以支持开发。谢谢！",
     "inbox": "收件箱",
-    "inboxSubtitle": "查看您订阅的新单集"
+    "inboxSubtitle": "查看您订阅的新单集",
+    "noSubscriptions": "没有订阅",
+    "noSubscriptionsSubtitle": "哎呀，您似乎没有任何订阅...",
+    "emptyInbox": "收件箱为空",
+    "emptyInboxSubtitle": "哎呀，您的收件箱似乎是空的..."
 }

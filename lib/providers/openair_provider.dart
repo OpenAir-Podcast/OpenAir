@@ -147,6 +147,14 @@ class OpenAirProvider extends ChangeNotifier {
     return await hiveService.getNewInboxCount();
   }
 
+  Future<Map> fetchInboxEpisodes() async {
+    return hiveService.fetchInboxEpisodes();
+  }
+
+  Future<Map?> getInboxEpisodes() async {
+    return await hiveService.getInboxEpisodes();
+  }
+
   Future<String> getQueueCount() async {
     return await hiveService.queueCount();
   }

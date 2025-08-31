@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/components/no_subscriptions.dart';
+import 'package:openair/components/empty_inbox.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
@@ -11,9 +11,14 @@ import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/feeds_episode_card%20.dart';
 
 final getInboxProvider = FutureProvider.autoDispose((ref) async {
-  // Feeds data comes from subscribed episodes in Hive.
-  // This provider will be manually invalidated when subscriptions (and their episodes) change.
-  return await ref.read(openAirProvider).getSubscribedEpisodes();
+  final Map? inboxEpisodes =
+      await ref.watch(openAirProvider).getInboxEpisodes();
+
+  if (inboxEpisodes != null) {
+    return inboxEpisodes;
+  }
+
+  return await ref.read(openAirProvider).fetchInboxEpisodes();
 });
 
 class InboxPage extends ConsumerStatefulWidget {
@@ -26,12 +31,12 @@ class InboxPage extends ConsumerStatefulWidget {
 class _InboxPageState extends ConsumerState<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Map>> getEpisodesValue = ref.watch(getInboxProvider);
+    final AsyncValue<Map> getEpisodesValue = ref.watch(getInboxProvider);
 
     return getEpisodesValue.when(
-      data: (List<Map> data) {
+      data: (Map data) {
         if (data.isEmpty) {
-          return NoSubscriptions(title: 'inbox');
+          return EmptyInbox();
         }
 
         return Scaffold(

@@ -320,5 +320,9 @@
     "thirdPartyLicenses": "Licences tierces",
     "aboutDescription": "OpenAir est une application gratuite et open-source. Elle est conçue pour être un lecteur de podcast simple et facile à utiliser pour les appareils de bureau et mobiles. OpenAir est construit avec Flutter et est disponible sur GitHub. Si vous aimez l'utiliser, veuillez envisager de faire un don pour soutenir le développement. Merci !",
     "inbox": "Boîte de réception",
-    "inboxSubtitle": "Afficher les nouveaux épisodes de vos abonnements"
+    "inboxSubtitle": "Afficher les nouveaux épisodes de vos abonnements",
+    "noSubscriptions": "Aucun abonnement",
+    "noSubscriptionsSubtitle": "Oups, il semble que vous n'ayez aucun abonnement...",
+    "emptyInbox": "Boîte de réception vide",
+    "emptyInboxSubtitle": "Oups, il semble que votre boîte de réception soit vide..."
 }

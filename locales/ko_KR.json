@@ -320,5 +320,9 @@
     "thirdPartyLicenses": "타사 라이선스",
     "aboutDescription": "OpenAir는 무료 오픈 소스 앱입니다. 데스크톱 및 모바일 장치용으로 간단하고 사용하기 쉬운 팟캐스트 플레이어로 설계되었습니다. OpenAir는 Flutter로 구축되었으며 GitHub에서 사용할 수 있습니다. 사용이 즐거우시다면 개발을 지원하기 위해 기부를 고려해 주십시오. 감사합니다!",
     "inbox": "받은 편지함",
-    "inboxSubtitle": "구독한 새 에피소드 보기"
+    "inboxSubtitle": "구독한 새 에피소드 보기",
+    "noSubscriptions": "구독 없음",
+    "noSubscriptionsSubtitle": "おっと, 구독이 없는 것 같습니다...",
+    "emptyInbox": "받은 편지함 비어 있음",
+    "emptyInboxSubtitle": "おっと, 받은 편지함이 비어 있는 것 같습니다..."
 }

@@ -320,5 +320,9 @@
     "privacyPolicy": "Privacy Policy",
     "aboutDescription": "OpenAir is a free and open-source app. It is designed to be a simple and easy-to-use podcast player for desktop and mobile devices. OpenAir is built with Flutter and is available on GitHub. If you enjoy using it, please consider donating to help support the development. Thank you!",
     "inbox": "Inbox",
-    "inboxSubtitle": "View new episodes from your subscriptions"
+    "inboxSubtitle": "View new episodes from your subscriptions",
+    "noSubscriptions": "No Subscriptions",
+    "noSubscriptionsSubtitle": "Oops, looks like you have no subscriptions...",
+    "emptyInbox": "Empty Inbox",
+    "emptyInboxSubtitle": "Oops, looks like your inbox is empty..."
 }

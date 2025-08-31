@@ -53,7 +53,7 @@ class HiveService {
   late final Future<CollectionBox<HistoryModel>> historyBox;
   late final Future<CollectionBox<CompletedEpisodeModel>> completedEpisodeBox;
   late final Future<CollectionBox<Map>> settingsBox;
-  late final Future<CollectionBox<Map>> persistence;
+  late final Future<CollectionBox> persistence;
 
   late final Future<CollectionBox<FetchDataModel>> trendingBox;
 
@@ -231,6 +231,48 @@ class HiveService {
         return element.value['podcastId'] == podcastId;
       },
     );
+  }
+
+  void saveInboxEpisodes(Map episodes) async {
+    final persistenceBox = await persistence;
+
+    await persistenceBox.put('inbox_episodes', episodes);
+  }
+
+  Future<Map?> getInboxEpisodes() async {
+    final persistenceBox = await persistence;
+    return await persistenceBox.get('inbox_episodes');
+  }
+
+  // TODO: Rename this....
+  Future<Map<String, Map>> fetchInboxEpisodes() async {
+    final subscriptions = await getSubscriptions();
+    final episodesBox = await episodeBox;
+    final allStoredEpisodes = await episodesBox.getAllValues();
+    final newEpisodes = <String, Map>{};
+
+    for (final subscription in subscriptions.values) {
+      try {
+        final podcastEpisodes = await ref
+            .read(podcastIndexProvider)
+            .getEpisodesByFeedUrl(subscription.feedUrl);
+
+        for (final episodeData in podcastEpisodes['items']) {
+          final guid = episodeData['guid'];
+
+          if (guid != null) {
+            if (!allStoredEpisodes.containsKey(guid)) {
+              newEpisodes[guid] = episodeData;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Error fetching episodes for ${subscription.title}: $e');
+      }
+    }
+
+    saveInboxEpisodes(newEpisodes);
+    return newEpisodes;
   }
 
   // Feed Operations:
