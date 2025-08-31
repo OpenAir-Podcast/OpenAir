@@ -36,7 +36,7 @@ When suggesting an enhancement, please consider the following:
 *   **Describe the Problem:** Clearly explain the issue or limitation you are addressing with your suggestion.
 *   **Proposed Solution:** Describe your idea in detail.
 *   **Benefits:** Explain the advantages of implementing your suggestion.
-*   **Mockups or UI Sketches (Optional):**Visual aids can be very helpful in conveying your idea.
+*   **Mockups or UI Sketches (Optional):** Visual aids can be very helpful in conveying your idea.
 
 ### Contributing Code
 
