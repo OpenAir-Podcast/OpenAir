@@ -318,5 +318,7 @@
     "sourceCode": "Código-fonte",
     "licenses": "Licenças",
     "thirdPartyLicenses": "Licenças de terceiros",
-    "aboutDescription": "OpenAir é um aplicativo gratuito e de código aberto. Ele foi projetado para ser um reprodutor de podcast simples e fácil de usar para desktops e dispositivos móveis. O OpenAir é construído com Flutter e está disponível no GitHub. Se você gosta de usá-lo, considere fazer uma doação para apoiar o desenvolvimento. Obrigado!"
+    "aboutDescription": "OpenAir é um aplicativo gratuito e de código aberto. Ele foi projetado para ser um reprodutor de podcast simples e fácil de usar para desktops e dispositivos móveis. O OpenAir é construído com Flutter e está disponível no GitHub. Se você gosta de usá-lo, considere fazer uma doação para apoiar o desenvolvimento. Obrigado!",
+    "inbox": "Caixa de entrada",
+    "inboxSubtitle": "Ver novos episódios de suas assinaturas"
 }

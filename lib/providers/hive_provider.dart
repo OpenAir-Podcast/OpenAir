@@ -647,6 +647,13 @@ class HiveService {
     return result.toString();
   }
 
+  Future<int> getNewInboxCount() async {
+    final box = await feedBox;
+    final Map<String, FeedModel> allFeeds = await box.getAllValues();
+
+    return allFeeds.length;
+  }
+
   Future<String> queueCount() async {
     final box = await queueBox;
     final Map allEpisodes = await box.getAllValues();

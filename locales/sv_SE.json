@@ -318,5 +318,7 @@
     "sourceCode": "Källkod",
     "licenses": "Licenser",
     "thirdPartyLicenses": "Tredjepartslicenser",
-    "aboutDescription": "OpenAir är en gratis och öppen källkodsapp. Den är designad för att vara en enkel och lättanvänd podcastspelare för både stationära och mobila enheter. OpenAir är byggd med Flutter och finns tillgänglig på GitHub. Om du gillar att använda den, överväg att donera för att stödja utvecklingen. Tack!"
+    "aboutDescription": "OpenAir är en gratis och öppen källkodsapp. Den är designad för att vara en enkel och lättanvänd podcastspelare för både stationära och mobila enheter. OpenAir är byggd med Flutter och finns tillgänglig på GitHub. Om du gillar att använda den, överväg att donera för att stödja utvecklingen. Tack!",
+    "inbox": "Inkorg",
+    "inboxSubtitle": "Visa nya avsnitt från dina prenumerationer"
 }

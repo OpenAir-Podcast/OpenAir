@@ -6,6 +6,7 @@ import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/history_page.dart';
+import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:openair/views/mobile/nav_pages/settings_page.dart';
 import 'package:openair/views/mobile/nav_pages/sign_in_page.dart';
@@ -26,6 +27,10 @@ final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
 final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
   // Watch hiveServiceProvider as feed counts depend on Hive data
   return await ref.read(openAirProvider).getFeedsCount();
+});
+
+final inboxCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  return await ref.read(openAirProvider).getInboxCount();
 });
 
 final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
@@ -52,6 +57,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
   Widget build(BuildContext context) {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
     final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
+    final AsyncValue<int> getInboxCountValue = ref.watch(inboxCountProvider);
     final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
     final AsyncValue<String> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
@@ -187,12 +193,36 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 ),
                 const Divider(),
                 // Inbox
-                // TODO: Display all the new episodes in one area
-                ListTile(
-                  leading: const Icon(Icons.inbox_rounded),
-                  title: Text(Translations.of(context).text('inbox')),
-                  onTap: () {
-                    Navigator.pop(context);
+                getInboxCountValue.when(
+                  loading: () {
+                    return ListTile(
+                      leading: const Icon(Icons.inbox_rounded),
+                      title: Text(Translations.of(context).text('inbox')),
+                      trailing: const Text('...'),
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return ListTile(
+                      leading: const Icon(Icons.inbox_rounded),
+                      title: Text(Translations.of(context).text('inbox')),
+                      trailing: ElevatedButton(
+                        child: const Text('Retry'),
+                        onPressed: () => ref.invalidate(inboxCountProvider),
+                      ),
+                    );
+                  },
+                  data: (int data) {
+                    return ListTile(
+                      leading: const Icon(Icons.inbox_rounded),
+                      title: Text(Translations.of(context).text('inbox')),
+                      trailing: Text('$data'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => InboxPage()),
+                        );
+                      },
+                    );
                   },
                 ),
                 const Divider(),

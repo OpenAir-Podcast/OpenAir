@@ -13,7 +13,7 @@ class NoSubscriptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(Translations.of(context).text(title)),
       ),
       body: Center(
         child: Column(

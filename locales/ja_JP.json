@@ -305,11 +305,11 @@
     "receiveNotificationsWhenPlayingSubtitle": "再生中に通知を受け取る",
     "receiveNotificationsWhenDownloading": "ダウンロード中に通知を受け取る",
     "receiveNotificationsWhenDownloadingSubtitle": "ダウンロード中に通知を受け取る",
-    "donateDescription": "OpenAirは無料のオープンソースアプリです。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます！",
+    "donateDescription": "OpenAirは無料のオープンソースアプリです。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます!",
     "donateWithPayPal": "PayPalで寄付",
     "buyMeACoffee": "コーヒーを買う",
     "donateWithKofi": "Ko-fiで寄付",
-    "helpAndFeedbackDescription": "ご質問、ご提案、バグレポートがありましたら、お気軽にお問い合わせください。フィードバックをお待ちしております！",
+    "helpAndFeedbackDescription": "ご質問、ご提案、バグレポートがありましたら、お気軽にお問い合わせください。フィードバックをお待ちしております!",
     "joinOurDiscord": "Discordに参加する",
     "reportABug": "バグを報告",
     "suggestAFeature": "機能を提案",
@@ -318,5 +318,7 @@
     "sourceCode": "ソースコード",
     "licenses": "ライセンス",
     "thirdPartyLicenses": "サードパーティライセンス",
-    "aboutDescription": "OpenAirは無料のオープンソースアプリです。デスクトップおよびモバイルデバイス向けのシンプルで使いやすいポッドキャストプレーヤーとして設計されています。OpenAirはFlutterで構築されており、GitHubで入手できます。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます！"
+    "aboutDescription": "OpenAirは無料のオープンソースアプリです。デスクトップおよびモバイルデバイス向けのシンプルで使いやすいポッドキャストプレーヤーとして設計されています。OpenAirはFlutterで構築されており、GitHubで入手できます。もし気に入っていただけたら、開発を支援するために寄付をご検討ください。ありがとうございます!",
+    "inbox": "受信トレイ",
+    "inboxSubtitle": "購読している新しいエピソードを表示"
 }
