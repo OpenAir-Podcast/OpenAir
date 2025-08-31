@@ -37,6 +37,18 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
         return Scaffold(
           appBar: AppBar(
             title: Text(Translations.of(context).text('feeds')),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.refresh_rounded),
+                  tooltip: Translations.of(context).text('refresh'),
+                  onPressed: () async {
+                    ref.invalidate(getFeedsProvider);
+                  },
+                ),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

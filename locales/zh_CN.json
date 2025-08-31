@@ -326,5 +326,10 @@
     "emptyInbox": "收件箱为空",
     "emptyInboxSubtitle": "哎呀，您的收件箱似乎是空的...",
     "refreshAllPodcasts": "刷新所有播客",
-    "clearAllPodcasts": "清除所有播客"
+    "clearAllPodcasts": "清除所有播客",
+    "clearQueue": "清除播放列表",
+    "areYouSureClearQueue": "您确定要清除整个播放列表吗？此操作无法撤消。",
+    "queueCleared": "播放列表已清除。",
+    "areYouSureClearAllPodcasts": "您确定要清除所有播客吗？此操作无法撤消。",
+    "allPodcastsCleared": "所有播客已清除。"
 }

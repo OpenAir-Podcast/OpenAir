@@ -40,7 +40,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: IconButton(
-                  icon: const Icon(Icons.delete_sweep_rounded),
+                  icon: const Icon(Icons.delete_outline_rounded),
                   tooltip: Translations.of(context).text('clearHistory'),
                   onPressed: () {
                     showDialog(
@@ -70,7 +70,6 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    // FIXME: Localization issue. Does not translate.
                                     content: Text(
                                       Translations.of(context)
                                           .text('historyCleared'),

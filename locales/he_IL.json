@@ -326,5 +326,10 @@
     "emptyInbox": "תיבת דואר נכנס ריקה",
     "emptyInboxSubtitle": "אופס, נראה שתיבת הדואר הנכנס שלך ריקה...",
     "refreshAllPodcasts": "רענן את כל הפודקאסטים",
-    "clearAllPodcasts": "נקה את כל הפודקאסטים"
+    "clearAllPodcasts": "נקה את כל הפודקאסטים",
+    "clearQueue": "נקה תור",
+    "areYouSureClearQueue": "האם אתה בטוח שברצונך לנקות את כל התור שלך? לא ניתן לבטל פעולה זו.",
+    "queueCleared": "התור נוקה.",
+    "areYouSureClearAllPodcasts": "האם אתה בטוח שברצונך לנקות את כל הפודקאסטים? לא ניתן לבטל פעולה זו.",
+    "allPodcastsCleared": "כל הפודקאסטים נוקו."
 }

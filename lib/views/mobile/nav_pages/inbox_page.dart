@@ -42,6 +42,18 @@ class _InboxPageState extends ConsumerState<InboxPage> {
         return Scaffold(
           appBar: AppBar(
             title: Text(Translations.of(context).text('inbox')),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.refresh_rounded),
+                  tooltip: Translations.of(context).text('refresh'),
+                  onPressed: () async {
+                    ref.invalidate(getInboxProvider);
+                  },
+                ),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),

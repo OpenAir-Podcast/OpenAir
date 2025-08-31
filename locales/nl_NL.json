@@ -326,5 +326,10 @@
     "emptyInbox": "Lege inbox",
     "emptyInboxSubtitle": "Oeps, het lijkt erop dat je inbox leeg is...",
     "refreshAllPodcasts": "Alle podcasts vernieuwen",
-    "clearAllPodcasts": "Alle podcasts wissen"
+    "clearAllPodcasts": "Alle podcasts wissen",
+    "clearQueue": "Wachtrij wissen",
+    "areYouSureClearQueue": "Weet je zeker dat je je hele wachtrij wilt wissen? Deze actie kan niet ongedaan worden gemaakt.",
+    "queueCleared": "Wachtrij gewist.",
+    "areYouSureClearAllPodcasts": "Weet je zeker dat je alle podcasts wilt wissen? Deze actie kan niet ongedaan worden gemaakt.",
+    "allPodcastsCleared": "Alle podcasts gewist."
 }

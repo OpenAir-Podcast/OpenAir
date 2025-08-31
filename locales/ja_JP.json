@@ -326,5 +326,10 @@
     "emptyInbox": "受信トレイは空です",
     "emptyInboxSubtitle": "受信トレイが空のようです...",
     "refreshAllPodcasts": "すべてのポッドキャストを更新",
-    "clearAllPodcasts": "すべてのポッドキャストをクリア"
+    "clearAllPodcasts": "すべてのポッドキャストをクリア",
+    "clearQueue": "キューをクリア",
+    "areYouSureClearQueue": "キュー全体をクリアしてもよろしいですか？この操作は元に戻せません。",
+    "queueCleared": "キューがクリアされました。",
+    "areYouSureClearAllPodcasts": "すべてのポッドキャストをクリアしてもよろしいですか？この操作は元に戻せません。",
+    "allPodcastsCleared": "すべてのポッドキャストがクリアされました。"
 }

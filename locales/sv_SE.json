@@ -326,5 +326,10 @@
     "emptyInbox": "Tom inkorg",
     "emptyInboxSubtitle": "Hoppsan, det verkar som om din inkorg är tom...",
     "refreshAllPodcasts": "Uppdatera alla podcaster",
-    "clearAllPodcasts": "Rensa alla podcaster"
+    "clearAllPodcasts": "Rensa alla podcaster",
+    "clearQueue": "Rensa kö",
+    "areYouSureClearQueue": "Är du säker på att du vill rensa hela din kö? Denna åtgärd kan inte ångras.",
+    "queueCleared": "Kön rensad.",
+    "areYouSureClearAllPodcasts": "Är du säker på att du vill rensa alla podcaster? Denna åtgärd kan inte ångras.",
+    "allPodcastsCleared": "Alla podcaster rensade."
 }

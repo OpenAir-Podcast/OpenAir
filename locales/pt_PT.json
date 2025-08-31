@@ -326,5 +326,10 @@
     "emptyInbox": "Caixa de entrada vazia",
     "emptyInboxSubtitle": "Opa, parece que sua caixa de entrada está vazia...",
     "refreshAllPodcasts": "Atualizar todos os podcasts",
-    "clearAllPodcasts": "Limpar todos os podcasts"
+    "clearAllPodcasts": "Limpar todos os podcasts",
+    "clearQueue": "Limpar fila",
+    "areYouSureClearQueue": "Tem certeza de que deseja limpar toda a sua fila? Esta ação não pode ser desfeita.",
+    "queueCleared": "Fila limpa.",
+    "areYouSureClearAllPodcasts": "Tem certeza de que deseja limpar todos os podcasts? Esta ação não pode ser desfeita.",
+    "allPodcastsCleared": "Todos os podcasts limpos."
 }

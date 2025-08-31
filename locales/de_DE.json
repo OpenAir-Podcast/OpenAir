@@ -326,5 +326,10 @@
     "emptyInbox": "Leerer Posteingang",
     "emptyInboxSubtitle": "Hoppla, anscheinend ist Ihr Posteingang leer...",
     "refreshAllPodcasts": "Alle Podcasts aktualisieren",
-    "clearAllPodcasts": "Alle Podcasts löschen"
+    "clearAllPodcasts": "Alle Podcasts löschen",
+    "clearQueue": "Warteschlange löschen",
+    "areYouSureClearQueue": "Möchten Sie wirklich Ihre gesamte Warteschlange löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "queueCleared": "Warteschlange gelöscht.",
+    "areYouSureClearAllPodcasts": "Möchten Sie wirklich alle Podcasts löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "allPodcastsCleared": "Alle Podcasts gelöscht."
 }

@@ -326,5 +326,10 @@
     "emptyInbox": "Пустые входящие",
     "emptyInboxSubtitle": "Ой, похоже, ваши входящие пусты...",
     "refreshAllPodcasts": "Обновить все подкасты",
-    "clearAllPodcasts": "Очистить все подкасты"
+    "clearAllPodcasts": "Очистить все подкасты",
+    "clearQueue": "Очистить очередь",
+    "areYouSureClearQueue": "Вы уверены, что хотите очистить всю очередь? Это действие нельзя отменить.",
+    "queueCleared": "Очередь очищена.",
+    "areYouSureClearAllPodcasts": "Вы уверены, что хотите очистить все подкасты? Это действие нельзя отменить.",
+    "allPodcastsCleared": "Все подкасты очищены."
 }

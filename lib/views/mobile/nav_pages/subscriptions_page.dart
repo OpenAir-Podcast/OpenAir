@@ -63,39 +63,70 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                       items: [
                         PopupMenuItem(
                           value: 'refresh_all',
-                          child: Text(Translations.of(context)
-                              .text('refreshAllPodcasts')),
+                          child: Text(
+                            Translations.of(context).text('refreshAllPodcasts'),
+                          ),
+                          onTap: () {
+                            ref
+                                .read(openAirProvider)
+                                .hiveService
+                                .podcastAccumulatedSubscribedEpisodes();
+
+                            ref.invalidate(getSubscriptionsCountProvider);
+                            ref.invalidate(subscriptionsProvider);
+                          },
                         ),
                         PopupMenuItem(
                           value: 'clear_all',
-                          child: Text(Translations.of(context)
-                              .text('clearAllPodcasts')),
+                          child: Text(
+                            Translations.of(context).text('clearAllPodcasts'),
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext dialogContext) =>
+                                  AlertDialog(
+                                title: Text(Translations.of(context)
+                                    .text('clearAllPodcasts')),
+                                content: Text(Translations.of(context)
+                                    .text('areYouSureClearAllPodcasts')),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text(Translations.of(context)
+                                        .text('cancel')),
+                                    onPressed: () {
+                                      Navigator.of(dialogContext).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text(
+                                        Translations.of(context).text('clear')),
+                                    onPressed: () async {
+                                      Navigator.of(dialogContext).pop();
+                                      await ref
+                                          .read(openAirProvider)
+                                          .hiveService
+                                          .deleteSubscriptions();
+                                      ref.invalidate(subscriptionsProvider);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              Translations.of(context)
+                                                  .text('allPodcastsCleared'),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ],
-                    ).then(
-                      (value) {
-                        if (value == 'refresh_all') {
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .podcastAccumulatedSubscribedEpisodes();
-
-                          ref.invalidate(getSubscriptionsCountProvider);
-                          ref.invalidate(subscriptionsProvider);
-                        } else if (value == 'clear_all') {
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .deleteSubscriptions();
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .deleteEpisodes();
-
-                          ref.invalidate(subscriptionsProvider);
-                        }
-                      },
                     );
                   },
                   icon: const Icon(Icons.more_vert_rounded),

@@ -36,6 +36,48 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Translations.of(context).text('queue')),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext dialogContext) => AlertDialog(
+                  title: Text(Translations.of(context).text('clearQueue')),
+                  content: Text(
+                      Translations.of(context).text('areYouSureClearQueue')),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text(Translations.of(context).text('cancel')),
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text(Translations.of(context).text('clear')),
+                      onPressed: () async {
+                        Navigator.of(dialogContext).pop();
+
+                        ref.read(openAirProvider).hiveService.clearQueue();
+                        ref.invalidate(sortedProvider);
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                Translations.of(context).text('queueCleared'),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.delete_outline_rounded),
+          ),
+        ],
       ),
       body: queueStream.when(
         data: (queueData) {

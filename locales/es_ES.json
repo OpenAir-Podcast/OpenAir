@@ -326,5 +326,10 @@
     "emptyInbox": "Bandeja de entrada vacía",
     "emptyInboxSubtitle": "Vaya, parece que tu bandeja de entrada está vacía...",
     "refreshAllPodcasts": "Actualizar todos los podcasts",
-    "clearAllPodcasts": "Borrar todos los podcasts"
+    "clearAllPodcasts": "Borrar todos los podcasts",
+    "clearQueue": "Borrar cola",
+    "areYouSureClearQueue": "¿Estás seguro de que quieres borrar toda tu cola? Esta acción no se puede deshacer.",
+    "queueCleared": "Cola borrada.",
+    "areYouSureClearAllPodcasts": "¿Estás seguro de que quieres borrar todos los podcasts? Esta acción no se puede deshacer.",
+    "allPodcastsCleared": "Todos los podcasts borrados."
 }

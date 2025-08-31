@@ -326,5 +326,10 @@
     "emptyInbox": "صندوق الوارد فارغ",
     "emptyInboxSubtitle": "عفوًا، يبدو أن صندوق الوارد الخاص بك فارغ...",
     "refreshAllPodcasts": "تحديث جميع البودكاست",
-    "clearAllPodcasts": "مسح جميع البودكاست"
+    "clearAllPodcasts": "مسح جميع البودكاست",
+    "clearQueue": "مسح قائمة الانتظار",
+    "areYouSureClearQueue": "هل أنت متأكد من أنك تريد مسح قائمة الانتظار بالكامل؟ لا يمكن التراجع عن هذا الإجراء.",
+    "queueCleared": "تم مسح قائمة الانتظار.",
+    "areYouSureClearAllPodcasts": "هل أنت متأكد من أنك تريد مسح جميع البودكاست؟ لا يمكن التراجع عن هذا الإجراء.",
+    "allPodcastsCleared": "تم مسح جميع البودكاست."
 }

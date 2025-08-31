@@ -326,5 +326,10 @@
     "emptyInbox": "Empty Inbox",
     "emptyInboxSubtitle": "Oops, looks like your inbox is empty...",
     "refreshAllPodcasts": "Refresh All Podcasts",
-    "clearAllPodcasts": "Clear All Podcasts"
+    "clearAllPodcasts": "Clear All Podcasts",
+    "clearQueue": "Clear Queue",
+    "areYouSureClearQueue": "Are you sure you want to clear your entire queue? This action cannot be undone.",
+    "queueCleared": "Queue cleared.",
+    "areYouSureClearAllPodcasts": "Are you sure you want to clear all podcasts? This action cannot be undone.",
+    "allPodcastsCleared": "All podcasts cleared."
 }

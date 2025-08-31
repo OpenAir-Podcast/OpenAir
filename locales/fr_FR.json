@@ -326,5 +326,10 @@
     "emptyInbox": "Boîte de réception vide",
     "emptyInboxSubtitle": "Oups, il semble que votre boîte de réception soit vide...",
     "refreshAllPodcasts": "Actualiser tous les podcasts",
-    "clearAllPodcasts": "Effacer tous les podcasts"
+    "clearAllPodcasts": "Effacer tous les podcasts",
+    "clearQueue": "Effacer la file d'attente",
+    "areYouSureClearQueue": "Êtes-vous sûr de vouloir effacer toute votre file d'attente ? Cette action est irréversible.",
+    "queueCleared": "File d'attente effacée.",
+    "areYouSureClearAllPodcasts": "Êtes-vous sûr de vouloir effacer tous les podcasts ? Cette action est irréversible.",
+    "allPodcastsCleared": "Tous les podcasts effacés."
 }

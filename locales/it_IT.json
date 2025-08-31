@@ -326,5 +326,10 @@
     "emptyInbox": "Posta in arrivo vuota",
     "emptyInboxSubtitle": "Ops, sembra che la tua posta in arrivo sia vuota...",
     "refreshAllPodcasts": "Aggiorna tutti i podcast",
-    "clearAllPodcasts": "Cancella tutti i podcast"
+    "clearAllPodcasts": "Cancella tutti i podcast",
+    "clearQueue": "Cancella coda",
+    "areYouSureClearQueue": "Sei sicuro di voler cancellare tutta la tua coda? Questa azione non può essere annullata.",
+    "queueCleared": "Coda cancellata.",
+    "areYouSureClearAllPodcasts": "Sei sicuro di voler cancellare tutti i podcast? Questa azione non può essere annullata.",
+    "allPodcastsCleared": "Tutti i podcast cancellati."
 }

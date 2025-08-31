@@ -326,5 +326,10 @@
     "emptyInbox": "받은 편지함 비어 있음",
     "emptyInboxSubtitle": "おっと, 받은 편지함이 비어 있는 것 같습니다...",
     "refreshAllPodcasts": "모든 팟캐스트 새로 고침",
-    "clearAllPodcasts": "모든 팟캐스트 지우기"
+    "clearAllPodcasts": "모든 팟캐스트 지우기",
+    "clearQueue": "대기열 지우기",
+    "areYouSureClearQueue": "전체 대기열을 지우시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "queueCleared": "대기열이 지워졌습니다.",
+    "areYouSureClearAllPodcasts": "모든 팟캐스트를 지우시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "allPodcastsCleared": "모든 팟캐스트가 지워졌습니다."
 }

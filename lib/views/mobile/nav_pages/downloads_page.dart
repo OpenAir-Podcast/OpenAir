@@ -40,7 +40,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: IconButton(
-                  icon: const Icon(Icons.delete_sweep_rounded),
+                  icon: const Icon(Icons.delete_outline_rounded),
                   tooltip: Translations.of(context).text('clearDownloads'),
                   onPressed: () {
                     showDialog(
@@ -62,8 +62,9 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                             child: Text(Translations.of(context).text('clear')),
                             onPressed: () async {
                               Navigator.of(dialogContext).pop();
+
                               await ref
-                                  .read(auidoProvider.notifier)
+                                  .read(auidoProvider)
                                   .removeAllDownloadedPodcasts(context);
 
                               ref.invalidate(getDownloadsProvider);
