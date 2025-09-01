@@ -502,8 +502,8 @@ class AudioProvider extends ChangeNotifier {
 
           final hiveService = await ref.read(hiveServiceProvider.future);
           hiveService.addToCompletedEpisode(
-                CompletedEpisodeModel(guid: currentEpisode!['guid']),
-              );
+            CompletedEpisodeModel(guid: currentEpisode!['guid']),
+          );
 
           await updateCurrentQueueCard(
             currentEpisode!['guid'],
@@ -513,7 +513,7 @@ class AudioProvider extends ChangeNotifier {
             playerPosition,
           );
 
-          playNextInQueue();
+          if (autoplayNextInQueue) playNextInQueue();
         }
       } else if (playerState == PlayerState.paused) {
         if (!onceQueueComplete) {
@@ -585,22 +585,28 @@ class AudioProvider extends ChangeNotifier {
       await hiveService.removeFromQueue(guid: completedEpisodeGuid);
 
       // 2. Add to completed episodes
-      // Assuming CompletedEpisode model has a constructor like: CompletedEpisode({required this.guid})
       await hiveService.addToCompletedEpisode(
           CompletedEpisodeModel(guid: completedEpisodeGuid));
 
+      ref.invalidate(getQueueProvider);
+      ref.invalidate(sortedDownloadsProvider);
+
       // 3. Get the updated queue to determine the next episode.
-      // The sortedQueueListProvider will also update reactively for the UI.
       final updatedQueue = await hiveService.getQueue();
 
       if (updatedQueue.isNotEmpty) {
         // 4. If the queue is not empty, play the next episode.
-        final nextEpisodeToPlay = updatedQueue.entries.first.value;
+        final Map<dynamic, dynamic> nextEpisodeToPlay =
+            updatedQueue.entries.first.value;
 
-        currentEpisode = nextEpisodeToPlay.toJson();
-        currentPodcast = nextEpisodeToPlay.podcast;
+        final episodeData = Map<String, dynamic>.from(nextEpisodeToPlay);
 
-        playNewQueueItem(nextEpisodeToPlay);
+        currentEpisode = episodeData;
+
+        PodcastModel podcastData = episodeData['podcast'];
+        currentPodcast = podcastData;
+
+        playNewQueueItem(episodeData);
       } else {
         // 5. If the queue is empty, reset player state.
         isPodcastSelected = false;
@@ -865,9 +871,9 @@ class AudioProvider extends ChangeNotifier {
 
       final hiveService = await ref.read(hiveServiceProvider.future);
       hiveService.insertEpisode(
-            episode,
-            episode['guid'],
-          );
+        episode,
+        episode['guid'],
+      );
     }
 
     notifyListeners();

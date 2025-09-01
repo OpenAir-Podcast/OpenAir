@@ -41,8 +41,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         memCacheHeight: imageSize.ceil(),
                         memCacheWidth: imageSize.ceil(),
                         imageUrl: ref
-                            .watch(audioProvider)
-                            .currentEpisode!['feedImage'],
+                                .watch(audioProvider)
+                                .currentEpisode!['feedImage'] ??
+                            ref.watch(audioProvider).currentEpisode!['image'],
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -118,12 +119,23 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           ref
                               .watch(audioProvider)
                               .currentPlaybackPositionString,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Brightness.dark == Theme.of(context).brightness
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
                         ),
-                        //
-                        // Spacer
-                        //
                         Text(
                           '-${ref.watch(audioProvider).currentPlaybackRemainingTimeString}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Brightness.dark == Theme.of(context).brightness
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
                         ),
                       ],
                     ),
@@ -161,6 +173,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.0,
+                                color: Brightness.dark ==
+                                        Theme.of(context).brightness
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ),
@@ -207,6 +223,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.0,
+                                color: Brightness.dark ==
+                                        Theme.of(context).brightness
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ),

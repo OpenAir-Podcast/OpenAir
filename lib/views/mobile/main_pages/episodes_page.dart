@@ -173,7 +173,9 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+            height: ref.watch(audioProvider).isPodcastSelected
+                ? bannerAudioPlayerHeight
+                : 0.0,
             child: ref.watch(audioProvider).isPodcastSelected
                 ? const BannerAudioPlayer()
                 : const SizedBox(),

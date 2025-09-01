@@ -151,7 +151,7 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           ),
           bottomNavigationBar: SizedBox(
             height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? 80.0
+                ? bannerAudioPlayerHeight
                 : 0.0,
             child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()

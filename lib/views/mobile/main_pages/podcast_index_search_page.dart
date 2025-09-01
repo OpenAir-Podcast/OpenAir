@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -43,7 +44,9 @@ class PodcastIndexSearchPage extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+        height: ref.watch(audioProvider).isPodcastSelected
+            ? bannerAudioPlayerHeight
+            : 0.0,
         child: ref.watch(audioProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),

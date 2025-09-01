@@ -53,31 +53,28 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 ),
               ),
             ),
-            title: SizedBox(
-              height: 42.0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ref.watch(audioProvider).currentEpisode!['title'],
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    maxLines: 2,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ref.watch(audioProvider).currentEpisode!['title'],
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    ref.watch(audioProvider).currentEpisode!['author'] ??
-                        'Unknown',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    maxLines: 2,
+                  maxLines: 2,
+                ),
+                Text(
+                  ref.watch(audioProvider).currentEpisode!['author'] ??
+                      'Unknown',
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                  maxLines: 2,
+                ),
+              ],
             ),
             trailing: IconButton(
               onPressed: () {

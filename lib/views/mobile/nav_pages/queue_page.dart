@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
@@ -134,7 +135,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
         },
       ),
       bottomNavigationBar: SizedBox(
-        height: isPodcastSelected ? 80.0 : 0.0,
+        height: isPodcastSelected ? bannerAudioPlayerHeight : 0.0,
         child: isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),

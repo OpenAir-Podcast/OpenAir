@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -300,7 +301,9 @@ class CategoryPage extends ConsumerWidget {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+            height: ref.watch(audioProvider).isPodcastSelected
+                ? bannerAudioPlayerHeight
+                : 0.0,
             child: ref.watch(audioProvider).isPodcastSelected
                 ? const BannerAudioPlayer()
                 : const SizedBox(),

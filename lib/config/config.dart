@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+double bannerAudioPlayerHeight = 85.0;
+
 Color? highlightColor = Colors.grey[100];
 Color? highlightColor2 = Colors.grey[400];
 
@@ -137,8 +139,8 @@ String fastForwardInterval = '10';
 String rewindInterval = '10';
 String playbackSpeed = '1.0x';
 
-String enqueuePos = 'Last';
-bool enqueueDownloaded = false;
-bool autoplayNextInQueue = false;
-String smartMarkAsCompleted = 'Disabled';
-bool keepSkippedEpisodes = false;
+late String enqueuePos;
+late bool enqueueDownloaded;
+late bool autoplayNextInQueue;
+late String smartMarkAsCompleted;
+late bool keepSkippedEpisodes;
