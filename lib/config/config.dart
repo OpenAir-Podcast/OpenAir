@@ -118,31 +118,12 @@ Color cardColorDark = Colors.grey[850]!;
 Color primaryColorLight = Colors.blue;
 Color primaryColorDark = Colors.blue;
 
-String paypalUrl =
-    'https://www.paypal.com/donate/?hosted_button_id=F2UVR7PBQM5XQ';
-
-String buyMeACoffeeUrl = 'https://buymeacoffee.com/theobviouschico';
-
-String donateWithKofiUrl = 'https://ko-fi.com/theobviouschico';
-
-String discordUrl = 'https://discord.gg/cxy9AmMaYS';
-
-String gitHubIssuesUrl = 'https://github.com/OpenAir-Podcast/OpenAir/issues';
-
-String gitHubDiscussionsUrl =
-    'https://github.com/OpenAir-Podcast/OpenAir/discussions';
-
-String privacyPolicyUrl =
-    'https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md';
-
-String gitHubUrl = 'https://github.com/OpenAir-Podcast/OpenAir';
-
 // Playback
 String fastForwardInterval = '10';
 String rewindInterval = '10';
 String playbackSpeed = '1.0x';
 
-String enqueuePosition = 'Last';
+String enqueuePos = 'Last';
 bool enqueueDownloaded = false;
 bool autoplayNextInQueue = false;
 String smartMarkAsCompleted = 'Disabled';

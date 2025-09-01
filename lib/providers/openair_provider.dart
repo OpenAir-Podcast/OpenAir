@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -204,4 +205,21 @@ class OpenAirProvider extends ChangeNotifier {
   void exportPodcastToOpml() async {}
 
   void updateFontSize(String size) {}
+
+  void downloadEnqueue(BuildContext context) async {
+    final queue = await hiveService.getQueue();
+
+    for (var item in queue.values) {
+      final isDownloaded =
+          await ref.read(audioProvider).isAudioFileDownloaded(item.guid);
+
+      if (!isDownloaded && context.mounted) {
+        ref.read(audioProvider).downloadEpisode(
+              item.toJson(),
+              item.podcast,
+              context,
+            );
+      }
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -48,6 +49,10 @@ class AboutPageState extends ConsumerState<AboutPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15.0,
+                    fontWeight: FontWeight.bold,
+                    color: Brightness.dark == Theme.of(context).brightness
+                        ? Colors.white
+                        : Colors.black,
                   ),
                 ),
               ),
@@ -63,6 +68,8 @@ class AboutPageState extends ConsumerState<AboutPage> {
                 title: Text(Translations.of(context).text('sourceCode')),
                 onTap: () async {
                   try {
+                    final String gitHubUrl = dotenv.env['GITHUB_URL']!;
+
                     await launchUrl(Uri.parse(gitHubUrl));
                   } catch (e) {
                     if (context.mounted) {
@@ -82,8 +89,6 @@ class AboutPageState extends ConsumerState<AboutPage> {
                 onTap: () {
                   showLicensePage(
                     context: context,
-                    applicationName: 'OpenAir',
-                    applicationVersion: data.version,
                   );
                 },
               ),

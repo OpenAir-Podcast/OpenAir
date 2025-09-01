@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -30,6 +31,9 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
               style: TextStyle(
                 fontSize: 15.0,
                 fontWeight: FontWeight.bold,
+                color: Brightness.dark == Theme.of(context).brightness
+                    ? Colors.white
+                    : Colors.black,
               ),
             ),
           ),
@@ -38,6 +42,7 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             title: Text(Translations.of(context).text('joinOurDiscord')),
             onTap: () async {
               try {
+                final String discordUrl = dotenv.env['DISCORD_URL']!;
                 await launchUrl(Uri.parse(discordUrl));
               } catch (e) {
                 if (context.mounted) {
@@ -56,6 +61,7 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             title: Text(Translations.of(context).text('reportABug')),
             onTap: () async {
               try {
+                final String gitHubIssuesUrl = dotenv.env['GITHUB_ISSUES_URL']!;
                 await launchUrl(Uri.parse(gitHubIssuesUrl));
               } catch (e) {
                 if (context.mounted) {
@@ -74,6 +80,8 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             title: Text(Translations.of(context).text('suggestAFeature')),
             onTap: () async {
               try {
+                final String gitHubDiscussionsUrl =
+                    dotenv.env['GITHUB_DISCUSSION_URL']!;
                 await launchUrl(Uri.parse(gitHubDiscussionsUrl));
               } catch (e) {
                 if (context.mounted) {
@@ -92,6 +100,7 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             title: Text(Translations.of(context).text('privacyPolicy')),
             onTap: () async {
               try {
+                final String privacyPolicyUrl = dotenv.env['PRIVACY_POLICY']!;
                 await launchUrl(Uri.parse(privacyPolicyUrl));
               } catch (e) {
                 if (context.mounted) {

@@ -129,7 +129,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
             case 'First':
               enqueuePosition = Translations.of(context).text('first');
               break;
-            case 'After Current Episode':
+            case 'After current episode':
               enqueuePosition =
                   Translations.of(context).text('afterCurrentEpisode');
               break;
@@ -405,14 +405,18 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
 
                         if (Translations.of(context).text('last') == newValue) {
                           playbackData['enqueuePosition'] = 'Last';
+                          enqueuePos = 'Last';
                         } else if (Translations.of(context).text('first') ==
                             newValue) {
                           playbackData['enqueuePosition'] = 'First';
+                          enqueuePos = 'First';
                         } else if (Translations.of(context)
                                 .text('afterCurrentEpisode') ==
                             newValue) {
                           playbackData['enqueuePosition'] =
                               'After current episode';
+
+                          enqueuePos = 'After current episode';
                         }
 
                         ref
@@ -444,6 +448,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   onPressed: (int index) {
                     setState(() {
                       enqueueDownloaded = !enqueueDownloaded;
+
                       playbackData['enqueueDownloaded'] = enqueueDownloaded;
 
                       ref
@@ -451,6 +456,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                           .hiveService
                           .savePlaybackSettings(playbackData);
                     });
+
+                    if (enqueueDownloaded == true) {
+                      ref.watch(openAirProvider).downloadEnqueue(context);
+                    }
                   },
                   children: [
                     Padding(

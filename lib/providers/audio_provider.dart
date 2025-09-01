@@ -197,10 +197,12 @@ class AudioProvider extends ChangeNotifier {
     final downloadsDirPath = path.join(baseDir.path, '.downloaded_episodes');
 
     final downloadsDir = Directory(downloadsDirPath);
+
     // Ensure the directory exists before we try to use it.
     if (!await downloadsDir.exists()) {
       await downloadsDir.create(recursive: true);
     }
+    
     return downloadsDir.path;
   }
 
@@ -208,6 +210,7 @@ class AudioProvider extends ChangeNotifier {
     if (kIsWeb) {
       return false;
     }
+
     // The filename is consistently the GUID with a .mp3 extension.
     final filename = '$guid.mp3';
     final downloadsDir = await getDownloadsDir();
@@ -717,16 +720,71 @@ class AudioProvider extends ChangeNotifier {
     Map<String, dynamic> episode,
     PodcastModel? podcast,
   ) async {
+    final hiveService = ref.watch(openAirProvider).hiveService;
+    Map queue = await hiveService.getQueue();
+
+    List<Map<String, dynamic>> queueList =
+        queue.values.map((e) => Map<String, dynamic>.from(e)).toList();
+
+    queueList.sort((a, b) => a['pos'].compareTo(b['pos']));
+
     int pos;
 
-    Map queue = await ref.watch(openAirProvider).hiveService.getQueue();
+    debugPrint(enqueuePos);
 
-    if (queue.isEmpty) {
-      pos = 1;
-    } else {
-      int lastPos = queue.entries.last.value['pos'];
+    switch (enqueuePos) {
+      case 'First':
+        pos = 1;
+        for (var item in queueList) {
+          item['pos'] = item['pos'] + 1;
+          await hiveService.addToQueue(item);
+        }
+        break;
+      case 'Last':
+        if (queue.isEmpty) {
+          pos = 1;
+        } else {
+          pos = queueList.last['pos'] + 1;
+        }
+        break;
+      case 'After current episode':
+        if (currentEpisode != null && currentEpisode!.isNotEmpty) {
+          if (queue.isEmpty) {
+            pos = 1;
+          } else {
+            int currentPos = -1;
+            try {
+              currentPos = queueList.firstWhere((element) =>
+                  element['guid'] == currentEpisode!['guid'])['pos'];
+            } catch (e) {
+              // current episode is not in the queue
+              currentPos = queueList.last['pos'];
+            }
 
-      pos = lastPos + 1;
+            pos = currentPos + 1;
+
+            for (var item in queueList) {
+              if (item['pos'] >= pos) {
+                item['pos'] = item['pos'] + 1;
+                await hiveService.addToQueue(item);
+              }
+            }
+          }
+        } else {
+          // if there is no current episode, add to the end
+          if (queue.isEmpty) {
+            pos = 1;
+          } else {
+            pos = queueList.last['pos'] + 1;
+          }
+        }
+        break;
+      default:
+        if (queue.isEmpty) {
+          pos = 1;
+        } else {
+          pos = queueList.last['pos'] + 1;
+        }
     }
 
     int enclosureLength = episode['enclosureLength'];
@@ -754,7 +812,7 @@ class AudioProvider extends ChangeNotifier {
     final String formattedTotalDurationString =
         formatCurrentPlaybackRemainingTime(Duration.zero, episodeTotalDuration);
 
-    ref.watch(openAirProvider).hiveService.addToQueue({
+    hiveService.addToQueue({
       'guid': episode['guid'],
       'title': episode['title'],
       'author': episode['author'] ?? 'Unknown',

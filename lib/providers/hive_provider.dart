@@ -143,7 +143,7 @@ class HiveService {
 
     playbackSpeed = playbackSettings['playbackSpeed'];
 
-    enqueuePosition = playbackSettings['enqueuePosition'];
+    enqueuePos = playbackSettings['enqueuePosition'];
     enqueueDownloaded = playbackSettings['enqueueDownloaded'];
     autoplayNextInQueue = playbackSettings['continuePlayback'];
     smartMarkAsCompleted = playbackSettings['smartMarkAsCompleted'];
