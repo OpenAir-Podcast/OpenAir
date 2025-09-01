@@ -37,7 +37,7 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
 
     return GestureDetector(
       onTap: () async {
-        ref.read(auidoProvider).currentPodcast = podcast;
+        ref.read(audioProvider).currentPodcast = podcast;
 
         if (context.mounted) {
           Navigator.of(context).push(
@@ -137,8 +137,8 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                       onPressed: () async {
                         // FIXME: Doesn't subscribe/unsubscribe immediately
                         snapshot.data!
-                            ? ref.read(auidoProvider).unsubscribe(podcast)
-                            : ref.read(auidoProvider).subscribe(
+                            ? ref.read(audioProvider).unsubscribe(podcast)
+                            : ref.read(audioProvider).subscribe(
                                   podcast,
                                   context,
                                 );

@@ -102,9 +102,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
           }
 
           switch (playbackData['playbackSpeed']) {
-            case '0.25x':
-              playbackSpeed = Translations.of(context).text('x0.25');
-              break;
             case '0.5x':
               playbackSpeed = Translations.of(context).text('x0.5');
               break;
@@ -178,8 +175,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 ),
               ),
               ListTile(
-                title:
-                    Text(Translations.of(context).text('FastfarwordSkipTime')),
+                title: Text(Translations.of(context).text('rewindSkipTime')),
                 trailing: SizedBox(
                   width: 200.0,
                   child: DropdownButton<String>(
@@ -189,32 +185,39 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: fastForwardSkipTime,
+                    value: rewindSkipTime,
                     onChanged: (String? newValue) {
                       setState(() {
-                        fastForwardSkipTime = newValue!;
+                        rewindSkipTime = newValue!;
 
                         if (Translations.of(context).text('seconds3') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '3 seconds';
+                          playbackData['rewindInterval'] = '3 seconds';
+                          rewindInterval = '3';
                         } else if (Translations.of(context).text('seconds5') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '5 seconds';
+                          playbackData['rewindInterval'] = '5 seconds';
+                          rewindInterval = '5';
                         } else if (Translations.of(context).text('seconds10') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '10 seconds';
+                          playbackData['rewindInterval'] = '10 seconds';
+                          rewindInterval = '10';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '15 seconds';
+                          playbackData['rewindInterval'] = '15 seconds';
+                          rewindInterval = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '30 seconds';
+                          playbackData['rewindInterval'] = '30 seconds';
+                          rewindInterval = '30';
                         } else if (Translations.of(context).text('seconds45') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '45 seconds';
+                          playbackData['rewindInterval'] = '45 seconds';
+                          rewindInterval = '45';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
-                          playbackData['fastForwardInterval'] = '60 seconds';
+                          playbackData['rewindInterval'] = '60 seconds';
+                          rewindInterval = '60';
                         }
 
                         ref
@@ -243,7 +246,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 ),
               ),
               ListTile(
-                title: Text(Translations.of(context).text('rewindSkipTime')),
+                title:
+                    Text(Translations.of(context).text('FastfarwordSkipTime')),
                 trailing: SizedBox(
                   width: 200.0,
                   child: DropdownButton<String>(
@@ -253,32 +257,39 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: rewindSkipTime,
+                    value: fastForwardSkipTime,
                     onChanged: (String? newValue) {
                       setState(() {
-                        rewindSkipTime = newValue!;
+                        fastForwardSkipTime = newValue!;
 
                         if (Translations.of(context).text('seconds3') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '3 seconds';
+                          playbackData['fastForwardInterval'] = '3 seconds';
+                          fastForwardInterval = '3';
                         } else if (Translations.of(context).text('seconds5') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '5 seconds';
+                          playbackData['fastForwardInterval'] = '5 seconds';
+                          fastForwardInterval = '5';
                         } else if (Translations.of(context).text('seconds10') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '10 seconds';
+                          playbackData['fastForwardInterval'] = '10 seconds';
+                          fastForwardInterval = '10';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '15 seconds';
+                          playbackData['fastForwardInterval'] = '15 seconds';
+                          fastForwardInterval = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '30 seconds';
+                          playbackData['fastForwardInterval'] = '30 seconds';
+                          fastForwardInterval = '30';
                         } else if (Translations.of(context).text('seconds45') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '45 seconds';
+                          playbackData['fastForwardInterval'] = '45 seconds';
+                          fastForwardInterval = '45';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
-                          playbackData['rewindInterval'] = '60 seconds';
+                          playbackData['fastForwardInterval'] = '60 seconds';
+                          fastForwardInterval = '60';
                         }
 
                         ref
@@ -322,24 +333,25 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       setState(() {
                         playbackSpeed = newValue!;
 
-                        if (Translations.of(context).text('x0.25') ==
-                            newValue) {
-                          playbackData['playbackSpeed'] = '0.25x';
-                        } else if (Translations.of(context).text('x0.5') ==
-                            newValue) {
+                        if (Translations.of(context).text('x0.5') == newValue) {
                           playbackData['playbackSpeed'] = '0.5x';
+                          playbackSpeed = '0.5x';
                         } else if (Translations.of(context).text('x1.0') ==
                             newValue) {
                           playbackData['playbackSpeed'] = '1.0x';
+                          playbackSpeed = '1.0x';
                         } else if (Translations.of(context).text('x1.25') ==
                             newValue) {
                           playbackData['playbackSpeed'] = '1.25x';
+                          playbackSpeed = '1.25x';
                         } else if (Translations.of(context).text('x1.5') ==
                             newValue) {
                           playbackData['playbackSpeed'] = '1.5x';
+                          playbackSpeed = '1.5x';
                         } else if (Translations.of(context).text('x2.0') ==
                             newValue) {
                           playbackData['playbackSpeed'] = '2.0x';
+                          playbackSpeed = '2.0x';
                         }
 
                         ref
@@ -349,7 +361,6 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       });
                     },
                     items: <String>[
-                      Translations.of(context).text('x0.25'),
                       Translations.of(context).text('x0.5'),
                       Translations.of(context).text('x1.0'),
                       Translations.of(context).text('x1.25'),

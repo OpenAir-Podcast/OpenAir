@@ -55,7 +55,7 @@ class SubscriptionCard extends StatelessWidget {
           // TODO Add a dropmenu here
         },
         onTap: () {
-          ref.read(auidoProvider.notifier).currentPodcast =
+          ref.read(audioProvider.notifier).currentPodcast =
               PodcastModel.fromJson(subs[index].toJson());
 
           Navigator.of(context).push(

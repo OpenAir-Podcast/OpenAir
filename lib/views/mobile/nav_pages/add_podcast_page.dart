@@ -226,7 +226,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                 artwork: snapshot[index]['imgURL'],
                               );
 
-                              ref.read(auidoProvider).currentPodcast =
+                              ref.read(audioProvider).currentPodcast =
                                   PodcastModel.fromJson(podcast.toJson());
 
                               if (context.mounted) {
@@ -389,7 +389,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             }
 
                             bool i = await ref
-                                .watch(auidoProvider)
+                                .watch(audioProvider)
                                 .addPodcastByRssUrl(textInputControl.text);
 
                             if (context.mounted) {
@@ -596,7 +596,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
               ),
               onTap: () async {
-                bool i = await ref.watch(auidoProvider).importPodcastFromOpml();
+                bool i = await ref.watch(audioProvider).importPodcastFromOpml();
 
                 if (context.mounted) {
                   if (i == true) {
@@ -616,10 +616,10 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+        height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
             ? 80.0
             : 0.0,
-        child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+        child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),
       ),

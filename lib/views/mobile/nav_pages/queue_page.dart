@@ -28,10 +28,10 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     final queueStream = ref.watch(sortedProvider);
 
     final isPodcastSelected =
-        ref.watch(auidoProvider.select((p) => p.isPodcastSelected));
+        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
 
     final currentPlayingGuid =
-        ref.watch(auidoProvider.select((p) => p.currentEpisode?['guid']));
+        ref.watch(audioProvider.select((p) => p.currentEpisode?['guid']));
 
     return Scaffold(
       appBar: AppBar(

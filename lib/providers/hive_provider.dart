@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:openair/config/config.dart';
 
 import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/feed_model.dart';
@@ -132,6 +133,21 @@ class HiveService {
 
     // Category page
     categoryBox = collection.openBox<FetchDataModel>('category');
+
+    Map<String, dynamic>? playbackSettings = await getPlaybackSettings();
+    rewindInterval =
+        playbackSettings!['rewindInterval'].toString().split(' ').first;
+
+    fastForwardInterval =
+        playbackSettings['fastForwardInterval'].toString().split(' ').first;
+
+    playbackSpeed = playbackSettings['playbackSpeed'];
+
+    enqueuePosition = playbackSettings['enqueuePosition'];
+    enqueueDownloaded = playbackSettings['enqueueDownloaded'];
+    autoplayNextInQueue = playbackSettings['continuePlayback'];
+    smartMarkAsCompleted = playbackSettings['smartMarkAsCompleted'];
+    keepSkippedEpisodes = playbackSettings['keepSkippedEpisodes'];
   }
 
   // Subscription Operations:
@@ -502,15 +518,15 @@ class HiveService {
     return playbackSettings.cast<String, dynamic>();
   }
 
-  // Downloads
+  // Automatic
   void saveDownloadSettings(Map downloadSettings) async {
     final box = await settingsBox;
-    await box.put('downloads', downloadSettings);
+    await box.put('automatic', downloadSettings);
   }
 
   Future<Map<String, dynamic>?> getDownloadSettings() async {
     final box = await settingsBox;
-    Map? downloadSettings = await box.get('downloads');
+    Map? downloadSettings = await box.get('automatic');
 
     if (downloadSettings == null) {
       downloadSettings = {
@@ -525,7 +541,7 @@ class HiveService {
         "removeEpisodesFromQueue": false,
       };
 
-      await box.put('downloads', downloadSettings);
+      await box.put('automatic', downloadSettings);
     }
 
     return downloadSettings.cast<String, dynamic>();

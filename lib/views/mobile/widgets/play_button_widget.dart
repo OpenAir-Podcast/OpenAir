@@ -23,20 +23,20 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
     const double paddingSpace = 8.0;
 
     if (widget.episodeItem['guid'] !=
-        ref.watch(auidoProvider).currentEpisode!['guid']) {
-      if (ref.watch(auidoProvider).isPlaying == PlayingStatus.playing) {
+        ref.watch(audioProvider).currentEpisode!['guid']) {
+      if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }
     }
     // EpisodeItem is the same as currentEpisode
     else {
-      if (ref.watch(auidoProvider).isPlaying == PlayingStatus.playing) {
+      if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
-      } else if (ref.watch(auidoProvider).isPlaying == PlayingStatus.paused) {
+      } else if (ref.watch(audioProvider).isPlaying == PlayingStatus.paused) {
         playStatus = PlayingStatus.paused;
-      } else if (ref.watch(auidoProvider).isPlaying == PlayingStatus.stop) {
+      } else if (ref.watch(audioProvider).isPlaying == PlayingStatus.stop) {
         playStatus = PlayingStatus.detail;
-      } else if (ref.watch(auidoProvider).isPlaying ==
+      } else if (ref.watch(audioProvider).isPlaying ==
           PlayingStatus.buffering) {
         playStatus = PlayingStatus.buffering;
       }
@@ -54,7 +54,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
           ),
           Text(
             ref
-                .watch(auidoProvider)
+                .watch(audioProvider)
                 .getPodcastDuration(widget.episodeItem['enclosureLength']),
             overflow: TextOverflow.ellipsis,
           ),
@@ -71,7 +71,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             child: Icon(Icons.timelapse_rounded),
           ),
           Text(
-            ref.watch(auidoProvider).currentPodcastTimeRemaining!,
+            ref.watch(audioProvider).currentPodcastTimeRemaining!,
             overflow: TextOverflow.ellipsis,
           ),
         ],

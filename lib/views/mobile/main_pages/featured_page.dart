@@ -348,7 +348,7 @@ class PodcastsCard extends ConsumerWidget {
                       ),
                       child: GestureDetector(
                         onTap: () {
-                          ref.read(auidoProvider).currentPodcast =
+                          ref.read(audioProvider).currentPodcast =
                               snapshot.feeds[index];
 
                           Navigator.of(context).push(

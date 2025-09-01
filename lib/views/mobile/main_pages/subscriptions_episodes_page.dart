@@ -94,7 +94,7 @@ class _SubscriptionsEpisodesPageState
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(ref.watch(auidoProvider).currentPodcast!.title),
+            title: Text(ref.watch(audioProvider).currentPodcast!.title),
             actions: [
               FutureBuilder(
                 future: ref
@@ -121,9 +121,9 @@ class _SubscriptionsEpisodesPageState
                       onPressed: () async {
                         snapshot.data! && snapshot.hasData
                             ? ref
-                                .read(auidoProvider)
+                                .read(audioProvider)
                                 .unsubscribe(widget.podcast)
-                            : ref.read(auidoProvider).subscribe(
+                            : ref.read(audioProvider).subscribe(
                                   widget.podcast,
                                   context,
                                 );
@@ -168,8 +168,8 @@ class _SubscriptionsEpisodesPageState
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
-            child: ref.watch(auidoProvider).isPodcastSelected
+            height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+            child: ref.watch(audioProvider).isPodcastSelected
                 ? const BannerAudioPlayer()
                 : const SizedBox(),
           ),

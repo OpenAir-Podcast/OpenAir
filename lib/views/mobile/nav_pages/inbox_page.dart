@@ -83,10 +83,10 @@ class _InboxPageState extends ConsumerState<InboxPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+            height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
                 ? 80.0
                 : 0.0,
-            child: ref.watch(auidoProvider.select((p) => p.isPodcastSelected))
+            child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
                 ? const BannerAudioPlayer()
                 : const SizedBox.shrink(),
           ),

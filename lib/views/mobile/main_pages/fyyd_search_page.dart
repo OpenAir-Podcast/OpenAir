@@ -42,8 +42,8 @@ class FyydSearchPage extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
-        child: ref.watch(auidoProvider).isPodcastSelected
+        height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+        child: ref.watch(audioProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

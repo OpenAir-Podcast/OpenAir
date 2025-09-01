@@ -27,7 +27,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ref.read(auidoProvider).currentPodcast = widget.podcastItem;
+        ref.read(audioProvider).currentPodcast = widget.podcastItem;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => EpisodesPage(podcast: widget.podcastItem),
@@ -129,9 +129,9 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
                       onPressed: () async {
                         snapshot.data!
                             ? ref
-                                .read(auidoProvider)
+                                .read(audioProvider)
                                 .unsubscribe(widget.podcastItem)
-                            : ref.read(auidoProvider).subscribe(
+                            : ref.read(audioProvider).subscribe(
                                   widget.podcastItem,
                                   context,
                                 );

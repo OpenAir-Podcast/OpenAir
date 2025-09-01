@@ -24,9 +24,9 @@ class QueueCard extends ConsumerStatefulWidget {
 class _QueueCardState extends ConsumerState<QueueCard> {
   @override
   Widget build(BuildContext context) {
-    final audioProviderNotifier = ref.read(auidoProvider.notifier);
+    final audioProviderNotifier = ref.read(audioProvider.notifier);
     // Watch the provider to get live updates for the active card.
-    final openAir = ref.watch(auidoProvider);
+    final openAir = ref.watch(audioProvider);
 
     final double currentPositionMilliseconds;
     final String currentPositionString;
@@ -98,7 +98,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
             Row(
               children: [
                 Text(
-                  ref.read(auidoProvider).getPodcastPublishedDateFromEpoch(
+                  ref.read(audioProvider).getPodcastPublishedDateFromEpoch(
                         widget.episodeItem['datePublished'],
                       ),
                   style: const TextStyle(fontSize: 12),

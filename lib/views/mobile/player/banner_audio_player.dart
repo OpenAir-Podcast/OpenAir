@@ -44,8 +44,8 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 memCacheHeight: 62,
                 memCacheWidth: 62,
                 imageUrl:
-                    ref.watch(auidoProvider).currentEpisode!['feedImage'] ??
-                        ref.watch(auidoProvider).currentEpisode!['image'],
+                    ref.watch(audioProvider).currentEpisode!['feedImage'] ??
+                        ref.watch(audioProvider).currentEpisode!['image'],
                 fit: BoxFit.fill,
                 errorWidget: (context, url, error) => Icon(
                   Icons.error,
@@ -59,7 +59,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    ref.watch(auidoProvider).currentEpisode!['title'],
+                    ref.watch(audioProvider).currentEpisode!['title'],
                     style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                     maxLines: 2,
                   ),
                   Text(
-                    ref.watch(auidoProvider).currentEpisode!['author'] ??
+                    ref.watch(audioProvider).currentEpisode!['author'] ??
                         'Unknown',
                     style: const TextStyle(
                       fontSize: 14.0,
@@ -81,18 +81,18 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
             ),
             trailing: IconButton(
               onPressed: () {
-                ref.read(auidoProvider).audioState == 'Play'
-                    ? ref.read(auidoProvider).playerPauseButtonClicked()
-                    : ref.read(auidoProvider).playerPlayButtonClicked(
-                        ref.read(auidoProvider).currentEpisode!);
+                ref.read(audioProvider).audioState == 'Play'
+                    ? ref.read(audioProvider).playerPauseButtonClicked()
+                    : ref.read(audioProvider).playerPlayButtonClicked(
+                        ref.read(audioProvider).currentEpisode!);
               },
-              icon: ref.watch(auidoProvider).audioState == 'Play'
+              icon: ref.watch(audioProvider).audioState == 'Play'
                   ? const Icon(Icons.pause_rounded)
                   : const Icon(Icons.play_arrow_rounded),
             ),
           ),
           LinearProgressIndicator(
-            value: ref.watch(auidoProvider
+            value: ref.watch(audioProvider
                 .select((p) => p.podcastCurrentPositionInMilliseconds)),
           ),
         ],

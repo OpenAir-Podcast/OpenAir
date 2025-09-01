@@ -136,3 +136,14 @@ String privacyPolicyUrl =
     'https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md';
 
 String gitHubUrl = 'https://github.com/OpenAir-Podcast/OpenAir';
+
+// Playback
+String fastForwardInterval = '10';
+String rewindInterval = '10';
+String playbackSpeed = '1.0x';
+
+String enqueuePosition = 'Last';
+bool enqueueDownloaded = false;
+bool autoplayNextInQueue = false;
+String smartMarkAsCompleted = 'Disabled';
+bool keepSkippedEpisodes = false;

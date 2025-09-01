@@ -44,7 +44,7 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
           description: rssFeed.description!,
         );
 
-        ref.read(auidoProvider).currentPodcast = podcastModel;
+        ref.read(audioProvider).currentPodcast = podcastModel;
 
         if (context.mounted) {
           Navigator.of(context).push(
@@ -163,13 +163,13 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
                         );
 
                         if (snapshot.data!) {
-                          ref.read(auidoProvider).unsubscribe(podcastModel);
+                          ref.read(audioProvider).unsubscribe(podcastModel);
                           setState(() {
                             isSub = false;
                           });
                         } else {
                           if (context.mounted) {
-                            ref.read(auidoProvider).subscribe(
+                            ref.read(audioProvider).subscribe(
                                   podcastModel,
                                   context,
                                 );

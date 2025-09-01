@@ -94,7 +94,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(auidoProvider).currentPodcast!.author ??
+                            ref.watch(audioProvider).currentPodcast!.author ??
                                 Translations.of(context).text('unknown'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         // Podcast Published Date
                         Text(
                           ref
-                              .watch(auidoProvider)
+                              .watch(audioProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!['datePublished']),
                           style: const TextStyle(
@@ -139,7 +139,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           ),
                         ),
                         onPressed: () => ref
-                            .read(auidoProvider)
+                            .read(audioProvider)
                             .playerPlayButtonClicked(widget.episodeItem!),
                         child: PlayButtonWidget(
                           episodeItem: widget.episodeItem!,
@@ -156,9 +156,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           tooltip: Translations.of(context).text('addToQueue'),
                           onPressed: () {
                             isQueued
-                                ? ref.read(auidoProvider).removeFromQueue(
+                                ? ref.read(audioProvider).removeFromQueue(
                                     widget.episodeItem!['guid'])
-                                : ref.read(auidoProvider).addToQueue(
+                                : ref.read(audioProvider).addToQueue(
                                       widget.episodeItem!,
                                       widget.podcast,
                                     );
@@ -211,7 +211,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           final isDownloaded = downloads.any(
                               (d) => d.guid == widget.episodeItem!['guid']);
 
-                          final isDownloading = ref.watch(auidoProvider.select(
+                          final isDownloading = ref.watch(audioProvider.select(
                               (p) => p.downloadingPodcasts
                                   .contains(widget.episodeItem!['guid'])));
 
@@ -256,7 +256,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
                                         // Then perform the removal
                                         await ref
-                                            .read(auidoProvider.notifier)
+                                            .read(audioProvider.notifier)
                                             .removeDownload(
                                                 widget.episodeItem!);
 
@@ -288,7 +288,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
-                              ref.read(auidoProvider.notifier).downloadEpisode(
+                              ref.read(audioProvider.notifier).downloadEpisode(
                                     widget.episodeItem!,
                                     widget.podcast!,
                                     context,
@@ -347,8 +347,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(auidoProvider).isPodcastSelected ? 75.0 : 0.0,
-        child: ref.watch(auidoProvider).isPodcastSelected
+        height: ref.watch(audioProvider).isPodcastSelected ? 75.0 : 0.0,
+        child: ref.watch(audioProvider).isPodcastSelected
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),

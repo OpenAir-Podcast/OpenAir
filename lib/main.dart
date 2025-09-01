@@ -48,7 +48,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initApp() async {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
-    if (mounted) await ref.read(auidoProvider).initAudio(context);
+    if (mounted) await ref.read(audioProvider).initAudio(context);
   }
 
   @override

@@ -46,7 +46,7 @@ class _SubscriptionEpisodeCardState
         ref.watch(isEpisodeNewProvider(widget.episodeItem['guid'].toString()));
 
     podcastDate = ref
-        .read(auidoProvider)
+        .read(audioProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
@@ -95,7 +95,7 @@ class _SubscriptionEpisodeCardState
                               memCacheHeight: 62,
                               memCacheWidth: 62,
                               imageUrl: ref
-                                      .watch(auidoProvider)
+                                      .watch(audioProvider)
                                       .currentPodcast
                                       ?.imageUrl ??
                                   widget.podcast.imageUrl,
@@ -139,7 +139,7 @@ class _SubscriptionEpisodeCardState
                                   // Podcast title
                                   child: Text(
                                     ref
-                                            .watch(auidoProvider)
+                                            .watch(audioProvider)
                                             .currentPodcast!
                                             .author ??
                                         Translations.of(context)
@@ -199,10 +199,10 @@ class _SubscriptionEpisodeCardState
                               ),
                             ),
                             onPressed: () {
-                              if (ref.read(auidoProvider).currentEpisode !=
+                              if (ref.read(audioProvider).currentEpisode !=
                                   widget.episodeItem) {
                                 ref
-                                    .read(auidoProvider.notifier)
+                                    .read(audioProvider.notifier)
                                     .playerPlayButtonClicked(
                                       widget.episodeItem,
                                     );
@@ -223,9 +223,9 @@ class _SubscriptionEpisodeCardState
                               tooltip: "Add to Queue",
                               onPressed: () {
                                 isQueued
-                                    ? ref.watch(auidoProvider).removeFromQueue(
+                                    ? ref.watch(audioProvider).removeFromQueue(
                                         widget.episodeItem['guid'])
-                                    : ref.watch(auidoProvider).addToQueue(
+                                    : ref.watch(audioProvider).addToQueue(
                                           widget.episodeItem,
                                           widget.podcast,
                                         );
@@ -280,7 +280,7 @@ class _SubscriptionEpisodeCardState
                               final isDownloaded = downloads.any(
                                   (d) => d.guid == widget.episodeItem['guid']);
 
-                              final isDownloading = ref.watch(auidoProvider
+                              final isDownloading = ref.watch(audioProvider
                                   .select((p) => p.downloadingPodcasts
                                       .contains(widget.episodeItem['guid'])));
 
@@ -320,7 +320,7 @@ class _SubscriptionEpisodeCardState
 
                                             // Then perform the removal
                                             await ref
-                                                .read(auidoProvider.notifier)
+                                                .read(audioProvider.notifier)
                                                 .removeDownload(
                                                     widget.episodeItem);
 
@@ -348,7 +348,7 @@ class _SubscriptionEpisodeCardState
 
                                 onPressed = () {
                                   ref
-                                      .read(auidoProvider.notifier)
+                                      .read(audioProvider.notifier)
                                       .downloadEpisode(
                                         widget.episodeItem,
                                         widget.podcast,

@@ -31,7 +31,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final podcastUrl = ref.watch(auidoProvider).currentPodcast!.feedUrl;
+    final podcastUrl = ref.watch(audioProvider).currentPodcast!.feedUrl;
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
@@ -96,7 +96,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(ref.watch(auidoProvider).currentPodcast!.title),
+            title: Text(ref.watch(audioProvider).currentPodcast!.title),
             actions: [
               IconButton(
                 tooltip: Translations.of(context).text('podcastDetails'),
@@ -126,9 +126,9 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                       onPressed: () async {
                         snapshot.data! && snapshot.hasData
                             ? ref
-                                .read(auidoProvider)
+                                .read(audioProvider)
                                 .unsubscribe(widget.podcast)
-                            : ref.read(auidoProvider).subscribe(
+                            : ref.read(audioProvider).subscribe(
                                   widget.podcast,
                                   context,
                                 );
@@ -173,8 +173,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             ),
           ),
           bottomNavigationBar: SizedBox(
-            height: ref.watch(auidoProvider).isPodcastSelected ? 80.0 : 0.0,
-            child: ref.watch(auidoProvider).isPodcastSelected
+            height: ref.watch(audioProvider).isPodcastSelected ? 80.0 : 0.0,
+            child: ref.watch(audioProvider).isPodcastSelected
                 ? const BannerAudioPlayer()
                 : const SizedBox(),
           ),

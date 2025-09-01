@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/completed_episode_model.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
@@ -25,7 +26,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
-final auidoProvider = ChangeNotifierProvider<AudioProvider>(
+final audioProvider = ChangeNotifierProvider<AudioProvider>(
   (ref) {
     return AudioProvider(ref);
   },
@@ -68,9 +69,7 @@ class AudioProvider extends ChangeNotifier {
 
   late String? currentPodcastTimeRemaining;
 
-  String audioSpeedButtonLabel = '1.0x';
-
-  List<String> audioSpeedOptions = ['0.5x', '1.0x', '1.5x', '2.0x'];
+  List<String> audioSpeedOptions = ['0.5x', '1.0x', '1.25x', '1.5x', '2.0x'];
 
   List downloadingPodcasts = [];
 
@@ -111,14 +110,6 @@ class AudioProvider extends ChangeNotifier {
     }
 
     return icon;
-  }
-
-  void audioPlayerSheetCloseButtonClicked() {}
-
-  void rewindButtonClicked() {
-    if (playerPosition.inSeconds - 10 > 0) {
-      player.seek(Duration(seconds: playerPosition.inSeconds - 10));
-    }
   }
 
   Future<void> playerPlayButtonClicked(
@@ -446,17 +437,26 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
+  void rewindButtonClicked() {
+    if (playerPosition.inSeconds - int.parse(rewindInterval) > 0) {
+      player.seek(Duration(
+          seconds: playerPosition.inSeconds - int.parse(rewindInterval)));
+    }
+  }
+
   void fastForwardButtonClicked() {
-    if (playerPosition.inSeconds + 10 < playerTotalDuration.inSeconds) {
-      player.seek(Duration(seconds: playerPosition.inSeconds + 10));
+    if (playerPosition.inSeconds + int.parse(fastForwardInterval) <
+        playerTotalDuration.inSeconds) {
+      player.seek(Duration(
+          seconds: playerPosition.inSeconds + int.parse(fastForwardInterval)));
     }
   }
 
   void audioSpeedButtonClicked() {
-    int index = audioSpeedOptions.indexOf(audioSpeedButtonLabel);
+    int index = audioSpeedOptions.indexOf(playbackSpeed);
     int newIndex = (index + 1) % audioSpeedOptions.length;
-    audioSpeedButtonLabel = audioSpeedOptions[newIndex];
-    player.setPlaybackRate(double.parse(audioSpeedButtonLabel.substring(0, 3)));
+    playbackSpeed = audioSpeedOptions[newIndex];
+    player.setPlaybackRate(double.parse(playbackSpeed.split('x').first));
     notifyListeners();
   }
 

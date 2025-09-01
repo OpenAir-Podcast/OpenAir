@@ -29,7 +29,7 @@ class _PodcastIndexSearchCardState
 
     return GestureDetector(
       onTap: () async {
-        ref.read(auidoProvider).currentPodcast = widget.podcastItem;
+        ref.read(audioProvider).currentPodcast = widget.podcastItem;
 
         if (context.mounted) {
           Navigator.of(context).push(
@@ -132,13 +132,13 @@ class _PodcastIndexSearchCardState
                       onPressed: () async {
                         if (snapshot.data!) {
                           ref
-                              .read(auidoProvider)
+                              .read(audioProvider)
                               .unsubscribe(widget.podcastItem);
                           setState(() {
                             isSub = false;
                           });
                         } else {
-                          ref.read(auidoProvider).subscribe(
+                          ref.read(audioProvider).subscribe(
                                 widget.podcastItem,
                                 context,
                               );

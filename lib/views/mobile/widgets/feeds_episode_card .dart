@@ -35,7 +35,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
   @override
   Widget build(BuildContext context) {
     podcastDate = ref
-        .read(auidoProvider)
+        .read(audioProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
@@ -171,10 +171,10 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         ),
                       ),
                       onPressed: () {
-                        if (ref.read(auidoProvider).currentEpisode !=
+                        if (ref.read(audioProvider).currentEpisode !=
                             widget.episodeItem) {
                           ref
-                              .read(auidoProvider.notifier)
+                              .read(audioProvider.notifier)
                               .playerPlayButtonClicked(
                                 widget.episodeItem,
                               );
@@ -196,9 +196,9 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         onPressed: () {
                           isQueued
                               ? ref
-                                  .read(auidoProvider)
+                                  .read(audioProvider)
                                   .removeFromQueue(widget.episodeItem['guid'])
-                              : ref.read(auidoProvider).addToQueue(
+                              : ref.read(audioProvider).addToQueue(
                                     widget.episodeItem,
                                     widget.podcast,
                                   );
@@ -251,7 +251,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                         final isDownloaded = downloads
                             .any((d) => d.guid == widget.episodeItem['guid']);
 
-                        final isDownloading = ref.watch(auidoProvider.select(
+                        final isDownloading = ref.watch(audioProvider.select(
                             (p) => p.downloadingPodcasts
                                 .contains(widget.episodeItem['guid'])));
 
@@ -296,7 +296,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
 
                                       // Then perform the removal
                                       await ref
-                                          .read(auidoProvider.notifier)
+                                          .read(audioProvider.notifier)
                                           .removeDownload(widget.episodeItem);
 
                                       // Show feedback
@@ -323,7 +323,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                               Translations.of(context).text('downloadEpisode');
 
                           onPressed = () {
-                            ref.read(auidoProvider.notifier).downloadEpisode(
+                            ref.read(audioProvider.notifier).downloadEpisode(
                                   widget.episodeItem,
                                   widget.podcast,
                                   context,

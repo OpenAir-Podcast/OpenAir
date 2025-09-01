@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
@@ -40,7 +41,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         memCacheHeight: imageSize.ceil(),
                         memCacheWidth: imageSize.ceil(),
                         imageUrl: ref
-                            .watch(auidoProvider)
+                            .watch(audioProvider)
                             .currentEpisode!['feedImage'],
                         fit: BoxFit.fill,
                       ),
@@ -51,12 +52,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => EpisodeDetail(
-                          episodeItem: ref.watch(auidoProvider).currentEpisode!,
+                          episodeItem: ref.watch(audioProvider).currentEpisode!,
                         ),
                       ),
                     ),
                     child: Text(
-                      ref.watch(auidoProvider).currentEpisode!['title'],
+                      ref.watch(audioProvider).currentEpisode!['title'],
                       style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -74,12 +75,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         MaterialPageRoute(
                           builder: (context) => EpisodesPage(
                               podcast:
-                                  ref.watch(auidoProvider).currentPodcast!),
+                                  ref.watch(audioProvider).currentPodcast!),
                         ),
                       );
                     },
                     child: Text(
-                      ref.watch(auidoProvider).currentEpisode!['author'] ??
+                      ref.watch(audioProvider).currentEpisode!['author'] ??
                           'Unknown',
                       style: const TextStyle(
                         fontSize: 14.0,
@@ -100,10 +101,10 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     min: 0.0,
                     max: 1.0,
                     value: ref
-                        .watch(auidoProvider)
+                        .watch(audioProvider)
                         .podcastCurrentPositionInMilliseconds,
                     onChanged: (value) {
-                      ref.read(auidoProvider).mainPlayerSliderClicked(
+                      ref.read(audioProvider).mainPlayerSliderClicked(
                           value); // Use read for actions
                     },
                   ),
@@ -115,14 +116,14 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       children: [
                         Text(
                           ref
-                              .watch(auidoProvider)
+                              .watch(audioProvider)
                               .currentPlaybackPositionString,
                         ),
                         //
                         // Spacer
                         //
                         Text(
-                          '-${ref.watch(auidoProvider).currentPlaybackRemainingTimeString}',
+                          '-${ref.watch(audioProvider).currentPlaybackRemainingTimeString}',
                         ),
                       ],
                     ),
@@ -142,9 +143,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Rewind button
                   IconButton(
                     onPressed: ref
-                        .read(auidoProvider)
+                        .read(audioProvider)
                         .rewindButtonClicked, // Use read for actions
-                    icon: const SizedBox(
+                    icon: SizedBox(
                       width: 52.0,
                       height: 52.0,
                       child: Stack(
@@ -153,9 +154,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           Icon(Icons.fast_rewind_rounded),
                           Positioned(
                             top: 30.0,
-                            left: 25.0,
+                            left: 18.0,
                             right: 0.0,
-                            child: Icon(Icons.timer_10_rounded),
+                            child: Text(
+                              '-${rewindInterval}s',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.0,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -164,17 +171,17 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.read(auidoProvider).audioState ==
+                      ref.read(audioProvider).audioState ==
                               'Play' // Use read for state check in action
                           ? ref
-                              .read(auidoProvider) // Use read for actions
+                              .read(audioProvider) // Use read for actions
                               .playerPauseButtonClicked()
-                          : ref.read(auidoProvider).playerPlayButtonClicked(
+                          : ref.read(audioProvider).playerPlayButtonClicked(
                                 // Use read for actions
-                                ref.read(auidoProvider).currentEpisode!,
+                                ref.read(audioProvider).currentEpisode!,
                               );
                     }, // Add play/pause functionality
-                    icon: ref.watch(auidoProvider).audioState == 'Play'
+                    icon: ref.watch(audioProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
                         : const Icon(Icons.play_arrow_rounded),
                     iconSize: 48.0,
@@ -182,9 +189,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Fast forward button
                   IconButton(
                     onPressed: ref
-                        .read(auidoProvider)
+                        .read(audioProvider)
                         .fastForwardButtonClicked, // Use read for actions
-                    icon: const SizedBox(
+                    icon: SizedBox(
                       width: 52.0,
                       height: 52.0,
                       child: Stack(
@@ -193,9 +200,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           Icon(Icons.fast_forward_rounded),
                           Positioned(
                             top: 30.0,
-                            left: 25.0,
+                            left: 18.0,
                             right: 0.0,
-                            child: Icon(Icons.timer_10_rounded),
+                            child: Text(
+                              '+${fastForwardInterval}s',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.0,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -213,25 +226,25 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Playback speed
                   TextButton(
                     onPressed: () => ref
-                        .read(auidoProvider.notifier)
+                        .read(audioProvider.notifier)
                         .audioSpeedButtonClicked(),
                     child: Text(
-                      ref.watch(auidoProvider).audioSpeedButtonLabel,
+                      playbackSpeed,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   IconButton(
-                    onPressed: () => {}, // Add fast-forward functionality
+                    onPressed: () => {}, // Add timer functionality
                     icon: const Icon(Icons.timer_outlined),
                   ),
                   IconButton(
-                    onPressed: () => {}, // Add fast-forward functionality
-                    icon: const Icon(Icons.cast),
+                    onPressed: () => {}, // Add favourite functionality
+                    icon: const Icon(Icons.favorite_border_rounded),
                   ),
                   IconButton(
-                    onPressed: () => {}, // Add fast-forward functionality
+                    onPressed: () => {}, // Add more functionality
                     icon: const Icon(Icons.more_horiz),
                   ),
                 ],

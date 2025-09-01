@@ -211,7 +211,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                               }
 
                               bool i = await ref
-                                  .watch(auidoProvider)
+                                  .watch(audioProvider)
                                   .addPodcastByRssUrl(textInputControl.text);
 
                               if (context.mounted) {
