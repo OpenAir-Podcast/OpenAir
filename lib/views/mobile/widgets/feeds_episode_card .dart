@@ -141,7 +141,6 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                   ),
                 ],
               ),
-              // TODO: Use a rich text widget to display the description
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3.0),
                 child: StyledText(
@@ -155,217 +154,222 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Play button
-                  Expanded(
-                    // width: 200.0,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 1.0,
-                        shape: const StadiumBorder(
-                          side: BorderSide(
-                            width: 1.0,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Play button
+                    Expanded(
+                      // width: 200.0,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 1.0,
+                          shape: const StadiumBorder(
+                            side: BorderSide(
+                              width: 1.0,
+                            ),
                           ),
                         ),
-                      ),
-                      onPressed: () {
-                        if (ref.read(audioProvider).currentEpisode !=
-                            widget.episodeItem) {
-                          ref
-                              .read(audioProvider.notifier)
-                              .playerPlayButtonClicked(
-                                widget.episodeItem,
-                              );
-                        }
-                      },
-                      child: PlayButtonWidget(
-                        episodeItem: widget.episodeItem,
+                        onPressed: () {
+                          if (ref.read(audioProvider).currentEpisode !=
+                              widget.episodeItem) {
+                            ref
+                                .read(audioProvider.notifier)
+                                .playerPlayButtonClicked(
+                                  widget.episodeItem,
+                                );
+                          }
+                        },
+                        child: PlayButtonWidget(
+                          episodeItem: widget.episodeItem,
+                        ),
                       ),
                     ),
-                  ),
-                  // Playlist button
-                  queueListAsync.when(
-                    data: (data) {
-                      final isQueued =
-                          data.containsKey(widget.episodeItem['guid']);
+                    // Playlist button
+                    queueListAsync.when(
+                      data: (data) {
+                        final isQueued =
+                            data.containsKey(widget.episodeItem['guid']);
 
-                      return IconButton(
-                        tooltip: Translations.of(context).text('addToQueue'),
-                        onPressed: () {
-                          isQueued
-                              ? ref
-                                  .read(audioProvider)
-                                  .removeFromQueue(widget.episodeItem['guid'])
-                              : ref.read(audioProvider).addToQueue(
-                                    widget.episodeItem,
-                                    widget.podcast,
-                                  );
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                isQueued
-                                    ? '${Translations.of(context).text('removed')} ${widget.episodeItem['title']}'
-                                    : '${Translations.of(context).text('add')} ${widget.episodeItem['title']}',
-                              ),
-                            ),
-                          );
-                        },
-                        icon: isQueued
-                            ? const Icon(Icons.playlist_add_check_rounded)
-                            : const Icon(Icons.playlist_add_rounded),
-                      );
-                    },
-                    error: (error, stackTrace) {
-                      debugPrint(
-                          'Error in queueListAsync for EpisodeCard: $error');
-                      return IconButton(
-                        tooltip:
-                            Translations.of(context).text('errorAddingToQueue'),
-                        onPressed: () {},
-                        icon: const Icon(Icons.error_outline_rounded),
-                      );
-                    },
-                    loading: () {
-                      // Handle loading by showing previous state's icon, disabled
-                      final previousList = queueListAsync.valueOrNull;
-                      final isQueuedPreviously = previousList
-                              ?.containsKey(widget.episodeItem['guid']) ??
-                          false;
-
-                      return IconButton(
-                        tooltip: Translations.of(context).text('addingToQueue'),
-                        onPressed: null, // Disable button while loading
-                        icon: isQueuedPreviously
-                            ? const Icon(Icons.playlist_add_check_rounded)
-                            : const Icon(Icons.playlist_add_rounded),
-                      );
-                    },
-                  ),
-                  // Download button
-                  if (!kIsWeb)
-                    downloadedListAsync.when(
-                      data: (downloads) {
-                        final isDownloaded = downloads
-                            .any((d) => d.guid == widget.episodeItem['guid']);
-
-                        final isDownloading = ref.watch(audioProvider.select(
-                            (p) => p.downloadingPodcasts
-                                .contains(widget.episodeItem['guid'])));
-
-                        IconData iconData;
-                        String tooltip;
-                        VoidCallback? onPressed;
-
-                        if (isDownloading) {
-                          iconData = Icons.downloading_rounded;
-                          tooltip =
-                              Translations.of(context).text('downloading');
-                          onPressed = null;
-                        } else if (isDownloaded) {
-                          iconData = Icons.download_done_rounded;
-                          tooltip =
-                              Translations.of(context).text('deleteDownload');
-
-                          onPressed = () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext dialogContext) =>
-                                  AlertDialog(
-                                title: Text(Translations.of(context)
-                                    .text('confirmDeletion')),
-                                content: Text(
-                                    '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(Translations.of(context)
-                                        .text('cancel')),
-                                    onPressed: () {
-                                      Navigator.of(dialogContext)
-                                          .pop(); // Dismiss the dialog
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text(Translations.of(context)
-                                        .text('remove')),
-                                    onPressed: () async {
-                                      // Pop the dialog first
-                                      Navigator.of(dialogContext).pop();
-
-                                      // Then perform the removal
-                                      await ref
-                                          .read(audioProvider.notifier)
-                                          .removeDownload(widget.episodeItem);
-
-                                      // Show feedback
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\''),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          };
-                        }
-                        // Not downloaded
-                        else {
-                          iconData = Icons.download_rounded;
-                          tooltip =
-                              Translations.of(context).text('downloadEpisode');
-
-                          onPressed = () {
-                            ref.read(audioProvider.notifier).downloadEpisode(
-                                  widget.episodeItem,
-                                  widget.podcast,
-                                  context,
-                                );
+                        return IconButton(
+                          tooltip: Translations.of(context).text('addToQueue'),
+                          onPressed: () {
+                            isQueued
+                                ? ref
+                                    .read(audioProvider)
+                                    .removeFromQueue(widget.episodeItem['guid'])
+                                : ref.read(audioProvider).addToQueue(
+                                      widget.episodeItem,
+                                      widget.podcast,
+                                    );
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                  isQueued
+                                      ? '${Translations.of(context).text('removed')} ${widget.episodeItem['title']}'
+                                      : '${Translations.of(context).text('add')} ${widget.episodeItem['title']}',
+                                ),
                               ),
                             );
-                          };
-                        }
-
-                        return IconButton(
-                          tooltip: tooltip,
-                          onPressed: onPressed,
-                          icon: Icon(iconData),
+                          },
+                          icon: isQueued
+                              ? const Icon(Icons.playlist_add_check_rounded)
+                              : const Icon(Icons.playlist_add_rounded),
                         );
                       },
-                      error: (e, s) => const IconButton(
-                          icon: Icon(Icons.error), onPressed: null),
-                      loading: () => const IconButton(
-                          icon: SizedBox(
-                            width: 24,
-                            height: 24,
-                            // child: CircularProgressIndicator(),
-                            child: CircularProgressIndicator(strokeWidth: 2.0),
-                          ),
-                          onPressed: null),
+                      error: (error, stackTrace) {
+                        debugPrint(
+                            'Error in queueListAsync for EpisodeCard: $error');
+                        return IconButton(
+                          tooltip: Translations.of(context)
+                              .text('errorAddingToQueue'),
+                          onPressed: () {},
+                          icon: const Icon(Icons.error_outline_rounded),
+                        );
+                      },
+                      loading: () {
+                        // Handle loading by showing previous state's icon, disabled
+                        final previousList = queueListAsync.valueOrNull;
+                        final isQueuedPreviously = previousList
+                                ?.containsKey(widget.episodeItem['guid']) ??
+                            false;
+
+                        return IconButton(
+                          tooltip:
+                              Translations.of(context).text('addingToQueue'),
+                          onPressed: null, // Disable button while loading
+                          icon: isQueuedPreviously
+                              ? const Icon(Icons.playlist_add_check_rounded)
+                              : const Icon(Icons.playlist_add_rounded),
+                        );
+                      },
                     ),
-                  IconButton(
-                    tooltip: Translations.of(context).text('share'),
-                    onPressed: () => ref.watch(openAirProvider).share(),
-                    icon: const Icon(Icons.share_rounded),
-                  ),
-                  IconButton(
-                    tooltip: Translations.of(context).text('favourite'),
-                    onPressed: () => ref.watch(openAirProvider).favourite(),
-                    icon: const Icon(Icons.favorite_border_rounded),
-                  ),
-                ],
+                    // Download button
+                    if (!kIsWeb)
+                      downloadedListAsync.when(
+                        data: (downloads) {
+                          final isDownloaded = downloads
+                              .any((d) => d.guid == widget.episodeItem['guid']);
+
+                          final isDownloading = ref.watch(audioProvider.select(
+                              (p) => p.downloadingPodcasts
+                                  .contains(widget.episodeItem['guid'])));
+
+                          IconData iconData;
+                          String tooltip;
+                          VoidCallback? onPressed;
+
+                          if (isDownloading) {
+                            iconData = Icons.downloading_rounded;
+                            tooltip =
+                                Translations.of(context).text('downloading');
+                            onPressed = null;
+                          } else if (isDownloaded) {
+                            iconData = Icons.download_done_rounded;
+                            tooltip =
+                                Translations.of(context).text('deleteDownload');
+
+                            onPressed = () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext dialogContext) =>
+                                    AlertDialog(
+                                  title: Text(Translations.of(context)
+                                      .text('confirmDeletion')),
+                                  content: Text(
+                                      '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text(Translations.of(context)
+                                          .text('cancel')),
+                                      onPressed: () {
+                                        Navigator.of(dialogContext)
+                                            .pop(); // Dismiss the dialog
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text(Translations.of(context)
+                                          .text('remove')),
+                                      onPressed: () async {
+                                        // Pop the dialog first
+                                        Navigator.of(dialogContext).pop();
+
+                                        // Then perform the removal
+                                        await ref
+                                            .read(audioProvider.notifier)
+                                            .removeDownload(widget.episodeItem);
+
+                                        // Show feedback
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\''),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            };
+                          }
+                          // Not downloaded
+                          else {
+                            iconData = Icons.download_rounded;
+                            tooltip = Translations.of(context)
+                                .text('downloadEpisode');
+
+                            onPressed = () {
+                              ref.read(audioProvider.notifier).downloadEpisode(
+                                    widget.episodeItem,
+                                    widget.podcast,
+                                    context,
+                                  );
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                ),
+                              );
+                            };
+                          }
+
+                          return IconButton(
+                            tooltip: tooltip,
+                            onPressed: onPressed,
+                            icon: Icon(iconData),
+                          );
+                        },
+                        error: (e, s) => const IconButton(
+                            icon: Icon(Icons.error), onPressed: null),
+                        loading: () => const IconButton(
+                            icon: SizedBox(
+                              width: 24,
+                              height: 24,
+                              // child: CircularProgressIndicator(),
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2.0),
+                            ),
+                            onPressed: null),
+                      ),
+                    IconButton(
+                      tooltip: Translations.of(context).text('share'),
+                      onPressed: () => ref.watch(openAirProvider).share(),
+                      icon: const Icon(Icons.share_rounded),
+                    ),
+                    IconButton(
+                      tooltip: Translations.of(context).text('favourite'),
+                      onPressed: () => ref.watch(openAirProvider).favourite(),
+                      icon: const Icon(Icons.favorite_border_rounded),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

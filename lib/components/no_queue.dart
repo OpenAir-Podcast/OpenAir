@@ -23,11 +23,19 @@ class NoQueue extends StatelessWidget {
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
+              color: Brightness.dark == Theme.of(context).brightness
+                  ? Colors.white
+                  : Colors.black,
             ),
           ),
           Text(
             Translations.of(context).text('pleaseAddEpisodeToQueue'),
-            style: TextStyle(fontSize: 16.0),
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Brightness.dark == Theme.of(context).brightness
+                  ? Colors.white
+                  : Colors.black,
+            ),
           ),
         ],
       ),

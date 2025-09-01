@@ -81,6 +81,20 @@ FloatingActionButtonThemeData floatingActionButtonTheme =
   foregroundColor: Colors.white,
 );
 
+SnackBarThemeData snackBarThemeLight = SnackBarThemeData(
+  backgroundColor: Colors.blue,
+  contentTextStyle: TextStyle(
+    color: Colors.white,
+  ),
+);
+
+SnackBarThemeData snackBarThemeDark = SnackBarThemeData(
+  backgroundColor: Colors.black,
+  contentTextStyle: TextStyle(
+    color: Colors.white,
+  ),
+);
+
 ColorScheme colorSchemeLight = ColorScheme.light(
   primary: Colors.blue,
   onPrimary: Colors.white,

@@ -31,7 +31,7 @@ class OpenAirProvider extends ChangeNotifier {
 
   late bool hasConnection;
 
-  final Ref<OpenAirProvider> ref;
+  final Ref ref;
 
   OpenAirProvider(this.ref);
 
@@ -46,8 +46,7 @@ class OpenAirProvider extends ChangeNotifier {
 
     this.context = context;
 
-    hiveService = HiveService(ref);
-    await hiveService.initial();
+    hiveService = await ref.read(hiveServiceProvider.future);
 
     try {
       final List<ConnectivityResult> connectivityResult =
@@ -207,16 +206,22 @@ class OpenAirProvider extends ChangeNotifier {
   void updateFontSize(String size) {}
 
   void downloadEnqueue(BuildContext context) async {
-    final queue = await hiveService.getQueue();
+    Map queue = await hiveService.getQueue();
+
+    if (queue.isEmpty) {
+      return;
+    }
 
     for (var item in queue.values) {
+      item = Map<String, dynamic>.from(item);
+
       final isDownloaded =
-          await ref.read(audioProvider).isAudioFileDownloaded(item.guid);
+          await ref.read(audioProvider).isAudioFileDownloaded(item!['guid']);
 
       if (!isDownloaded && context.mounted) {
         ref.read(audioProvider).downloadEpisode(
-              item.toJson(),
-              item.podcast,
+              item,
+              item!['podcast'],
               context,
             );
       }

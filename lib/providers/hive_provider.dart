@@ -13,16 +13,21 @@ import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
-import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
+final hiveServiceProvider = FutureProvider<HiveService>((ref) async {
+  final hiveService = HiveService(ref);
+  await hiveService.initial();
+  return hiveService;
+});
+
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
     StreamProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async* {
-  final hiveService = ref.watch(openAirProvider).hiveService;
+  final hiveService = await ref.watch(hiveServiceProvider.future);
   final box = await hiveService.subscriptionBox;
 
   // Emit the initial state
@@ -31,16 +36,16 @@ final subscriptionsProvider =
 
 // FutureProvider for sorted Queue List
 final getQueueProvider = StreamProvider.autoDispose(
-  (ref) {
-    final hiveService = ref.watch(openAirProvider).hiveService;
-    return hiveService.getQueue().asStream();
+  (ref) async* {
+    final hiveService = await ref.watch(hiveServiceProvider.future);
+    yield* hiveService.getQueue().asStream();
   },
 );
 
 final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
-  (ref) {
-    final hiveService = ref.watch(openAirProvider).hiveService;
-    return hiveService.getSortedDownloads().asStream();
+  (ref) async* {
+    final hiveService = await ref.watch(hiveServiceProvider.future);
+    yield* hiveService.getSortedDownloads().asStream();
   },
 );
 
@@ -65,7 +70,7 @@ class HiveService {
   late final Directory openAirDir;
 
   HiveService(this.ref);
-  final Ref<OpenAirProvider> ref;
+  final Ref ref;
 
   Future<void> initial() async {
     // Register all adapters

@@ -15,7 +15,6 @@ import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
@@ -190,7 +189,7 @@ class AudioProvider extends ChangeNotifier {
     }
 
     // The HiveService initializes and holds the reference to the app's base directory.
-    final hiveService = ref.read(openAirProvider).hiveService;
+    final hiveService = await ref.read(hiveServiceProvider.future);
     final baseDir = hiveService.openAirDir;
 
     // Define a specific subdirectory for downloads to keep things organized.
@@ -202,7 +201,7 @@ class AudioProvider extends ChangeNotifier {
     if (!await downloadsDir.exists()) {
       await downloadsDir.create(recursive: true);
     }
-    
+
     return downloadsDir.path;
   }
 
@@ -241,7 +240,8 @@ class AudioProvider extends ChangeNotifier {
         }
       }
 
-      ref.watch(openAirProvider).hiveService.clearDownloads();
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      hiveService.clearDownloads();
       ref.invalidate(getDownloadsProvider);
 
       if (context.mounted) {
@@ -309,10 +309,8 @@ class AudioProvider extends ChangeNotifier {
         fileName: filename,
       );
 
-      await ref
-          .watch(openAirProvider)
-          .hiveService
-          .addToDownloads(downloadModel);
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      await hiveService.addToDownloads(downloadModel);
 
       ref.invalidate(sortedDownloadsProvider);
 
@@ -363,7 +361,8 @@ class AudioProvider extends ChangeNotifier {
         await file.delete();
       }
 
-      await ref.watch(openAirProvider).hiveService.deleteDownload(guid);
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      await hiveService.deleteDownload(guid);
 
       notifyListeners();
     } catch (e) {
@@ -501,7 +500,8 @@ class AudioProvider extends ChangeNotifier {
           audioState = 'Stop';
           isPlaying = PlayingStatus.stop;
 
-          ref.watch(openAirProvider).hiveService.addToCompletedEpisode(
+          final hiveService = await ref.read(hiveServiceProvider.future);
+          hiveService.addToCompletedEpisode(
                 CompletedEpisodeModel(guid: currentEpisode!['guid']),
               );
 
@@ -579,21 +579,19 @@ class AudioProvider extends ChangeNotifier {
         isPlaying = PlayingStatus.stop;
       }
 
+      final hiveService = await ref.read(hiveServiceProvider.future);
+
       // 1. Remove the completed episode from the queue
-      await ref
-          .watch(openAirProvider)
-          .hiveService
-          .removeFromQueue(guid: completedEpisodeGuid);
+      await hiveService.removeFromQueue(guid: completedEpisodeGuid);
 
       // 2. Add to completed episodes
       // Assuming CompletedEpisode model has a constructor like: CompletedEpisode({required this.guid})
-      await ref.watch(openAirProvider).hiveService.addToCompletedEpisode(
+      await hiveService.addToCompletedEpisode(
           CompletedEpisodeModel(guid: completedEpisodeGuid));
 
       // 3. Get the updated queue to determine the next episode.
       // The sortedQueueListProvider will also update reactively for the UI.
-      final updatedQueue =
-          await ref.watch(openAirProvider).hiveService.getQueue();
+      final updatedQueue = await hiveService.getQueue();
 
       if (updatedQueue.isNotEmpty) {
         // 4. If the queue is not empty, play the next episode.
@@ -710,7 +708,8 @@ class AudioProvider extends ChangeNotifier {
   void mainPlayerMoreOptionsClicked() {}
 
   void removeFromQueue(String guid) async {
-    ref.watch(openAirProvider).hiveService.removeFromQueue(guid: guid);
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.removeFromQueue(guid: guid);
     ref.invalidate(sortedProvider);
     ref.invalidate(getQueueProvider);
     notifyListeners();
@@ -720,7 +719,7 @@ class AudioProvider extends ChangeNotifier {
     Map<String, dynamic> episode,
     PodcastModel? podcast,
   ) async {
-    final hiveService = ref.watch(openAirProvider).hiveService;
+    final hiveService = await ref.read(hiveServiceProvider.future);
     Map queue = await hiveService.getQueue();
 
     List<Map<String, dynamic>> queueList =
@@ -729,8 +728,6 @@ class AudioProvider extends ChangeNotifier {
     queueList.sort((a, b) => a['pos'].compareTo(b['pos']));
 
     int pos;
-
-    debugPrint(enqueuePos);
 
     switch (enqueuePos) {
       case 'First':
@@ -866,7 +863,8 @@ class AudioProvider extends ChangeNotifier {
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
       };
 
-      ref.watch(openAirProvider).hiveService.insertEpisode(
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      hiveService.insertEpisode(
             episode,
             episode['guid'],
           );
@@ -876,7 +874,8 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void removePodcastEpisodes(PodcastModel podcast) async {
-    ref.watch(openAirProvider).hiveService.deleteEpisode(podcast.title);
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.deleteEpisode(podcast.title);
     notifyListeners();
   }
 
@@ -900,7 +899,8 @@ class AudioProvider extends ChangeNotifier {
         artwork: podcast.artwork,
       );
 
-      ref.watch(openAirProvider).hiveService.subscribe(subscription);
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      hiveService.subscribe(subscription);
       await addPodcastEpisodes(subscription);
 
       // subscriptionsProvider (from hive_provider.dart) will update reactively
@@ -948,7 +948,8 @@ class AudioProvider extends ChangeNotifier {
         artwork: '',
       );
 
-      ref.watch(openAirProvider).hiveService.subscribe(subscription);
+      final hiveService = await ref.read(hiveServiceProvider.future);
+      hiveService.subscribe(subscription);
       await addPodcastEpisodes(podcast);
     } on DioException catch (e) {
       debugPrint(
@@ -962,7 +963,8 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void unsubscribe(PodcastModel podcast) async {
-    ref.watch(openAirProvider).hiveService.unsubscribe(podcast.title);
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.unsubscribe(podcast.title);
     removePodcastEpisodes(podcast);
 
     // subscriptionsProvider (from hive_provider.dart) will update reactively
@@ -1105,7 +1107,8 @@ class AudioProvider extends ChangeNotifier {
       playDate: DateTime.now(),
     );
 
-    ref.watch(openAirProvider).hiveService.addToHistory(historyMod);
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.addToHistory(historyMod);
   }
 
   Future<void> updateCurrentQueueCard(
@@ -1115,7 +1118,7 @@ class AudioProvider extends ChangeNotifier {
     String currentPlaybackRemainingTimeString,
     Duration position,
   ) async {
-    final hiveService = ref.watch(openAirProvider).hiveService;
+    final hiveService = await ref.read(hiveServiceProvider.future);
 
     // Retrieve the existing QueueModel from Hive
     Map? existingQueueItem = await hiveService.getQueueByGuid(guid);

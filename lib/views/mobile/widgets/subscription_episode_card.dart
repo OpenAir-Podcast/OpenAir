@@ -165,7 +165,6 @@ class _SubscriptionEpisodeCardState
                         ),
                       ],
                     ),
-                    // TODO: Use a rich text widget to display the description
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: SizedBox(
@@ -183,209 +182,217 @@ class _SubscriptionEpisodeCardState
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Play button
-                        Expanded(
-                          // width: 200.0,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 1.0,
-                              shape: const StadiumBorder(
-                                side: BorderSide(
-                                  width: 1.0,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Play button
+                          Expanded(
+                            // width: 200.0,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 1.0,
+                                shape: const StadiumBorder(
+                                  side: BorderSide(
+                                    width: 1.0,
+                                  ),
                                 ),
                               ),
-                            ),
-                            onPressed: () {
-                              if (ref.read(audioProvider).currentEpisode !=
-                                  widget.episodeItem) {
-                                ref
-                                    .read(audioProvider.notifier)
-                                    .playerPlayButtonClicked(
-                                      widget.episodeItem,
-                                    );
-                              }
-                            },
-                            child: PlayButtonWidget(
-                              episodeItem: widget.episodeItem,
-                            ),
-                          ),
-                        ),
-                        // Playlist button
-                        queueListAsync.when(
-                          data: (data) {
-                            final isQueued =
-                                data.containsKey(widget.episodeItem['guid']);
-
-                            return IconButton(
-                              tooltip: "Add to Queue",
                               onPressed: () {
-                                isQueued
-                                    ? ref.watch(audioProvider).removeFromQueue(
-                                        widget.episodeItem['guid'])
-                                    : ref.watch(audioProvider).addToQueue(
-                                          widget.episodeItem,
-                                          widget.podcast,
-                                        );
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      isQueued
-                                          ? 'Removed ${widget.episodeItem['title']} from queue'
-                                          : 'Added ${widget.episodeItem['title']} to queue',
-                                    ),
-                                  ),
-                                );
-
-                                // No need to invalidate here, sortedQueueListProvider
-                                // updates reactively via hiveServiceProvider.
-                              },
-                              icon: isQueued
-                                  ? const Icon(Icons.playlist_add_check_rounded)
-                                  : const Icon(Icons.playlist_add_rounded),
-                            );
-                          },
-                          error: (error, stackTrace) {
-                            debugPrint(
-                                'Error in queueListAsync for SubscriptionEpisodeCard: $error');
-                            return IconButton(
-                              tooltip: "Add to Queue",
-                              onPressed: () {},
-                              icon: const Icon(Icons.error_outline_rounded),
-                            );
-                          },
-                          loading: () {
-                            // Handle loading by showing previous state's icon, disabled
-                            final previousList = queueListAsync.valueOrNull;
-                            final isQueuedPreviously = previousList
-                                    ?.containsKey(widget.episodeItem['guid']) ??
-                                false;
-
-                            return IconButton(
-                              tooltip: "Add to Queue",
-                              onPressed: null, // Disable button while loading
-                              icon: isQueuedPreviously
-                                  ? const Icon(Icons.playlist_add_check_rounded)
-                                  : const Icon(Icons.playlist_add_rounded),
-                            );
-                          },
-                        ),
-                        // Download button
-                        if (!kIsWeb)
-                          downloadedListAsync.when(
-                            data: (downloads) {
-                              final isDownloaded = downloads.any(
-                                  (d) => d.guid == widget.episodeItem['guid']);
-
-                              final isDownloading = ref.watch(audioProvider
-                                  .select((p) => p.downloadingPodcasts
-                                      .contains(widget.episodeItem['guid'])));
-
-                              IconData iconData;
-                              String tooltip;
-                              VoidCallback? onPressed;
-
-                              if (isDownloading) {
-                                iconData = Icons.downloading_rounded;
-                                tooltip = 'Downloading...';
-                                onPressed = null; // Or implement cancel
-                              } else if (isDownloaded) {
-                                iconData = Icons.download_done_rounded;
-                                tooltip = 'Delete Download';
-
-                                onPressed = () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext dialogContext) =>
-                                        AlertDialog(
-                                      title: const Text('Confirm Deletion'),
-                                      content: Text(
-                                          'Are you sure you want to remove the download for \'${widget.episodeItem['title']}\'?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Cancel'),
-                                          onPressed: () {
-                                            Navigator.of(dialogContext)
-                                                .pop(); // Dismiss the dialog
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text('Remove'),
-                                          onPressed: () async {
-                                            // Pop the dialog first
-                                            Navigator.of(dialogContext).pop();
-
-                                            // Then perform the removal
-                                            await ref
-                                                .read(audioProvider.notifier)
-                                                .removeDownload(
-                                                    widget.episodeItem);
-
-                                            // Show feedback
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      'Removed \'${widget.episodeItem['title']}\''),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                };
-                              }
-                              // Not downloaded
-                              else {
-                                iconData = Icons.download_rounded;
-                                tooltip = 'Download Episode';
-
-                                onPressed = () {
+                                if (ref.read(audioProvider).currentEpisode !=
+                                    widget.episodeItem) {
                                   ref
                                       .read(audioProvider.notifier)
-                                      .downloadEpisode(
+                                      .playerPlayButtonClicked(
                                         widget.episodeItem,
-                                        widget.podcast,
-                                        context,
                                       );
+                                }
+                              },
+                              child: PlayButtonWidget(
+                                episodeItem: widget.episodeItem,
+                              ),
+                            ),
+                          ),
+                          // Playlist button
+                          queueListAsync.when(
+                            data: (data) {
+                              final isQueued =
+                                  data.containsKey(widget.episodeItem['guid']);
+
+                              return IconButton(
+                                tooltip: "Add to Queue",
+                                onPressed: () {
+                                  isQueued
+                                      ? ref
+                                          .watch(audioProvider)
+                                          .removeFromQueue(
+                                              widget.episodeItem['guid'])
+                                      : ref.watch(audioProvider).addToQueue(
+                                            widget.episodeItem,
+                                            widget.podcast,
+                                          );
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                          'Downloading \'${widget.episodeItem['title']}\''),
+                                        isQueued
+                                            ? 'Removed ${widget.episodeItem['title']} from queue'
+                                            : 'Added ${widget.episodeItem['title']} to queue',
+                                      ),
                                     ),
                                   );
-                                };
-                              }
 
-                              return IconButton(
-                                tooltip: tooltip,
-                                onPressed: onPressed,
-                                icon: Icon(iconData),
+                                  // No need to invalidate here, sortedQueueListProvider
+                                  // updates reactively via hiveServiceProvider.
+                                },
+                                icon: isQueued
+                                    ? const Icon(
+                                        Icons.playlist_add_check_rounded)
+                                    : const Icon(Icons.playlist_add_rounded),
                               );
                             },
-                            error: (e, s) => const IconButton(
-                                icon: Icon(Icons.error), onPressed: null),
-                            loading: () => const IconButton(
-                                icon: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2.0)),
-                                onPressed: null),
+                            error: (error, stackTrace) {
+                              debugPrint(
+                                  'Error in queueListAsync for SubscriptionEpisodeCard: $error');
+                              return IconButton(
+                                tooltip: "Add to Queue",
+                                onPressed: () {},
+                                icon: const Icon(Icons.error_outline_rounded),
+                              );
+                            },
+                            loading: () {
+                              // Handle loading by showing previous state's icon, disabled
+                              final previousList = queueListAsync.valueOrNull;
+                              final isQueuedPreviously =
+                                  previousList?.containsKey(
+                                          widget.episodeItem['guid']) ??
+                                      false;
+
+                              return IconButton(
+                                tooltip: "Add to Queue",
+                                onPressed: null, // Disable button while loading
+                                icon: isQueuedPreviously
+                                    ? const Icon(
+                                        Icons.playlist_add_check_rounded)
+                                    : const Icon(Icons.playlist_add_rounded),
+                              );
+                            },
                           ),
-                        IconButton(
-                          tooltip: "More",
-                          onPressed: () {},
-                          icon: const Icon(Icons.more_vert_rounded),
-                        ),
-                      ],
+                          // Download button
+                          if (!kIsWeb)
+                            downloadedListAsync.when(
+                              data: (downloads) {
+                                final isDownloaded = downloads.any((d) =>
+                                    d.guid == widget.episodeItem['guid']);
+
+                                final isDownloading = ref.watch(audioProvider
+                                    .select((p) => p.downloadingPodcasts
+                                        .contains(widget.episodeItem['guid'])));
+
+                                IconData iconData;
+                                String tooltip;
+                                VoidCallback? onPressed;
+
+                                if (isDownloading) {
+                                  iconData = Icons.downloading_rounded;
+                                  tooltip = 'Downloading...';
+                                  onPressed = null; // Or implement cancel
+                                } else if (isDownloaded) {
+                                  iconData = Icons.download_done_rounded;
+                                  tooltip = 'Delete Download';
+
+                                  onPressed = () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext dialogContext) =>
+                                          AlertDialog(
+                                        title: const Text('Confirm Deletion'),
+                                        content: Text(
+                                            'Are you sure you want to remove the download for \'${widget.episodeItem['title']}\'?'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: const Text('Cancel'),
+                                            onPressed: () {
+                                              Navigator.of(dialogContext)
+                                                  .pop(); // Dismiss the dialog
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text('Remove'),
+                                            onPressed: () async {
+                                              // Pop the dialog first
+                                              Navigator.of(dialogContext).pop();
+
+                                              // Then perform the removal
+                                              await ref
+                                                  .read(audioProvider.notifier)
+                                                  .removeDownload(
+                                                      widget.episodeItem);
+
+                                              // Show feedback
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        'Removed \'${widget.episodeItem['title']}\''),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  };
+                                }
+                                // Not downloaded
+                                else {
+                                  iconData = Icons.download_rounded;
+                                  tooltip = 'Download Episode';
+
+                                  onPressed = () {
+                                    ref
+                                        .read(audioProvider.notifier)
+                                        .downloadEpisode(
+                                          widget.episodeItem,
+                                          widget.podcast,
+                                          context,
+                                        );
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Downloading \'${widget.episodeItem['title']}\''),
+                                      ),
+                                    );
+                                  };
+                                }
+
+                                return IconButton(
+                                  tooltip: tooltip,
+                                  onPressed: onPressed,
+                                  icon: Icon(iconData),
+                                );
+                              },
+                              error: (e, s) => const IconButton(
+                                  icon: Icon(Icons.error), onPressed: null),
+                              loading: () => const IconButton(
+                                  icon: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2.0)),
+                                  onPressed: null),
+                            ),
+                          IconButton(
+                            tooltip: "More",
+                            onPressed: () {},
+                            icon: const Icon(Icons.more_vert_rounded),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

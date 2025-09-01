@@ -95,6 +95,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 0.875,
                       ),
+                  snackBarTheme: snackBarThemeLight,
                 ),
               ),
               AppTheme(
@@ -111,6 +112,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.0,
                       ),
+                  snackBarTheme: snackBarThemeLight,
                 ),
               ),
               AppTheme(
@@ -127,6 +129,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.125,
                       ),
+                  snackBarTheme: snackBarThemeLight,
                 ),
               ),
               AppTheme(
@@ -143,6 +146,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.25,
                       ),
+                  snackBarTheme: snackBarThemeLight,
                 ),
               ),
               // Dark Theme
@@ -160,6 +164,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 0.875,
                       ),
+                  snackBarTheme: snackBarThemeDark,
                 ),
               ),
               AppTheme(
@@ -176,6 +181,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.0,
                       ),
+                  snackBarTheme: snackBarThemeDark,
                 ),
               ),
               AppTheme(
@@ -192,6 +198,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.125,
                       ),
+                  snackBarTheme: snackBarThemeDark,
                 ),
               ),
               AppTheme(
@@ -208,6 +215,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   textTheme: Theme.of(context).textTheme.apply(
                         fontSizeFactor: 1.25,
                       ),
+                  snackBarTheme: snackBarThemeDark,
                 ),
               ),
             ],

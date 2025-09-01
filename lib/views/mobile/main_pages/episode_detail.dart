@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
@@ -172,6 +173,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 ),
                               ),
                             );
+
+                            if (enqueueDownloaded) {
+                              ref
+                                  .watch(openAirProvider)
+                                  .downloadEnqueue(context);
+                            }
 
                             ref.invalidate(getQueueProvider);
                           },

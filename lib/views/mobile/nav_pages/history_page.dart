@@ -172,11 +172,8 @@ class _HistoryState extends ConsumerState<HistoryPage> {
           ),
         );
       },
-      loading: () => Container(
-        color: Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
