@@ -45,6 +45,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
 
           enqueueDownloaded = playbackData['enqueueDownloaded'] ??= false;
           autoplayNextInQueue = playbackData['continuePlayback'] ??= false;
+
+          smartMarkAsCompleted =
+              playbackData['smartMarkAsCompleted'] ??= 'Disabled';
+
           keepSkippedEpisodes = playbackData['keepSkippedEpisodes'] ??= false;
 
           switch (playbackData['fastForwardInterval']) {
@@ -511,8 +515,9 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 )),
               ),
               ListTile(
-                title: Text(Translations.of(context)
-                    .text('autoMarkEpisodesAsComppleted')),
+                title: Text(
+                  Translations.of(context).text('autoMarkEpisodesAsCompleted'),
+                ),
                 trailing: SizedBox(
                   width: 200.0,
                   child: DropdownButton<String>(
@@ -530,21 +535,27 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                         if (Translations.of(context).text('disabled') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = 'Disabled';
+                          smartMarkAsCpl = 'Disabled';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '15 seconds';
+                          smartMarkAsCpl = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '30 seconds';
+                          smartMarkAsCpl = '30';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '60 seconds';
+                          smartMarkAsCpl = '60';
                         } else if (Translations.of(context).text('minutes3') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '3 minutes';
+                          smartMarkAsCpl = '180';
                         } else if (Translations.of(context).text('minutes5') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '5 minutes';
+                          smartMarkAsCpl = '300';
                         }
 
                         ref

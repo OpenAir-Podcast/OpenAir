@@ -262,7 +262,7 @@
     "off": "Av",
     "enqueueDownloaded": "Lägg nedladdade i kö",
     "autoPlayNextInQueue": "Spela nästa i kö automatiskt",
-    "autoMarkEpisodesAsComppleted": "Markera avsnitt som slutförda automatiskt",
+    "autoMarkEpisodesAsCompleted": "Markera avsnitt som slutförda automatiskt",
     "keepSkippedEpisodes": "Behåll överhoppade avsnitt",
     "removeEpisodesFromQueue": "Ta bort avsnitt från kö",
     "automatic": "Automatisk",

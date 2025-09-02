@@ -262,7 +262,7 @@
     "off": "Uit",
     "enqueueDownloaded": "Gedownloade afleveringen in wachtrij plaatsen",
     "autoPlayNextInQueue": "Volgende in wachtrij automatisch afspelen",
-    "autoMarkEpisodesAsComppleted": "Afleveringen automatisch als voltooid markeren",
+    "autoMarkEpisodesAsCompleted": "Afleveringen automatisch als voltooid markeren",
     "keepSkippedEpisodes": "Overgeslagen afleveringen behouden",
     "removeEpisodesFromQueue": "Afleveringen uit wachtrij verwijderen",
     "automatic": "Automatisch",

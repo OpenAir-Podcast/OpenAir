@@ -262,7 +262,7 @@
     "off": "オフ",
     "enqueueDownloaded": "ダウンロード済みをキューに追加",
     "autoPlayNextInQueue": "キュー内の次を自動再生",
-    "autoMarkEpisodesAsComppleted": "エピソードを自動的に完了としてマーク",
+    "autoMarkEpisodesAsCompleted": "エピソードを自動的に完了としてマーク",
     "keepSkippedEpisodes": "スキップしたエピソードを保持",
     "removeEpisodesFromQueue": "キューからエピソードを削除",
     "automatic": "自動",

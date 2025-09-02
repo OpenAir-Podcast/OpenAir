@@ -262,7 +262,7 @@
     "off": "Spento",
     "enqueueDownloaded": "Metti in coda gli scaricati",
     "autoPlayNextInQueue": "Riproduci automaticamente il prossimo in coda",
-    "autoMarkEpisodesAsComppleted": "Contrassegna automaticamente gli episodi come completati",
+    "autoMarkEpisodesAsCompleted": "Contrassegna automaticamente gli episodi come completati",
     "keepSkippedEpisodes": "Mantieni gli episodi saltati",
     "removeEpisodesFromQueue": "Rimuovi episodi dalla coda",
     "automatic": "Automatico",

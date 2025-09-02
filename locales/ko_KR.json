@@ -262,7 +262,7 @@
     "off": "꺼짐",
     "enqueueDownloaded": "다운로드된 항목 대기열에 추가",
     "autoPlayNextInQueue": "대기열의 다음 항목 자동 재생",
-    "autoMarkEpisodesAsComppleted": "에피소드를 자동으로 완료로 표시",
+    "autoMarkEpisodesAsCompleted": "에피소드를 자동으로 완료로 표시",
     "keepSkippedEpisodes": "건너뛴 에피소드 유지",
     "removeEpisodesFromQueue": "대기열에서 에피소드 제거",
     "automatic": "자동",

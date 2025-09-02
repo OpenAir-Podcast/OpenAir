@@ -262,7 +262,7 @@
     "off": "إيقاف",
     "enqueueDownloaded": "إضافة التنزيلات إلى قائمة الانتظار",
     "autoPlayNextInQueue": "تشغيل التالي تلقائيًا في قائمة الانتظار",
-    "autoMarkEpisodesAsComppleted": "تحديد الحلقات كمكتملة تلقائيًا",
+    "autoMarkEpisodesAsCompleted": "تحديد الحلقات كمكتملة تلقائيًا",
     "keepSkippedEpisodes": "الاحتفاظ بالحلقات التي تم تخطيها",
     "automatic": "تلقائي",
     "refreshPodcasts": "تحديث البودكاست",

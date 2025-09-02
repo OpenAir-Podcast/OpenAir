@@ -262,7 +262,7 @@
     "off": "Désactivé",
     "enqueueDownloaded": "Mettre en file d'attente les téléchargements",
     "autoPlayNextInQueue": "Lire automatiquement le suivant dans la file d'attente",
-    "autoMarkEpisodesAsComppleted": "Marquer automatiquement les épisodes comme terminés",
+    "autoMarkEpisodesAsCompleted": "Marquer automatiquement les épisodes comme terminés",
     "keepSkippedEpisodes": "Conserver les épisodes ignorés",
     "removeEpisodesFromQueue": "Supprimer les épisodes de la file d'attente",
     "automatic": "Automatique",

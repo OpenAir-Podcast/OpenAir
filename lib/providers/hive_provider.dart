@@ -151,7 +151,29 @@ class HiveService {
     enqueuePos = playbackSettings['enqueuePosition'];
     enqueueDownloaded = playbackSettings['enqueueDownloaded'];
     autoplayNextInQueue = playbackSettings['continuePlayback'];
-    smartMarkAsCompleted = playbackSettings['smartMarkAsCompleted'];
+
+    switch (playbackSettings['smartMarkAsCompleted']) {
+      case 'Disabled':
+        smartMarkAsCpl = 'Disabled';
+        break;
+      case '15 seconds':
+        smartMarkAsCpl = '15';
+        break;
+      case '30 seconds':
+        smartMarkAsCpl = '30';
+        break;
+      case '60 seconds':
+        smartMarkAsCpl = '60';
+        break;
+      case '180 seconds':
+        smartMarkAsCpl = '180';
+        break;
+      case '120 seconds':
+        smartMarkAsCpl = '120';
+        break;
+      default:
+    }
+
     keepSkippedEpisodes = playbackSettings['keepSkippedEpisodes'];
   }
 

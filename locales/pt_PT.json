@@ -262,7 +262,7 @@
     "off": "Desligado",
     "enqueueDownloaded": "Enfileirar baixados",
     "autoPlayNextInQueue": "Reproduzir automaticamente o próximo na fila",
-    "autoMarkEpisodesAsComppleted": "Marcar automaticamente episódios como concluídos",
+    "autoMarkEpisodesAsCompleted": "Marcar automaticamente episódios como concluídos",
     "keepSkippedEpisodes": "Manter episódios pulados",
     "removeEpisodesFromQueue": "Remover episódios da fila",
     "automatic": "Automático",

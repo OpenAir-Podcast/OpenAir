@@ -142,5 +142,5 @@ String playbackSpeed = '1.0x';
 late String enqueuePos;
 late bool enqueueDownloaded;
 late bool autoplayNextInQueue;
-late String smartMarkAsCompleted;
+late String smartMarkAsCpl;
 late bool keepSkippedEpisodes;

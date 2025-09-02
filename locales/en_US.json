@@ -262,7 +262,7 @@
     "off": "Off",
     "enqueueDownloaded": "Enqueue downloaded",
     "autoPlayNextInQueue": "Autoplay next in queue",
-    "autoMarkEpisodesAsComppleted": "Auto mark episodes as completed",
+    "autoMarkEpisodesAsCompleted": "Auto mark episodes as completed",
     "keepSkippedEpisodes": "Keep skipped episodes",
     "automatic": "Automatic",
     "refreshPodcasts": "Refresh podcasts",

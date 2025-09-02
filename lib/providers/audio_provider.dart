@@ -50,6 +50,7 @@ class AudioProvider extends ChangeNotifier {
 
   bool isPodcastSelected = false;
   bool onceQueueComplete = false;
+  bool isCompleted = false;
 
   late String podcastTitle;
   late String podcastSubtitle;
@@ -119,6 +120,7 @@ class AudioProvider extends ChangeNotifier {
 
     isPodcastSelected = true;
     onceQueueComplete = false;
+    isCompleted = false;
 
     try {
       // Checks if the episode has already been downloaded
@@ -380,6 +382,7 @@ class AudioProvider extends ChangeNotifier {
 
     isPodcastSelected = true;
     onceQueueComplete = false;
+    isCompleted = false;
 
     playerPosition = position;
 
@@ -475,7 +478,7 @@ class AudioProvider extends ChangeNotifier {
       }
     });
 
-    player.onPositionChanged.listen((Duration p) {
+    player.onPositionChanged.listen((Duration p) async {
       playerPosition = p;
 
       currentPlaybackPositionString =
@@ -487,6 +490,25 @@ class AudioProvider extends ChangeNotifier {
       podcastCurrentPositionInMilliseconds =
           (playerPosition.inMilliseconds / playerTotalDuration.inMilliseconds)
               .clamp(0.0, 1.0);
+
+      if (smartMarkAsCpl != 'Disabled' && !isCompleted) {
+        int sec = int.parse(smartMarkAsCpl);
+
+        Future.delayed(Duration(seconds: 3), () async {
+          int remainingTimeInSeconds =
+              playerTotalDuration.inSeconds - playerPosition.inSeconds;
+
+          if (remainingTimeInSeconds < sec && isCompleted == false) {
+            isCompleted = true;
+
+            final hiveService = await ref.read(hiveServiceProvider.future);
+
+            hiveService.addToCompletedEpisode(
+              CompletedEpisodeModel(guid: currentEpisode!['guid']),
+            );
+          }
+        });
+      }
 
       notifyListeners();
     });

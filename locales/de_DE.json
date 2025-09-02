@@ -262,7 +262,7 @@
     "off": "Aus",
     "enqueueDownloaded": "Heruntergeladene in Warteschlange",
     "autoPlayNextInQueue": "Nächste in Warteschlange automatisch abspielen",
-    "autoMarkEpisodesAsComppleted": "Episoden automatisch als abgeschlossen markieren",
+    "autoMarkEpisodesAsCompleted": "Episoden automatisch als abgeschlossen markieren",
     "keepSkippedEpisodes": "Übersprungene Episoden behalten",
     "automatic": "Automatisch",
     "refreshPodcasts": "Podcasts aktualisieren",

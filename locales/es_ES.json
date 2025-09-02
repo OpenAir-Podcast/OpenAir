@@ -262,7 +262,7 @@
     "off": "Desactivado",
     "enqueueDownloaded": "Poner en cola los descargados",
     "autoPlayNextInQueue": "Reproducir automáticamente el siguiente en la cola",
-    "autoMarkEpisodesAsComppleted": "Marcar episodios automáticamente como completados",
+    "autoMarkEpisodesAsCompleted": "Marcar episodios automáticamente como completados",
     "keepSkippedEpisodes": "Mantener episodios saltados",
     "automatic": "Automático",
     "refreshPodcasts": "Actualizar podcasts",

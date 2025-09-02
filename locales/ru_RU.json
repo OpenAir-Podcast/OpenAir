@@ -262,7 +262,7 @@
     "off": "Выкл",
     "enqueueDownloaded": "Добавить загруженные в очередь",
     "autoPlayNextInQueue": "Автоматически воспроизводить следующий в очереди",
-    "autoMarkEpisodesAsComppleted": "Автоматически отмечать эпизоды как завершенные",
+    "autoMarkEpisodesAsCompleted": "Автоматически отмечать эпизоды как завершенные",
     "keepSkippedEpisodes": "Сохранять пропущенные эпизоды",
     "removeEpisodesFromQueue": "Удалить эпизоды из очереди",
     "automatic": "Автоматически",
