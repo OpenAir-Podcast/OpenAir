@@ -96,6 +96,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 0.875,
                       ),
                   snackBarTheme: snackBarThemeLight,
+                  listTileTheme: listTileThemeLight,
                 ),
               ),
               AppTheme(
@@ -113,6 +114,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.0,
                       ),
                   snackBarTheme: snackBarThemeLight,
+                  listTileTheme: listTileThemeLight,
                 ),
               ),
               AppTheme(
@@ -130,6 +132,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.125,
                       ),
                   snackBarTheme: snackBarThemeLight,
+                  listTileTheme: listTileThemeLight,
                 ),
               ),
               AppTheme(
@@ -147,6 +150,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.25,
                       ),
                   snackBarTheme: snackBarThemeLight,
+                  listTileTheme: listTileThemeLight,
                 ),
               ),
               // Dark Theme
@@ -165,6 +169,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 0.875,
                       ),
                   snackBarTheme: snackBarThemeDark,
+                  listTileTheme: listTileThemeDark,
                 ),
               ),
               AppTheme(
@@ -182,6 +187,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.0,
                       ),
                   snackBarTheme: snackBarThemeDark,
+                  listTileTheme: listTileThemeDark,
                 ),
               ),
               AppTheme(
@@ -199,6 +205,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.125,
                       ),
                   snackBarTheme: snackBarThemeDark,
+                  listTileTheme: listTileThemeDark,
                 ),
               ),
               AppTheme(
@@ -216,6 +223,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         fontSizeFactor: 1.25,
                       ),
                   snackBarTheme: snackBarThemeDark,
+                  listTileTheme: listTileThemeDark,
                 ),
               ),
             ],

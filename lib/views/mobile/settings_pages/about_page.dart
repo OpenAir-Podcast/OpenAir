@@ -87,9 +87,13 @@ class AboutPageState extends ConsumerState<AboutPage> {
                 leading: Icon(Icons.gavel_rounded),
                 title: Text(Translations.of(context).text('licenses')),
                 onTap: () {
-                  showLicensePage(
-                    context: context,
-                  );
+                  if (Brightness.dark == Theme.of(context).brightness) {
+                    showDarkLicensePage(context);
+                  } else {
+                    showLicensePage(context: context);
+                  }
+
+                  // showLicensePage(context: context);
                 },
               ),
             ],
@@ -107,6 +111,30 @@ class AboutPageState extends ConsumerState<AboutPage> {
         loading: () {
           return const Center(child: CircularProgressIndicator());
         },
+      ),
+    );
+  }
+
+  void showDarkLicensePage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Theme(
+          data: ThemeData.dark(useMaterial3: true).copyWith(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.blue,
+            ),
+            listTileTheme: const ListTileThemeData(
+              iconColor: Colors.white,
+              textColor: Colors.white,
+            ),
+          ),
+          child: const LicensePage(
+            applicationName: 'OpenAir',
+            applicationVersion: '1.0.0',
+          ),
+        ),
       ),
     );
   }

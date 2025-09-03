@@ -127,6 +127,16 @@ ColorScheme colorSchemeDark = ColorScheme.dark(
   onSecondaryContainer: Colors.white,
 );
 
+ListTileThemeData listTileThemeDark = ListTileThemeData(
+  iconColor: Colors.white,
+  textColor: Colors.white,
+);
+
+ListTileThemeData listTileThemeLight = ListTileThemeData(
+  iconColor: Colors.black,
+  textColor: Colors.black,
+);
+
 Color scaffoldBackgroundColorLight = Colors.grey[100]!;
 Color scaffoldBackgroundColorDark = Colors.black;
 Color cardColorLight = Colors.white;
