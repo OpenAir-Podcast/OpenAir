@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Möchten Sie wirklich Ihre gesamte Warteschlange löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "queueCleared": "Warteschlange gelöscht.",
     "areYouSureClearAllPodcasts": "Möchten Sie wirklich alle Podcasts löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "allPodcastsCleared": "Alle Podcasts gelöscht."
+    "allPodcastsCleared": "Alle Podcasts gelöscht.",
+    "favorites": "Favoriten",
+    "emptyFavorites": "Hoppla, anscheinend haben Sie keine Favoriten...",
+    "emptyFavoritesSubtitle": "Bitte fügen Sie einige Episoden zu Ihren Favoriten hinzu und versuchen Sie es erneut",
+    "removedFromFavorites": "Aus Favoriten entfernt",
+    "addedToFavorites": "Zu Favoriten hinzugefügt"
 }

@@ -193,10 +193,6 @@ class OpenAirProvider extends ChangeNotifier {
     return hiveService.getSortedHistory();
   }
 
-  void favourite() {
-    debugPrint('favourite button clicked');
-  }
-
   void share() {
     debugPrint('share button clicked');
   }

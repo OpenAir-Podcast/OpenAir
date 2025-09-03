@@ -67,6 +67,8 @@ class HiveService {
 
   late final Future<CollectionBox<FetchDataModel>> categoryBox;
 
+  late final Future<CollectionBox<Map>> favoritesBox;
+
   late final Directory openAirDir;
 
   HiveService(this.ref);
@@ -112,6 +114,7 @@ class HiveService {
         'top_featured',
         'trending',
         'category',
+        'favorites',
       },
       path: kIsWeb ? null : openAirDir.path,
     );
@@ -138,6 +141,8 @@ class HiveService {
 
     // Category page
     categoryBox = collection.openBox<FetchDataModel>('category');
+
+    favoritesBox = collection.openBox<Map>('favorites');
 
     Map<String, dynamic>? playbackSettings = await getPlaybackSettings();
     rewindInterval =
@@ -782,5 +787,20 @@ class HiveService {
   void putCategoryPodcast(String category, Map<String, dynamic> data) async {
     final box = await categoryBox;
     await box.put(category, FetchDataModel.fromJson(data));
+  }
+
+  void addEpisodeToFavorite(Map<String, dynamic> episode) async {
+    final box = await favoritesBox;
+    await box.put(episode['guid'], episode);
+  }
+
+  void removeEpisodeFromFavorite(String guid) async {
+    final box = await favoritesBox;
+    await box.delete(guid);
+  }
+
+  Future<Map> getFavoriteEpisodes() async {
+    final box = await favoritesBox;
+    return await box.getAllValues();
   }
 }

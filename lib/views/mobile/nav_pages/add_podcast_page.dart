@@ -220,7 +220,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                 feedUrl: snapshot[index]['xmlURL'],
                                 title: rssFeed.title!,
                                 description: rssFeed.description!,
-                                author: rssFeed.author ?? 'unkown',
+                                author: rssFeed.author ?? 'unknown',
                                 imageUrl: snapshot[index]['imgURL'],
                                 episodeCount: rssFeed.items!.length,
                                 artwork: snapshot[index]['imgURL'],

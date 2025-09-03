@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "¿Estás seguro de que quieres borrar toda tu cola? Esta acción no se puede deshacer.",
     "queueCleared": "Cola borrada.",
     "areYouSureClearAllPodcasts": "¿Estás seguro de que quieres borrar todos los podcasts? Esta acción no se puede deshacer.",
-    "allPodcastsCleared": "Todos los podcasts borrados."
+    "allPodcastsCleared": "Todos los podcasts borrados.",
+    "favorites": "Favoritos",
+    "emptyFavorites": "Vaya, parece que no tienes favoritos...",
+    "emptyFavoritesSubtitle": "Por favor, añade algunos episodios a tus favoritos e inténtalo de nuevo",
+    "removedFromFavorites": "Eliminado de favoritos",
+    "addedToFavorites": "Añadido a favoritos"
 }

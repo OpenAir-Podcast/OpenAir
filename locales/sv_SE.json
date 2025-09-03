@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Är du säker på att du vill rensa hela din kö? Denna åtgärd kan inte ångras.",
     "queueCleared": "Kön rensad.",
     "areYouSureClearAllPodcasts": "Är du säker på att du vill rensa alla podcaster? Denna åtgärd kan inte ångras.",
-    "allPodcastsCleared": "Alla podcaster rensade."
+    "allPodcastsCleared": "Alla podcaster rensade.",
+    "favorites": "Favoriter",
+    "emptyFavorites": "Hoppsan, det verkar som om du inte har några favoriter...",
+    "emptyFavoritesSubtitle": "Lägg till några avsnitt i dina favoriter och försök igen",
+    "removedFromFavorites": "Borttagen från favoriter",
+    "addedToFavorites": "Tillagd i favoriter"
 }

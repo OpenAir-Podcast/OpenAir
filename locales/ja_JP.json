@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "キュー全体をクリアしてもよろしいですか？この操作は元に戻せません。",
     "queueCleared": "キューがクリアされました。",
     "areYouSureClearAllPodcasts": "すべてのポッドキャストをクリアしてもよろしいですか？この操作は元に戻せません。",
-    "allPodcastsCleared": "すべてのポッドキャストがクリアされました。"
+    "allPodcastsCleared": "すべてのポッドキャストがクリアされました。",
+    "favorites": "お気に入り",
+    "emptyFavorites": "お気に入りがないようです...",
+    "emptyFavoritesSubtitle": "お気に入りにエピソードを追加してからもう一度お試しください",
+    "removedFromFavorites": "お気に入りから削除されました",
+    "addedToFavorites": "お気に入りに追加されました"
 }

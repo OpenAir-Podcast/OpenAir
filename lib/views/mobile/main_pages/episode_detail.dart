@@ -8,6 +8,7 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/widgets/styled_text.dart';
@@ -33,6 +34,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
+
+    final AsyncValue favoriteListAsync = ref.watch(isFavoriteProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -331,6 +334,58 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       tooltip: Translations.of(context).text('share'),
                       onPressed: () => ref.watch(openAirProvider).share(),
                       icon: const Icon(Icons.share_rounded),
+                    ),
+                    favoriteListAsync.when(
+                      data: (isCurrentlyFavorite) {
+                        return IconButton(
+                          tooltip: Translations.of(context).text('favourite'),
+                          onPressed: () async {
+                            if (isCurrentlyFavorite) {
+                              ref.read(audioProvider).removeEpisodeFromFavorite(
+                                  widget.episodeItem!['guid']);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem!['title']}'),
+                                  ),
+                                );
+                              }
+                            } else {
+                              ref
+                                  .read(audioProvider)
+                                  .addEpisodeToFavorite(widget.episodeItem!);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem!['title']}'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          icon: isCurrentlyFavorite
+                              ? const Icon(Icons.favorite_rounded)
+                              : const Icon(Icons.favorite_border_rounded),
+                        );
+                      },
+                      loading: () => IconButton(
+                        tooltip: Translations.of(context).text('favourite'),
+                        onPressed: null, // Disable button while loading
+                        icon: const Icon(Icons
+                            .favorite_border_rounded), // Or a loading indicator icon
+                      ),
+                      error: (error, stackTrace) {
+                        debugPrint('Error checking favorite status: $error');
+                        return IconButton(
+                          tooltip: Translations.of(context).text('error'),
+                          onPressed: null,
+                          icon: const Icon(Icons.error_outline_rounded),
+                        );
+                      },
                     ),
                   ],
                 ),

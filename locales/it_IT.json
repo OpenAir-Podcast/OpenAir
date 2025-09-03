@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Sei sicuro di voler cancellare tutta la tua coda? Questa azione non può essere annullata.",
     "queueCleared": "Coda cancellata.",
     "areYouSureClearAllPodcasts": "Sei sicuro di voler cancellare tutti i podcast? Questa azione non può essere annullata.",
-    "allPodcastsCleared": "Tutti i podcast cancellati."
+    "allPodcastsCleared": "Tutti i podcast cancellati.",
+    "favorites": "Preferiti",
+    "emptyFavorites": "Ops, sembra che tu non abbia nessun preferito...",
+    "emptyFavoritesSubtitle": "Aggiungi alcuni episodi ai tuoi preferiti e riprova",
+    "removedFromFavorites": "Rimosso dai preferiti",
+    "addedToFavorites": "Aggiunto ai preferiti"
 }

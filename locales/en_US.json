@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Are you sure you want to clear your entire queue? This action cannot be undone.",
     "queueCleared": "Queue cleared.",
     "areYouSureClearAllPodcasts": "Are you sure you want to clear all podcasts? This action cannot be undone.",
-    "allPodcastsCleared": "All podcasts cleared."
+    "allPodcastsCleared": "All podcasts cleared.",
+    "favorites": "Favorites",
+    "emptyFavorites": "Oops, looks like you have no favorites...",
+    "emptyFavoritesSubtitle": "Please add some episodes to your favorites and try again",
+    "removedFromFavorites": "Removed from favorites",
+    "addedToFavorites": "Added to favorites"
 }

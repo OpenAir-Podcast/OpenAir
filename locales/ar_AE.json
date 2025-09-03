@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "هل أنت متأكد من أنك تريد مسح قائمة الانتظار بالكامل؟ لا يمكن التراجع عن هذا الإجراء.",
     "queueCleared": "تم مسح قائمة الانتظار.",
     "areYouSureClearAllPodcasts": "هل أنت متأكد من أنك تريد مسح جميع البودكاست؟ لا يمكن التراجع عن هذا الإجراء.",
-    "allPodcastsCleared": "تم مسح جميع البودكاست."
+    "allPodcastsCleared": "تم مسح جميع البودكاست.",
+    "favorites": "المفضلة",
+    "emptyFavorites": "عفوًا، يبدو أنه ليس لديك أي مفضلات...",
+    "emptyFavoritesSubtitle": "يرجى إضافة بعض الحلقات إلى مفضلاتك والمحاولة مرة أخرى",
+    "removedFromFavorites": "تمت الإزالة من المفضلة",
+    "addedToFavorites": "تمت الإضافة إلى المفضلة"
 }

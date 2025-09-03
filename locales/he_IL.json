@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "האם אתה בטוח שברצונך לנקות את כל התור שלך? לא ניתן לבטל פעולה זו.",
     "queueCleared": "התור נוקה.",
     "areYouSureClearAllPodcasts": "האם אתה בטוח שברצונך לנקות את כל הפודקאסטים? לא ניתן לבטל פעולה זו.",
-    "allPodcastsCleared": "כל הפודקאסטים נוקו."
+    "allPodcastsCleared": "כל הפודקאסטים נוקו.",
+    "favorites": "מועדפים",
+    "emptyFavorites": "אופס, נראה שאין לך מועדפים...",
+    "emptyFavoritesSubtitle": "אנא הוסף כמה פרקים למועדפים שלך ונסה שוב",
+    "removedFromFavorites": "הוסר ממועדפים",
+    "addedToFavorites": "נוסף למועדפים"
 }

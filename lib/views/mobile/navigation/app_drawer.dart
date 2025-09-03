@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
+import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/history_page.dart';
 import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
@@ -225,6 +226,19 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     );
                   },
                 ),
+                const Divider(),
+                // Favourite
+                ListTile(
+                  leading: const Icon(Icons.favorite_rounded),
+                  title: Text(Translations.of(context).text('favorites')),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => FavoritesPage()),
+                    );
+                  },
+                ),
+
                 const Divider(),
                 // Queue button
                 getQueueCountValue.when(

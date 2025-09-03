@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Вы уверены, что хотите очистить всю очередь? Это действие нельзя отменить.",
     "queueCleared": "Очередь очищена.",
     "areYouSureClearAllPodcasts": "Вы уверены, что хотите очистить все подкасты? Это действие нельзя отменить.",
-    "allPodcastsCleared": "Все подкасты очищены."
+    "allPodcastsCleared": "Все подкасты очищены.",
+    "favorites": "Избранное",
+    "emptyFavorites": "Ой, похоже, у вас нет избранного...",
+    "emptyFavoritesSubtitle": "Пожалуйста, добавьте несколько эпизодов в избранное и повторите попытку",
+    "removedFromFavorites": "Удалено из избранного",
+    "addedToFavorites": "Добавлено в избранное"
 }

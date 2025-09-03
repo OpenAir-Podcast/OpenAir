@@ -10,6 +10,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
+import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
@@ -31,9 +32,12 @@ class DownloadsEpisodeCard extends ConsumerStatefulWidget {
 
 class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
   String podcastDate = "";
+  late bool isFavorite;
 
   @override
   Widget build(BuildContext context) {
+    final AsyncValue favoriteListAsync = ref.watch(isFavoriteProvider);
+
     podcastDate = ref
         .read(audioProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
@@ -359,10 +363,59 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                       onPressed: () => ref.watch(openAirProvider).share(),
                       icon: const Icon(Icons.share_rounded),
                     ),
-                    IconButton(
-                      tooltip: Translations.of(context).text('favourite'),
-                      onPressed: () => ref.watch(openAirProvider).favourite(),
-                      icon: const Icon(Icons.favorite_border_rounded),
+                    favoriteListAsync.when(
+                      data: (data) {
+                        isFavorite =
+                            data.containsKey(widget.episodeItem['guid']);
+
+                        return IconButton(
+                          tooltip: Translations.of(context).text('favourite'),
+                          onPressed: () async {
+                            if (isFavorite) {
+                              ref.read(audioProvider).removeEpisodeFromFavorite(
+                                  widget.episodeItem['guid']);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}'),
+                                  ),
+                                );
+                              }
+                            } else {
+                              ref
+                                  .read(audioProvider)
+                                  .addEpisodeToFavorite(widget.episodeItem);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          icon: isFavorite
+                              ? const Icon(Icons.favorite_rounded)
+                              : const Icon(Icons.favorite_border_rounded),
+                        );
+                      },
+                      loading: () => IconButton(
+                        tooltip: Translations.of(context).text('favourite'),
+                        onPressed: null,
+                        icon: const Icon(Icons.favorite_border_rounded),
+                      ),
+                      error: (error, stackTrace) {
+                        debugPrint('Error checking favorite status: $error');
+                        return IconButton(
+                          tooltip: Translations.of(context).text('error'),
+                          onPressed: null,
+                          icon: const Icon(Icons.error_outline_rounded),
+                        );
+                      },
                     ),
                   ],
                 ),

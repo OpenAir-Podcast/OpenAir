@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Êtes-vous sûr de vouloir effacer toute votre file d'attente ? Cette action est irréversible.",
     "queueCleared": "File d'attente effacée.",
     "areYouSureClearAllPodcasts": "Êtes-vous sûr de vouloir effacer tous les podcasts ? Cette action est irréversible.",
-    "allPodcastsCleared": "Tous les podcasts effacés."
+    "allPodcastsCleared": "Tous les podcasts effacés.",
+    "favorites": "Favoris",
+    "emptyFavorites": "Oups, il semble que vous n'ayez aucun favori...",
+    "emptyFavoritesSubtitle": "Veuillez ajouter des épisodes à vos favoris et réessayer",
+    "removedFromFavorites": "Retiré des favoris",
+    "addedToFavorites": "Ajouté aux favoris"
 }

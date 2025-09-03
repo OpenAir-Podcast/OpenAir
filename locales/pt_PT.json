@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "Tem certeza de que deseja limpar toda a sua fila? Esta ação não pode ser desfeita.",
     "queueCleared": "Fila limpa.",
     "areYouSureClearAllPodcasts": "Tem certeza de que deseja limpar todos os podcasts? Esta ação não pode ser desfeita.",
-    "allPodcastsCleared": "Todos os podcasts limpos."
+    "allPodcastsCleared": "Todos os podcasts limpos.",
+    "favorites": "Favoritos",
+    "emptyFavorites": "Opa, parece que você não tem favoritos...",
+    "emptyFavoritesSubtitle": "Por favor, adicione alguns episódios aos seus favoritos e tente novamente",
+    "removedFromFavorites": "Removido dos favoritos",
+    "addedToFavorites": "Adicionado aos favoritos"
 }

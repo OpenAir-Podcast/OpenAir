@@ -331,5 +331,10 @@
     "areYouSureClearQueue": "您确定要清除整个播放列表吗？此操作无法撤消。",
     "queueCleared": "播放列表已清除。",
     "areYouSureClearAllPodcasts": "您确定要清除所有播客吗？此操作无法撤消。",
-    "allPodcastsCleared": "所有播客已清除。"
+    "allPodcastsCleared": "所有播客已清除。",
+    "favorites": "收藏夹",
+    "emptyFavorites": "哎呀，您似乎没有任何收藏...",
+    "emptyFavoritesSubtitle": "请将一些单集添加到您的收藏夹后重试",
+    "removedFromFavorites": "已从收藏夹中移除",
+    "addedToFavorites": "已添加到收藏夹"
 }

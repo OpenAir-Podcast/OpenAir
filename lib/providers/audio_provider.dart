@@ -18,6 +18,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
+import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:opml/opml.dart';
@@ -1276,5 +1277,34 @@ class AudioProvider extends ChangeNotifier {
       existingQueueItem['playerPosition'] = position;
       await hiveService.addToQueue(existingQueueItem);
     }
+  }
+
+  Future<void> addEpisodeToFavorite(Map<String, dynamic> episode) async {
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.addEpisodeToFavorite(episode);
+    ref.invalidate(isFavoriteProvider);
+  }
+
+  Future<void> removeEpisodeFromFavorite(String guid) async {
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService.removeEpisodeFromFavorite(guid);
+    ref.invalidate(isFavoriteProvider);
+  }
+
+  Future<Map?> getFavoriteEpisodes() async {
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    return await hiveService.getFavoriteEpisodes();
+  }
+
+  Future<bool> isEpisodesFavorite(String guid) async {
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    final Map<dynamic, dynamic>? favoriteEpisodes =
+        await hiveService.favoritesBox.then((box) => box.get(guid));
+
+    if (favoriteEpisodes != null) {
+      return true;
+    }
+
+    return false;
   }
 }
