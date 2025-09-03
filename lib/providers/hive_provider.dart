@@ -174,7 +174,7 @@ class HiveService {
       default:
     }
 
-    keepSkippedEpisodes = playbackSettings['keepSkippedEpisodes'];
+    keepSkippedEp = playbackSettings['keepSkippedEpisodes'];
   }
 
   // Subscription Operations:

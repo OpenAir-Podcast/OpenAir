@@ -442,6 +442,68 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
+  void previousButtonClicked() => playPreviousEpisode();
+
+  Future<void> playPreviousEpisode() async {
+    // 1. Check if currentEpisode is set
+    if (currentEpisode == null || currentEpisode!.isEmpty) {
+      return;
+    }
+
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    Map queueMap = await hiveService.getQueue();
+
+    // Convert to list and sort by position
+    List<Map<String, dynamic>> queueList =
+        queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
+
+    queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+
+    // Find the index of the current episode
+    int currentEpisodeIndex = -1;
+
+    for (int i = 0; i < queueList.length; i++) {
+      if (queueList[i]['guid'] == currentEpisode!['guid']) {
+        currentEpisodeIndex = i;
+        break;
+      }
+    }
+
+    if (!keepSkippedEp) {
+      await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
+    }
+
+    // 2. If current episode is not found or is the first, do nothing
+    if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
+      return; // Do nothing if it's the first or not found
+    }
+
+    // 3. Save progress of the current episode before switching
+    await updateCurrentQueueCard(
+      currentEpisode!['guid'],
+      podcastCurrentPositionInMilliseconds,
+      currentPlaybackPositionString,
+      currentPlaybackRemainingTimeString,
+      playerPosition,
+    );
+
+    // 4. Stop current playback and play the previous episode
+    await player.stop(); // Ensure player is stopped before changing source
+
+    Map<String, dynamic> previousEpisode = queueList[currentEpisodeIndex - 1];
+    currentEpisode = previousEpisode;
+
+    currentPodcast = previousEpisode[
+        'podcast']; // Assuming 'podcast' is stored in queue item
+
+    await queuePlayButtonClicked(
+      previousEpisode,
+      previousEpisode['playerPosition'], // Use the saved position
+    );
+
+    notifyListeners();
+  }
+
   void rewindButtonClicked() {
     if (playerPosition.inSeconds - int.parse(rewindInterval) > 0) {
       player.seek(Duration(
@@ -455,6 +517,63 @@ class AudioProvider extends ChangeNotifier {
       player.seek(Duration(
           seconds: playerPosition.inSeconds + int.parse(fastForwardInterval)));
     }
+  }
+
+  void nextButtonClicked() => playNextEpisode();
+
+  Future<void> playNextEpisode() async {
+    // 1. Check if there's a current episode playing.
+    if (currentEpisode == null || currentEpisode!.isEmpty) {
+      return;
+    }
+
+    final hiveService = await ref.read(hiveServiceProvider.future);
+    final Map queueMap = await hiveService.getQueue();
+
+    // Convert to a list and sort by position to ensure correct order.
+    List<Map<String, dynamic>> queueList =
+        queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
+    queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+
+    // Find the index of the current episode in the sorted queue.
+    int currentEpisodeIndex = -1;
+    for (int i = 0; i < queueList.length; i++) {
+      if (queueList[i]['guid'] == currentEpisode!['guid']) {
+        currentEpisodeIndex = i;
+        break;
+      }
+    }
+
+    if (!keepSkippedEp) {
+      await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
+    }
+
+    // 2. If the episode isn't in the queue or is already the last one, do nothing.
+    if (currentEpisodeIndex == -1 ||
+        currentEpisodeIndex == queueList.length - 1) {
+      return;
+    }
+
+    // 3. Save the progress of the currently playing episode before switching.
+    await updateCurrentQueueCard(
+      currentEpisode!['guid'],
+      podcastCurrentPositionInMilliseconds,
+      currentPlaybackPositionString,
+      currentPlaybackRemainingTimeString,
+      playerPosition,
+    );
+
+    // 4. Stop the current playback.
+    await player.stop();
+
+    // 5. Get the next episode's data and start playing it.
+    final Map<String, dynamic> nextEpisode = queueList[currentEpisodeIndex + 1];
+    currentEpisode = nextEpisode;
+    currentPodcast = nextEpisode['podcast'];
+
+    await queuePlayButtonClicked(nextEpisode, nextEpisode['playerPosition']);
+
+    notifyListeners();
   }
 
   void audioSpeedButtonClicked() {
@@ -722,12 +841,6 @@ class AudioProvider extends ChangeNotifier {
     player.seek(duration);
     notifyListeners();
   }
-
-  void mainPlayerRewindClicked() {}
-
-  void mainPlayerFastForwardClicked() {}
-
-  void mainPlayerPaybackSpeedClicked() {}
 
   void mainPlayerTimerClicked() {}
 
@@ -1112,8 +1225,6 @@ class AudioProvider extends ChangeNotifier {
       historyPodcastImage = podcast.imageUrl;
       historyPodcastAuthor = podcast.author ?? 'Unknown';
     } else {
-      debugPrint(
-          'Warning: Podcast map is null in addToHistory. Using episode author/image.');
       historyPodcastId = episode['podcastId']?.toString() ?? 'unknown';
       historyPodcastImage = episode['image'] ?? '';
       historyPodcastAuthor = episode['author'] ?? 'Unknown';

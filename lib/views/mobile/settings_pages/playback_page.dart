@@ -593,6 +593,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       keepSkippedEpisodes = !keepSkippedEpisodes;
                       playbackData['keepSkippedEpisodes'] = keepSkippedEpisodes;
 
+                      keepSkippedEp = keepSkippedEpisodes;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService

@@ -169,7 +169,6 @@ class _QueueCardState extends ConsumerState<QueueCard> {
             if (widget.isQueueSelected &&
                 openAir.isPlaying == PlayingStatus.playing) {
               audioProviderNotifier.playerPauseButtonClicked();
-              debugPrint('Pausing');
             } else if (widget.isQueueSelected &&
                 openAir.isPlaying == PlayingStatus.paused) {
               debugPrint('Resuming');

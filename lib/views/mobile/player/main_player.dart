@@ -152,11 +152,18 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // Previous
+                  IconButton(
+                    onPressed: ref.read(audioProvider).previousButtonClicked,
+                    icon: SizedBox(
+                      width: 52.0,
+                      height: 52.0,
+                      child: Icon(Icons.skip_previous_sharp),
+                    ),
+                  ),
                   // Rewind button
                   IconButton(
-                    onPressed: ref
-                        .read(audioProvider)
-                        .rewindButtonClicked, // Use read for actions
+                    onPressed: ref.read(audioProvider).rewindButtonClicked,
                     icon: SizedBox(
                       width: 52.0,
                       height: 52.0,
@@ -187,16 +194,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   // Play/pause button
                   IconButton(
                     onPressed: () async {
-                      ref.read(audioProvider).audioState ==
-                              'Play' // Use read for state check in action
-                          ? ref
-                              .read(audioProvider) // Use read for actions
-                              .playerPauseButtonClicked()
+                      ref.read(audioProvider).audioState == 'Play'
+                          ? ref.read(audioProvider).playerPauseButtonClicked()
                           : ref.read(audioProvider).playerPlayButtonClicked(
-                                // Use read for actions
-                                ref.read(audioProvider).currentEpisode!,
-                              );
-                    }, // Add play/pause functionality
+                              ref.read(audioProvider).currentEpisode!);
+                    },
                     icon: ref.watch(audioProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
                         : const Icon(Icons.play_arrow_rounded),
@@ -204,9 +206,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   // Fast forward button
                   IconButton(
-                    onPressed: ref
-                        .read(audioProvider)
-                        .fastForwardButtonClicked, // Use read for actions
+                    onPressed: ref.read(audioProvider).fastForwardButtonClicked,
                     icon: SizedBox(
                       width: 52.0,
                       height: 52.0,
@@ -232,6 +232,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  // Next
+                  IconButton(
+                    onPressed: ref.read(audioProvider).nextButtonClicked,
+                    icon: SizedBox(
+                      width: 52.0,
+                      height: 52.0,
+                      child: Icon(Icons.skip_next_sharp),
                     ),
                   ),
                 ],

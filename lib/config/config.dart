@@ -143,4 +143,4 @@ late String enqueuePos;
 late bool enqueueDownloaded;
 late bool autoplayNextInQueue;
 late String smartMarkAsCpl;
-late bool keepSkippedEpisodes;
+late bool keepSkippedEp;
