@@ -6,25 +6,13 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/widgets/feeds_episode_card%20.dart';
+import 'package:openair/views/mobile/widgets/episode_card.dart';
 
 final isFavoriteProvider = StreamProvider.autoDispose((ref) async* {
   final hiveService = await ref.watch(hiveServiceProvider.future);
   yield* hiveService.getFavoriteEpisodes().asStream();
-});
-
-final getInboxProvider = FutureProvider.autoDispose((ref) async {
-  final Map? inboxEpisodes =
-      await ref.watch(openAirProvider).getInboxEpisodes();
-
-  if (inboxEpisodes != null) {
-    return inboxEpisodes;
-  }
-
-  return await ref.read(openAirProvider).fetchInboxEpisodes();
 });
 
 class FavoritesPage extends ConsumerStatefulWidget {
@@ -37,7 +25,7 @@ class FavoritesPage extends ConsumerStatefulWidget {
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map> getEpisodesValue = ref.watch(getInboxProvider);
+    final AsyncValue<Map> getEpisodesValue = ref.watch(isFavoriteProvider);
 
     return getEpisodesValue.when(
       data: (Map data) {
@@ -55,7 +43,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                   icon: const Icon(Icons.refresh_rounded),
                   tooltip: Translations.of(context).text('refresh'),
                   onPressed: () async {
-                    ref.invalidate(getInboxProvider);
+                    ref.invalidate(isFavoriteProvider);
                   },
                 ),
               ),
@@ -64,25 +52,26 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
-              onRefresh: () async => ref.invalidate(getInboxProvider),
+              onRefresh: () async => ref.invalidate(isFavoriteProvider),
               child: ListView.builder(
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
-                  PodcastModel podcastModel = PodcastModel(
-                    id: int.parse(data[index]['podcastId']),
-                    title: data[index]['title'],
-                    author: data[index]['author'],
-                    feedUrl: data[index]['feedUrl'],
-                    imageUrl: data[index]['image'],
-                    description: data[index]['description'],
-                    artwork: data[index]['image'],
-                  );
+                  final episodeData = data.values.elementAt(index);
+                  PodcastModel podcastData = episodeData['podcast'];
 
-                  return FeedsEpisodeCard(
-                    title: data[index]['title'],
-                    episodeItem: data[index].cast<String, dynamic>(),
-                    podcast: podcastModel,
+                  return EpisodeCard(
+                    episodeItem: episodeData.cast<String, dynamic>(),
+                    title: episodeData['title'],
+                    podcast: PodcastModel(
+                      id: podcastData.id,
+                      title: podcastData.title,
+                      description: podcastData.description,
+                      author: podcastData.author,
+                      feedUrl: podcastData.feedUrl,
+                      artwork: podcastData.artwork,
+                      imageUrl: podcastData.imageUrl,
+                    ),
                   );
                 },
               ),
@@ -136,7 +125,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                       ),
                     ),
                     onPressed: () async {
-                      ref.invalidate(getInboxProvider);
+                      ref.invalidate(isFavoriteProvider);
                     },
                     child: const Text('Retry'),
                   ),

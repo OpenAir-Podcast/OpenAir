@@ -789,8 +789,10 @@ class HiveService {
     await box.put(category, FetchDataModel.fromJson(data));
   }
 
-  void addEpisodeToFavorite(Map<String, dynamic> episode) async {
+  void addEpisodeToFavorite(
+      Map<String, dynamic> episode, PodcastModel podcast) async {
     final box = await favoritesBox;
+    episode['podcast'] = podcast;
     await box.put(episode['guid'], episode);
   }
 

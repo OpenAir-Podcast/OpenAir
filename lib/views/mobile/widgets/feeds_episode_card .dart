@@ -388,9 +388,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                                 );
                               }
                             } else {
-                              ref
-                                  .read(audioProvider)
-                                  .addEpisodeToFavorite(widget.episodeItem);
+                              ref.read(audioProvider).addEpisodeToFavorite(
+                                  widget.episodeItem, widget.podcast);
 
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
