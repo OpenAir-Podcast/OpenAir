@@ -251,7 +251,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
               ),
               ListTile(
                 title:
-                    Text(Translations.of(context).text('FastfarwordSkipTime')),
+                    Text(Translations.of(context).text('fastForwardSkipTime')),
                 trailing: SizedBox(
                   width: 200.0,
                   child: DropdownButton<String>(

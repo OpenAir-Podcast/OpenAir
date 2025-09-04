@@ -144,9 +144,10 @@ class HiveService {
 
     favoritesBox = collection.openBox<Map>('favorites');
 
-    Map<String, dynamic>? playbackSettings = await getPlaybackSettings();
+    Map<String, dynamic> playbackSettings = await getPlaybackSettings();
+
     rewindInterval =
-        playbackSettings!['rewindInterval'].toString().split(' ').first;
+        playbackSettings['rewindInterval'].toString().split(' ').first;
 
     fastForwardInterval =
         playbackSettings['fastForwardInterval'].toString().split(' ').first;
@@ -180,6 +181,19 @@ class HiveService {
     }
 
     keepSkippedEp = playbackSettings['keepSkippedEpisodes'];
+
+    // Automatic
+    Map<String, dynamic> automaticSettings = await getAutomaticSettings();
+
+    refreshPodcasts = automaticSettings['refreshPodcasts'];
+    downloadNewEpisodes = automaticSettings['downloadNewEpisodes'];
+    downloadQueuedEpisodes = automaticSettings['downloadQueuedEpisodes'];
+    downloadEpisodeLimit = automaticSettings['downloadEpisodeLimit'];
+
+    deletePlayedEpisodes = automaticSettings['deletePlayedEpisodes'];
+    keepFavouriteEpisodes = automaticSettings['keepFavouriteEpisodes'];
+
+    removeEpisodesFromQueue = automaticSettings['removeEpisodesFromQueue'];
   }
 
   // Subscription Operations:
@@ -526,7 +540,7 @@ class HiveService {
     await box.put('playback', playbackSettings);
   }
 
-  Future<Map<String, dynamic>?> getPlaybackSettings() async {
+  Future<Map<String, dynamic>> getPlaybackSettings() async {
     final box = await settingsBox;
     Map? playbackSettings = await box.get('playback');
 
@@ -551,12 +565,12 @@ class HiveService {
   }
 
   // Automatic
-  void saveDownloadSettings(Map downloadSettings) async {
+  void saveAutomaticSettings(Map downloadSettings) async {
     final box = await settingsBox;
     await box.put('automatic', downloadSettings);
   }
 
-  Future<Map<String, dynamic>?> getDownloadSettings() async {
+  Future<Map<String, dynamic>> getAutomaticSettings() async {
     final box = await settingsBox;
     Map? downloadSettings = await box.get('automatic');
 
@@ -568,7 +582,7 @@ class HiveService {
         'downloadEpisodeLimit': '25',
         //
         'deletePlayedEpisodes': true,
-        "keepFavourteEpisodes": true,
+        "keepFavouriteEpisodes": true,
         //
         "removeEpisodesFromQueue": false,
       };

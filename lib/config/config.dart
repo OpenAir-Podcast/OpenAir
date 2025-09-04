@@ -154,3 +154,14 @@ late bool enqueueDownloaded;
 late bool autoplayNextInQueue;
 late String smartMarkAsCpl;
 late bool keepSkippedEp;
+
+// Automatic
+late String refreshPodcasts;
+late bool downloadNewEpisodes;
+late bool downloadQueuedEpisodes;
+late String downloadEpisodeLimit;
+
+late bool deletePlayedEpisodes;
+late bool keepFavouriteEpisodes;
+
+late bool removeEpisodesFromQueue;

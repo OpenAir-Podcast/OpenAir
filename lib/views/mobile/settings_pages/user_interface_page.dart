@@ -3,14 +3,15 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 final FutureProvider<Map?> userInterfaceSettingsDataProvider =
     FutureProvider((ref) async {
-  final hiveService = ref.watch(openAirProvider).hiveService;
-  Map? userInterfaceSettings = await hiveService.getUserInterfaceSettings();
-  return userInterfaceSettings;
+  final hiveService = await ref.watch(hiveServiceProvider.future);
+  return await hiveService.getUserInterfaceSettings();
 });
 
 enum ThemeMode {

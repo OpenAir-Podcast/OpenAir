@@ -8,7 +8,7 @@ import 'package:theme_provider/theme_provider.dart';
 final FutureProvider<Map?> downloadSettingsDataProvider =
     FutureProvider((ref) async {
   final hiveService = ref.watch(openAirProvider).hiveService;
-  return await hiveService.getDownloadSettings();
+  return await hiveService.getAutomaticSettings();
 });
 
 class AutomaticPage extends ConsumerStatefulWidget {
@@ -27,7 +27,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
   late String downloadEpisodeLimit;
 
   late bool deletePlayedEpisodes;
-  late bool keepFavourteEpisodes;
+  late bool keepFavouriteEpisodes;
 
   late bool removeEpisodesFromQueue;
 
@@ -48,7 +48,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
               downloadsData['downloadQueuedEpisodes'] ?? false;
 
           deletePlayedEpisodes = downloadsData['deletePlayedEpisodes'] ?? false;
-          keepFavourteEpisodes = downloadsData['keepFavourteEpisodes'] ?? false;
+          keepFavouriteEpisodes =
+              downloadsData['keepFavouriteEpisodes'] ?? false;
 
           removeEpisodesFromQueue =
               downloadsData['removeEpisodesFromQueue'] ?? false;
@@ -174,7 +175,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                         ref
                             .watch(openAirProvider)
                             .hiveService
-                            .saveDownloadSettings(downloadsData);
+                            .saveAutomaticSettings(downloadsData);
                       });
                     },
                     items: <String>[
@@ -212,7 +213,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       ref
                           .watch(openAirProvider)
                           .hiveService
-                          .saveDownloadSettings(downloadsData);
+                          .saveAutomaticSettings(downloadsData);
                     });
                   },
                   children: [
@@ -246,7 +247,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       ref
                           .watch(openAirProvider)
                           .hiveService
-                          .saveDownloadSettings(downloadsData);
+                          .saveAutomaticSettings(downloadsData);
                     });
                   },
                   children: [
@@ -304,7 +305,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                         ref
                             .watch(openAirProvider)
                             .hiveService
-                            .saveDownloadSettings(downloadsData);
+                            .saveAutomaticSettings(downloadsData);
                       });
                     },
                     items: <String>[
@@ -343,7 +344,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       ref
                           .watch(openAirProvider)
                           .hiveService
-                          .saveDownloadSettings(downloadsData);
+                          .saveAutomaticSettings(downloadsData);
                     });
                   },
                   children: [
@@ -363,22 +364,22 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                 )),
               ),
               ListTile(
-                title:
-                    Text(Translations.of(context).text('keepFavourteEpisodes')),
+                title: Text(
+                    Translations.of(context).text('keepFavouriteEpisodes')),
                 trailing: SizedBox(
                     child: ToggleButtons(
-                  isSelected: [keepFavourteEpisodes, !keepFavourteEpisodes],
+                  isSelected: [keepFavouriteEpisodes, !keepFavouriteEpisodes],
                   onPressed: deletePlayedEpisodes
                       ? (int index) {
                           setState(() {
-                            keepFavourteEpisodes = !keepFavourteEpisodes;
-                            downloadsData['keepFavourteEpisodes'] =
-                                keepFavourteEpisodes;
+                            keepFavouriteEpisodes = !keepFavouriteEpisodes;
+                            downloadsData['keepFavouriteEpisodes'] =
+                                keepFavouriteEpisodes;
 
                             ref
                                 .watch(openAirProvider)
                                 .hiveService
-                                .saveDownloadSettings(downloadsData);
+                                .saveAutomaticSettings(downloadsData);
                           });
                         }
                       : null,
@@ -417,7 +418,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       ref
                           .watch(openAirProvider)
                           .hiveService
-                          .saveDownloadSettings(downloadsData);
+                          .saveAutomaticSettings(downloadsData);
                     });
                   },
                   children: [
