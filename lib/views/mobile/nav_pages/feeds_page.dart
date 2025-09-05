@@ -44,6 +44,11 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                   icon: const Icon(Icons.refresh_rounded),
                   tooltip: Translations.of(context).text('refresh'),
                   onPressed: () async {
+                    await ref
+                        .read(openAirProvider)
+                        .hiveService
+                        .updateSubscriptions();
+
                     ref.invalidate(getFeedsProvider);
                   },
                 ),

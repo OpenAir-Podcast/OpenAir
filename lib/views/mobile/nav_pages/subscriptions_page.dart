@@ -66,11 +66,11 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                           child: Text(
                             Translations.of(context).text('refreshAllPodcasts'),
                           ),
-                          onTap: () {
-                            ref
+                          onTap: () async {
+                            await ref
                                 .read(openAirProvider)
                                 .hiveService
-                                .podcastAccumulatedSubscribedEpisodes();
+                                .updateSubscriptions();
 
                             ref.invalidate(getSubscriptionsCountProvider);
                             ref.invalidate(subscriptionsProvider);
@@ -86,10 +86,28 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                               context: context,
                               builder: (BuildContext dialogContext) =>
                                   AlertDialog(
-                                title: Text(Translations.of(context)
-                                    .text('clearAllPodcasts')),
-                                content: Text(Translations.of(context)
-                                    .text('areYouSureClearAllPodcasts')),
+                                title: Text(
+                                  Translations.of(context).text(
+                                    'clearAllPodcasts',
+                                  ),
+                                  style: TextStyle(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                                content: Text(
+                                  Translations.of(context).text(
+                                    'areYouSureClearAllPodcasts',
+                                  ),
+                                  style: TextStyle(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
                                 actions: <Widget>[
                                   TextButton(
                                     child: Text(Translations.of(context)
