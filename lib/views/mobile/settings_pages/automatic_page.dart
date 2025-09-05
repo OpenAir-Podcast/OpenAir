@@ -147,7 +147,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Never';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .clearSchedule();
@@ -167,7 +167,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every 2 hours';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(
@@ -178,7 +178,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every 4 hours';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(
@@ -189,7 +189,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every 8 hours';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(
@@ -200,7 +200,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every 12 hours';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(DateTime.now()
@@ -210,7 +210,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every day';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(
@@ -220,7 +220,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['refreshPodcasts'] = 'Every 3 days';
 
                           ref
-                              .watch(openAirProvider)
+                              .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .schedule(
@@ -228,7 +228,7 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                         }
 
                         ref
-                            .watch(openAirProvider)
+                            .read(openAirProvider)
                             .hiveService
                             .saveAutomaticSettings(downloadsData);
                       });

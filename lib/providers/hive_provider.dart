@@ -227,7 +227,7 @@ class HiveService {
         break;
       case 'Never':
       default:
-        return;
+        duration = Duration.zero;
     }
 
     refreshTimer = ScheduledTimer(
@@ -243,6 +243,10 @@ class HiveService {
       defaultScheduledTime: DateTime.now(),
       onMissedSchedule: () => refreshTimer.execute(),
     );
+
+    if (refreshPodcasts != 'Never') {
+      refreshTimer.schedule(DateTime.now().add(duration));
+    }
   }
 
   // Subscription Operations:
@@ -296,6 +300,7 @@ class HiveService {
           if (newEpisodes.length > currentEpisodeCount) {
             for (final episode in newEpisodes) {
               final guid = episode['guid'];
+
               if (await episodeBox.get(guid) == null) {
                 await episodeBox.put(guid, episode);
 
