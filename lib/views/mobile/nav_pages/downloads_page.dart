@@ -47,9 +47,24 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                       context: context,
                       builder: (BuildContext dialogContext) => AlertDialog(
                         title: Text(
-                            Translations.of(context).text('clearDownloads')),
-                        content: Text(Translations.of(context)
-                            .text('areYouSureClearDownloads')),
+                          Translations.of(context).text('clearDownloads'),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                        ),
+                        content: Text(
+                          Translations.of(context)
+                              .text('areYouSureClearDownloads'),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                        ),
                         actions: <Widget>[
                           TextButton(
                             child:

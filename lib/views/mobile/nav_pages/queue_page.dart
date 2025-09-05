@@ -36,16 +36,36 @@ class _QueuePageState extends ConsumerState<QueuePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('queue')),
+        title: Text(
+          Translations.of(context).text('queue'),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext dialogContext) => AlertDialog(
-                  title: Text(Translations.of(context).text('clearQueue')),
+                  title: Text(
+                    Translations.of(context).text('clearQueue'),
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
                   content: Text(
-                      Translations.of(context).text('areYouSureClearQueue')),
+                    Translations.of(context).text('areYouSureClearQueue'),
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
                   actions: <Widget>[
                     TextButton(
                       child: Text(Translations.of(context).text('cancel')),

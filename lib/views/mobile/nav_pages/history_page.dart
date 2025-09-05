@@ -35,7 +35,14 @@ class _HistoryState extends ConsumerState<HistoryPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(Translations.of(context).text('history')),
+            title: Text(
+              Translations.of(context).text('history'),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
+            ),
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -46,10 +53,25 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) => AlertDialog(
-                        title:
-                            Text(Translations.of(context).text('clearHistory')),
-                        content: Text(Translations.of(context)
-                            .text('areYouSureClearHistory')),
+                        title: Text(
+                          Translations.of(context).text('clearHistory'),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                        ),
+                        content: Text(
+                          Translations.of(context)
+                              .text('areYouSureClearHistory'),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                        ),
                         actions: <Widget>[
                           TextButton(
                             child:

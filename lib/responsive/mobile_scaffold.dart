@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/mobile/main_pages/categories_page.dart';
 import 'package:openair/views/mobile/main_pages/featured_page.dart';
 import 'package:openair/views/mobile/main_pages/trending_page.dart';
