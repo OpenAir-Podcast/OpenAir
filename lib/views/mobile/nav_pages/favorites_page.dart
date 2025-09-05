@@ -10,7 +10,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 
-final isFavoriteProvider = StreamProvider.autoDispose((ref) async* {
+final getFavoriteProvider = StreamProvider.autoDispose((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
   yield* hiveService.getFavoriteEpisodes().asStream();
 });
@@ -25,7 +25,7 @@ class FavoritesPage extends ConsumerStatefulWidget {
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map> getEpisodesValue = ref.watch(isFavoriteProvider);
+    final AsyncValue<Map> getEpisodesValue = ref.watch(getFavoriteProvider);
 
     return getEpisodesValue.when(
       data: (Map data) {
@@ -43,7 +43,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                   icon: const Icon(Icons.refresh_rounded),
                   tooltip: Translations.of(context).text('refresh'),
                   onPressed: () async {
-                    ref.invalidate(isFavoriteProvider);
+                    ref.invalidate(getFavoriteProvider);
                   },
                 ),
               ),
@@ -52,7 +52,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
-              onRefresh: () async => ref.invalidate(isFavoriteProvider),
+              onRefresh: () async => ref.invalidate(getFavoriteProvider),
               child: ListView.builder(
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
@@ -125,7 +125,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                       ),
                     ),
                     onPressed: () async {
-                      ref.invalidate(isFavoriteProvider);
+                      ref.invalidate(getFavoriteProvider);
                     },
                     child: const Text('Retry'),
                   ),

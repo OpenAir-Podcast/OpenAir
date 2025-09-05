@@ -48,7 +48,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
     final AsyncValue<List<DownloadModel>> downloadedListProvider =
         ref.watch(sortedDownloadsProvider);
 
-    final AsyncValue favoriteListAsync = ref.watch(isFavoriteProvider);
+    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     return GestureDetector(
       onTap: () {
@@ -419,7 +419,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ref.read(audioProvider).addEpisodeToFavorite(
                                   widget.episodeItem, widget.podcast);
 
-                              ref.invalidate(isFavoriteProvider);
+                              ref.invalidate(getFavoriteProvider);
 
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(

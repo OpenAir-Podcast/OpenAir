@@ -35,7 +35,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
 
-    final AsyncValue favoriteListAsync = ref.watch(isFavoriteProvider);
+    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -95,20 +95,20 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 140.0,
-                          child: Text(
-                            ref.watch(audioProvider).currentPodcast!.author ??
-                                Translations.of(context).text('unknown'),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Colors.grey,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
+                        // SizedBox(
+                        //   width: MediaQuery.of(context).size.width - 140.0,
+                        //   child: Text(
+                        //     ref.watch(audioProvider).currentPodcast!.author ??
+                        //         Translations.of(context).text('unknown'),
+                        //     style: const TextStyle(
+                        //       fontWeight: FontWeight.bold,
+                        //       fontSize: 14.0,
+                        //       color: Colors.grey,
+                        //     ),
+                        //     overflow: TextOverflow.ellipsis,
+                        //     maxLines: 2,
+                        //   ),
+                        // ),
                         // Podcast Published Date
                         Text(
                           ref
@@ -336,37 +336,44 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       icon: const Icon(Icons.share_rounded),
                     ),
                     favoriteListAsync.when(
-                      data: (isCurrentlyFavorite) {
+                      data: (data) {
+                        bool isFavorite =
+                            data.containsKey(widget.episodeItem!['guid']);
+
                         return IconButton(
                           tooltip: Translations.of(context).text('favourite'),
                           onPressed: () async {
-                            if (isCurrentlyFavorite) {
-                              ref.read(audioProvider).removeEpisodeFromFavorite(
-                                  widget.episodeItem!['guid']);
+                            setState(() {
+                              if (isFavorite) {
+                                ref
+                                    .read(audioProvider)
+                                    .removeEpisodeFromFavorite(
+                                        widget.episodeItem!['guid']);
 
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem!['title']}'),
-                                  ),
-                                );
-                              }
-                            } else {
-                              ref.read(audioProvider).addEpisodeToFavorite(
-                                  widget.episodeItem!, widget.podcast!);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem!['title']}'),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                ref.read(audioProvider).addEpisodeToFavorite(
+                                    widget.episodeItem!, widget.podcast!);
 
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem!['title']}'),
-                                  ),
-                                );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem!['title']}'),
+                                    ),
+                                  );
+                                }
                               }
-                            }
+                            });
                           },
-                          icon: isCurrentlyFavorite
+                          icon: isFavorite
                               ? const Icon(Icons.favorite_rounded)
                               : const Icon(Icons.favorite_border_rounded),
                         );

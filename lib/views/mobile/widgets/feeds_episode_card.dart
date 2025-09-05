@@ -36,7 +36,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue favoriteListAsync = ref.watch(isFavoriteProvider);
+    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     podcastDate = ref
         .watch(audioProvider)

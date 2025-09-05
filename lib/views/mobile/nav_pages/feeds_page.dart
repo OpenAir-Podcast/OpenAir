@@ -63,20 +63,22 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
-                  PodcastModel podcastModel = PodcastModel(
-                    id: int.parse(data[index]['podcastId']),
-                    title: data[index]['title'],
-                    author: data[index]['author'],
-                    feedUrl: data[index]['feedUrl'],
-                    imageUrl: data[index]['image'],
-                    description: data[index]['description'],
-                    artwork: data[index]['image'],
-                  );
+                  final episodeData = data[index];
 
                   return FeedsEpisodeCard(
-                    title: data[index]['title'],
-                    episodeItem: data[index].cast<String, dynamic>(),
-                    podcast: podcastModel,
+                    title: episodeData['title'],
+                    episodeItem: episodeData.cast<String, dynamic>(),
+                    podcast: PodcastModel(
+                      id: episodeData['id'] ?? -1,
+                      title: episodeData['title'],
+                      description: episodeData['description'],
+                      author: episodeData['author'] ??
+                          Translations.of(context).text('unknown'),
+                      feedUrl: episodeData['feedUrl'],
+                      artwork: episodeData['image'],
+                      imageUrl:
+                          episodeData['feedImage'] ?? episodeData['image'],
+                    ),
                   );
                 },
               ),

@@ -1283,13 +1283,13 @@ class AudioProvider extends ChangeNotifier {
       Map<String, dynamic> episode, PodcastModel podcast) async {
     final hiveService = ref.read(hiveServiceProvider);
     hiveService.addEpisodeToFavorite(episode, podcast);
-    ref.invalidate(isFavoriteProvider);
+    ref.invalidate(getFavoriteProvider);
   }
 
   Future<void> removeEpisodeFromFavorite(String guid) async {
     final hiveService = ref.read(hiveServiceProvider);
     hiveService.removeEpisodeFromFavorite(guid);
-    ref.invalidate(isFavoriteProvider);
+    ref.invalidate(getFavoriteProvider);
   }
 
   Future<Map?> getFavoriteEpisodes() async {

@@ -10,6 +10,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
+import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
@@ -53,6 +54,8 @@ class _SubscriptionEpisodeCardState
         ref.watch(sortedDownloadsProvider);
 
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
+
+    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     return GestureDetector(
       onTap: () {
@@ -386,10 +389,77 @@ class _SubscriptionEpisodeCardState
                                           strokeWidth: 2.0)),
                                   onPressed: null),
                             ),
+                          // Share Button
                           IconButton(
-                            tooltip: "More",
-                            onPressed: () {},
-                            icon: const Icon(Icons.more_vert_rounded),
+                            tooltip: Translations.of(context).text('share'),
+                            onPressed: () => ref.watch(openAirProvider).share(),
+                            icon: const Icon(Icons.share_rounded),
+                          ),
+                          favoriteListAsync.when(
+                            data: (data) {
+                              bool isFavorite =
+                                  data.containsKey(widget.episodeItem['guid']);
+
+                              return IconButton(
+                                tooltip:
+                                    Translations.of(context).text('favourite'),
+                                onPressed: () async {
+                                  setState(() {
+                                    if (isFavorite) {
+                                      ref
+                                          .read(audioProvider)
+                                          .removeEpisodeFromFavorite(
+                                              widget.episodeItem['guid']);
+
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}'),
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      ref
+                                          .read(audioProvider)
+                                          .addEpisodeToFavorite(
+                                              widget.episodeItem,
+                                              widget.podcast);
+
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}'),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  });
+                                },
+                                icon: isFavorite
+                                    ? const Icon(Icons.favorite_rounded)
+                                    : const Icon(Icons.favorite_border_rounded),
+                              );
+                            },
+                            loading: () => IconButton(
+                              tooltip:
+                                  Translations.of(context).text('favourite'),
+                              onPressed: null, // Disable button while loading
+                              icon: const Icon(Icons
+                                  .favorite_border_rounded), // Or a loading indicator icon
+                            ),
+                            error: (error, stackTrace) {
+                              debugPrint(
+                                  'Error checking favorite status: $error');
+                              return IconButton(
+                                tooltip: Translations.of(context).text('error'),
+                                onPressed: null,
+                                icon: const Icon(Icons.error_outline_rounded),
+                              );
+                            },
                           ),
                         ],
                       ),

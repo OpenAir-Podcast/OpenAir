@@ -86,6 +86,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                       if (episodeData == null) {
                         return const SizedBox.shrink();
                       }
+                      
                       PodcastModel podcastModel = PodcastModel(
                         id: episodeData['id'],
                         title: episodeData['title'],
