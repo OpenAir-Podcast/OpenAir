@@ -271,7 +271,7 @@ class AudioProvider extends ChangeNotifier {
   Future<void> downloadEpisode(
     Map<String, dynamic> item,
     PodcastModel podcast,
-    BuildContext context,
+    BuildContext? context,
   ) async {
     final dio = Dio();
 
@@ -317,7 +317,7 @@ class AudioProvider extends ChangeNotifier {
 
       ref.invalidate(sortedDownloadsProvider);
 
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -335,7 +335,7 @@ class AudioProvider extends ChangeNotifier {
         await file.delete();
       }
 
-      if (context.mounted) {
+      if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('An error has occurred while downloading.'),

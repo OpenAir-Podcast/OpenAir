@@ -14,6 +14,7 @@ import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
@@ -297,6 +298,23 @@ class HiveService {
               final guid = episode['guid'];
               if (await episodeBox.get(guid) == null) {
                 await episodeBox.put(guid, episode);
+
+                if (downloadNewEpisodes) {
+                  final podcast = PodcastModel(
+                    id: subscription.id,
+                    title: subscription.title,
+                    author: subscription.author,
+                    feedUrl: subscription.feedUrl,
+                    imageUrl: subscription.imageUrl,
+                    description: subscription.description,
+                    artwork: subscription.artwork,
+                  );
+
+                  // No context is available here.
+                  ref
+                      .read(audioProvider)
+                      .downloadEpisode(episode, podcast, null);
+                }
               }
             }
 
@@ -389,8 +407,6 @@ class HiveService {
       },
     );
   }
-
-  
 
   // Feed Operations:
   Future<void> addToFeed(FeedModel feed) async {
