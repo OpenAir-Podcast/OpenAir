@@ -972,6 +972,10 @@ class AudioProvider extends ChangeNotifier {
       'playerPosition': Duration.zero,
     });
 
+    if (downloadQueuedEpisodes) {
+      await downloadEpisode(episode, podcast, null);
+    }
+
     ref.invalidate(sortedProvider);
     ref.invalidate(getQueueProvider);
     notifyListeners();

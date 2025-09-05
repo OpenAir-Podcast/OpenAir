@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
@@ -62,6 +63,8 @@ class OpenAirProvider extends ChangeNotifier {
       debugPrint(e.toString());
       hasConnection = false;
     }
+
+    automaticDownloadQueuedEpisodes();
   }
 
   Future<bool> getConnectionStatus() async {
@@ -148,8 +151,6 @@ class OpenAirProvider extends ChangeNotifier {
     return await hiveService.getNewInboxCount();
   }
 
-  
-
   Future<String> getQueueCount() async {
     return await hiveService.queueCount();
   }
@@ -215,6 +216,31 @@ class OpenAirProvider extends ChangeNotifier {
               item!['podcast'],
               context,
             );
+      }
+    }
+  }
+
+  void automaticDownloadQueuedEpisodes() async {
+    if (downloadQueuedEpisodes) {
+      Map queue = await hiveService.getQueue();
+
+      if (queue.isEmpty) {
+        return;
+      }
+
+      for (var item in queue.values) {
+        item = Map<String, dynamic>.from(item);
+
+        final isDownloaded =
+            await ref.read(audioProvider).isAudioFileDownloaded(item['guid']);
+
+        if (!isDownloaded) {
+          ref.read(audioProvider).downloadEpisode(
+                item,
+                item['podcast'],
+                null,
+              );
+        }
       }
     }
   }
