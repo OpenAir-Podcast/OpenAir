@@ -3,22 +3,29 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/empty_inbox.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/feeds_episode_card.dart';
 
 final getInboxProvider = FutureProvider.autoDispose((ref) async {
-  final Map? inboxEpisodes =
-      await ref.watch(openAirProvider).getInboxEpisodes();
+  final Map<String, FeedModel> inboxEpisodes =
+      await ref.watch(hiveServiceProvider).getFeed();
 
-  if (inboxEpisodes != null) {
+  if (inboxEpisodes.isNotEmpty) {
     return inboxEpisodes;
   }
 
-  return await ref.read(openAirProvider).fetchInboxEpisodes();
+  await ref.read(hiveServiceProvider).updateSubscriptions();
+  return await ref.watch(hiveServiceProvider).getFeed();
+});
+
+final episodeProvider =
+    FutureProvider.autoDispose.family<Map?, String>((ref, guid) async {
+  return await ref.watch(hiveServiceProvider).getEpisode(guid);
 });
 
 class InboxPage extends ConsumerStatefulWidget {
@@ -31,13 +38,16 @@ class InboxPage extends ConsumerStatefulWidget {
 class _InboxPageState extends ConsumerState<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map> getEpisodesValue = ref.watch(getInboxProvider);
+    final AsyncValue<Map<String, FeedModel>> getEpisodesValue =
+        ref.watch(getInboxProvider);
 
     return getEpisodesValue.when(
-      data: (Map data) {
+      data: (Map<String, FeedModel> data) {
         if (data.isEmpty) {
           return EmptyInbox();
         }
+
+        final feedItems = data.values.toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -49,6 +59,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                   icon: const Icon(Icons.refresh_rounded),
                   tooltip: Translations.of(context).text('refresh'),
                   onPressed: () async {
+                    await ref.read(hiveServiceProvider).updateSubscriptions();
                     ref.invalidate(getInboxProvider);
                   },
                 ),
@@ -58,25 +69,42 @@ class _InboxPageState extends ConsumerState<InboxPage> {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
-              onRefresh: () async => ref.invalidate(getInboxProvider),
+              onRefresh: () async {
+                await ref.read(hiveServiceProvider).updateSubscriptions();
+                ref.invalidate(getInboxProvider);
+              },
               child: ListView.builder(
                 cacheExtent: cacheExtent,
-                itemCount: data.length,
+                itemCount: feedItems.length,
                 itemBuilder: (context, index) {
-                  PodcastModel podcastModel = PodcastModel(
-                    id: int.parse(data[index]['podcastId']),
-                    title: data[index]['title'],
-                    author: data[index]['author'],
-                    feedUrl: data[index]['feedUrl'],
-                    imageUrl: data[index]['image'],
-                    description: data[index]['description'],
-                    artwork: data[index]['image'],
-                  );
+                  final feedItem = feedItems[index];
+                  final episodeFuture =
+                      ref.watch(episodeProvider(feedItem.guid));
 
-                  return FeedsEpisodeCard(
-                    title: data[index]['title'],
-                    episodeItem: data[index].cast<String, dynamic>(),
-                    podcast: podcastModel,
+                  return episodeFuture.when(
+                    data: (episodeData) {
+                      if (episodeData == null) {
+                        return const SizedBox.shrink();
+                      }
+                      PodcastModel podcastModel = PodcastModel(
+                        id: episodeData['id'],
+                        title: episodeData['title'],
+                        author: episodeData['author'],
+                        feedUrl: episodeData['feedUrl'],
+                        imageUrl: episodeData['image'],
+                        description: episodeData['description'],
+                        artwork: episodeData['image'],
+                      );
+
+                      return FeedsEpisodeCard(
+                        title: episodeData['title'],
+                        episodeItem: episodeData.cast<String, dynamic>(),
+                        podcast: podcastModel,
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, stackTrace) => const SizedBox.shrink(),
                   );
                 },
               ),
@@ -140,11 +168,8 @@ class _InboxPageState extends ConsumerState<InboxPage> {
           ),
         );
       },
-      loading: () => Container(
-        color: Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

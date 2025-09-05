@@ -281,7 +281,6 @@ class HiveService {
   Future<void> updateSubscriptions() async {
     final subscriptions = await getSubscriptions();
     final episodeBox = await this.episodeBox;
-    final feedBox = await this.feedBox;
 
     for (final subscription in subscriptions.values) {
       try {
@@ -298,7 +297,6 @@ class HiveService {
               final guid = episode['guid'];
               if (await episodeBox.get(guid) == null) {
                 await episodeBox.put(guid, episode);
-                await feedBox.put(guid, FeedModel(guid: guid));
               }
             }
 
@@ -308,6 +306,35 @@ class HiveService {
         }
       } catch (e) {
         debugPrint('Error updating subscription ${subscription.title}: $e');
+      }
+    }
+    await populateInbox();
+  }
+
+  Future<void> populateInbox() async {
+    final subscriptions = await getSubscriptions();
+    final episodeBox = await this.episodeBox;
+    final feedBox = await this.feedBox;
+
+    for (final subscription in subscriptions.values) {
+      try {
+        final response = await ref
+            .read(podcastIndexProvider)
+            .getEpisodesByFeedUrl(subscription.feedUrl);
+
+        if (response.isNotEmpty) {
+          final newEpisodes = response['items'];
+
+          for (final episode in newEpisodes) {
+            final guid = episode['guid'];
+            if (await episodeBox.get(guid) == null) {
+              await episodeBox.put(guid, episode);
+              await feedBox.put(guid, FeedModel(guid: guid));
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Error populating inbox for ${subscription.title}: $e');
       }
     }
   }
@@ -363,46 +390,7 @@ class HiveService {
     );
   }
 
-  void saveInboxEpisodes(Map episodes) async {
-    final persistenceBox = await persistence;
-
-    await persistenceBox.put('inbox_episodes', episodes);
-  }
-
-  Future<Map?> getInboxEpisodes() async {
-    final persistenceBox = await persistence;
-    return await persistenceBox.get('inbox_episodes');
-  }
-
-  Future<Map<String, Map>> fetchInboxEpisodes() async {
-    final subscriptions = await getSubscriptions();
-    final episodesBox = await episodeBox;
-    final allStoredEpisodes = await episodesBox.getAllValues();
-    final newEpisodes = <String, Map>{};
-
-    for (final subscription in subscriptions.values) {
-      try {
-        final podcastEpisodes = await ref
-            .read(podcastIndexProvider)
-            .getEpisodesByFeedUrl(subscription.feedUrl);
-
-        for (final episodeData in podcastEpisodes['items']) {
-          final guid = episodeData['guid'];
-
-          if (guid != null) {
-            if (!allStoredEpisodes.containsKey(guid)) {
-              newEpisodes[guid] = episodeData;
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint('Error fetching episodes for ${subscription.title}: $e');
-      }
-    }
-
-    saveInboxEpisodes(newEpisodes);
-    return newEpisodes;
-  }
+  
 
   // Feed Operations:
   Future<void> addToFeed(FeedModel feed) async {
