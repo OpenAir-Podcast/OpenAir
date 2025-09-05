@@ -192,7 +192,7 @@ class AudioProvider extends ChangeNotifier {
     }
 
     // The HiveService initializes and holds the reference to the app's base directory.
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     final baseDir = hiveService.openAirDir;
 
     // Define a specific subdirectory for downloads to keep things organized.
@@ -243,7 +243,7 @@ class AudioProvider extends ChangeNotifier {
         }
       }
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       hiveService.clearDownloads();
       ref.invalidate(getDownloadsProvider);
 
@@ -312,7 +312,7 @@ class AudioProvider extends ChangeNotifier {
         fileName: filename,
       );
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       await hiveService.addToDownloads(downloadModel);
 
       ref.invalidate(sortedDownloadsProvider);
@@ -364,7 +364,7 @@ class AudioProvider extends ChangeNotifier {
         await file.delete();
       }
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       await hiveService.deleteDownload(guid);
 
       notifyListeners();
@@ -451,7 +451,7 @@ class AudioProvider extends ChangeNotifier {
       return;
     }
 
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     Map queueMap = await hiveService.getQueue();
 
     // Convert to list and sort by position
@@ -528,7 +528,7 @@ class AudioProvider extends ChangeNotifier {
       return;
     }
 
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     final Map queueMap = await hiveService.getQueue();
 
     // Convert to a list and sort by position to ensure correct order.
@@ -621,7 +621,7 @@ class AudioProvider extends ChangeNotifier {
           if (remainingTimeInSeconds < sec && isCompleted == false) {
             isCompleted = true;
 
-            final hiveService = await ref.read(hiveServiceProvider.future);
+            final hiveService = ref.read(hiveServiceProvider);
 
             hiveService.addToCompletedEpisode(
               CompletedEpisodeModel(guid: currentEpisode!['guid']),
@@ -642,7 +642,7 @@ class AudioProvider extends ChangeNotifier {
           audioState = 'Stop';
           isPlaying = PlayingStatus.stop;
 
-          final hiveService = await ref.read(hiveServiceProvider.future);
+          final hiveService = ref.read(hiveServiceProvider);
           hiveService.addToCompletedEpisode(
             CompletedEpisodeModel(guid: currentEpisode!['guid']),
           );
@@ -721,7 +721,7 @@ class AudioProvider extends ChangeNotifier {
         isPlaying = PlayingStatus.stop;
       }
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
 
       // 1. Remove the completed episode from the queue
       await hiveService.removeFromQueue(guid: completedEpisodeGuid);
@@ -850,7 +850,7 @@ class AudioProvider extends ChangeNotifier {
   void mainPlayerMoreOptionsClicked() {}
 
   void removeFromQueue(String guid) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.removeFromQueue(guid: guid);
     ref.invalidate(sortedProvider);
     ref.invalidate(getQueueProvider);
@@ -861,7 +861,7 @@ class AudioProvider extends ChangeNotifier {
     Map<String, dynamic> episode,
     PodcastModel? podcast,
   ) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     Map queue = await hiveService.getQueue();
 
     List<Map<String, dynamic>> queueList =
@@ -1005,7 +1005,7 @@ class AudioProvider extends ChangeNotifier {
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
       };
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       hiveService.insertEpisode(
         episode,
         episode['guid'],
@@ -1016,7 +1016,7 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void removePodcastEpisodes(PodcastModel podcast) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.deleteEpisode(podcast.title);
     notifyListeners();
   }
@@ -1041,7 +1041,7 @@ class AudioProvider extends ChangeNotifier {
         artwork: podcast.artwork,
       );
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       hiveService.subscribe(subscription);
       await addPodcastEpisodes(subscription);
 
@@ -1090,7 +1090,7 @@ class AudioProvider extends ChangeNotifier {
         artwork: '',
       );
 
-      final hiveService = await ref.read(hiveServiceProvider.future);
+      final hiveService = ref.read(hiveServiceProvider);
       hiveService.subscribe(subscription);
       await addPodcastEpisodes(podcast);
     } on DioException catch (e) {
@@ -1105,7 +1105,7 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void unsubscribe(PodcastModel podcast) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.unsubscribe(podcast.title);
     removePodcastEpisodes(podcast);
 
@@ -1247,7 +1247,7 @@ class AudioProvider extends ChangeNotifier {
       playDate: DateTime.now(),
     );
 
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.addToHistory(historyMod);
   }
 
@@ -1258,7 +1258,7 @@ class AudioProvider extends ChangeNotifier {
     String currentPlaybackRemainingTimeString,
     Duration position,
   ) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
 
     // Retrieve the existing QueueModel from Hive
     Map? existingQueueItem = await hiveService.getQueueByGuid(guid);
@@ -1281,24 +1281,24 @@ class AudioProvider extends ChangeNotifier {
 
   Future<void> addEpisodeToFavorite(
       Map<String, dynamic> episode, PodcastModel podcast) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.addEpisodeToFavorite(episode, podcast);
     ref.invalidate(isFavoriteProvider);
   }
 
   Future<void> removeEpisodeFromFavorite(String guid) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     hiveService.removeEpisodeFromFavorite(guid);
     ref.invalidate(isFavoriteProvider);
   }
 
   Future<Map?> getFavoriteEpisodes() async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     return await hiveService.getFavoriteEpisodes();
   }
 
   Future<bool> isEpisodesFavorite(String guid) async {
-    final hiveService = await ref.read(hiveServiceProvider.future);
+    final hiveService = ref.read(hiveServiceProvider);
     final Map<dynamic, dynamic>? favoriteEpisodes =
         await hiveService.favoritesBox.then((box) => box.get(guid));
 

@@ -8,7 +8,7 @@ part of 'podcast_model.dart';
 
 class PodcastModelAdapter extends TypeAdapter<PodcastModel> {
   @override
-  final typeId = 8;
+  final typeId = podcastTypeId;
 
   @override
   PodcastModel read(BinaryReader reader) {

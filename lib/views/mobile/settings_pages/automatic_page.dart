@@ -145,31 +145,86 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                         if (Translations.of(context).text('never') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Never';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .clearSchedule();
                         } else if (Translations.of(context).text('everyHour') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every hour';
+
+                          ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(hours: 1)));
                         } else if (Translations.of(context)
                                 .text('every2Hours') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every 2 hours';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(hours: 2)));
                         } else if (Translations.of(context)
                                 .text('every4Hours') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every 4 hours';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(hours: 4)));
                         } else if (Translations.of(context)
                                 .text('every8Hours') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every 8 hours';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(hours: 8)));
                         } else if (Translations.of(context)
                                 .text('every12Hours') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every 12 hours';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(DateTime.now()
+                                  .add(const Duration(hours: 12)));
                         } else if (Translations.of(context).text('everyDay') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every day';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(days: 1)));
                         } else if (Translations.of(context).text('everyDay3') ==
                             newValue) {
                           downloadsData['refreshPodcasts'] = 'Every 3 days';
+
+                          ref
+                              .watch(openAirProvider)
+                              .hiveService
+                              .refreshTimer
+                              .schedule(
+                                  DateTime.now().add(const Duration(days: 3)));
                         }
 
                         ref

@@ -8,7 +8,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/widgets/feeds_episode_card%20.dart';
+import 'package:openair/views/mobile/widgets/feeds_episode_card.dart';
 
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
   // Feeds data comes from subscribed episodes in Hive.

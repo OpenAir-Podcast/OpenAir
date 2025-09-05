@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -17,17 +18,16 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:scheduled_timer/scheduled_timer.dart';
 
-final hiveServiceProvider = FutureProvider<HiveService>((ref) async {
-  final hiveService = HiveService(ref);
-  await hiveService.initial();
-  return hiveService;
-});
+final hiveServiceProvider = Provider<HiveService>(
+  (ref) => HiveService(ref),
+);
 
 // StreamProvider for Subscriptions
 final subscriptionsProvider =
     StreamProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async* {
-  final hiveService = await ref.watch(hiveServiceProvider.future);
+  final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
 
   // Emit the initial state
@@ -37,14 +37,14 @@ final subscriptionsProvider =
 // FutureProvider for sorted Queue List
 final getQueueProvider = StreamProvider.autoDispose(
   (ref) async* {
-    final hiveService = await ref.watch(hiveServiceProvider.future);
+    final hiveService = ref.watch(hiveServiceProvider);
     yield* hiveService.getQueue().asStream();
   },
 );
 
 final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
   (ref) async* {
-    final hiveService = await ref.watch(hiveServiceProvider.future);
+    final hiveService = ref.watch(hiveServiceProvider);
     yield* hiveService.getSortedDownloads().asStream();
   },
 );
@@ -73,6 +73,8 @@ class HiveService {
 
   HiveService(this.ref);
   final Ref ref;
+
+  late ScheduledTimer refreshTimer;
 
   Future<void> initial() async {
     // Register all adapters
@@ -185,6 +187,9 @@ class HiveService {
     // Automatic
     Map<String, dynamic> automaticSettings = await getAutomaticSettings();
 
+    // refresh settings
+    // Never, Every hour, Every 2 hours, Every 4 hours, Every 8 hours,
+    // Every 12 hours, Every day, Every 3 days
     refreshPodcasts = automaticSettings['refreshPodcasts'];
     downloadNewEpisodes = automaticSettings['downloadNewEpisodes'];
     downloadQueuedEpisodes = automaticSettings['downloadQueuedEpisodes'];
@@ -194,6 +199,49 @@ class HiveService {
     keepFavouriteEpisodes = automaticSettings['keepFavouriteEpisodes'];
 
     removeEpisodesFromQueue = automaticSettings['removeEpisodesFromQueue'];
+
+    Duration duration;
+
+    switch (refreshPodcasts) {
+      case 'Every hour':
+        duration = const Duration(hours: 1);
+        break;
+      case 'Every 2 hours':
+        duration = const Duration(hours: 2);
+        break;
+      case 'Every 4 hours':
+        duration = const Duration(hours: 4);
+        break;
+      case 'Every 8 hours':
+        duration = const Duration(hours: 8);
+        break;
+      case 'Every 12 hours':
+        duration = const Duration(hours: 12);
+        break;
+      case 'Every day':
+        duration = const Duration(days: 1);
+        break;
+      case 'Every 3 days':
+        duration = const Duration(days: 3);
+        break;
+      case 'Never':
+      default:
+        return;
+    }
+
+    refreshTimer = ScheduledTimer(
+      id: 'refresh_timer',
+      onExecute: () {
+        if (refreshPodcasts != 'Never') {
+          updateSubscriptions();
+          refreshTimer.schedule(DateTime.now().add(duration));
+        } else {
+          refreshTimer.clearSchedule();
+        }
+      },
+      defaultScheduledTime: DateTime.now(),
+      onMissedSchedule: () => refreshTimer.execute(),
+    );
   }
 
   // Subscription Operations:
@@ -228,6 +276,40 @@ class HiveService {
   Future<void> deleteSubscription(String id) async {
     final box = await subscriptionBox;
     await box.delete(id); // Add await
+  }
+
+  Future<void> updateSubscriptions() async {
+    final subscriptions = await getSubscriptions();
+    final episodeBox = await this.episodeBox;
+    final feedBox = await this.feedBox;
+
+    for (final subscription in subscriptions.values) {
+      try {
+        final response = await ref
+            .read(podcastIndexProvider)
+            .getEpisodesByFeedUrl(subscription.feedUrl);
+
+        if (response.isNotEmpty) {
+          final newEpisodes = response['items'];
+          final currentEpisodeCount = subscription.episodeCount;
+
+          if (newEpisodes.length > currentEpisodeCount) {
+            for (final episode in newEpisodes) {
+              final guid = episode['guid'];
+              if (await episodeBox.get(guid) == null) {
+                await episodeBox.put(guid, episode);
+                await feedBox.put(guid, FeedModel(guid: guid));
+              }
+            }
+
+            subscription.episodeCount = newEpisodes.length;
+            await subscribe(subscription);
+          }
+        }
+      } catch (e) {
+        debugPrint('Error updating subscription ${subscription.title}: $e');
+      }
+    }
   }
 
   // Episodes Operations:
@@ -292,7 +374,6 @@ class HiveService {
     return await persistenceBox.get('inbox_episodes');
   }
 
-  // TODO: Rename this....
   Future<Map<String, Map>> fetchInboxEpisodes() async {
     final subscriptions = await getSubscriptions();
     final episodesBox = await episodeBox;
@@ -382,7 +463,7 @@ class HiveService {
       ..sort(
           (a, b) => (a.value['pos'] as int).compareTo(b.value['pos'] as int));
 
-    // Adjust newIndex as per Flutter's ReorderableListView behavior
+    // Adjust newIndex as per Flutter's ReorderableListView behaviour
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }

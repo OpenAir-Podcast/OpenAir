@@ -10,7 +10,7 @@ import 'package:theme_provider/theme_provider.dart';
 
 final FutureProvider<Map?> userInterfaceSettingsDataProvider =
     FutureProvider((ref) async {
-  final hiveService = await ref.watch(hiveServiceProvider.future);
+  final hiveService = ref.watch(hiveServiceProvider);
   return await hiveService.getUserInterfaceSettings();
 });
 

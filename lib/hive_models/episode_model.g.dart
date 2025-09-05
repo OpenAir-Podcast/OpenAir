@@ -8,7 +8,7 @@ part of 'episode_model.dart';
 
 class EpisodeModelAdapter extends TypeAdapter<EpisodeModel> {
   @override
-  final typeId = 1;
+  final typeId = episodeTypeId;
 
   @override
   EpisodeModel read(BinaryReader reader) {

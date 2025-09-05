@@ -14,18 +14,11 @@ import 'package:openair/hive_models/subscription_model.dart';
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CompletedEpisodeModelAdapter());
-    registerAdapter(CompletedEpisodeModelAdapter());
-    registerAdapter(DownloadModelAdapter());
     registerAdapter(DownloadModelAdapter());
     registerAdapter(FeedModelAdapter());
-    registerAdapter(FeedModelAdapter());
-    registerAdapter(FetchDataModelAdapter());
     registerAdapter(FetchDataModelAdapter());
     registerAdapter(HistoryModelAdapter());
-    registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
-    registerAdapter(PodcastModelAdapter());
-    registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }
 }
@@ -33,18 +26,11 @@ extension HiveRegistrar on HiveInterface {
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CompletedEpisodeModelAdapter());
-    registerAdapter(CompletedEpisodeModelAdapter());
-    registerAdapter(DownloadModelAdapter());
     registerAdapter(DownloadModelAdapter());
     registerAdapter(FeedModelAdapter());
-    registerAdapter(FeedModelAdapter());
-    registerAdapter(FetchDataModelAdapter());
     registerAdapter(FetchDataModelAdapter());
     registerAdapter(HistoryModelAdapter());
-    registerAdapter(HistoryModelAdapter());
     registerAdapter(PodcastModelAdapter());
-    registerAdapter(PodcastModelAdapter());
-    registerAdapter(SubscriptionModelAdapter());
     registerAdapter(SubscriptionModelAdapter());
   }
 }

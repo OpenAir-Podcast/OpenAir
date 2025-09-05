@@ -11,7 +11,7 @@ import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 
 final isFavoriteProvider = StreamProvider.autoDispose((ref) async* {
-  final hiveService = await ref.watch(hiveServiceProvider.future);
+  final hiveService = ref.watch(hiveServiceProvider);
   yield* hiveService.getFavoriteEpisodes().asStream();
 });
 

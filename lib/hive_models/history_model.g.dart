@@ -8,7 +8,7 @@ part of 'history_model.dart';
 
 class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
   @override
-  final typeId = 5;
+  final typeId = historyTypeId;
 
   @override
   HistoryModel read(BinaryReader reader) {

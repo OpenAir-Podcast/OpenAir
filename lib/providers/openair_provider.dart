@@ -46,7 +46,8 @@ class OpenAirProvider extends ChangeNotifier {
 
     this.context = context;
 
-    hiveService = await ref.read(hiveServiceProvider.future);
+    hiveService = ref.read(hiveServiceProvider);
+    await hiveService.initial();
 
     try {
       final List<ConnectivityResult> connectivityResult =

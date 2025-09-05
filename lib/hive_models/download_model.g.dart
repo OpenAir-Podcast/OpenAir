@@ -8,7 +8,7 @@ part of 'download_model.dart';
 
 class DownloadModelAdapter extends TypeAdapter<DownloadModel> {
   @override
-  final typeId = 4;
+  final typeId = downloadTypeId;
 
   @override
   DownloadModel read(BinaryReader reader) {
