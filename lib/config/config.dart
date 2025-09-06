@@ -165,3 +165,10 @@ late bool deletePlayedEpisodes;
 late bool keepFavouriteEpisodes;
 
 late bool removeEpisodesFromQueue;
+
+// Synchronization
+late bool syncFavourites;
+late bool syncQueue;
+late bool syncHistory;
+late bool syncPlaybackPosition;
+late bool syncSettings;

@@ -336,5 +336,6 @@
     "emptyFavorites": "Oups, il semble que vous n'ayez aucun favori...",
     "emptyFavoritesSubtitle": "Veuillez ajouter des épisodes à vos favoris et réessayer",
     "removedFromFavorites": "Retiré des favoris",
-    "addedToFavorites": "Ajouté aux favoris"
+    "addedToFavorites": "Ajouté aux favoris",
+    "oopsAnErrorHasOccurredWhileDownloading": "Oups ! Une erreur est survenue lors du téléchargement."
 }

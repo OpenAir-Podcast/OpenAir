@@ -336,5 +336,6 @@
     "emptyFavorites": "Oeps, het lijkt erop dat je geen favorieten hebt...",
     "emptyFavoritesSubtitle": "Voeg een paar afleveringen toe aan je favorieten en probeer het opnieuw",
     "removedFromFavorites": "Verwijderd uit favorieten",
-    "addedToFavorites": "Toegevoegd aan favorieten"
+    "addedToFavorites": "Toegevoegd aan favorieten",
+    "oopsAnErrorHasOccurredWhileDownloading": "Oeps! Er is een fout opgetreden tijdens het downloaden."
 }

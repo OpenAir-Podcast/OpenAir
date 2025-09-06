@@ -194,6 +194,8 @@ class HiveService {
     refreshPodcasts = automaticSettings['refreshPodcasts'];
     downloadNewEpisodes = automaticSettings['downloadNewEpisodes'];
     downloadQueuedEpisodes = automaticSettings['downloadQueuedEpisodes'];
+
+    // 5, 10, 25, 50, 75, 100, 500, unlimited
     downloadEpisodeLimit = automaticSettings['downloadEpisodeLimit'];
 
     deletePlayedEpisodes = automaticSettings['deletePlayedEpisodes'];
@@ -247,6 +249,16 @@ class HiveService {
     if (refreshPodcasts != 'Never') {
       refreshTimer.schedule(DateTime.now().add(duration));
     }
+
+    // Synchronization
+    Map<String, dynamic>? synchronizationSettings =
+        await getSynchronizationSettings();
+
+    syncFavourites = synchronizationSettings!['syncFavourites'];
+    syncQueue = synchronizationSettings['syncQueue'];
+    syncHistory = synchronizationSettings['syncHistory'];
+    syncPlaybackPosition = synchronizationSettings['syncPlaybackPosition'];
+    syncSettings = synchronizationSettings['syncSettings'];
   }
 
   // Subscription Operations:
@@ -842,12 +854,12 @@ class HiveService {
     return result.toString();
   }
 
-  Future<String> downloadsCount() async {
+  Future<int> downloadsCount() async {
     final box = await downloadBox;
     final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
 
     int result = allEpisodes.length;
-    return result.toString();
+    return result;
   }
 
   Future<int> getAccumulatedEpisodes() async {

@@ -336,5 +336,6 @@
     "emptyFavorites": "عفوًا، يبدو أنه ليس لديك أي مفضلات...",
     "emptyFavoritesSubtitle": "يرجى إضافة بعض الحلقات إلى مفضلاتك والمحاولة مرة أخرى",
     "removedFromFavorites": "تمت الإزالة من المفضلة",
-    "addedToFavorites": "تمت الإضافة إلى المفضلة"
+    "addedToFavorites": "تمت الإضافة إلى المفضلة",
+    "oopsAnErrorHasOccurredWhileDownloading": "عفوًا! حدث خطأ أثناء التنزيل."
 }

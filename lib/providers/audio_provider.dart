@@ -273,6 +273,33 @@ class AudioProvider extends ChangeNotifier {
     PodcastModel podcast,
     BuildContext? context,
   ) async {
+    final hiveService = ref.read(hiveServiceProvider);
+
+    // Get the download limit.
+    final downloadLimitString = downloadEpisodeLimit;
+
+    final downloadLimit = downloadLimitString != 'Unlimited'
+        ? int.tryParse(downloadLimitString)
+        : null;
+
+    // Get the number of downloaded episodes.
+    final downloadedCount = await hiveService.downloadsCount();
+
+    // Check if the limit has been reached.
+    if (downloadLimit != null && downloadedCount >= downloadLimit) {
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Download limit of $downloadLimit episodes reached.',
+            ),
+          ),
+        );
+      }
+      
+      return;
+    }
+
     final dio = Dio();
 
     final guid = item['guid'] as String;
@@ -312,7 +339,6 @@ class AudioProvider extends ChangeNotifier {
         fileName: filename,
       );
 
-      final hiveService = ref.read(hiveServiceProvider);
       await hiveService.addToDownloads(downloadModel);
 
       ref.invalidate(sortedDownloadsProvider);
@@ -338,7 +364,7 @@ class AudioProvider extends ChangeNotifier {
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('An error has occurred while downloading.'),
+            content: Text(''),
           ),
         );
       }

@@ -336,5 +336,6 @@
     "emptyFavorites": "おっと, 즐겨찾기가 없는 것 같습니다...",
     "emptyFavoritesSubtitle": "즐겨찾기에 에피소드를 추가한 후 다시 시도하십시오",
     "removedFromFavorites": "즐겨찾기에서 제거됨",
-    "addedToFavorites": "즐겨찾기에 추가됨"
+    "addedToFavorites": "즐겨찾기에 추가됨",
+    "oopsAnErrorHasOccurredWhileDownloading": "おっと! 다운로드 중 오류가 발생했습니다."
 }

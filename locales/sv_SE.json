@@ -336,5 +336,6 @@
     "emptyFavorites": "Hoppsan, det verkar som om du inte har några favoriter...",
     "emptyFavoritesSubtitle": "Lägg till några avsnitt i dina favoriter och försök igen",
     "removedFromFavorites": "Borttagen från favoriter",
-    "addedToFavorites": "Tillagd i favoriter"
+    "addedToFavorites": "Tillagd i favoriter",
+    "oopsAnErrorHasOccurredWhileDownloading": "Hoppsan! Ett fel uppstod under nedladdningen."
 }

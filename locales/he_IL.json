@@ -336,5 +336,6 @@
     "emptyFavorites": "אופס, נראה שאין לך מועדפים...",
     "emptyFavoritesSubtitle": "אנא הוסף כמה פרקים למועדפים שלך ונסה שוב",
     "removedFromFavorites": "הוסר ממועדפים",
-    "addedToFavorites": "נוסף למועדפים"
+    "addedToFavorites": "נוסף למועדפים",
+    "oopsAnErrorHasOccurredWhileDownloading": "אופס! אירעה שגיאה במהלך ההורדה."
 }

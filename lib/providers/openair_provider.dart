@@ -155,7 +155,7 @@ class OpenAirProvider extends ChangeNotifier {
     return await hiveService.queueCount();
   }
 
-  Future<String> getDownloadsCount() async {
+  Future<int> getDownloadsCount() async {
     return await hiveService.downloadsCount();
   }
 

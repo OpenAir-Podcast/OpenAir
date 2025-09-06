@@ -336,5 +336,6 @@
     "emptyFavorites": "Ой, похоже, у вас нет избранного...",
     "emptyFavoritesSubtitle": "Пожалуйста, добавьте несколько эпизодов в избранное и повторите попытку",
     "removedFromFavorites": "Удалено из избранного",
-    "addedToFavorites": "Добавлено в избранное"
+    "addedToFavorites": "Добавлено в избранное",
+    "oopsAnErrorHasOccurredWhileDownloading": "Ой! Произошла ошибка при загрузке."
 }

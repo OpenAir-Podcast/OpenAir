@@ -336,5 +336,6 @@
     "emptyFavorites": "お気に入りがないようです...",
     "emptyFavoritesSubtitle": "お気に入りにエピソードを追加してからもう一度お試しください",
     "removedFromFavorites": "お気に入りから削除されました",
-    "addedToFavorites": "お気に入りに追加されました"
+    "addedToFavorites": "お気に入りに追加されました",
+    "oopsAnErrorHasOccurredWhileDownloading": "おっと！ダウンロード中にエラーが発生しました。"
 }

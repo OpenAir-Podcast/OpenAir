@@ -39,7 +39,7 @@ final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
   return await ref.read(openAirProvider).getQueueCount();
 });
 
-final downloadsCountProvider = FutureProvider.autoDispose<String>((ref) async {
+final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   // Watch hiveServiceProvider as queue counts depend on Hive data
   return await ref.read(openAirProvider).getDownloadsCount();
 });
@@ -60,7 +60,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
     final AsyncValue<int> getInboxCountValue = ref.watch(inboxCountProvider);
     final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
-    final AsyncValue<String> getDownloadsCountValue =
+    final AsyncValue<int> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
 
     return Drawer(
@@ -293,11 +293,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       ),
                     );
                   },
-                  data: (String data) {
+                  data: (int data) {
                     return ListTile(
                       leading: const Icon(Icons.download_rounded),
                       title: Text(Translations.of(context).text('downloads')),
-                      trailing: Text(data),
+                      trailing: Text(data.toString()),
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.of(context).push(
