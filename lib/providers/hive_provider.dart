@@ -593,6 +593,30 @@ class HiveService {
       CompletedEpisodeModel completedEpisode) async {
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);
+    deletePlayedEpisode(completedEpisode.guid);
+  }
+
+  Future<void> deletePlayedEpisode(String guid) async {
+    if (deletePlayedEpisodes) {
+      final favorites = await getFavoriteEpisodes();
+
+      if (keepFavouriteEpisodes && favorites.containsKey(guid)) {
+        return; // Do not delete favorite episodes
+      }
+
+      final dBox = await downloadBox;
+      final download = await dBox.get(guid);
+
+      if (download != null) {
+        final file = File(join(openAirDir.path, download.fileName));
+
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        await deleteDownload(guid);
+      }
+    }
   }
 
   Future<Map<String, CompletedEpisodeModel>> getCompletedEpisodes() async {
