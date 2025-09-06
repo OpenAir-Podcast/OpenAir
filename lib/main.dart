@@ -12,6 +12,7 @@ import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
 import 'package:openair/responsive/tablet_scaffold.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 void main() async {
@@ -22,6 +23,11 @@ void main() async {
   } on FileNotFoundError catch (_, e) {
     debugPrint('Error loading .env file: $e');
   }
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_PROJECT_URL']!,
+    anonKey: dotenv.env['SUPABASE_API_KEY']!,
+  );
 
   await Hive.initFlutter('OpenAir/.hive_config');
   runApp(ProviderScope(child: const MyApp()));

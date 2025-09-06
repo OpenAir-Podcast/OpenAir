@@ -13,9 +13,9 @@ OpenAir is a free and open-source podcast app built with Flutter, empowering you
 
 OpenAir embraces open-source principles. The codebase is freely accessible, allowing anyone to contribute, report issues, and propose improvements. We believe in fostering a collaborative environment to create the best possible podcast experience for everyone.
 
-## Get Involved:
+## Get Involved
 
-Clone the repository: https://github.com/OpenAir-Podcast/openair.git
+Clone the repository: <https://github.com/OpenAir-Podcast/openair.git>
 
 Read the contribution guidelines: [click here for contribution guidelines](https://github.com/OpenAir-Podcast/openair/blob/main/Contribution%20Guidelines.md)
 
@@ -33,34 +33,55 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
 
 **Running the App:**
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/OpenAir-Podcast/openair.git
     ```
-2.  **Navigate to the project directory:**
+
+2. **Navigate to the project directory:**
+
     ```bash
     cd OpenAir
     ```
-3.  **Create a `.env` file** in the root of the `OpenAir` project directory.
-4.  **Add your API credentials to the `.env` file:**
+
+3. **Create a `.env` file** in the root of the `OpenAir` project directory.
+4. **Add your API credentials to the `.env` file:**
 
     For PodcastIndex (required):
+
     ```env
     PODCASTINDEX_API_KEY=YOUR_API_KEY_HERE
     PODCASTINDEX_API_SECRET=YOUR_API_SECRET_HERE
     ```
+
     **Important:** Replace `YOUR_API_KEY_HERE` and `YOUR_API_SECRET_HERE` with your actual API key and secret from the PodcastIndex developer portal.
 
     For Fyyd (optional, for additional podcast discovery):
+
     ```env
     FYYD_CLIENT_ID=YOUR_FYYD_CLIENT_ID
     FYYD_CLIENT_SECRET=YOUR_FYYD_CLIENT_SECRET
     ```
-5.  **Install dependencies:**
+
+    For Supabase (required for user authentication and data storage):
+
+    ```env
+    SUPABASE_PROJECT_URL=YOUR_SUPABASE_PROJECT_URL
+    SUPABASE_API_KEY=YOUR_SUPABASE_API_KEY
+    SUPABASE_DATABASE_PASSWORD=YOUR_SUPABASE_DATABASE_PASSWORD
+    ```
+
+    **Note:** You will need to create a Supabase account and project to get these credentials.
+
+5. **Install dependencies:**
+
     ```bash
     flutter pub get
     ```
-6.  **Run the app on your device or emulator:**
+
+6. **Run the app on your device or emulator:**
+
     ```bash
     flutter run
     ```
@@ -82,11 +103,15 @@ OpenAir is provided "as is" without warranty of any kind, express or implied. Th
 OpenAir is proudly developed and maintained by its contributors—who are enthusiastic podcast listeners themselves. Dedicated to building open-source tools for the community, by the community, we hope you enjoy using OpenAir!
 
 ## Screenshots
+
 <img width="330" alt="Screenshot_20250826_115019" src="https://github.com/user-attachments/assets/6fe45f83-9d82-4195-9f7d-ee9fad4e78c0" />
+
 <img width="330" alt="Screenshot_20250826_120748" src="https://github.com/user-attachments/assets/5a6f7e9a-d2f0-4f59-bbd2-06c0968d3abb" />
+
 <img width="330" alt="Screenshot_20250826_120811" src="https://github.com/user-attachments/assets/ff93f19f-88ed-49ef-86be-01b5dbe9b96a" />
 
 <img width="330" alt="Screenshot_20250826_120831" src="https://github.com/user-attachments/assets/64996ad3-3ffe-40bc-92bd-564ac0fc01fd" />
-<img width="330" alt="Screenshot_20250826_122518" src="https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168" />
-<img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />
 
+<img width="330" alt="Screenshot_20250826_122518" src="https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168" />
+
+<img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />

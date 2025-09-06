@@ -63,6 +63,8 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<int> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
 
+    double circleSize = 90.0;
+
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -71,7 +73,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           Expanded(
             child: ListView(
               children: [
-                // TODO: check if the user is logged in
                 DrawerHeader(
                   decoration: const BoxDecoration(
                       // color: Colors.grey,
@@ -79,9 +80,16 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 5.0,
                       children: [
-                        // TODO: Replace with OpenAir logo
-                        Icon(Icons.person_rounded, size: 80.0),
+                        ClipOval(
+                          child: Image.asset(
+                            'assets/images/openair_logo.png',
+                            width: circleSize,
+                            height: circleSize,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
@@ -91,6 +99,10 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                               ),
                             );
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
                           child: Text(Translations.of(context).text('signIn')),
                         ),
                       ],

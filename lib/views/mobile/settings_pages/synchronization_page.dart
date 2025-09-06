@@ -235,7 +235,7 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                         foregroundColor: WidgetStateProperty.all(
                             Theme.of(context).colorScheme.onPrimary),
                       ),
-                      onPressed: () {},
+                      onPressed: ref.read(openAirProvider).synchronize,
                       child: Text(
                           Translations.of(context).text('synchronizeNow'))),
                 ),

@@ -244,4 +244,28 @@ class OpenAirProvider extends ChangeNotifier {
       }
     }
   }
+
+  void synchronize() {
+    debugPrint('Syncing');
+
+    if (syncFavourites) {
+      debugPrint('Syncing Favourites');
+    }
+
+    if (syncQueue) {
+      debugPrint('Syncing Queue');
+    }
+
+    if (syncHistory) {
+      debugPrint('Syncing History');
+    }
+
+    if (syncPlaybackPosition) {
+      debugPrint('Syncing Playback Position');
+    }
+
+    if (syncSettings) {
+      debugPrint('Syncing Settings');
+    }
+  }
 }
