@@ -17,6 +17,7 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
@@ -200,8 +201,6 @@ class HiveService {
 
     deletePlayedEpisodes = automaticSettings['deletePlayedEpisodes'];
     keepFavouriteEpisodes = automaticSettings['keepFavouriteEpisodes'];
-
-    removeEpisodesFromQueue = automaticSettings['removeEpisodesFromQueue'];
 
     Duration duration;
 
@@ -560,6 +559,7 @@ class HiveService {
   Future<void> deleteDownload(String guid) async {
     final box = await downloadBox;
     await box.delete(guid);
+    ref.invalidate(getDownloadsProvider);
   }
 
   Future<void> clearDownloads() async {

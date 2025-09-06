@@ -29,8 +29,6 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
   late bool deletePlayedEpisodes;
   late bool keepFavouriteEpisodes;
 
-  late bool removeEpisodesFromQueue;
-
   @override
   Widget build(BuildContext context) {
     final playback = ref.watch(downloadSettingsDataProvider);
@@ -50,9 +48,6 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
           deletePlayedEpisodes = downloadsData['deletePlayedEpisodes'] ?? false;
           keepFavouriteEpisodes =
               downloadsData['keepFavouriteEpisodes'] ?? false;
-
-          removeEpisodesFromQueue =
-              downloadsData['removeEpisodesFromQueue'] ?? false;
 
           switch (downloadsData['refreshPodcasts']) {
             case 'Never':
@@ -438,44 +433,6 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           });
                         }
                       : null,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                    Translations.of(context).text('removeEpisodesFromQueue')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [
-                    removeEpisodesFromQueue,
-                    !removeEpisodesFromQueue
-                  ],
-                  onPressed: (int index) {
-                    setState(() {
-                      removeEpisodesFromQueue = !removeEpisodesFromQueue;
-                      downloadsData['removeEpisodesFromQueue'] =
-                          removeEpisodesFromQueue;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveAutomaticSettings(downloadsData);
-                    });
-                  },
                   children: [
                     Padding(
                       padding: EdgeInsets.all(8.0),

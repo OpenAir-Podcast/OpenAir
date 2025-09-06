@@ -164,8 +164,6 @@ late String downloadEpisodeLimit;
 late bool deletePlayedEpisodes;
 late bool keepFavouriteEpisodes;
 
-late bool removeEpisodesFromQueue;
-
 // Synchronization
 late bool syncFavourites;
 late bool syncQueue;
