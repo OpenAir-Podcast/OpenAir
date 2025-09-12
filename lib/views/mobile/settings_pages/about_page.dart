@@ -38,7 +38,7 @@ class AboutPageState extends ConsumerState<AboutPage> {
                   width: 150.0,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20.0),
-                    child: Image.asset('assets/images/openair_logo.png'),
+                    child: Image.asset('assets/images/openair-logo.png'),
                   ),
                 ),
               ),
@@ -92,8 +92,6 @@ class AboutPageState extends ConsumerState<AboutPage> {
                   } else {
                     showLicensePage(context: context);
                   }
-
-                  // showLicensePage(context: context);
                 },
               ),
             ],

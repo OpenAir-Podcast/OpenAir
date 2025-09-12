@@ -102,7 +102,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   PodcastModel podcastModel = PodcastModel(
-                    id: int.parse(data[index].podcastId),
+                    id: data[index].podcastId,
                     title: data[index].title,
                     author: data[index].author,
                     feedUrl: data[index].feedUrl,
@@ -144,7 +144,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                 ),
                 const SizedBox(height: 20.0),
                 Text(
-                  'Oops, an error occurred...',
+                  Translations.of(context).text('oopsTryAgainLater'),
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,

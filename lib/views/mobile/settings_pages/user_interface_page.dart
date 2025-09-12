@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/views/mobile/account_page.dart';
 
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -200,21 +199,6 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
           return Column(
             spacing: settingsSpacer,
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('account'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AccountPage(),
-                    ),
-                  );
-                },
-              ),
               ListTile(
                 title: Text(
                   Translations.of(context).text('display'),

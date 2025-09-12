@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/views/mobile/account_page.dart';
 import 'package:openair/views/mobile/settings_pages/about_page.dart';
 import 'package:openair/views/mobile/settings_pages/donate_page.dart';
 import 'package:openair/views/mobile/settings_pages/automatic_page.dart';
@@ -28,6 +29,22 @@ class _SettingsState extends ConsumerState<Settings> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            ListTile(
+              leading: Icon(Icons.account_circle_rounded),
+              title: Text(
+                Translations.of(context).text('account'),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AccountPage(),
+                  ),
+                );
+              },
+            ),
+            Divider(),
             ListTile(
               leading: Icon(Icons.display_settings_rounded),
               title: Text(Translations.of(context).text('userInterface')),

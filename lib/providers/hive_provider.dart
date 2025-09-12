@@ -253,11 +253,12 @@ class HiveService {
     Map<String, dynamic>? synchronizationSettings =
         await getSynchronizationSettings();
 
-    syncFavourites = synchronizationSettings!['syncFavourites'];
-    syncQueue = synchronizationSettings['syncQueue'];
-    syncHistory = synchronizationSettings['syncHistory'];
-    syncPlaybackPosition = synchronizationSettings['syncPlaybackPosition'];
-    syncSettings = synchronizationSettings['syncSettings'];
+    syncFavouritesConfig = synchronizationSettings!['syncFavourites'];
+    syncQueueConfig = synchronizationSettings['syncQueue'];
+    syncHistoryConfig = synchronizationSettings['syncHistory'];
+    syncPlaybackPositionConfig =
+        synchronizationSettings['syncPlaybackPosition'];
+    syncSettingsConfig = synchronizationSettings['syncSettings'];
   }
 
   // Subscription Operations:
@@ -469,6 +470,26 @@ class HiveService {
   Future<void> clearQueue() async {
     final box = await queueBox;
     await box.clear();
+  }
+
+  Future<void> addEpisodeToQueue(Map episode, Map podcast) async {
+    final box = await queueBox;
+    final currentQueue = await box.getAllValues();
+
+    int position = 0;
+
+    if (currentQueue.isNotEmpty) {
+      // Find the maximum position in the current queue
+      position = currentQueue.values
+          .map<int>((e) => e['pos'] as int)
+          .reduce((a, b) => a > b ? a : b);
+      position += 1; // New episode goes to the end of the queue
+    }
+
+    episode['podcast'] = podcast;
+    episode['pos'] = position;
+
+    await box.put(episode['guid'], episode);
   }
 
 // Improved reorderQueue method for HiveService
@@ -944,5 +965,27 @@ class HiveService {
   Future<Map> getFavoriteEpisodes() async {
     final box = await favoritesBox;
     return await box.getAllValues();
+  }
+
+  updateEpisodePosition(String guid, Duration position) async {
+    final box = await episodeBox;
+    final episode = await box.get(guid);
+
+    if (episode != null) {
+      episode['position'] = position.inSeconds;
+      await box.put(guid, episode);
+    }
+  }
+
+  markEpisodeAsCompleted(String guid) async {
+    final box = await episodeBox;
+    final episode = await box.get(guid);
+
+    if (episode != null) {
+      episode['completed'] = true;
+      await box.put(guid, episode);
+      final completedEpisode = CompletedEpisodeModel(guid: guid);
+      await addToCompletedEpisode(completedEpisode);
+    }
   }
 }

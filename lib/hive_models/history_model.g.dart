@@ -29,7 +29,7 @@ class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
-      playDate: fields[12] as DateTime,
+      playDate: (fields[12] as num).toInt(),
     );
   }
 

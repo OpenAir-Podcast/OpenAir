@@ -43,7 +43,10 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             onTap: () async {
               try {
                 final String discordUrl = dotenv.env['DISCORD_URL']!;
-                await launchUrl(Uri.parse(discordUrl));
+                await launchUrl(
+                  Uri.parse(discordUrl),
+                  mode: LaunchMode.externalApplication,
+                );
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -62,7 +65,10 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             onTap: () async {
               try {
                 final String gitHubIssuesUrl = dotenv.env['GITHUB_ISSUES_URL']!;
-                await launchUrl(Uri.parse(gitHubIssuesUrl));
+                await launchUrl(
+                  Uri.parse(gitHubIssuesUrl),
+                  mode: LaunchMode.externalApplication,
+                );
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +88,10 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
               try {
                 final String gitHubDiscussionsUrl =
                     dotenv.env['GITHUB_DISCUSSION_URL']!;
-                await launchUrl(Uri.parse(gitHubDiscussionsUrl));
+                await launchUrl(
+                  Uri.parse(gitHubDiscussionsUrl),
+                  mode: LaunchMode.externalApplication,
+                );
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -101,7 +110,10 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
             onTap: () async {
               try {
                 final String privacyPolicyUrl = dotenv.env['PRIVACY_POLICY']!;
-                await launchUrl(Uri.parse(privacyPolicyUrl));
+                await launchUrl(
+                  Uri.parse(privacyPolicyUrl),
+                  mode: LaunchMode.externalApplication,
+                );
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

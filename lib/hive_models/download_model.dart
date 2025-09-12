@@ -50,7 +50,7 @@ class DownloadModel extends HiveObject {
   String size;
 
   @HiveField(9)
-  String podcastId;
+  int podcastId;
 
   @HiveField(10)
   int enclosureLength;

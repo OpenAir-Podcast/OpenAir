@@ -296,7 +296,7 @@ class AudioProvider extends ChangeNotifier {
           ),
         );
       }
-      
+
       return;
     }
 
@@ -306,7 +306,6 @@ class AudioProvider extends ChangeNotifier {
     final url = item['enclosureUrl'] as String;
 
     final size = getEpisodeSize(item['enclosureLength']);
-    Duration episodeTotalDuration = getEpisodeDuration(item['enclosureLength']);
 
     if (downloadingPodcasts.contains(guid)) {
       return;
@@ -330,9 +329,9 @@ class AudioProvider extends ChangeNotifier {
         datePublished: item['datePublished'],
         description: item['description'],
         feedUrl: item['feedUrl'],
-        duration: episodeTotalDuration,
+        duration: Duration(milliseconds: item['duration']),
         size: size,
-        podcastId: podcast.id.toString(),
+        podcastId: podcast.id,
         enclosureLength: item['enclosureLength'],
         enclosureUrl: item['enclosureUrl'],
         downloadDate: DateTime.now(),
@@ -355,8 +354,10 @@ class AudioProvider extends ChangeNotifier {
       debugPrint('Error downloading ${item['title']}: $e');
 
       String filename = '${item['guid']}.mp3';
+
       final filePath = await getDownloadsDir();
       final file = File('$filePath/$filename');
+
       if (await file.exists()) {
         await file.delete();
       }
@@ -985,17 +986,17 @@ class AudioProvider extends ChangeNotifier {
       'datePublished': episode['datePublished'],
       'description': episode['description'],
       'feedUrl': episode['feedUrl'],
-      'duration': episodeTotalDuration,
+      'duration': episodeTotalDuration.inMilliseconds,
       'downloadSize': downloadSize,
       'enclosureType': episode['enclosureType'] ?? 'audio/mpeg',
       'enclosureLength': episode['enclosureLength'],
       'enclosureUrl': episode['enclosureUrl'],
-      'podcast': podcast!,
+      'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': initialPositionMilliseconds,
       'currentPlaybackPositionString': initialPositionString,
       'currentPlaybackRemainingTimeString': formattedTotalDurationString,
-      'playerPosition': Duration.zero,
+      'playerPosition': Duration.zero.inMilliseconds,
     });
 
     if (downloadQueuedEpisodes) {
@@ -1069,6 +1070,7 @@ class AudioProvider extends ChangeNotifier {
         episodeCount: podcastEpisodeCount,
         description: podcast.description,
         artwork: podcast.artwork,
+        updatedAt: DateTime.now(),
       );
 
       final hiveService = ref.read(hiveServiceProvider);
@@ -1117,7 +1119,8 @@ class AudioProvider extends ChangeNotifier {
         imageUrl: podcast.imageUrl,
         episodeCount: podcastEpisodeCount,
         description: podcast.description,
-        artwork: '',
+        artwork: podcast.artwork,
+        updatedAt: DateTime.now(),
       );
 
       final hiveService = ref.read(hiveServiceProvider);
@@ -1161,6 +1164,7 @@ class AudioProvider extends ChangeNotifier {
         episodeCount: 0,
         description: rssFeed.description!,
         artwork: rssFeed.itunes!.image!.href!,
+        updatedAt: DateTime.now(),
       );
 
       subscribeByRssFeed(podcast);
@@ -1240,11 +1244,13 @@ class AudioProvider extends ChangeNotifier {
     Map<String, dynamic> episode,
     PodcastModel? podcast,
   ) async {
-    final int enclosureLength = episode['enclosureLength'];
-    final String downloadSize = getEpisodeSize(enclosureLength);
+    final String downloadSize = getEpisodeSize(episode['enclosureLength']);
 
-    final Duration episodeTotalDuration =
-        getEpisodeDuration(episode['enclosureLength']);
+    final Duration episodeTotalDuration = getEpisodeDuration(
+      episode['enclosureLength'].runtimeType == String
+          ? int.parse(episode['enclosureLength'])
+          : episode['enclosureLength'],
+    );
 
     String historyPodcastId;
     String historyPodcastImage;
@@ -1274,7 +1280,7 @@ class AudioProvider extends ChangeNotifier {
       podcastId: historyPodcastId,
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
-      playDate: DateTime.now(),
+      playDate: DateTime.now().millisecondsSinceEpoch,
     );
 
     final hiveService = ref.read(hiveServiceProvider);

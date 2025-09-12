@@ -42,6 +42,16 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       }
     }
 
+    var enclosureLengthVal;
+
+    if (widget.episodeItem['enclosureLength'].runtimeType == String) {
+      enclosureLengthVal = int.parse(widget.episodeItem['enclosureLength']);
+    } else if (widget.episodeItem['enclosureLength'].runtimeType == int) {
+      enclosureLengthVal = widget.episodeItem['enclosureLength'];
+    } else {
+      enclosureLengthVal = '0';
+    }
+
     if (playStatus case PlayingStatus.detail) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,9 +63,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             child: Icon(Icons.play_arrow_rounded),
           ),
           Text(
-            ref
-                .watch(audioProvider)
-                .getPodcastDuration(widget.episodeItem['enclosureLength']),
+            ref.watch(audioProvider).getPodcastDuration(enclosureLengthVal),
             overflow: TextOverflow.ellipsis,
           ),
         ],

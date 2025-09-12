@@ -68,6 +68,8 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                       syncFavourites = !syncFavourites;
                       synchronizationData['syncFavourites'] = syncFavourites;
 
+                      syncFavouritesConfig = syncFavourites;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -100,6 +102,8 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                       syncQueue = !syncQueue;
                       synchronizationData['syncQueue'] = syncQueue;
 
+                      syncQueueConfig = syncQueue;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -131,6 +135,8 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                       setState(() {
                         syncHistory = !syncHistory;
                         synchronizationData['syncHistory'] = syncHistory;
+
+                        syncHistoryConfig = syncHistory;
 
                         ref
                             .watch(openAirProvider)
@@ -167,6 +173,8 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                         synchronizationData['syncPlaybackPosition'] =
                             syncPlaybackPosition;
 
+                        syncPlaybackPositionConfig = syncPlaybackPosition;
+
                         ref
                             .watch(openAirProvider)
                             .hiveService
@@ -199,6 +207,8 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
                       setState(() {
                         syncSettings = !syncSettings;
                         synchronizationData['syncSettings'] = syncSettings;
+
+                        syncSettingsConfig = syncSettings;
 
                         ref
                             .watch(openAirProvider)

@@ -28,12 +28,20 @@ class NoHistoryEpisodes extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
+                color: Brightness.light == Theme.of(context).brightness
+                    ? Colors.black
+                    : Colors.white,
               ),
             ),
             Text(
               Translations.of(context).text('pleasePlaySomeEpisodes'),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16.0),
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Brightness.light == Theme.of(context).brightness
+                    ? Colors.black
+                    : Colors.white,
+              ),
             ),
           ],
         ),

@@ -18,11 +18,26 @@ class AccountPage extends ConsumerWidget {
         stream: supabaseService.client.auth.onAuthStateChange,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            final user = snapshot.data!.session?.user;
+
+            if (user == null) {
+              return Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await supabaseService.client.auth.signInWithOAuth(
+                      OAuthProvider.github,
+                    );
+                  },
+                  child: const Text('Sign In with GitHub'),
+                ),
+              );
+            }
+
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Welcome ${snapshot.data!.session!.user.email}'),
+                  // Text('Welcome ${snapshot.data!.session!.user.email}'),
                   ElevatedButton(
                     onPressed: () async {
                       await supabaseService.client.auth.signOut();

@@ -26,7 +26,7 @@ class DownloadModelAdapter extends TypeAdapter<DownloadModel> {
       feedUrl: fields[6] as String,
       duration: fields[7] as Duration,
       size: fields[8] as String,
-      podcastId: fields[9] as String,
+      podcastId: (fields[9] as num).toInt(),
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       downloadDate: fields[12] as DateTime,

@@ -58,7 +58,7 @@ class HistoryModel extends HiveObject {
   String enclosureUrl;
 
   @HiveField(12)
-  DateTime playDate;
+  int playDate;
 
   factory HistoryModel.fromJson(Map<String, dynamic> json) => HistoryModel(
         guid: json["guid"],

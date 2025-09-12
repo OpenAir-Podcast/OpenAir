@@ -2,6 +2,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
@@ -10,15 +11,15 @@ import 'package:openair/views/mobile/nav_pages/history_page.dart';
 import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:openair/views/mobile/nav_pages/settings_page.dart';
-import 'package:openair/views/mobile/nav_pages/sign_in_page.dart';
+import 'package:openair/views/mobile/nav_pages/log_in_page.dart';
 import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
 
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
   final hiveService = ref.watch(openAirProvider).hiveService;
-  var episiodes = await hiveService.getNewEpisodesCount();
+  var episodes = await hiveService.getNewEpisodesCount();
 
-  if (episiodes != -1) {
-    return episiodes.toString();
+  if (episodes != -1) {
+    return episodes.toString();
   }
 
   // Watch hiveServiceProvider as subscription counts depend on Hive data
@@ -65,6 +66,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
 
     double circleSize = 90.0;
 
+    final supabaseService = ref.watch(supabaseServiceProvider);
+    final session = supabaseService.client.auth.currentUser;
+
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -74,17 +78,15 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             child: ListView(
               children: [
                 DrawerHeader(
-                  decoration: const BoxDecoration(
-                      // color: Colors.grey,
-                      ),
+                  decoration: const BoxDecoration(),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 5.0,
+                      spacing: 8.0,
                       children: [
                         ClipOval(
                           child: Image.asset(
-                            'assets/images/openair_logo.png',
+                            'assets/images/openair-logo.png',
                             width: circleSize,
                             height: circleSize,
                             fit: BoxFit.cover,
@@ -92,18 +94,28 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const SignIn(),
-                              ),
-                            );
+                            if (session == null) {
+                              Navigator.pop(context);
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const LogIn(),
+                                ),
+                              );
+                            } else {
+                              Navigator.pop(context);
+                              supabaseService.signOut();
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 Theme.of(context).colorScheme.primaryContainer,
                           ),
-                          child: Text(Translations.of(context).text('signIn')),
+                          child: Text(
+                            session == null
+                                ? Translations.of(context).text('login')
+                                : Translations.of(context).text('logout'),
+                          ),
                         ),
                       ],
                     ),

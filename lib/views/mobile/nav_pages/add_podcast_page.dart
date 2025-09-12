@@ -34,6 +34,12 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
   TextEditingController textInputControl = TextEditingController();
 
   @override
+  void dispose() {
+    textInputControl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final podcastDataAsyncValue = ref.watch(podcastDataFeaturedProvider);
 
@@ -224,6 +230,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                 imageUrl: snapshot[index]['imgURL'],
                                 episodeCount: rssFeed.items!.length,
                                 artwork: snapshot[index]['imgURL'],
+                                updatedAt: DateTime.now(),
                               );
 
                               ref.read(audioProvider).currentPodcast =
@@ -276,6 +283,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
+                    color: Brightness.light == Theme.of(context).brightness
+                        ? Colors.black
+                        : Colors.white,
                   ),
                 ),
                 const Spacer(),
@@ -333,6 +343,11 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     title: Text(
                       Translations.of(context).text('addPodcastByRssUrl'),
                       textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Brightness.light == Theme.of(context).brightness
+                            ? Colors.black
+                            : Colors.white,
+                      ),
                     ),
                     content: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.85,
@@ -439,6 +454,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 Translations.of(context).text('searchPodcastIndex'),
                 style: TextStyle(
                   fontSize: 18.0,
+                  color: Brightness.light == Theme.of(context).brightness
+                      ? Colors.black
+                      : Colors.white,
                 ),
               ),
               onTap: () => showDialog(
@@ -451,6 +469,11 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     title: Text(
                       Translations.of(context).text('searchPodcastIndex'),
                       textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Brightness.light == Theme.of(context).brightness
+                            ? Colors.black
+                            : Colors.white,
+                      ),
                     ),
                     content: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.85,

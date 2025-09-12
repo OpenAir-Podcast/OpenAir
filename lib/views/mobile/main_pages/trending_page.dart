@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/translations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
@@ -72,7 +73,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                       ),
                       const SizedBox(height: 20.0),
                       Text(
-                        'Oops, an error occurred...',
+                        Translations.of(context).text('oopsTryAgainLater'),
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
@@ -133,7 +134,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
               ),
               const SizedBox(height: 20.0),
               Text(
-                'Oops, an error occurred...',
+                Translations.of(context).text(']oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,

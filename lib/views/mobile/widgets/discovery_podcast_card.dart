@@ -48,7 +48,7 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
         }
       },
       child: Card(
-        color: Colors.blueGrey[100],
+        color: Theme.of(context).cardColor,
         elevation: 2.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -88,9 +88,13 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                           child: Text(
                             podcast.title,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               overflow: TextOverflow.ellipsis,
+                              color: Brightness.light ==
+                                      Theme.of(context).brightness
+                                  ? Colors.black
+                                  : Colors.white,
                             ),
                           ),
                         ),

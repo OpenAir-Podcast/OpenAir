@@ -25,13 +25,14 @@ class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
       artwork: fields[5] as String,
       description: fields[6] as String,
       episodeCount: (fields[7] as num).toInt(),
+      updatedAt: fields[8] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, SubscriptionModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class SubscriptionModelAdapter extends TypeAdapter<SubscriptionModel> {
       ..writeByte(6)
       ..write(obj.description)
       ..writeByte(7)
-      ..write(obj.episodeCount);
+      ..write(obj.episodeCount)
+      ..writeByte(8)
+      ..write(obj.updatedAt);
   }
 
   @override

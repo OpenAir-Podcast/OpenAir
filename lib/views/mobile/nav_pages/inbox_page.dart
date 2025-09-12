@@ -86,7 +86,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                       if (episodeData == null) {
                         return const SizedBox.shrink();
                       }
-                      
+
                       PodcastModel podcastModel = PodcastModel(
                         id: episodeData['id'],
                         title: episodeData['title'],
@@ -135,7 +135,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                 ),
                 const SizedBox(height: 20.0),
                 Text(
-                  'Oops, an error occurred...',
+                  Translations.of(context).text('oopsTryAgainLater'),
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,

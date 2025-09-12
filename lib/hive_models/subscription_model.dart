@@ -14,6 +14,7 @@ class SubscriptionModel extends HiveObject {
     required this.artwork,
     required this.description,
     required this.episodeCount,
+    required this.updatedAt,
   });
 
   @HiveField(0)
@@ -40,6 +41,9 @@ class SubscriptionModel extends HiveObject {
   @HiveField(7)
   int episodeCount;
 
+  @HiveField(8)
+  DateTime updatedAt;
+
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
       SubscriptionModel(
         id: json['id'],
@@ -50,6 +54,7 @@ class SubscriptionModel extends HiveObject {
         artwork: json['artwork'],
         description: json['description'],
         episodeCount: json['episodeCount'],
+        updatedAt: DateTime.parse(json['updated_at']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +66,7 @@ class SubscriptionModel extends HiveObject {
         'artwork': artwork,
         'description': description,
         'episodeCount': episodeCount,
+        'updated_at': updatedAt.toIso8601String(),
       };
 
   @override
@@ -74,6 +80,7 @@ class SubscriptionModel extends HiveObject {
     artwork: $artwork,
     description: $description,
     episodeCount: $episodeCount,
+    updatedAt: $updatedAt,
     ''';
   }
 }

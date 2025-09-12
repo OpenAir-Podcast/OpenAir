@@ -108,7 +108,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 ),
                 const SizedBox(height: 20.0),
                 Text(
-                  'Oops, an error occurred...',
+                  Translations.of(context).text('oopsTryAgainLater'),
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,

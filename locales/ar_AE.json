@@ -163,6 +163,7 @@
     "aboutSubtitle": "الإصدار، التراخيص، الجهات الخارجية",
     "account": "الحساب",
     "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
     "subscriptions": "الاشتراكات",
     "login": "تسجيل الدخول",
     "home": "الصفحة الرئيسية",
@@ -338,5 +339,5 @@
     "emptyFavoritesSubtitle": "يرجى إضافة بعض الحلقات إلى مفضلاتك والمحاولة مرة أخرى",
     "removedFromFavorites": "تمت الإزالة من المفضلة",
     "addedToFavorites": "تمت الإضافة إلى المفضلة",
-    "oopsAnErrorHasOccurredWhileDownloading": "عفوًا! حدث خطأ أثناء التنزيل."
+    "logout": "تسجيل الخروج"
 }

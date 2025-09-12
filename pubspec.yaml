@@ -60,4 +60,8 @@ flutter:
   assets:
     - .env
     - locales/
-    - assets/images/openair_logo.png
+    - assets/images/openair-logo.png
+    - assets/images/github-white-logo.png
+    - assets/images/github-black-logo.png
+    - assets/images/google-white-logo.png
+    - assets/images/google-black-logo.png

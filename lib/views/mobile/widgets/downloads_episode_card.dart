@@ -84,7 +84,9 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                       child: CachedNetworkImage(
                         memCacheHeight: 62,
                         memCacheWidth: 62,
-                        imageUrl: widget.podcast.imageUrl,
+                        imageUrl: widget.podcast.imageUrl.isEmpty
+                            ? widget.podcast.artwork
+                            : widget.podcast.imageUrl,
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(
                           Icons.error,

@@ -9,10 +9,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/supabase_service.dart';
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
@@ -37,6 +42,7 @@ class OpenAirProvider extends ChangeNotifier {
   OpenAirProvider(this.ref);
 
   late HiveService hiveService;
+  late SupabaseService supabaseService;
 
   Future<void> initial(
     BuildContext context,
@@ -49,6 +55,7 @@ class OpenAirProvider extends ChangeNotifier {
 
     hiveService = ref.read(hiveServiceProvider);
     await hiveService.initial();
+    supabaseService = ref.read(supabaseServiceProvider);
 
     try {
       final List<ConnectivityResult> connectivityResult =
@@ -229,15 +236,17 @@ class OpenAirProvider extends ChangeNotifier {
       }
 
       for (var item in queue.values) {
-        item = Map<String, dynamic>.from(item);
+        var itemMap = Map<String, dynamic>.from(item as Map);
 
-        final isDownloaded =
-            await ref.read(audioProvider).isAudioFileDownloaded(item['guid']);
+        final isDownloaded = await ref
+            .read(audioProvider)
+            .isAudioFileDownloaded(itemMap['guid']);
 
         if (!isDownloaded) {
           ref.read(audioProvider).downloadEpisode(
-                item,
-                item['podcast'],
+                itemMap,
+                PodcastModel.fromJson(
+                    Map<String, dynamic>.from(itemMap['podcast'])),
                 null,
               );
         }
@@ -245,27 +254,370 @@ class OpenAirProvider extends ChangeNotifier {
     }
   }
 
-  void synchronize() {
-    debugPrint('Syncing');
+  void synchronize() async {
+    if (syncFavouritesConfig) {
+      final user = supabaseService.client.auth.currentUser;
 
-    if (syncFavourites) {
-      debugPrint('Syncing Favourites');
+      if (user == null) {
+        return;
+      }
+
+      // Get local subscriptions
+      final localSubscriptions = await hiveService.getSubscriptions();
+
+      // Get remote subscriptions
+      final remoteSubscriptionsResponse = await supabaseService.client
+          .from('subscriptions')
+          .select()
+          .eq('user_id', user.id);
+
+      final remoteSubscriptions = remoteSubscriptionsResponse;
+
+      // Sync local to remote
+      for (final localSub in localSubscriptions.values) {
+        remoteSubscriptions.firstWhere(
+          (element) => element['podcast_id'] == localSub.id,
+          orElse: () => {},
+        );
+
+        // Subscription doesn't exist remotely, so add it
+        await supabaseService.client.from('subscriptions').upsert(
+          {
+            'user_id': user.id,
+            'podcast_id': localSub.id,
+            'podcast_url': localSub.feedUrl,
+            'podcast_title': localSub.title,
+            'podcast_author': localSub.author ?? 'Unknown',
+            'podcast_image': localSub.imageUrl,
+            'podcast_artwork': localSub.artwork,
+            'podcast_description': localSub.description,
+            'podcast_episode_count': localSub.episodeCount,
+            'updated_at': DateTime.now().toIso8601String(),
+          },
+          onConflict: 'user_id',
+        );
+      }
+
+      // Sync remote to local
+      for (final remoteItem in remoteSubscriptions) {
+        final podcastID = remoteItem['podcast_id'];
+
+        if (podcastID == null) {
+          continue;
+        }
+
+        final localSubscriptionItem = localSubscriptions[podcastID];
+
+        if (localSubscriptionItem == null) {
+          try {
+            SubscriptionModel subscription = SubscriptionModel(
+              id: remoteItem['podcast_id'],
+              feedUrl: remoteItem['podcast_url'],
+              title: remoteItem['podcast_title'],
+              author: remoteItem['podcast_author'],
+              imageUrl: remoteItem['podcast_image'],
+              artwork: remoteItem['podcast_artwork'],
+              description: remoteItem['podcast_description'],
+              episodeCount: remoteItem['podcast_episode_count'],
+              updatedAt: DateTime.parse(remoteItem['updated_at']),
+            );
+
+            await hiveService.subscribe(subscription);
+            await ref.read(audioProvider).addPodcastEpisodes(subscription);
+          } catch (e) {
+            debugPrint('Error parsing remote subscription item: $e');
+          }
+        }
+      }
+
+      ref.invalidate(getFeedsProvider);
     }
 
-    if (syncQueue) {
+    if (syncQueueConfig) {
       debugPrint('Syncing Queue');
+
+      final user = supabaseService.client.auth.currentUser;
+
+      if (user == null) {
+        return;
+      }
+
+      // Fetch both local and remote queues
+      final localQueue = await hiveService.getQueue();
+
+      final remoteQueueResult = await supabaseService.client
+          .from('queue')
+          .select('guid')
+          .eq('user_id', user.id);
+
+      final localGuid =
+          localQueue.values.map((item) => item['guid'] as String).toSet();
+
+      final remoteGuid =
+          remoteQueueResult.map((item) => item['guid'] as String).toSet();
+
+      // Episodes to remove from remote
+      final guidToRemove = remoteGuid.difference(localGuid);
+
+      // if (guidToRemove.isNotEmpty) {
+      //   await supabaseService.client
+      //       .from('queue')
+      //       .delete()
+      //       .inFilter('guid', guidToRemove.toList())
+      //       .eq('user_id', user.id);
+      // }
+
+      // Sync local to remote, with updated positions
+      final localQueueList = List.from(localQueue.values);
+
+      for (int i = 0; i < localQueueList.length; i++) {
+        final item = Map<String, dynamic>.from(localQueueList[i]);
+
+        await supabaseService.client.from('queue').upsert(
+          {
+            'user_id': user.id,
+            'guid': item['guid'],
+            'title': item['title'],
+            'author': item['author'] ?? 'Unknown',
+            'image': item['feedImage'] ?? item['image'],
+            'date_published': item['datePublished'],
+            'description': item['description'],
+            'feed_url': item['feedUrl'],
+            'duration': item['duration'],
+            'download_size': item['downloadSize'],
+            'enclosure_type': item['enclosureType'],
+            'enclosure_length': item['enclosureLength'],
+            'enclosure_url': item['enclosureUrl'],
+            'podcast': item['podcast'],
+            'pos': i,
+            'podcast_current_position_in_milliseconds':
+                item['podcastCurrentPositionInMilliseconds'],
+            'current_playback_position_string':
+                item['currentPlaybackPositionString'],
+            'current_playback_remaining_time_string':
+                item['currentPlaybackRemainingTimeString'],
+            'player_position': item['playerPosition'],
+          },
+          onConflict: 'user_id, guid',
+        );
+      }
+
+      // Sync remote to local
+      hiveService.clearQueue();
+
+      debugPrint(remoteQueueResult.toString());
+
+      for (final remoteItem in remoteQueueResult) {
+        final guid = remoteItem['guid'];
+
+        debugPrint('Processing remote queue item with GUID: $guid');
+
+        if (guid == null) {
+          continue;
+        }
+
+        final localQueueItem = localQueue[guid];
+
+        if (localQueueItem == null) {
+          try {
+            final remoteFullItem = await supabaseService.client
+                .from('queue')
+                .select()
+                .eq('user_id', user.id)
+                .eq('guid', guid)
+                .single();
+
+            debugPrint('Adding remote queue item to local');
+
+            await hiveService.addToQueue({
+              'guid': remoteFullItem['guid'],
+              'title': remoteFullItem['title'],
+              'author': remoteFullItem['author'],
+              'image': remoteFullItem['image'],
+              'datePublished': remoteFullItem['date_published'],
+              'description': remoteFullItem['description'],
+              'feedUrl': remoteFullItem['feed_url'],
+              'duration': remoteFullItem['duration'],
+              'downloadSize': remoteFullItem['download_size'],
+              'enclosureType': remoteFullItem['enclosure_type'],
+              'enclosureLength': remoteFullItem['enclosure_length'],
+              'enclosureUrl': remoteFullItem['enclosure_url'],
+              'podcast': PodcastModel.fromJson(
+                  Map<String, dynamic>.from(remoteFullItem['podcast'])),
+              'pos': remoteFullItem['pos'],
+              'podcastCurrentPositionInMilliseconds':
+                  (remoteFullItem['podcast_current_position_in_milliseconds']
+                          as int)
+                      .toDouble(),
+              'currentPlaybackPositionString':
+                  remoteFullItem['current_playback_position_string'],
+              'currentPlaybackRemainingTimeString':
+                  remoteFullItem['current_playback_remaining_time_string'],
+              'playerPosition': Duration(
+                  milliseconds: remoteFullItem['player_position'] ?? 0),
+            });
+          } catch (e) {
+            debugPrint('Error parsing remote queue item: $e');
+          }
+        }
+      }
+
+      ref.invalidate(sortedProvider);
+      ref.invalidate(getQueueProvider);
     }
 
-    if (syncHistory) {
-      debugPrint('Syncing History');
-    }
-
-    if (syncPlaybackPosition) {
+    if (syncPlaybackPositionConfig) {
       debugPrint('Syncing Playback Position');
+      final user = supabaseService.client.auth.currentUser;
+
+      if (user != null) {
+        // Sync local to remote
+        final localQueue = await hiveService.getQueue();
+        for (var item in localQueue.values) {
+          item = Map<String, dynamic>.from(item);
+          final position = item['playerPosition'] as Duration?;
+
+          if (position != null && position.inSeconds > 0) {
+            await supabaseService.client.from('history').upsert({
+              'user_id': user.id,
+              'episode_guid': item['guid'],
+              'position_in_seconds': position.inSeconds,
+            }, onConflict: 'user_id, episode_guid');
+          }
+        }
+
+        // Sync remote to local
+        final remoteHistoryResponse = await supabaseService.client
+            .from('history')
+            .select('episode_guid, position_in_seconds')
+            .eq('user_id', user.id);
+
+        final remoteHistory = remoteHistoryResponse;
+
+        for (final remoteItem in remoteHistory) {
+          final episodeGuid = remoteItem['episode_guid'];
+          if (episodeGuid == null) {
+            continue;
+          }
+
+          final localEpisode =
+              await hiveService.getEpisode(episodeGuid as String);
+
+          if (localEpisode != null) {
+            final localPosition =
+                (localEpisode['playerPosition'] as Duration?)?.inSeconds ?? 0;
+            final remotePosition = remoteItem['position_in_seconds'];
+
+            if (remotePosition is int && remotePosition > localPosition) {
+              await hiveService.updateEpisodePosition(
+                episodeGuid,
+                Duration(seconds: remotePosition),
+              );
+            }
+          }
+        }
+      }
     }
 
-    if (syncSettings) {
+    if (syncHistoryConfig) {
+      final user = supabaseService.client.auth.currentUser;
+
+      if (user != null) {
+        // Sync local to remote
+        Map<String, HistoryModel> history = await hiveService.getHistory();
+
+        for (HistoryModel episode in history.values) {
+          await supabaseService.client.from('history').upsert(
+            {
+              'user_id': user.id,
+              'guid': episode.guid,
+              'image': episode.image,
+              'title': episode.title,
+              'author': episode.author,
+              'date_published': episode.datePublished,
+              'description': episode.description,
+              'feed_url': episode.feedUrl,
+              'duration': episode.duration,
+              'size': episode.size,
+              'podcast_id': episode.podcastId,
+              'enclosure_length': episode.enclosureLength,
+              'enclosure_url': episode.enclosureUrl,
+              'play_date': episode.playDate,
+            },
+          );
+        }
+
+        // Sync remote to local
+        final remoteHistoryResponse = await supabaseService.client
+            .from('history')
+            .select()
+            .eq('user_id', user.id);
+
+        final remoteHistory = remoteHistoryResponse;
+
+        for (final remoteItem in remoteHistory) {
+          final guid = remoteItem['guid'];
+
+          if (guid == null) {
+            continue;
+          }
+
+          final localHistoryItem = history[guid];
+
+          if (localHistoryItem == null) {
+            try {
+              await hiveService.addToHistory(
+                HistoryModel(
+                  guid: guid,
+                  image: remoteItem['image'],
+                  title: remoteItem['title'],
+                  author: remoteItem['author'],
+                  datePublished: remoteItem['date_published'],
+                  description: remoteItem['description'],
+                  feedUrl: remoteItem['feed_url'],
+                  duration: remoteItem['duration'],
+                  size: remoteItem['size'],
+                  podcastId: remoteItem['podcast_id'],
+                  enclosureLength: remoteItem['enclosure_length'],
+                  enclosureUrl: remoteItem['enclosure_url'],
+                  playDate: remoteItem['play_date'],
+                ),
+              );
+            } catch (e) {
+              debugPrint('Error parsing remote history item: $e');
+            }
+          }
+        }
+      }
+    }
+
+    if (syncSettingsConfig) {
       debugPrint('Syncing Settings');
+      final user = supabaseService.client.auth.currentUser;
+      if (user == null) {
+        return;
+      }
+
+      final playbackSettings = await hiveService.getPlaybackSettings();
+      final uiSettings = await hiveService.getUserInterfaceSettings();
+
+      final Map<String, dynamic> settings = {
+        'user_id': user.id,
+      };
+
+      if (playbackSettings['playbackSpeed'] != null) {
+        settings['playback_speed'] = playbackSettings['playbackSpeed'];
+      }
+
+      if (uiSettings != null && uiSettings['themeMode'] != null) {
+        settings['theme_mode'] = uiSettings['themeMode'];
+      }
+
+      if (settings.length > 1) {
+        await supabaseService.client
+            .from('user_settings')
+            .upsert(settings, onConflict: 'user_id');
+      }
     }
   }
 }

@@ -38,18 +38,24 @@ class _QueueCardState extends ConsumerState<QueueCard> {
     if (widget.isQueueSelected) {
       currentPositionMilliseconds =
           openAir.podcastCurrentPositionInMilliseconds;
+
       currentPositionString = openAir.currentPlaybackPositionString;
+
       currentRemainingString = openAir.currentPlaybackRemainingTimeString;
+
       audioState = openAir.audioState;
     } else {
       // This is an inactive item in the queue. Show its saved progress.
       currentPositionMilliseconds =
           widget.episodeItem['podcastCurrentPositionInMilliseconds'];
+
       currentPositionString =
           widget.episodeItem['currentPlaybackPositionString'];
+
       currentRemainingString =
           widget.episodeItem['currentPlaybackRemainingTimeString'];
-      audioState = 'Pause'; // Represents a "playable" state
+
+      audioState = 'Pause';
     }
 
     return Card(
