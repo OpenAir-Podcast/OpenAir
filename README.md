@@ -104,7 +104,8 @@ OpenAir is proudly developed and maintained by its contributors—who are enthus
 
 ## Screenshots
 
-<img width="330" alt="Screenshot_20250826_115019" src="https://github.com/user-attachments/assets/6fe45f83-9d82-4195-9f7d-ee9fad4e78c0" />
+
+<img width="330" alt="Screenshot_20250913_155418" src="https://github.com/user-attachments/assets/c897d272-de0e-4014-8904-c4abda1922bc" />
 
 <img width="330" alt="Screenshot_20250826_120748" src="https://github.com/user-attachments/assets/5a6f7e9a-d2f0-4f59-bbd2-06c0968d3abb" />
 
