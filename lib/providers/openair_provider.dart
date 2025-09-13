@@ -17,7 +17,6 @@ import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
-import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -335,8 +334,6 @@ class OpenAirProvider extends ChangeNotifier {
     }
 
     if (syncQueueConfig || syncPlaybackPositionConfig) {
-      debugPrint('Syncing Queue');
-
       final user = supabaseService.client.auth.currentUser;
 
       if (user == null) {
@@ -380,7 +377,8 @@ class OpenAirProvider extends ChangeNotifier {
                 item['currentPlaybackPositionString'],
             'current_playback_remaining_time_string':
                 item['currentPlaybackRemainingTimeString'],
-            'player_position': item['playerPosition'],
+            'player_position':
+                (item['playerPosition'] as Duration).inMilliseconds,
           },
           onConflict: 'user_id, guid',
         );
@@ -389,12 +387,8 @@ class OpenAirProvider extends ChangeNotifier {
       // Sync remote to local
       hiveService.clearQueue();
 
-      debugPrint(remoteQueueResult.toString());
-
       for (final remoteItem in remoteQueueResult) {
         final guid = remoteItem['guid'];
-
-        debugPrint('Processing remote queue item with GUID: $guid');
 
         if (guid == null) {
           continue;
@@ -410,8 +404,6 @@ class OpenAirProvider extends ChangeNotifier {
                 .eq('user_id', user.id)
                 .eq('guid', guid)
                 .single();
-
-            debugPrint('Adding remote queue item to local');
 
             await hiveService.addToQueue({
               'guid': remoteFullItem['guid'],
@@ -446,7 +438,6 @@ class OpenAirProvider extends ChangeNotifier {
         }
       }
 
-      ref.invalidate(sortedProvider);
       ref.invalidate(getQueueProvider);
     }
 
@@ -523,8 +514,6 @@ class OpenAirProvider extends ChangeNotifier {
     }
 
     if (syncSettingsConfig) {
-      debugPrint('Syncing Settings');
-
       final user = supabaseService.client.auth.currentUser;
 
       if (user == null) {
