@@ -320,6 +320,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           break;
                       }
 
+                      themeModeConfig = userInterface['themeMode'];
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -385,6 +387,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                         }
 
                         userInterface['fontSizeFactor'] = scaleFactor;
+                        fontSizeConfig = userInterface['fontSizeFactor'];
+
                         ref
                             .watch(openAirProvider)
                             .hiveService
@@ -537,6 +541,9 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       setState(() {
                         userInterface['language'] = saveValue;
                         userInterface['locale'] = locale;
+                        languageConfig = userInterface['language'];
+                        localeConfig = userInterface['locale'];
+
                         localeSettings = locale;
                         onChanged = false;
 

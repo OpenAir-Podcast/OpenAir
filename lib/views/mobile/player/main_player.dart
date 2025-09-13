@@ -176,7 +176,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             left: 18.0,
                             right: 0.0,
                             child: Text(
-                              '-${rewindInterval}s',
+                              '-${rewindIntervalConfig}s',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.0,
@@ -219,7 +219,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             left: 18.0,
                             right: 0.0,
                             child: Text(
-                              '+${fastForwardInterval}s',
+                              '+${fastForwardIntervalConfig}s',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.0,
@@ -258,7 +258,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         .read(audioProvider.notifier)
                         .audioSpeedButtonClicked(),
                     child: Text(
-                      playbackSpeed,
+                      playbackSpeedConfig,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

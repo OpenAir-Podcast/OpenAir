@@ -144,25 +144,31 @@ Color cardColorDark = Colors.grey[850]!;
 Color primaryColorLight = Colors.blue;
 Color primaryColorDark = Colors.blue;
 
-// Playback
-String fastForwardInterval = '10';
-String rewindInterval = '10';
-String playbackSpeed = '1.0x';
+// User Interface
+late String fontSizeConfig;
+late String themeModeConfig;
+late String languageConfig;
+late String localeConfig;
 
-late String enqueuePos;
-late bool enqueueDownloaded;
-late bool autoplayNextInQueue;
-late String smartMarkAsCpl;
-late bool keepSkippedEp;
+// Playback
+String fastForwardIntervalConfig = '10';
+String rewindIntervalConfig = '10';
+String playbackSpeedConfig = '1.0x';
+
+late String enqueuePositionConfig;
+late bool enqueueDownloadedConfig;
+late bool autoplayNextInQueueConfig;
+late String smartMarkAsCompletionConfig;
+late bool keepSkippedEpisodesConfig;
 
 // Automatic
-late String refreshPodcasts;
-late bool downloadNewEpisodes;
-late bool downloadQueuedEpisodes;
-late String downloadEpisodeLimit;
+late String refreshPodcastsConfig;
+late bool downloadNewEpisodesConfig;
+late bool downloadQueuedEpisodesConfig;
+late String downloadEpisodeLimitConfig;
 
-late bool deletePlayedEpisodes;
-late bool keepFavouriteEpisodes;
+late bool deletePlayedEpisodesConfig;
+late bool keepFavouriteEpisodesConfig;
 
 // Synchronization
 late bool syncFavouritesConfig;
@@ -170,3 +176,11 @@ late bool syncQueueConfig;
 late bool syncHistoryConfig;
 late bool syncPlaybackPositionConfig;
 late bool syncSettingsConfig;
+
+// Import/Export
+late bool automaticExportDatabaseConfig;
+
+// Notifications
+late bool receiveNotificationsForNewEpisodesConfig;
+late bool receiveNotificationsWhenPlayConfig;
+late bool receiveNotificationsWhenDownloadConfig;

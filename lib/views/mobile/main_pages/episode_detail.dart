@@ -177,7 +177,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               ),
                             );
 
-                            if (enqueueDownloaded) {
+                            if (enqueueDownloadedConfig) {
                               ref
                                   .watch(openAirProvider)
                                   .downloadEnqueue(context);

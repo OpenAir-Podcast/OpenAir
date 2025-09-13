@@ -276,7 +276,7 @@ class AudioProvider extends ChangeNotifier {
     final hiveService = ref.read(hiveServiceProvider);
 
     // Get the download limit.
-    final downloadLimitString = downloadEpisodeLimit;
+    final downloadLimitString = downloadEpisodeLimitConfig;
 
     final downloadLimit = downloadLimitString != 'Unlimited'
         ? int.tryParse(downloadLimitString)
@@ -497,7 +497,7 @@ class AudioProvider extends ChangeNotifier {
       }
     }
 
-    if (!keepSkippedEp) {
+    if (!keepSkippedEpisodesConfig) {
       await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
     }
 
@@ -533,17 +533,18 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void rewindButtonClicked() {
-    if (playerPosition.inSeconds - int.parse(rewindInterval) > 0) {
+    if (playerPosition.inSeconds - int.parse(rewindIntervalConfig) > 0) {
       player.seek(Duration(
-          seconds: playerPosition.inSeconds - int.parse(rewindInterval)));
+          seconds: playerPosition.inSeconds - int.parse(rewindIntervalConfig)));
     }
   }
 
   void fastForwardButtonClicked() {
-    if (playerPosition.inSeconds + int.parse(fastForwardInterval) <
+    if (playerPosition.inSeconds + int.parse(fastForwardIntervalConfig) <
         playerTotalDuration.inSeconds) {
       player.seek(Duration(
-          seconds: playerPosition.inSeconds + int.parse(fastForwardInterval)));
+          seconds:
+              playerPosition.inSeconds + int.parse(fastForwardIntervalConfig)));
     }
   }
 
@@ -572,7 +573,7 @@ class AudioProvider extends ChangeNotifier {
       }
     }
 
-    if (!keepSkippedEp) {
+    if (!keepSkippedEpisodesConfig) {
       await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
     }
 
@@ -605,10 +606,10 @@ class AudioProvider extends ChangeNotifier {
   }
 
   void audioSpeedButtonClicked() {
-    int index = audioSpeedOptions.indexOf(playbackSpeed);
+    int index = audioSpeedOptions.indexOf(playbackSpeedConfig);
     int newIndex = (index + 1) % audioSpeedOptions.length;
-    playbackSpeed = audioSpeedOptions[newIndex];
-    player.setPlaybackRate(double.parse(playbackSpeed.split('x').first));
+    playbackSpeedConfig = audioSpeedOptions[newIndex];
+    player.setPlaybackRate(double.parse(playbackSpeedConfig.split('x').first));
     notifyListeners();
   }
 
@@ -638,8 +639,8 @@ class AudioProvider extends ChangeNotifier {
           (playerPosition.inMilliseconds / playerTotalDuration.inMilliseconds)
               .clamp(0.0, 1.0);
 
-      if (smartMarkAsCpl != 'Disabled' && !isCompleted) {
-        int sec = int.parse(smartMarkAsCpl);
+      if (smartMarkAsCompletionConfig != 'Disabled' && !isCompleted) {
+        int sec = int.parse(smartMarkAsCompletionConfig);
 
         Future.delayed(Duration(seconds: 3), () async {
           int remainingTimeInSeconds =
@@ -682,7 +683,7 @@ class AudioProvider extends ChangeNotifier {
             playerPosition,
           );
 
-          if (autoplayNextInQueue) playNextInQueue();
+          if (autoplayNextInQueueConfig) playNextInQueue();
         }
       } else if (playerState == PlayerState.paused) {
         if (!onceQueueComplete) {
@@ -898,7 +899,7 @@ class AudioProvider extends ChangeNotifier {
 
     int pos;
 
-    switch (enqueuePos) {
+    switch (enqueuePositionConfig) {
       case 'First':
         pos = 1;
         for (var item in queueList) {
@@ -999,7 +1000,7 @@ class AudioProvider extends ChangeNotifier {
       'playerPosition': Duration.zero.inMilliseconds,
     });
 
-    if (downloadQueuedEpisodes) {
+    if (downloadQueuedEpisodesConfig) {
       await downloadEpisode(episode, podcast, null);
     }
 

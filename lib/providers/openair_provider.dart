@@ -19,6 +19,7 @@ import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) => OpenAirProvider(ref),
@@ -228,7 +229,7 @@ class OpenAirProvider extends ChangeNotifier {
   }
 
   void automaticDownloadQueuedEpisodes() async {
-    if (downloadQueuedEpisodes) {
+    if (downloadQueuedEpisodesConfig) {
       Map queue = await hiveService.getQueue();
 
       if (queue.isEmpty) {
@@ -254,7 +255,7 @@ class OpenAirProvider extends ChangeNotifier {
     }
   }
 
-  void synchronize() async {
+  void synchronize(BuildContext context) async {
     if (syncFavouritesConfig) {
       final user = supabaseService.client.auth.currentUser;
 
@@ -333,7 +334,7 @@ class OpenAirProvider extends ChangeNotifier {
       ref.invalidate(getFeedsProvider);
     }
 
-    if (syncQueueConfig) {
+    if (syncQueueConfig || syncPlaybackPositionConfig) {
       debugPrint('Syncing Queue');
 
       final user = supabaseService.client.auth.currentUser;
@@ -349,23 +350,6 @@ class OpenAirProvider extends ChangeNotifier {
           .from('queue')
           .select('guid')
           .eq('user_id', user.id);
-
-      final localGuid =
-          localQueue.values.map((item) => item['guid'] as String).toSet();
-
-      final remoteGuid =
-          remoteQueueResult.map((item) => item['guid'] as String).toSet();
-
-      // Episodes to remove from remote
-      final guidToRemove = remoteGuid.difference(localGuid);
-
-      // if (guidToRemove.isNotEmpty) {
-      //   await supabaseService.client
-      //       .from('queue')
-      //       .delete()
-      //       .inFilter('guid', guidToRemove.toList())
-      //       .eq('user_id', user.id);
-      // }
 
       // Sync local to remote, with updated positions
       final localQueueList = List.from(localQueue.values);
@@ -466,59 +450,6 @@ class OpenAirProvider extends ChangeNotifier {
       ref.invalidate(getQueueProvider);
     }
 
-    if (syncPlaybackPositionConfig) {
-      debugPrint('Syncing Playback Position');
-      final user = supabaseService.client.auth.currentUser;
-
-      if (user != null) {
-        // Sync local to remote
-        final localQueue = await hiveService.getQueue();
-        for (var item in localQueue.values) {
-          item = Map<String, dynamic>.from(item);
-          final position = item['playerPosition'] as Duration?;
-
-          if (position != null && position.inSeconds > 0) {
-            await supabaseService.client.from('history').upsert({
-              'user_id': user.id,
-              'episode_guid': item['guid'],
-              'position_in_seconds': position.inSeconds,
-            }, onConflict: 'user_id, episode_guid');
-          }
-        }
-
-        // Sync remote to local
-        final remoteHistoryResponse = await supabaseService.client
-            .from('history')
-            .select('episode_guid, position_in_seconds')
-            .eq('user_id', user.id);
-
-        final remoteHistory = remoteHistoryResponse;
-
-        for (final remoteItem in remoteHistory) {
-          final episodeGuid = remoteItem['episode_guid'];
-          if (episodeGuid == null) {
-            continue;
-          }
-
-          final localEpisode =
-              await hiveService.getEpisode(episodeGuid as String);
-
-          if (localEpisode != null) {
-            final localPosition =
-                (localEpisode['playerPosition'] as Duration?)?.inSeconds ?? 0;
-            final remotePosition = remoteItem['position_in_seconds'];
-
-            if (remotePosition is int && remotePosition > localPosition) {
-              await hiveService.updateEpisodePosition(
-                episodeGuid,
-                Duration(seconds: remotePosition),
-              );
-            }
-          }
-        }
-      }
-    }
-
     if (syncHistoryConfig) {
       final user = supabaseService.client.auth.currentUser;
 
@@ -593,31 +524,298 @@ class OpenAirProvider extends ChangeNotifier {
 
     if (syncSettingsConfig) {
       debugPrint('Syncing Settings');
+
       final user = supabaseService.client.auth.currentUser;
+
       if (user == null) {
         return;
       }
 
-      final playbackSettings = await hiveService.getPlaybackSettings();
-      final uiSettings = await hiveService.getUserInterfaceSettings();
+      var i = await supabaseService.client
+          .from('settings')
+          .select()
+          .eq('user_id', user.id);
 
-      final Map<String, dynamic> settings = {
-        'user_id': user.id,
-      };
+      if (i.isEmpty) {
+        // Sync local to remote
+        final userInterfaceSettings =
+            await hiveService.getUserInterfaceSettings();
 
-      if (playbackSettings['playbackSpeed'] != null) {
-        settings['playback_speed'] = playbackSettings['playbackSpeed'];
+        final playbackSettings = await hiveService.getPlaybackSettings();
+
+        final automaticSettings = await hiveService.getAutomaticSettings();
+
+        final synchronizationSettings =
+            await hiveService.getSynchronizationSettings();
+
+        final importExport = await hiveService.getImportExportSettings();
+
+        final notifications = await hiveService.getNotificationsSettings();
+
+        await supabaseService.client.from('settings').upsert(
+          {
+            'user_id': user.id,
+            'user_interface': userInterfaceSettings,
+            'playback': playbackSettings,
+            'automatic': automaticSettings,
+            'synchronization': synchronizationSettings,
+            'import_export': importExport,
+            'notifications': notifications,
+          },
+          onConflict: 'user_id',
+        );
       }
 
-      if (uiSettings != null && uiSettings['themeMode'] != null) {
-        settings['theme_mode'] = uiSettings['themeMode'];
+      // Sync remote to local
+      final remoteSettingsResponse = await supabaseService.client
+          .from('settings')
+          .select()
+          .eq('user_id', user.id);
+
+      final remoteSettings = remoteSettingsResponse[0];
+
+      final remoteUserInterface = remoteSettings['user_interface'];
+      final remotePlayback = remoteSettings['playback'];
+      final remoteAutomatic = remoteSettings['automatic'];
+      final remoteSynchronization = remoteSettings['synchronization'];
+      final remoteImportExport = remoteSettings['import_export'];
+      final remoteNotifications = remoteSettings['notifications'];
+
+      if (remoteSettingsResponse.isEmpty) {
+        hiveService.saveUserInterfaceSettings({
+          'fontSizeFactor': remoteUserInterface['fontSizeFactor'],
+          'language': remoteUserInterface['language'],
+          'locale': remoteUserInterface['locale'],
+          'voice': remoteUserInterface['voice'],
+          'speechRate': remoteUserInterface['speechRate'],
+          'pitch': remoteUserInterface['pitch'],
+        });
       }
 
-      if (settings.length > 1) {
-        await supabaseService.client
-            .from('user_settings')
-            .upsert(settings, onConflict: 'user_id');
+      Brightness platformBrightness;
+
+      if (context.mounted) {
+        platformBrightness =
+            View.of(context).platformDispatcher.platformBrightness;
+
+        switch (themeModeConfig) {
+          case 'System':
+            if (platformBrightness == Brightness.dark) {
+              switch (fontSizeConfig) {
+                case 0.875:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_small');
+                  break;
+                case 1.0:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_medium');
+                  break;
+                case 1.125:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_large');
+                  break;
+                case 1.25:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_extra_large');
+                  break;
+                default:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_medium');
+              }
+            } else if (platformBrightness == Brightness.light) {
+              switch (fontSizeConfig) {
+                case 0.875:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_small');
+                  break;
+                case 1.0:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_medium');
+                  break;
+                case 1.125:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_large');
+                  break;
+                case 1.25:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_extra_large');
+                  break;
+                default:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_medium');
+              }
+            }
+
+            break;
+          case 'Light':
+            switch (fontSizeConfig) {
+              case 0.875:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_small');
+                break;
+              case 1.0:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+                break;
+              case 1.125:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_large');
+                break;
+              case 1.25:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+            }
+
+            break;
+          case 'Dark':
+            switch (fontSizeConfig) {
+              case 0.875:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_small');
+                break;
+              case 1.0:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+                break;
+              case 1.125:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_large');
+                break;
+              case 1.25:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+            }
+
+            break;
+          default:
+            if (platformBrightness == Brightness.dark) {
+              switch (fontSizeConfig) {
+                case 0.875:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_small');
+                  break;
+                case 1.0:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_medium');
+                  break;
+                case 1.125:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_large');
+                  break;
+                case 1.25:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_extra_large');
+                  break;
+                default:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_dark_medium');
+              }
+            } else if (platformBrightness == Brightness.light) {
+              switch (fontSizeConfig) {
+                case 0.875:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_small');
+                  break;
+                case 1.0:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_medium');
+                  break;
+                case 1.125:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_large');
+                  break;
+                case 1.25:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_extra_large');
+                  break;
+                default:
+                  ThemeProvider.controllerOf(context)
+                      .setTheme('blue_accent_light_medium');
+              }
+            }
+        }
       }
+
+      hiveService.savePlaybackSettings({
+        'fastForwardRewindInterval':
+            remotePlayback['fastForwardRewindInterval'],
+        'rewindInterval': remotePlayback['rewindInterval'],
+        'playbackSpeed': remotePlayback['playbackSpeed'],
+        'enqueuePosition': remotePlayback['enqueuePosition'],
+        'enqueueDownloaded': remotePlayback['enqueueDownloaded'],
+        'continuePlayback': remotePlayback['continuePlayback'],
+        'smartMarkAsCompleted': remotePlayback['smartMarkAsCompleted'],
+        'keepSkippedEpisodes': remotePlayback['keepSkippedEpisodes'],
+      });
+
+      fastForwardIntervalConfig = remotePlayback['fastForwardInterval'];
+      rewindIntervalConfig = remotePlayback['rewindInterval'];
+      playbackSpeedConfig = remotePlayback['playbackSpeed'];
+      enqueuePositionConfig = remotePlayback['enqueuePosition'];
+      enqueueDownloadedConfig = remotePlayback['enqueueDownloaded'];
+      autoplayNextInQueueConfig = remotePlayback['continuePlayback'];
+      smartMarkAsCompletionConfig = remotePlayback['smartMarkAsCompleted'];
+      keepSkippedEpisodesConfig = remotePlayback['keepSkippedEpisodes'];
+
+      hiveService.saveAutomaticSettings({
+        'refreshPodcasts': remoteAutomatic['refreshPodcasts'],
+        'downloadNewEpisodes': remoteAutomatic['downloadNewEpisodes'],
+        'downloadQueuedEpisodes': remoteAutomatic['downloadQueuedEpisodes'],
+        'downloadEpisodeLimit': remoteAutomatic['downloadEpisodeLimit'],
+        'deletePlayedEpisodes': remoteAutomatic['deletePlayedEpisodes'],
+        'keepFavouriteEpisodes': remoteAutomatic['keepFavouriteEpisodes'],
+      });
+
+      refreshPodcastsConfig = remoteAutomatic['refreshPodcasts'];
+      downloadNewEpisodesConfig = remoteAutomatic['downloadNewEpisodes'];
+      downloadQueuedEpisodesConfig = remoteAutomatic['downloadQueuedEpisodes'];
+      downloadEpisodeLimitConfig = remoteAutomatic['downloadEpisodeLimit'];
+      deletePlayedEpisodesConfig = remoteAutomatic['deletePlayedEpisodes'];
+      keepFavouriteEpisodesConfig = remoteAutomatic['keepFavouriteEpisodes'];
+
+      hiveService.saveSynchronizationSettings({
+        'syncFavourites': remoteSynchronization['syncFavourites'],
+        'syncQueue': remoteSynchronization['syncQueue'],
+        'syncHistory': remoteSynchronization['syncHistory'],
+        'syncPlaybackPosition': remoteSynchronization['syncPlaybackPosition'],
+        'syncSettings': remoteSynchronization['syncSettings'],
+      });
+
+      syncFavouritesConfig = remoteSynchronization['syncFavourites'];
+      syncQueueConfig = remoteSynchronization['syncQueue'];
+      syncHistoryConfig = remoteSynchronization['syncHistory'];
+      syncPlaybackPositionConfig =
+          remoteSynchronization['syncPlaybackPosition'];
+      syncSettingsConfig = remoteSynchronization['syncSettings'];
+
+      hiveService.saveImportExportSettings({
+        'autoBackup': remoteImportExport['autoBackup'],
+      });
+
+      automaticExportDatabaseConfig = remoteImportExport['autoBackup'];
+
+      hiveService.saveNotificationsSettings({
+        'newEpisodes': remoteNotifications['newEpisodes'],
+        'downloadedEpisodes': remoteNotifications['downloadedEpisodes'],
+        'playbackStatus': remoteNotifications['playbackStatus'],
+      });
+
+      receiveNotificationsForNewEpisodesConfig =
+          remoteNotifications['receiveNotificationsForNewEpisodes'];
+
+      receiveNotificationsWhenDownloadConfig =
+          remoteNotifications['receiveNotificationsWhenDownloading'];
+
+      receiveNotificationsWhenPlayConfig =
+          remoteNotifications['receiveNotificationsWhenPlaying'];
     }
   }
 }

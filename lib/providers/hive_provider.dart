@@ -150,41 +150,53 @@ class HiveService {
 
     Map<String, dynamic> playbackSettings = await getPlaybackSettings();
 
-    rewindInterval =
+    themeModeConfig = await getUserInterfaceSettings()
+        .then((value) => value['themeMode'] ?? 'System');
+
+    fontSizeConfig = await getUserInterfaceSettings()
+        .then((value) => value['fontSizeFactor'].toString());
+
+    languageConfig = await getUserInterfaceSettings()
+        .then((value) => value['language'] ?? 'English');
+
+    localeConfig = await getUserInterfaceSettings()
+        .then((value) => value['locale'] ?? 'en_US');
+
+    rewindIntervalConfig =
         playbackSettings['rewindInterval'].toString().split(' ').first;
 
-    fastForwardInterval =
+    fastForwardIntervalConfig =
         playbackSettings['fastForwardInterval'].toString().split(' ').first;
 
-    playbackSpeed = playbackSettings['playbackSpeed'];
+    playbackSpeedConfig = playbackSettings['playbackSpeed'];
 
-    enqueuePos = playbackSettings['enqueuePosition'];
-    enqueueDownloaded = playbackSettings['enqueueDownloaded'];
-    autoplayNextInQueue = playbackSettings['continuePlayback'];
+    enqueuePositionConfig = playbackSettings['enqueuePosition'];
+    enqueueDownloadedConfig = playbackSettings['enqueueDownloaded'];
+    autoplayNextInQueueConfig = playbackSettings['continuePlayback'];
 
     switch (playbackSettings['smartMarkAsCompleted']) {
       case 'Disabled':
-        smartMarkAsCpl = 'Disabled';
+        smartMarkAsCompletionConfig = 'Disabled';
         break;
       case '15 seconds':
-        smartMarkAsCpl = '15';
+        smartMarkAsCompletionConfig = '15';
         break;
       case '30 seconds':
-        smartMarkAsCpl = '30';
+        smartMarkAsCompletionConfig = '30';
         break;
       case '60 seconds':
-        smartMarkAsCpl = '60';
+        smartMarkAsCompletionConfig = '60';
         break;
       case '180 seconds':
-        smartMarkAsCpl = '180';
+        smartMarkAsCompletionConfig = '180';
         break;
       case '120 seconds':
-        smartMarkAsCpl = '120';
+        smartMarkAsCompletionConfig = '120';
         break;
       default:
     }
 
-    keepSkippedEp = playbackSettings['keepSkippedEpisodes'];
+    keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
 
     // Automatic
     Map<String, dynamic> automaticSettings = await getAutomaticSettings();
@@ -192,19 +204,19 @@ class HiveService {
     // refresh settings
     // Never, Every hour, Every 2 hours, Every 4 hours, Every 8 hours,
     // Every 12 hours, Every day, Every 3 days
-    refreshPodcasts = automaticSettings['refreshPodcasts'];
-    downloadNewEpisodes = automaticSettings['downloadNewEpisodes'];
-    downloadQueuedEpisodes = automaticSettings['downloadQueuedEpisodes'];
+    refreshPodcastsConfig = automaticSettings['refreshPodcasts'];
+    downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
+    downloadQueuedEpisodesConfig = automaticSettings['downloadQueuedEpisodes'];
 
     // 5, 10, 25, 50, 75, 100, 500, unlimited
-    downloadEpisodeLimit = automaticSettings['downloadEpisodeLimit'];
+    downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
 
-    deletePlayedEpisodes = automaticSettings['deletePlayedEpisodes'];
-    keepFavouriteEpisodes = automaticSettings['keepFavouriteEpisodes'];
+    deletePlayedEpisodesConfig = automaticSettings['deletePlayedEpisodes'];
+    keepFavouriteEpisodesConfig = automaticSettings['keepFavouriteEpisodes'];
 
     Duration duration;
 
-    switch (refreshPodcasts) {
+    switch (refreshPodcastsConfig) {
       case 'Every hour':
         duration = const Duration(hours: 1);
         break;
@@ -234,7 +246,7 @@ class HiveService {
     refreshTimer = ScheduledTimer(
       id: 'refresh_timer',
       onExecute: () {
-        if (refreshPodcasts != 'Never') {
+        if (refreshPodcastsConfig != 'Never') {
           updateSubscriptions();
           refreshTimer.schedule(DateTime.now().add(duration));
         } else {
@@ -245,7 +257,7 @@ class HiveService {
       onMissedSchedule: () => refreshTimer.execute(),
     );
 
-    if (refreshPodcasts != 'Never') {
+    if (refreshPodcastsConfig != 'Never') {
       refreshTimer.schedule(DateTime.now().add(duration));
     }
 
@@ -253,7 +265,7 @@ class HiveService {
     Map<String, dynamic>? synchronizationSettings =
         await getSynchronizationSettings();
 
-    syncFavouritesConfig = synchronizationSettings!['syncFavourites'];
+    syncFavouritesConfig = synchronizationSettings['syncFavourites'];
     syncQueueConfig = synchronizationSettings['syncQueue'];
     syncHistoryConfig = synchronizationSettings['syncHistory'];
     syncPlaybackPositionConfig =
@@ -316,7 +328,7 @@ class HiveService {
               if (await episodeBox.get(guid) == null) {
                 await episodeBox.put(guid, episode);
 
-                if (downloadNewEpisodes) {
+                if (downloadNewEpisodesConfig) {
                   final podcast = PodcastModel(
                     id: subscription.id,
                     title: subscription.title,
@@ -618,10 +630,10 @@ class HiveService {
   }
 
   Future<void> deletePlayedEpisode(String guid) async {
-    if (deletePlayedEpisodes) {
+    if (deletePlayedEpisodesConfig) {
       final favorites = await getFavoriteEpisodes();
 
-      if (keepFavouriteEpisodes && favorites.containsKey(guid)) {
+      if (keepFavouriteEpisodesConfig && favorites.containsKey(guid)) {
         return; // Do not delete favorite episodes
       }
 
@@ -661,7 +673,7 @@ class HiveService {
     await box.put('userInterface', userInterfaceSettings);
   }
 
-  Future<Map<String, dynamic>?> getUserInterfaceSettings() async {
+  Future<Map<String, dynamic>> getUserInterfaceSettings() async {
     final box = await settingsBox;
     Map? userInterfaceSettings = await box.get('userInterface');
 
@@ -746,7 +758,7 @@ class HiveService {
     await box.put('synchronization', synchronizationSettings);
   }
 
-  Future<Map<String, dynamic>?> getSynchronizationSettings() async {
+  Future<Map<String, dynamic>> getSynchronizationSettings() async {
     final box = await settingsBox;
     Map? synchronizationSettings = await box.get('synchronization');
 
@@ -778,7 +790,6 @@ class HiveService {
     if (importExportSettings == null) {
       importExportSettings = {
         'autoBackup': true,
-        'autoBackupFrequency': 'Daily',
       };
 
       await box.put('importExport', importExportSettings);

@@ -75,6 +75,9 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
                       notificationsData['receiveNotificationsForNewEpisodes'] =
                           receiveNotificationsForNewEpisodes;
 
+                      receiveNotificationsForNewEpisodesConfig =
+                          receiveNotificationsForNewEpisodes;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -115,6 +118,9 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
                       receiveNotificationsWhenPlaying =
                           !receiveNotificationsWhenPlaying;
                       notificationsData['receiveNotificationsWhenPlaying'] =
+                          receiveNotificationsWhenPlaying;
+
+                      receiveNotificationsWhenPlayConfig =
                           receiveNotificationsWhenPlaying;
 
                       ref
@@ -159,6 +165,9 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
                       receiveNotificationsWhenDownloading =
                           !receiveNotificationsWhenDownloading;
                       notificationsData['receiveNotificationsWhenDownloading'] =
+                          receiveNotificationsWhenDownloading;
+
+                      receiveNotificationsWhenDownloadConfig =
                           receiveNotificationsWhenDownloading;
 
                       ref

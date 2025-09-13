@@ -222,6 +222,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                                   DateTime.now().add(const Duration(days: 3)));
                         }
 
+                        refreshPodcastsConfig = refreshPodcasts;
+
                         ref
                             .read(openAirProvider)
                             .hiveService
@@ -260,6 +262,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       downloadsData['downloadNewEpisodes'] =
                           downloadNewEpisodes;
 
+                      downloadNewEpisodesConfig = downloadNewEpisodes;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -293,6 +297,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       downloadQueuedEpisodes = !downloadQueuedEpisodes;
                       downloadsData['downloadQueuedEpisodes'] =
                           downloadQueuedEpisodes;
+
+                      downloadQueuedEpisodesConfig = downloadQueuedEpisodes;
 
                       ref
                           .watch(openAirProvider)
@@ -352,6 +358,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                           downloadsData['downloadEpisodeLimit'] = 'Unlimited';
                         }
 
+                        downloadEpisodeLimitConfig = downloadEpisodeLimit;
+
                         ref
                             .watch(openAirProvider)
                             .hiveService
@@ -391,6 +399,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                       downloadsData['deletePlayedEpisodes'] =
                           deletePlayedEpisodes;
 
+                      deletePlayedEpisodesConfig = deletePlayedEpisodes;
+
                       ref
                           .watch(openAirProvider)
                           .hiveService
@@ -425,6 +435,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                             keepFavouriteEpisodes = !keepFavouriteEpisodes;
                             downloadsData['keepFavouriteEpisodes'] =
                                 keepFavouriteEpisodes;
+
+                            keepFavouriteEpisodesConfig = keepFavouriteEpisodes;
 
                             ref
                                 .watch(openAirProvider)

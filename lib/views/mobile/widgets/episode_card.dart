@@ -224,7 +224,7 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ),
                             );
 
-                            if (enqueueDownloaded) {
+                            if (enqueueDownloadedConfig) {
                               ref
                                   .watch(openAirProvider)
                                   .downloadEnqueue(context);

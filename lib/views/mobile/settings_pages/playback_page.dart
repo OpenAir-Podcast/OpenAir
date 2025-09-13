@@ -197,31 +197,31 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                         if (Translations.of(context).text('seconds3') ==
                             newValue) {
                           playbackData['rewindInterval'] = '3 seconds';
-                          rewindInterval = '3';
+                          rewindIntervalConfig = '3';
                         } else if (Translations.of(context).text('seconds5') ==
                             newValue) {
                           playbackData['rewindInterval'] = '5 seconds';
-                          rewindInterval = '5';
+                          rewindIntervalConfig = '5';
                         } else if (Translations.of(context).text('seconds10') ==
                             newValue) {
                           playbackData['rewindInterval'] = '10 seconds';
-                          rewindInterval = '10';
+                          rewindIntervalConfig = '10';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
                           playbackData['rewindInterval'] = '15 seconds';
-                          rewindInterval = '15';
+                          rewindIntervalConfig = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
                           playbackData['rewindInterval'] = '30 seconds';
-                          rewindInterval = '30';
+                          rewindIntervalConfig = '30';
                         } else if (Translations.of(context).text('seconds45') ==
                             newValue) {
                           playbackData['rewindInterval'] = '45 seconds';
-                          rewindInterval = '45';
+                          rewindIntervalConfig = '45';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
                           playbackData['rewindInterval'] = '60 seconds';
-                          rewindInterval = '60';
+                          rewindIntervalConfig = '60';
                         }
 
                         ref
@@ -269,31 +269,31 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                         if (Translations.of(context).text('seconds3') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '3 seconds';
-                          fastForwardInterval = '3';
+                          fastForwardIntervalConfig = '3';
                         } else if (Translations.of(context).text('seconds5') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '5 seconds';
-                          fastForwardInterval = '5';
+                          fastForwardIntervalConfig = '5';
                         } else if (Translations.of(context).text('seconds10') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '10 seconds';
-                          fastForwardInterval = '10';
+                          fastForwardIntervalConfig = '10';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '15 seconds';
-                          fastForwardInterval = '15';
+                          fastForwardIntervalConfig = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '30 seconds';
-                          fastForwardInterval = '30';
+                          fastForwardIntervalConfig = '30';
                         } else if (Translations.of(context).text('seconds45') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '45 seconds';
-                          fastForwardInterval = '45';
+                          fastForwardIntervalConfig = '45';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
                           playbackData['fastForwardInterval'] = '60 seconds';
-                          fastForwardInterval = '60';
+                          fastForwardIntervalConfig = '60';
                         }
 
                         ref
@@ -358,6 +358,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                           playbackSpeed = '2.0x';
                         }
 
+                        playbackSpeedConfig = playbackSpeed;
+
                         ref
                             .watch(openAirProvider)
                             .hiveService
@@ -409,18 +411,18 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
 
                         if (Translations.of(context).text('last') == newValue) {
                           playbackData['enqueuePosition'] = 'Last';
-                          enqueuePos = 'Last';
+                          enqueuePositionConfig = 'Last';
                         } else if (Translations.of(context).text('first') ==
                             newValue) {
                           playbackData['enqueuePosition'] = 'First';
-                          enqueuePos = 'First';
+                          enqueuePositionConfig = 'First';
                         } else if (Translations.of(context)
                                 .text('afterCurrentEpisode') ==
                             newValue) {
                           playbackData['enqueuePosition'] =
                               'After current episode';
 
-                          enqueuePos = 'After current episode';
+                          enqueuePositionConfig = 'After current episode';
                         }
 
                         ref
@@ -454,6 +456,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       enqueueDownloaded = !enqueueDownloaded;
 
                       playbackData['enqueueDownloaded'] = enqueueDownloaded;
+                      enqueueDownloadedConfig = enqueueDownloaded;
 
                       ref
                           .watch(openAirProvider)
@@ -491,6 +494,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                     setState(() {
                       autoplayNextInQueue = !autoplayNextInQueue;
                       playbackData['continuePlayback'] = autoplayNextInQueue;
+
+                      autoplayNextInQueueConfig = autoplayNextInQueue;
 
                       ref
                           .watch(openAirProvider)
@@ -535,27 +540,27 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                         if (Translations.of(context).text('disabled') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = 'Disabled';
-                          smartMarkAsCpl = 'Disabled';
+                          smartMarkAsCompletionConfig = 'Disabled';
                         } else if (Translations.of(context).text('seconds15') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '15 seconds';
-                          smartMarkAsCpl = '15';
+                          smartMarkAsCompletionConfig = '15';
                         } else if (Translations.of(context).text('seconds30') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '30 seconds';
-                          smartMarkAsCpl = '30';
+                          smartMarkAsCompletionConfig = '30';
                         } else if (Translations.of(context).text('seconds60') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '60 seconds';
-                          smartMarkAsCpl = '60';
+                          smartMarkAsCompletionConfig = '60';
                         } else if (Translations.of(context).text('minutes3') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '3 minutes';
-                          smartMarkAsCpl = '180';
+                          smartMarkAsCompletionConfig = '180';
                         } else if (Translations.of(context).text('minutes5') ==
                             newValue) {
                           playbackData['smartMarkAsCompleted'] = '5 minutes';
-                          smartMarkAsCpl = '300';
+                          smartMarkAsCompletionConfig = '300';
                         }
 
                         ref
@@ -593,7 +598,7 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                       keepSkippedEpisodes = !keepSkippedEpisodes;
                       playbackData['keepSkippedEpisodes'] = keepSkippedEpisodes;
 
-                      keepSkippedEp = keepSkippedEpisodes;
+                      keepSkippedEpisodesConfig = keepSkippedEpisodes;
 
                       ref
                           .watch(openAirProvider)

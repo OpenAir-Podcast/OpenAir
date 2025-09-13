@@ -80,6 +80,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                     setState(() {
                       automaticExportDatabase = !automaticExportDatabase;
                       importExportData['autoBackup'] = automaticExportDatabase;
+                      automaticExportDatabaseConfig = automaticExportDatabase;
 
                       ref
                           .watch(openAirProvider)
