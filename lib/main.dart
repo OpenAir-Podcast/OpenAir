@@ -73,20 +73,20 @@ class _MyAppState extends ConsumerState<MyApp> {
         builder: (context, snapshot) {
           Translations.support(
             [
-              Localization.ar_AE,
-              Localization.de_DE,
-              Localization.es_ES,
-              Localization.en_US,
-              Localization.fr_FR,
-              Localization.he_IL,
-              Localization.it_IT,
-              Localization.ja_JP,
-              Localization.ko_KR,
-              Localization.nl_NL,
-              Localization.pt_PT,
-              Localization.ru_RU,
-              Localization.sv_SE,
-              Localization.zh_CN,
+              Localization.ar_AE, // Arabic (UAE)
+              Localization.de_DE, // Germany
+              Localization.es_ES, // Spain
+              Localization.en_US, // United States
+              Localization.fr_FR, // France
+              Localization.he_IL, // Israel
+              Localization.it_IT, // Italy
+              Localization.ja_JP, // Japan
+              Localization.ko_KR, // South Korea
+              Localization.nl_NL, // Netherlands
+              Localization.pt_PT, // Portugal
+              Localization.ru_RU, // Russia
+              Localization.sv_SE, // Sweden
+              Localization.zh_CN, // China
             ],
           );
 
