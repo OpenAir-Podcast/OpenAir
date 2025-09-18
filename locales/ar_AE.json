@@ -293,7 +293,7 @@
     "exportDatabase": "تصدير قاعدة البيانات",
     "importDatabase": "استيراد قاعدة البيانات",
     "exportDatabaseSubtitle": "تصدير اشتراكات البودكاست",
-    "importDatabaseSubtitle": "استيراد اشتراكات البودكاست",
+    "importDatabaseSubtitle": "استيراد قائمة الانتظار والسجل والإعدادات",
     "automaticExportDatabase": "تصدير قاعدة البيانات تلقائيًا",
     "opml": "OPML",
     "userData": "بيانات المستخدم",

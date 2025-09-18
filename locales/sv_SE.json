@@ -293,7 +293,7 @@
     "exportDatabase": "Exportera databas",
     "importDatabase": "Importera databas",
     "exportDatabaseSubtitle": "Exportera podcastprenumerationer",
-    "importDatabaseSubtitle": "Importera podcastprenumerationer",
+    "importDatabaseSubtitle": "Importera din kö, historik och inställningar",
     "automaticExportDatabase": "Exportera databas automatiskt",
     "opml": "OPML",
     "userData": "Användardata",

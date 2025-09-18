@@ -57,9 +57,12 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
               maxLength: 256,
               controller: textInputControl,
               keyboardType: TextInputType.webSearch,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
+                color: Brightness.light == Theme.of(context).brightness
+                    ? Colors.black
+                    : Colors.white,
               ),
               decoration: InputDecoration(
                 icon: Icon(
@@ -171,11 +174,20 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
+                          color:
+                              Brightness.light == Theme.of(context).brightness
+                                  ? Colors.black
+                                  : Colors.white,
                         ),
                       ),
                       Text(
                         Translations.of(context).text('oopsTryAgainLater'),
-                        style: TextStyle(fontSize: 16.0),
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            color:
+                                Brightness.light == Theme.of(context).brightness
+                                    ? Colors.black
+                                    : Colors.white),
                       ),
                       const SizedBox(height: 20.0),
                       SizedBox(
@@ -344,9 +356,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                       Translations.of(context).text('addPodcastByRssUrl'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: Brightness.light == Theme.of(context).brightness
-                            ? Colors.black
-                            : Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     content: SizedBox(
@@ -356,9 +368,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                         autofocus: true,
                         controller: textInputControl,
                         keyboardType: TextInputType.url,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color:
+                              Brightness.light == Theme.of(context).brightness
+                                  ? Colors.black
+                                  : Colors.white,
                         ),
                         decoration: InputDecoration(
                           icon: Icon(
@@ -470,9 +486,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                       Translations.of(context).text('searchPodcastIndex'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: Brightness.light == Theme.of(context).brightness
-                            ? Colors.black
-                            : Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     content: SizedBox(
@@ -482,9 +498,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                         autofocus: true,
                         controller: textInputControl,
                         keyboardType: TextInputType.url,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color:
+                              Brightness.light == Theme.of(context).brightness
+                                  ? Colors.black
+                                  : Colors.white,
                         ),
                         decoration: InputDecoration(
                           icon: Icon(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -13,11 +15,17 @@ import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
 import 'package:openair/responsive/tablet_scaffold.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   try {
     // Load the .env file
     await dotenv.load(fileName: '.env');
@@ -276,7 +284,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                       data: (data) {
                         Translations.changeLanguage(data!['locale']);
 
-                        final hasConnection = ref.watch(openAirProvider).hasConnection;
+                        final hasConnection =
+                            ref.watch(openAirProvider).hasConnection;
                         if (!hasConnection) {
                           return const NoConnection();
                         }

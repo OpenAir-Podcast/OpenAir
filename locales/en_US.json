@@ -294,13 +294,18 @@
     "exportDatabase": "Export Database",
     "importDatabase": "Import Database",
     "exportDatabaseSubtitle": "Export podcast subscriptions",
-    "importDatabaseSubtitle": "Import podcast subscriptions",
+    "importDatabaseSubtitle": "Import your queue, history, and settings",
     "automaticExportDatabase": "Automatically export database",
     "opml": "OPML",
+    "importOpml": "Import OPML",
+    "importOpmlSubtitle": "Import podcasts from an OPML file",
+    "exportOpml": "Export OPML",
+    "exportOpmlSubtitle": "Export your subscriptions to an OPML file",
     "userData": "User Data",
     "deleteAllEpisode": "Delete all episodes",
     "deleteAllEpisodeSubtitle": "Delete all episodes from the database",
     "deleteAllEpisodeConfirmation": "Are you sure you want to delete all episodes? This action cannot be undone.",
+    "delete": "Delete",
     "alerts": "Alerts",
     "receiveNotificationsForNewEpisodes": "Receive notifications for new episodes",
     "receiveNotificationsForNewEpisodesSubtitle": "Receive notifications for new episodes",
@@ -400,5 +405,7 @@
     "or": "Or",
     "termsAndPrivacyPolicy": "By signing in, you agree to our Terms of service and Privacy Policy",
     "terms": "Terms of service",
-    "invalidUsername": "Invalid username"
+    "invalidUsername": "Invalid username",
+    "databaseImportedRestartApp": "Database imported. Please restart the app.",
+    "databaseExportedRestartApp": "Database exported. Please restart the app."
 }

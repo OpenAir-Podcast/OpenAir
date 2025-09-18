@@ -293,7 +293,7 @@
     "exportDatabase": "데이터베이스 내보내기",
     "importDatabase": "데이터베이스 가져오기",
     "exportDatabaseSubtitle": "팟캐스트 구독 내보내기",
-    "importDatabaseSubtitle": "팟캐스트 구독 가져오기",
+    "importDatabaseSubtitle": "대기열, 기록 및 설정 가져오기",
     "automaticExportDatabase": "데이터베이스 자동 내보내기",
     "opml": "OPML",
     "userData": "사용자 데이터",

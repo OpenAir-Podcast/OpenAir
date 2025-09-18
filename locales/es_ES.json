@@ -294,7 +294,7 @@
     "exportDatabase": "Exportar base de datos",
     "importDatabase": "Importar base de datos",
     "exportDatabaseSubtitle": "Exportar suscripciones de podcast",
-    "importDatabaseSubtitle": "Importar suscripciones de podcast",
+    "importDatabaseSubtitle": "Importar tu cola, historial y ajustes",
     "automaticExportDatabase": "Exportar base de datos automáticamente",
     "opml": "OPML",
     "userData": "Datos de usuario",

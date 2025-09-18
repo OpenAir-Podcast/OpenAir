@@ -293,7 +293,7 @@
     "exportDatabase": "Exporter la base de données",
     "importDatabase": "Importer la base de données",
     "exportDatabaseSubtitle": "Exporter les abonnements aux podcasts",
-    "importDatabaseSubtitle": "Importer les abonnements aux podcasts",
+    "importDatabaseSubtitle": "Importer votre file d'attente, votre historique et vos paramètres",
     "automaticExportDatabase": "Exporter automatiquement la base de données",
     "opml": "OPML",
     "userData": "Données utilisateur",

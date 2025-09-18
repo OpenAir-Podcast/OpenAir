@@ -19,6 +19,8 @@ import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'dart:convert';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) => OpenAirProvider(ref),
@@ -201,6 +203,242 @@ class OpenAirProvider extends ChangeNotifier {
   }
 
   void exportPodcastToOpml() async {}
+
+  Future<void> exportToDb(String path) async {
+    // Delete the database if it exists
+    await deleteDatabase(path);
+
+    final database = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE subscriptions (
+            id INTEGER PRIMARY KEY,
+            url TEXT,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            artwork TEXT,
+            description TEXT,
+            episodeCount INTEGER,
+            updated_at TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE queue (
+            guid TEXT PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            downloadSize TEXT,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT,
+            pos INTEGER,
+            podcastCurrentPositionInMilliseconds REAL,
+            currentPlaybackPositionString TEXT,
+            currentPlaybackRemainingTimeString TEXT,
+            playerPosition INTEGER
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE history (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            size TEXT,
+            podcastId TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            playDate INTEGER
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_interface TEXT,
+            playback TEXT,
+            automatic TEXT,
+            synchronization TEXT,
+            import_export TEXT,
+            notifications TEXT
+          )
+        ''');
+      },
+    );
+
+    // Export subscriptions
+    final localSubscriptions = await hiveService.getSubscriptions();
+    for (final sub in localSubscriptions.values) {
+      await database.insert('subscriptions', sub.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export queue
+    final localQueue = await hiveService.getQueue();
+    for (final item in localQueue.values) {
+      final queueItem = Map<String, dynamic>.from(item);
+
+      if (queueItem['podcast'] != null) {
+        queueItem['podcast'] = jsonEncode(queueItem['podcast'].toJson());
+      }
+
+      if (queueItem['playerPosition'] is Duration) {
+        queueItem['playerPosition'] =
+            (queueItem['playerPosition'] as Duration).inMilliseconds;
+      }
+
+      await database.insert('queue', queueItem,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export history
+    final history = await hiveService.getHistory();
+
+    for (final episode in history.values) {
+      await database.insert('history', episode.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export settings
+    final userInterfaceSettings = await hiveService.getUserInterfaceSettings();
+    final playbackSettings = await hiveService.getPlaybackSettings();
+    final automaticSettings = await hiveService.getAutomaticSettings();
+    final synchronizationSettings =
+        await hiveService.getSynchronizationSettings();
+    final importExport = await hiveService.getImportExportSettings();
+    final notifications = await hiveService.getNotificationsSettings();
+
+    await database.insert(
+        'settings',
+        {
+          'user_interface': jsonEncode(userInterfaceSettings),
+          'playback': jsonEncode(playbackSettings),
+          'automatic': jsonEncode(automaticSettings),
+          'synchronization': jsonEncode(synchronizationSettings),
+          'import_export': jsonEncode(importExport),
+          'notifications': jsonEncode(notifications),
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace);
+
+    debugPrint('Database exported to $path');
+  }
+
+  Future<void> importFromDb(File file) async {
+    final database = await openDatabase(
+      file.path,
+      version: 1,
+    );
+
+    // Import subscriptions
+    final List<Map<String, dynamic>> subscriptionsMaps =
+        await database.query('subscriptions');
+
+    for (var subMap in subscriptionsMaps) {
+      final subscription = SubscriptionModel.fromJson(subMap);
+
+      await hiveService.subscribe(subscription);
+      await ref.read(audioProvider).addPodcastEpisodes(subscription);
+    }
+
+    // Import queue
+    final List<Map<String, dynamic>> queueMaps = await database.query('queue');
+    for (var queueMap in queueMaps) {
+      final Map<String, dynamic> item = Map<String, dynamic>.from(queueMap);
+      if (item['podcast'] != null) {
+        item['podcast'] = PodcastModel.fromJson(jsonDecode(item['podcast']));
+      }
+      if (item['playerPosition'] != null) {
+        item['playerPosition'] = Duration(milliseconds: item['playerPosition']);
+      }
+      await hiveService.addToQueue(item);
+    }
+
+    // Import history
+    final List<Map<String, dynamic>> historyMaps =
+        await database.query('history');
+    for (var historyMap in historyMaps) {
+      final history = HistoryModel.fromJson(historyMap);
+      await hiveService.addToHistory(history);
+    }
+
+    // Import settings
+    final List<Map<String, dynamic>> settingsMaps =
+        await database.query('settings');
+    if (settingsMaps.isNotEmpty) {
+      final settings = settingsMaps.first;
+
+      final userInterfaceSettings =
+          jsonDecode(settings['user_interface'] as String);
+      final playbackSettings = jsonDecode(settings['playback'] as String);
+      final automaticSettings = jsonDecode(settings['automatic'] as String);
+      final synchronizationSettings =
+          jsonDecode(settings['synchronization'] as String);
+      final importExportSettings =
+          jsonDecode(settings['import_export'] as String);
+      final notificationsSettings =
+          jsonDecode(settings['notifications'] as String);
+
+      hiveService.saveUserInterfaceSettings(userInterfaceSettings);
+      hiveService.savePlaybackSettings(playbackSettings);
+      hiveService.saveAutomaticSettings(automaticSettings);
+      hiveService.saveSynchronizationSettings(synchronizationSettings);
+      hiveService.saveImportExportSettings(importExportSettings);
+      hiveService.saveNotificationsSettings(notificationsSettings);
+
+      // Apply settings to current config variables
+      fontSizeConfig = userInterfaceSettings['fontSizeFactor'].toString();
+      languageConfig = userInterfaceSettings['language'];
+      localeConfig = userInterfaceSettings['locale'];
+
+      fastForwardIntervalConfig = playbackSettings['fastForwardInterval'];
+      rewindIntervalConfig = playbackSettings['rewindInterval'];
+      playbackSpeedConfig = playbackSettings['playbackSpeed'];
+      enqueuePositionConfig = playbackSettings['enqueuePosition'];
+      enqueueDownloadedConfig = playbackSettings['enqueueDownloaded'];
+      autoplayNextInQueueConfig = playbackSettings['continuePlayback'];
+      smartMarkAsCompletionConfig = playbackSettings['smartMarkAsCompleted'];
+      keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
+
+      refreshPodcastsConfig = automaticSettings['refreshPodcasts'];
+      downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
+      downloadQueuedEpisodesConfig =
+          automaticSettings['downloadQueuedEpisodes'];
+      downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
+      deletePlayedEpisodesConfig = automaticSettings['deletePlayedEpisodes'];
+      keepFavouriteEpisodesConfig = automaticSettings['keepFavouriteEpisodes'];
+
+      syncFavouritesConfig = synchronizationSettings['syncFavourites'];
+      syncQueueConfig = synchronizationSettings['syncQueue'];
+      syncHistoryConfig = synchronizationSettings['syncHistory'];
+      syncPlaybackPositionConfig =
+          synchronizationSettings['syncPlaybackPosition'];
+      syncSettingsConfig = synchronizationSettings['syncSettings'];
+
+      automaticExportDatabaseConfig = importExportSettings['autoBackup'];
+
+      receiveNotificationsForNewEpisodesConfig =
+          notificationsSettings['receiveNotificationsForNewEpisodes'];
+      receiveNotificationsWhenDownloadConfig =
+          notificationsSettings['receiveNotificationsWhenDownloading'];
+      receiveNotificationsWhenPlayConfig =
+          notificationsSettings['receiveNotificationsWhenPlaying'];
+    }
+  }
 
   void updateFontSize(String size) {}
 
@@ -693,7 +931,7 @@ class OpenAirProvider extends ChangeNotifier {
                   break;
                 case 1.0:
                   ThemeProvider.controllerOf(context)
-                      .setTheme('blue_accent_dark_medium');
+                      .setTheme('blue_accent_.dark_medium');
                   break;
                 case 1.125:
                   ThemeProvider.controllerOf(context)

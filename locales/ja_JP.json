@@ -293,7 +293,7 @@
     "exportDatabase": "データベースをエクスポート",
     "importDatabase": "データベースをインポート",
     "exportDatabaseSubtitle": "ポッドキャストのサブスクリプションをエクスポート",
-    "importDatabaseSubtitle": "ポッドキャストのサブスクリプションをインポート",
+    "importDatabaseSubtitle": "キュー、履歴、設定をインポート",
     "automaticExportDatabase": "データベースを自動的にエクスポート",
     "opml": "OPML",
     "userData": "ユーザーデータ",

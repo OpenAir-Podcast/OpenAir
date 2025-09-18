@@ -21,6 +21,7 @@ import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
+import 'package:xml/xml.dart';
 
 final hiveServiceProvider = Provider<HiveService>(
   (ref) => HiveService(ref),
@@ -706,15 +707,15 @@ class HiveService {
     if (playbackSettings == null) {
       playbackSettings = {
         // Playback control
-        'fastForwardInterval': '10 seconds', // Seconds
-        'rewindInterval': '10 seconds', // Seconds
+        'fastForwardInterval': '10 seconds',
+        'rewindInterval': '10 seconds',
         'playbackSpeed': '1.0x', // Medium
 
         // Queue
         'enqueuePosition': 'Last',
         'enqueueDownloaded': false,
         'continuePlayback': true,
-        'smartMarkAsCompleted': '30 seconds', // Seconds
+        'smartMarkAsCompleted': '30 seconds',
         'keepSkippedEpisodes': false,
       };
       await box.put('playback', playbackSettings);
@@ -796,6 +797,52 @@ class HiveService {
     }
 
     return importExportSettings.cast<String, dynamic>();
+  }
+
+  Future<void> importSubscriptions(File file) async {
+    final box = await subscriptionBox;
+    final importedCollection =
+        await BoxCollection.open(file.path, {'subscriptions'});
+    final importedSubscriptionBox =
+        await importedCollection.openBox<SubscriptionModel>('subscriptions');
+    final importedSubscriptions = await importedSubscriptionBox.getAllValues();
+    for (var subscription in importedSubscriptions.entries) {
+      await box.put(subscription.key, subscription.value);
+    }
+  }
+
+  Future<void> importOpml(File file) async {
+    final document = XmlDocument.parse(file.readAsStringSync());
+    final outlines = document.findAllElements('outline');
+    for (final outline in outlines) {
+      final feedUrl = outline.getAttribute('xmlUrl');
+      if (feedUrl != null) {
+        await ref.read(audioProvider).addPodcastByRssUrl(feedUrl);
+      }
+    }
+  }
+
+  Future<void> exportOpml(String path) async {
+    final subscriptions = await getSubscriptions();
+    final builder = XmlBuilder();
+    builder.processing('xml', 'version="1.0" encoding="UTF-8" standalone="no"');
+    builder.element('opml', attributes: {'version': '2.0'}, nest: () {
+      builder.element('head', nest: () {
+        builder.element('title', nest: 'OpenAir Subscriptions');
+      });
+      builder.element('body', nest: () {
+        for (final subscription in subscriptions.values) {
+          builder.element('outline', attributes: {
+            'type': 'rss',
+            'text': subscription.title,
+            'xmlUrl': subscription.feedUrl,
+          });
+        }
+      });
+    });
+    final document = builder.buildDocument();
+    final file = File(path);
+    await file.writeAsString(document.toXmlString(pretty: true));
   }
 
   // Notifications

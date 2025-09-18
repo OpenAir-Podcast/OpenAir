@@ -293,7 +293,7 @@
     "exportDatabase": "Экспортировать базу данных",
     "importDatabase": "Импортировать базу данных",
     "exportDatabaseSubtitle": "Экспортировать подписки на подкасты",
-    "importDatabaseSubtitle": "Импортировать подписки на подкасты",
+    "importDatabaseSubtitle": "Импортировать вашу очередь, историю и настройки",
     "automaticExportDatabase": "Автоматически экспортировать базу данных",
     "opml": "OPML",
     "userData": "Пользовательские данные",

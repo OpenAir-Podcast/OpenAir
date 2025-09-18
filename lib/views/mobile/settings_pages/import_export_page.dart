@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +25,78 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
   late Map importExportData;
 
   late bool automaticExportDatabase;
+
+  void importDatabase() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Import database file',
+      type: FileType.custom,
+      allowedExtensions: ['db'],
+    );
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      await ref.read(openAirProvider).importFromDb(file);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              Translations.of(context).text('databaseImportedRestartApp'),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void exportDatabase() async {
+    final String date = DateTime.now().toIso8601String().split('T')[0];
+    String fileName = 'OpenAirBackup-$date.db';
+
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Please select an output file:',
+      fileName: fileName,
+    );
+
+    if (outputFile != null) {
+      ref.read(openAirProvider).exportToDb(outputFile);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              Translations.of(context).text('databaseExportedRestartApp'),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void importOpml() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['opml', 'xml'],
+    );
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      final hiveService = ref.read(openAirProvider).hiveService;
+      await hiveService.importOpml(file);
+    }
+  }
+
+  void exportOpml() async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Please select an output file:',
+      fileName: 'openair.opml',
+    );
+
+    if (outputFile != null) {
+      final hiveService = ref.read(openAirProvider).hiveService;
+      await hiveService.exportOpml(outputFile);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,18 +129,14 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 subtitle: Text(
                   Translations.of(context).text('importDatabaseSubtitle'),
                 ),
-                onTap: () {
-                  // TODO: Add file picker here
-                },
+                onTap: importDatabase,
               ),
               ListTile(
                 title: Text(Translations.of(context).text('exportDatabase')),
                 subtitle: Text(
                   Translations.of(context).text('exportDatabaseSubtitle'),
                 ),
-                onTap: () {
-                  // TODO: Add file picker here
-                },
+                onTap: exportDatabase,
               ),
               ListTile(
                 title: Text(
@@ -115,22 +186,18 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 ),
               ),
               ListTile(
-                title: Text(Translations.of(context).text('importDatabase')),
+                title: Text(Translations.of(context).text('importOpml')),
                 subtitle: Text(
-                  Translations.of(context).text('importDatabaseSubtitle'),
+                  Translations.of(context).text('importOpmlSubtitle'),
                 ),
-                onTap: () {
-                  // TODO: Add file picker here
-                },
+                onTap: importOpml,
               ),
               ListTile(
-                title: Text(Translations.of(context).text('exportDatabase')),
+                title: Text(Translations.of(context).text('exportOpml')),
                 subtitle: Text(
-                  Translations.of(context).text('exportDatabaseSubtitle'),
+                  Translations.of(context).text('exportOpmlSubtitle'),
                 ),
-                onTap: () {
-                  // TODO: Add file picker here
-                },
+                onTap: exportOpml,
               ),
               Divider(),
               ListTile(

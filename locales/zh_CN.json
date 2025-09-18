@@ -293,7 +293,7 @@
     "exportDatabase": "导出数据库",
     "importDatabase": "导入数据库",
     "exportDatabaseSubtitle": "导出播客订阅",
-    "importDatabaseSubtitle": "导入播客订阅",
+    "importDatabaseSubtitle": "导入您的播放列表、历史记录和设置",
     "automaticExportDatabase": "自动导出数据库",
     "opml": "OPML",
     "userData": "用户数据",

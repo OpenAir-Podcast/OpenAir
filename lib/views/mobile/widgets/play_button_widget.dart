@@ -42,7 +42,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       }
     }
 
-    var enclosureLengthVal;
+    dynamic enclosureLengthVal;
 
     if (widget.episodeItem['enclosureLength'].runtimeType == String) {
       enclosureLengthVal = int.parse(widget.episodeItem['enclosureLength']);

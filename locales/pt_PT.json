@@ -293,7 +293,7 @@
     "exportDatabase": "Exportar banco de dados",
     "importDatabase": "Importar banco de dados",
     "exportDatabaseSubtitle": "Exportar assinaturas de podcast",
-    "importDatabaseSubtitle": "Importar assinaturas de podcast",
+    "importDatabaseSubtitle": "Importar sua fila, histórico e configurações",
     "automaticExportDatabase": "Exportar banco de dados automaticamente",
     "opml": "OPML",
     "userData": "Dados do usuário",
