@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:path_provider/path_provider.dart';
 
 final FutureProvider<Map?> importExportSettingsDataProvider =
     FutureProvider((ref) async {
@@ -49,26 +50,23 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     }
   }
 
-  void exportDatabase() async {
+  void exportDatabase(BuildContext context) async {
     final String date = DateTime.now().toIso8601String().split('T')[0];
-    String fileName = 'OpenAirBackup-$date.db';
+    String fileName = 'openair-backup-$date.db';
 
-    String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: Translations.of(context).text('exportDatabase'),
-      fileName: fileName,
-    );
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String getOpenAirPath = '${appDocDir.path}/OpenAir';
 
-    if (outputFile != null) {
-      ref.read(openAirProvider).exportToDb(outputFile);
+    if (context.mounted) {
+      String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: Translations.of(context).text('exportDatabase'),
+          fileName: fileName,
+          type: FileType.custom,
+          allowedExtensions: ['db'],
+          initialDirectory: getOpenAirPath);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              Translations.of(context).text('databaseExportedRestartApp'),
-            ),
-          ),
-        );
+      if (outputFile != null) {
+        ref.read(openAirProvider).exportToDb(outputFile);
       }
     }
   }
@@ -87,15 +85,26 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     }
   }
 
-  void exportOpml() async {
-    String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: Translations.of(context).text('exportOpml'),
-      fileName: 'openair.opml',
-    );
+  void exportOpml(BuildContext context) async {
+    final String date = DateTime.now().toIso8601String().split('T')[0];
+    String fileName = 'openair-backup-$date.opml';
 
-    if (outputFile != null) {
-      final hiveService = ref.read(openAirProvider).hiveService;
-      await hiveService.exportOpml(outputFile);
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String getOpenAirPath = '${appDocDir.path}/OpenAir';
+
+    if (context.mounted) {
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: Translations.of(context).text('exportOpml'),
+        fileName: fileName,
+        type: FileType.custom,
+        allowedExtensions: ['opml', 'xml'],
+        initialDirectory: getOpenAirPath,
+      );
+
+      if (outputFile != null) {
+        final hiveService = ref.read(openAirProvider).hiveService;
+        await hiveService.exportOpml(outputFile);
+      }
     }
   }
 
@@ -137,7 +146,17 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 subtitle: Text(
                   Translations.of(context).text('exportDatabaseSubtitle'),
                 ),
-                onTap: exportDatabase,
+                onTap: () {
+                  exportDatabase(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        Translations.of(context).text('databaseExported'),
+                      ),
+                    ),
+                  );
+                },
               ),
               ListTile(
                 title: Text(
@@ -198,7 +217,17 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 subtitle: Text(
                   Translations.of(context).text('exportOpmlSubtitle'),
                 ),
-                onTap: exportOpml,
+                onTap: () {
+                  exportOpml(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        Translations.of(context).text('opmlExported'),
+                      ),
+                    ),
+                  );
+                },
               ),
               Divider(),
               ListTile(

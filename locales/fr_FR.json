@@ -407,5 +407,7 @@
     "terms": "Conditions d'utilisation",
     "invalidUsername": "Nom d'utilisateur invalide",
     "databaseImportedRestartApp": "Base de données importée. Veuillez redémarrer l'application.",
-    "databaseExportedRestartApp": "Base de données exportée. Veuillez redémarrer l'application."
+    "databaseExported": "Base de données exportée. Veuillez redémarrer l'application.",
+    "opmlImportedRestartApp": "OPML importé. Veuillez redémarrer l'application.",
+    "opmlExported": "OPML exporté."
 }

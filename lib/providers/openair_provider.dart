@@ -300,7 +300,11 @@ class OpenAirProvider extends ChangeNotifier {
             enclosureType TEXT,
             enclosureLength INTEGER,
             enclosureUrl TEXT,
-            podcast TEXT
+            podcast TEXT,
+            size TEXT,
+            podcastId TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
           )
         ''');
 
@@ -337,7 +341,7 @@ class OpenAirProvider extends ChangeNotifier {
       final queueItem = Map<String, dynamic>.from(item);
 
       if (queueItem['podcast'] != null) {
-        queueItem['podcast'] = jsonEncode(queueItem['podcast'].toJson());
+        queueItem['podcast'] = jsonEncode(queueItem['podcast']);
       }
 
       if (queueItem['playerPosition'] is Duration) {
@@ -362,11 +366,12 @@ class OpenAirProvider extends ChangeNotifier {
 
     for (final episode in downloads.values) {
       final downloadItem = episode.toJson();
-      downloadItem['duration'] = (episode.duration).inMilliseconds;
-      downloadItem['downloadDate'] =
-          (episode.downloadDate).millisecondsSinceEpoch;
+      downloadItem['duration'] = episode.duration.inMilliseconds;
 
-      await database.insert('downloads', downloadItem,
+      downloadItem['downloadDate'] =
+          episode.downloadDate.millisecondsSinceEpoch;
+
+      await database.insert('downloads', downloadItem.cast<String, Object?>(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
 
@@ -377,7 +382,17 @@ class OpenAirProvider extends ChangeNotifier {
       final favoriteItem = Map<String, dynamic>.from(item);
 
       if (favoriteItem['podcast'] != null) {
-        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast'].toJson());
+        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
+      }
+
+      if (favoriteItem['downloadDate'] is DateTime) {
+        favoriteItem['downloadDate'] =
+            (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
+      }
+
+      if (favoriteItem['duration'] is Duration) {
+        favoriteItem['duration'] =
+            (favoriteItem['duration'] as Duration).inMilliseconds;
       }
 
       await database.insert('favorites', favoriteItem,
@@ -427,7 +442,8 @@ class OpenAirProvider extends ChangeNotifier {
         await database.query('subscriptions');
 
     for (var subMap in subscriptionsMaps) {
-      final subscription = SubscriptionModel.fromJson(subMap);
+      final mutableSubMap = Map<String, dynamic>.from(subMap);
+      final subscription = SubscriptionModel.fromJson(mutableSubMap);
 
       await hiveService.subscribe(subscription);
       await ref.read(audioProvider).addPodcastEpisodes(subscription);
@@ -436,7 +452,7 @@ class OpenAirProvider extends ChangeNotifier {
     // Import queue
     final List<Map<String, dynamic>> queueMaps = await database.query('queue');
     for (var queueMap in queueMaps) {
-      final Map<String, dynamic> item = Map<String, dynamic>.from(queueMap);
+      final item = Map<String, dynamic>.from(queueMap);
       if (item['podcast'] != null) {
         item['podcast'] = PodcastModel.fromJson(jsonDecode(item['podcast']));
       }
@@ -450,7 +466,8 @@ class OpenAirProvider extends ChangeNotifier {
     final List<Map<String, dynamic>> historyMaps =
         await database.query('history');
     for (var historyMap in historyMaps) {
-      final history = HistoryModel.fromJson(historyMap);
+      final mutableHistoryMap = Map<String, dynamic>.from(historyMap);
+      final history = HistoryModel.fromJson(mutableHistoryMap);
       await hiveService.addToHistory(history);
     }
 
@@ -458,7 +475,15 @@ class OpenAirProvider extends ChangeNotifier {
     final List<Map<String, dynamic>> downloadsMaps =
         await database.query('downloads');
     for (var downloadMap in downloadsMaps) {
-      final download = DownloadModel.fromJson(downloadMap);
+      final mutableDownloadMap = Map<String, dynamic>.from(downloadMap);
+
+      mutableDownloadMap['duration'] =
+          Duration(milliseconds: mutableDownloadMap['duration'] as int);
+
+      mutableDownloadMap['downloadDate'] = DateTime.fromMillisecondsSinceEpoch(
+          mutableDownloadMap['downloadDate'] as int);
+
+      final download = DownloadModel.fromJson(mutableDownloadMap);
       await hiveService.addToDownloads(download);
     }
 
@@ -467,7 +492,7 @@ class OpenAirProvider extends ChangeNotifier {
         await database.query('favorites');
 
     for (var favoriteMap in favoritesMaps) {
-      final Map<String, dynamic> item = Map<String, dynamic>.from(favoriteMap);
+      final item = Map<String, dynamic>.from(favoriteMap);
 
       if (item['podcast'] != null) {
         final podcast =
@@ -482,7 +507,8 @@ class OpenAirProvider extends ChangeNotifier {
     // Import feed
     final List<Map<String, dynamic>> feedMaps = await database.query('feed');
     for (var feedMap in feedMaps) {
-      final feed = FeedModel.fromJson(feedMap);
+      final mutableFeedMap = Map<String, dynamic>.from(feedMap);
+      final feed = FeedModel.fromJson(mutableFeedMap);
       await hiveService.addToFeed(feed);
     }
 

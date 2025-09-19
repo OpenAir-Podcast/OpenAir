@@ -407,5 +407,7 @@
     "terms": "תנאי שירות",
     "invalidUsername": "שם משתמש לא חוקי",
     "databaseImportedRestartApp": "מסד הנתונים יובא. אנא הפעל מחדש את האפליקציה.",
-    "databaseExportedRestartApp": "מסד הנתונים יוצא. אנא הפעל מחדש את האפליקציה."
+    "databaseExported": "מסד הנתונים יוצא. אנא הפעל מחדש את האפליקציה.",
+    "opmlImportedRestartApp": "OPML יובא. אנא הפעל מחדש את האפליקציה.",
+    "opmlExported": "OPML יוצא."
 }

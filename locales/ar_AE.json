@@ -407,5 +407,7 @@
     "terms": "شروط الخدمة",
     "invalidUsername": "اسم مستخدم غير صالح",
     "databaseImportedRestartApp": "تم استيراد قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
-    "databaseExportedRestartApp": "تم تصدير قاعدة البيانات. يرجى إعادة تشغيل التطبيق."
+    "databaseExported": "تم تصدير قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
+    "opmlImportedRestartApp": "تم استيراد OPML. يرجى إعادة تشغيل التطبيق.",
+    "opmlExported": "تم تصدير OPML."
 }

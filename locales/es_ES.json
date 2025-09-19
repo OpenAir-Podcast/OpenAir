@@ -407,5 +407,7 @@
     "terms": "Términos de servicio",
     "invalidUsername": "Nombre de usuario no válido",
     "databaseImportedRestartApp": "Base de datos importada. Reinicia la aplicación.",
-    "databaseExportedRestartApp": "Base de datos exportada. Reinicia la aplicación."
+    "databaseExported": "Base de datos exportada. Reinicia la aplicación.",
+    "opmlImportedRestartApp": "OPML importado. Reinicia la aplicación.",
+    "opmlExported": "OPML exportado."
 }

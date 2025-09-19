@@ -407,5 +407,7 @@
     "terms": "Användarvillkor",
     "invalidUsername": "Ogiltigt användarnamn",
     "databaseImportedRestartApp": "Databas importerad. Starta om appen.",
-    "databaseExportedRestartApp": "Databas exporterad. Starta om appen."
+    "databaseExported": "Databas exporterad. Starta om appen.",
+    "opmlImportedRestartApp": "OPML importerad. Starta om appen.",
+    "opmlExported": "OPML exporterad."
 }

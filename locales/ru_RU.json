@@ -407,5 +407,7 @@
     "terms": "Условия обслуживания",
     "invalidUsername": "Неверное имя пользователя",
     "databaseImportedRestartApp": "База данных импортирована. Перезапустите приложение.",
-    "databaseExportedRestartApp": "База данных экспортирована. Перезапустите приложение."
+    "databaseExported": "База данных экспортирована. Перезапустите приложение.",
+    "opmlImportedRestartApp": "OPML импортирован. Перезапустите приложение.",
+    "opmlExported": "OPML экспортирован."
 }

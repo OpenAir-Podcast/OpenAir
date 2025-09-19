@@ -407,5 +407,7 @@
     "terms": "Nutzungsbedingungen",
     "invalidUsername": "Ungültiger Benutzername",
     "databaseImportedRestartApp": "Datenbank importiert. Bitte starten Sie die App neu.",
-    "databaseExportedRestartApp": "Datenbank exportiert. Bitte starten Sie die App neu."
+    "databaseExported": "Datenbank exportiert. Bitte starten Sie die App neu.",
+    "opmlImportedRestartApp": "OPML importiert. Bitte starten Sie die App neu.",
+    "opmlExported": "OPML exportiert."
 }

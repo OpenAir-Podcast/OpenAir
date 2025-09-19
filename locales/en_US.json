@@ -407,5 +407,7 @@
     "terms": "Terms of Service",
     "invalidUsername": "Invalid username",
     "databaseImportedRestartApp": "Database imported. Please restart the app.",
-    "databaseExportedRestartApp": "Database exported. Please restart the app."
+    "databaseExported": "Database exported.",
+    "opmlImportedRestartApp": "OPML imported. Please restart the app.",
+    "opmlExported": "OPML exported."
 }

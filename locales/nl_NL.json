@@ -407,5 +407,7 @@
     "terms": "Servicevoorwaarden",
     "invalidUsername": "Ongeldige gebruikersnaam",
     "databaseImportedRestartApp": "Database geïmporteerd. Herstart de app.",
-    "databaseExportedRestartApp": "Database geëxporteerd. Herstart de app."
+    "databaseExported": "Database geëxporteerd. Herstart de app.",
+    "opmlImportedRestartApp": "OPML geïmporteerd. Herstart de app.",
+    "opmlExported": "OPML geëxporteerd."
 }

@@ -407,5 +407,7 @@
     "terms": "服务条款",
     "invalidUsername": "无效的用户名",
     "databaseImportedRestartApp": "数据库已导入。请重启应用。",
-    "databaseExportedRestartApp": "数据库已导出。请重启应用。"
+    "databaseExported": "数据库已导出。请重启应用。",
+    "opmlImportedRestartApp": "OPML 已导入。请重启应用。",
+    "opmlExported": "OPML 已导出。"
 }

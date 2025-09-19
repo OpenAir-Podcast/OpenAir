@@ -407,5 +407,7 @@
     "terms": "利用規約",
     "invalidUsername": "無効なユーザー名",
     "databaseImportedRestartApp": "データベースをインポートしました。アプリを再起動してください。",
-    "databaseExportedRestartApp": "データベースをエクスポートしました。アプリを再起動してください。"
+    "databaseExported": "データベースをエクスポートしました。アプリを再起動してください。",
+    "opmlImportedRestartApp": "OPMLをインポートしました。アプリを再起動してください。",
+    "opmlExported": "OPMLをエクスポートしました。"
 }
