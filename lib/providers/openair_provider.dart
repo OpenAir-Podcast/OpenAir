@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
+import 'package:openair/hive_models/feed_model.dart';
 import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
@@ -268,6 +269,48 @@ class OpenAirProvider extends ChangeNotifier {
         ''');
 
         await db.execute('''
+          CREATE TABLE downloads (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            size TEXT,
+            podcastId INTEGER,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE favorites (
+            guid TEXT PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE feed (
+            guid TEXT PRIMARY KEY
+          )
+        ''');
+
+        await db.execute('''
           CREATE TABLE settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_interface TEXT,
@@ -311,6 +354,41 @@ class OpenAirProvider extends ChangeNotifier {
 
     for (final episode in history.values) {
       await database.insert('history', episode.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export downloads
+    final downloads = await hiveService.getDownloads();
+
+    for (final episode in downloads.values) {
+      final downloadItem = episode.toJson();
+      downloadItem['duration'] = (episode.duration).inMilliseconds;
+      downloadItem['downloadDate'] =
+          (episode.downloadDate).millisecondsSinceEpoch;
+
+      await database.insert('downloads', downloadItem,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export favorites
+    final localFavorites = await hiveService.getFavoriteEpisodes();
+
+    for (final item in localFavorites.values) {
+      final favoriteItem = Map<String, dynamic>.from(item);
+
+      if (favoriteItem['podcast'] != null) {
+        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast'].toJson());
+      }
+
+      await database.insert('favorites', favoriteItem,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    // Export feed
+    final localFeed = await hiveService.getFeed();
+
+    for (final item in localFeed.values) {
+      await database.insert('feed', item.toJson(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
 
@@ -374,6 +452,38 @@ class OpenAirProvider extends ChangeNotifier {
     for (var historyMap in historyMaps) {
       final history = HistoryModel.fromJson(historyMap);
       await hiveService.addToHistory(history);
+    }
+
+    // Import downloads
+    final List<Map<String, dynamic>> downloadsMaps =
+        await database.query('downloads');
+    for (var downloadMap in downloadsMaps) {
+      final download = DownloadModel.fromJson(downloadMap);
+      await hiveService.addToDownloads(download);
+    }
+
+    // Import favorites
+    final List<Map<String, dynamic>> favoritesMaps =
+        await database.query('favorites');
+
+    for (var favoriteMap in favoritesMaps) {
+      final Map<String, dynamic> item = Map<String, dynamic>.from(favoriteMap);
+
+      if (item['podcast'] != null) {
+        final podcast =
+            PodcastModel.fromJson(jsonDecode(item['podcast'] as String));
+
+        item['podcast'] = podcast;
+
+        hiveService.addEpisodeToFavorite(item, podcast);
+      }
+    }
+
+    // Import feed
+    final List<Map<String, dynamic>> feedMaps = await database.query('feed');
+    for (var feedMap in feedMaps) {
+      final feed = FeedModel.fromJson(feedMap);
+      await hiveService.addToFeed(feed);
     }
 
     // Import settings

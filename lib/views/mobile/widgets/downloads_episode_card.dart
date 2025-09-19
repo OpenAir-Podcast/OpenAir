@@ -283,14 +283,33 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                                 context: context,
                                 builder: (BuildContext dialogContext) =>
                                     AlertDialog(
-                                  title: Text(Translations.of(context)
-                                      .text('confirmDeletion')),
+                                  title: Text(
+                                    Translations.of(context)
+                                        .text('confirmDeletion'),
+                                    style: TextStyle(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),
+                                  ),
                                   content: Text(
-                                      '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
+                                    '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
+                                    style: TextStyle(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
                                   actions: <Widget>[
                                     TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('cancel')),
+                                      child: Text(
+                                        Translations.of(context).text('cancel'),
+                                      ),
                                       onPressed: () {
                                         Navigator.of(dialogContext)
                                             .pop(); // Dismiss the dialog

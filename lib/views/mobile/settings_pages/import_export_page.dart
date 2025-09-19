@@ -28,7 +28,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
   void importDatabase() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Import database file',
+      dialogTitle: Translations.of(context).text('importDatabase'),
       type: FileType.custom,
       allowedExtensions: ['db'],
     );
@@ -54,7 +54,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     String fileName = 'OpenAirBackup-$date.db';
 
     String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: 'Please select an output file:',
+      dialogTitle: Translations.of(context).text('exportDatabase'),
       fileName: fileName,
     );
 
@@ -75,6 +75,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
   void importOpml() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: Translations.of(context).text('importOpml'),
       type: FileType.custom,
       allowedExtensions: ['opml', 'xml'],
     );
@@ -88,7 +89,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
   void exportOpml() async {
     String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: 'Please select an output file:',
+      dialogTitle: Translations.of(context).text('exportOpml'),
       fileName: 'openair.opml',
     );
 
@@ -223,6 +224,11 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       title: Text(
                         Translations.of(context).text('addPodcastByRssUrl'),
                         textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,

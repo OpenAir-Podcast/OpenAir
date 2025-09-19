@@ -639,7 +639,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
               ),
               onTap: () async {
-                bool i = await ref.watch(audioProvider).importPodcastFromOpml();
+                bool i = await ref
+                    .watch(audioProvider)
+                    .importPodcastFromOpml(context);
 
                 if (context.mounted) {
                   if (i == true) {

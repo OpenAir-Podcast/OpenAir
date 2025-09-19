@@ -15,6 +15,7 @@ import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
@@ -78,6 +79,7 @@ class HiveService {
   final Ref ref;
 
   late ScheduledTimer refreshTimer;
+  late ScheduledTimer autoExportDBTimer;
 
   Future<void> initial() async {
     // Register all adapters
@@ -215,6 +217,9 @@ class HiveService {
     deletePlayedEpisodesConfig = automaticSettings['deletePlayedEpisodes'];
     keepFavouriteEpisodesConfig = automaticSettings['keepFavouriteEpisodes'];
 
+    automaticExportDatabaseConfig =
+        (await getImportExportSettings())?['autoBackup'] ?? true;
+
     Duration duration;
 
     switch (refreshPodcastsConfig) {
@@ -260,6 +265,41 @@ class HiveService {
 
     if (refreshPodcastsConfig != 'Never') {
       refreshTimer.schedule(DateTime.now().add(duration));
+    }
+
+    // Auto Export DB every day at 2 AM
+    autoExportDBTimer = ScheduledTimer(
+      id: 'auto_export_db_timer',
+      onExecute: () async {
+        if (automaticExportDatabaseConfig) {
+          final now = DateTime.now();
+          final formattedDate =
+              '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+          final exportPath =
+              join(openAirDir.path, 'openair_backup_$formattedDate.db');
+
+          // await exportOpml(exportPath);
+          ref.read(openAirProvider).exportToDb(exportPath);
+
+          debugPrint('Database exported to $exportPath');
+
+          autoExportDBTimer.schedule(
+            DateTime(now.year, now.month, now.day + 1, 2, 0),
+          );
+        } else {
+          autoExportDBTimer.clearSchedule();
+        }
+      },
+      defaultScheduledTime: DateTime.now(),
+      onMissedSchedule: () => autoExportDBTimer.execute(),
+    );
+
+    if (automaticExportDatabaseConfig) {
+      autoExportDBTimer.schedule(
+        DateTime(DateTime.now().year, DateTime.now().month,
+            DateTime.now().day + 1, 2, 0),
+      );
     }
 
     // Synchronization
@@ -456,7 +496,7 @@ class HiveService {
 
   Future<void> deleteFeed() async {
     final box = await feedBox;
-    await box.clear(); // Add await
+    await box.clear();
   }
 
   // Queue Operations:

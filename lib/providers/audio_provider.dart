@@ -1179,8 +1179,9 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> importPodcastFromOpml() async {
+  Future<bool> importPodcastFromOpml(BuildContext context) async {
     String defaultFilePath;
+    FilePickerResult? result;
 
     if (Platform.isAndroid) {
       defaultFilePath = '/storage/emulated/0/Download';
@@ -1191,12 +1192,14 @@ class AudioProvider extends ChangeNotifier {
           (await getApplicationDocumentsDirectory()).path;
     }
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Import podcast list (OPML)',
-      type: FileType.custom,
-      allowedExtensions: ['opml'],
-      initialDirectory: defaultFilePath,
-    );
+    if (context.mounted) {
+      result = await FilePicker.platform.pickFiles(
+        dialogTitle: Translations.of(context).text('importOpml'),
+        type: FileType.custom,
+        allowedExtensions: ['opml'],
+        initialDirectory: defaultFilePath,
+      );
+    }
 
     if (result != null) {
       File file = File(result.files.single.path!);
