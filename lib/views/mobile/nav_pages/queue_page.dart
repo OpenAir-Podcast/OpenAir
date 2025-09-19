@@ -74,7 +74,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                       },
                     ),
                     TextButton(
-                      child: Text(Translations.of(context).text('clear')),
+                      child: Text(Translations.of(context).text('clear'),
+                          style: TextStyle(color: Colors.red)),
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
 

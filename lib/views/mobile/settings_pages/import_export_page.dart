@@ -336,12 +336,73 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 ),
               ),
               ListTile(
-                title: Text(Translations.of(context).text('deleteAllEpisode')),
+                title: Text(
+                  Translations.of(context).text('deleteAllEpisode'),
+                ),
                 subtitle: Text(
                   Translations.of(context).text('deleteAllEpisodeSubtitle'),
                 ),
-                onTap: () {
-                  // TODO: Add file picker here
+                onTap: () async {
+                  final bool? shouldDelete = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) => AlertDialog(
+                      title: Text(
+                        Translations.of(context).text('deleteAllEpisode'),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      content: Text(
+                        Translations.of(context).text(
+                          'deleteAllEpisodeConfirmation',
+                        ),
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black87,
+                          fontSize: 16,
+                        ),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text(Translations.of(context).text('cancel')),
+                          onPressed: () {
+                            Navigator.of(dialogContext)
+                                .pop(false); // Dismiss the dialog
+                          },
+                        ),
+                        TextButton(
+                          child: Text(
+                            Translations.of(context).text('delete'),
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(dialogContext)
+                                .pop(true); // Dismiss the dialog
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldDelete == true) {
+                    await ref
+                        .read(openAirProvider)
+                        .hiveService
+                        .deleteEpisodes();
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(Translations.of(context)
+                                .text('allPodcastsCleared'))),
+                      );
+                    }
+                  }
                 },
               ),
             ],

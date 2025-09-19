@@ -305,8 +305,12 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                       },
                                     ),
                                     TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('remove')),
+                                      child: Text(
+                                        Translations.of(context).text('remove'),
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
                                       onPressed: () async {
                                         // Pop the dialog first
                                         Navigator.of(dialogContext).pop();

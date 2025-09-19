@@ -81,7 +81,12 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                             },
                           ),
                           TextButton(
-                            child: Text(Translations.of(context).text('clear')),
+                            child: Text(
+                              Translations.of(context).text('clear'),
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
                             onPressed: () async {
                               Navigator.of(dialogContext).pop();
                               await ref

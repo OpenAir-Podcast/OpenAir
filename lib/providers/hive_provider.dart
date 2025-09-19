@@ -443,7 +443,7 @@ class HiveService {
 
   Future<void> deleteEpisodes() async {
     final box = await episodeBox;
-    box.clear();
+    await box.clear();
   }
 
   Future<List<Map>> getEpisodes() async {

@@ -118,7 +118,11 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                   ),
                                   TextButton(
                                     child: Text(
-                                        Translations.of(context).text('clear')),
+                                      Translations.of(context).text('clear'),
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                      ),
+                                    ),
                                     onPressed: () async {
                                       Navigator.of(dialogContext).pop();
                                       await ref

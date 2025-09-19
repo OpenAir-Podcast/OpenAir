@@ -322,7 +322,13 @@ class _SubscriptionEpisodeCardState
                                             },
                                           ),
                                           TextButton(
-                                            child: const Text('Remove'),
+                                            child: Text(
+                                              Translations.of(context)
+                                                  .text('remove'),
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
                                             onPressed: () async {
                                               // Pop the dialog first
                                               Navigator.of(dialogContext).pop();
