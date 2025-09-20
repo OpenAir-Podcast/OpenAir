@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HelpAndFeedbackPage extends ConsumerStatefulWidget {
@@ -49,6 +52,23 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                 );
               } catch (e) {
                 if (context.mounted) {
+                  if (!Platform.isAndroid && !Platform.isIOS) {
+                    ref.read(notificationServiceProvider).showNotification(
+                          'OpenAir ${Translations.of(context).text('notification')}',
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        ),
+                      ),
+                    );
+                  }
+                }
+
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -70,6 +90,23 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                   mode: LaunchMode.externalApplication,
                 );
               } catch (e) {
+                if (context.mounted) {
+                  if (!Platform.isAndroid && !Platform.isIOS) {
+                    ref.read(notificationServiceProvider).showNotification(
+                          'OpenAir ${Translations.of(context).text('notification')}',
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        ),
+                      ),
+                    );
+                  }
+                }
+
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -94,12 +131,18 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                 );
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
-                    ),
-                  );
+                  if (!Platform.isAndroid && !Platform.isIOS) {
+                    ref.read(notificationServiceProvider).showNotification(
+                        'OpenAir ${Translations.of(context).text('notification')}',
+                        '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -116,12 +159,20 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                 );
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
-                    ),
-                  );
+                  if (!Platform.isAndroid && !Platform.isIOS) {
+                    ref.read(notificationServiceProvider).showNotification(
+                          'OpenAir ${Translations.of(context).text('notification')}',
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                        ),
+                      ),
+                    );
+                  }
                 }
               }
             },

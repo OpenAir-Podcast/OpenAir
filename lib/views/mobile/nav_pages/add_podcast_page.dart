@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -14,6 +16,7 @@ import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/fyyd_search_page.dart';
 import 'package:openair/views/mobile/main_pages/podcast_index_search_page.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/loading_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
@@ -94,12 +97,20 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
 
                   if (podcasts.isEmpty) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              Translations.of(context).text('noPodcastsFound')),
-                        ),
-                      );
+                      if (!Platform.isAndroid && !Platform.isIOS) {
+                        ref.read(notificationServiceProvider).showNotification(
+                              'OpenAir ${Translations.of(context).text('notification')}',
+                              Translations.of(context).text('noPodcastsFound'),
+                            );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              Translations.of(context).text('noPodcastsFound'),
+                            ),
+                          ),
+                        );
+                      }
                     }
                   } else {
                     if (context.mounted) {
@@ -119,13 +130,22 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                   debugPrint('Failed to find podcasts: $e');
 
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          Translations.of(context).text('failedToFindPodcasts'),
+                    if (!Platform.isAndroid && !Platform.isIOS) {
+                      ref.read(notificationServiceProvider).showNotification(
+                            'OpenAir ${Translations.of(context).text('notification')}',
+                            Translations.of(context)
+                                .text('failedToFindPodcasts'),
+                          );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Translations.of(context)
+                                .text('failedToFindPodcasts'),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   }
                 }
               },
@@ -425,23 +445,43 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
 
                             if (context.mounted) {
                               if (i == true) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      Translations.of(context)
-                                          .text('subscribed'),
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('subscribed'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('subscribed'),
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      Translations.of(context)
-                                          .text('errorAddingPodcast'),
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('errorAddingPodcast'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('errorAddingPodcast'),
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               }
                             }
                           },
@@ -645,14 +685,22 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
 
                 if (context.mounted) {
                   if (i == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          Translations.of(context)
-                              .text('importedPodcastsFromOpml'),
+                    if (!Platform.isAndroid && !Platform.isIOS) {
+                      ref.read(notificationServiceProvider).showNotification(
+                            'OpenAir ${Translations.of(context).text('notification')}',
+                            Translations.of(context)
+                                .text('importedPodcastsFromOpml'),
+                          );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Translations.of(context)
+                                .text('importedPodcastsFromOpml'),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   }
                 }
               },

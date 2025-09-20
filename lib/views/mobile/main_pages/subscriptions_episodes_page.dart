@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/subscription_episode_card.dart';
 
 final podcastDataByUrlProvider =
@@ -129,15 +132,26 @@ class _SubscriptionsEpisodesPageState
                                   context,
                                 );
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              snapshot.data!
-                                  ? 'Unsubscribed from ${widget.podcast.title}'
-                                  : 'Subscribed to ${widget.podcast.title}',
+                        if (!Platform.isAndroid && !Platform.isIOS) {
+                          ref
+                              .read(notificationServiceProvider)
+                              .showNotification(
+                                'OpenAir ${Translations.of(context).text('notification')}',
+                                snapshot.data!
+                                    ? 'Unsubscribed from ${widget.podcast.title}'
+                                    : 'Subscribed to ${widget.podcast.title}',
+                              );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                snapshot.data!
+                                    ? 'Unsubscribed from ${widget.podcast.title}'
+                                    : 'Subscribed to ${widget.podcast.title}',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
 
                         ref.invalidate(podcastDataByUrlProvider(podcastUrl));
                       },

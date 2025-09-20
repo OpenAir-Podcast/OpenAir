@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "База данных импортирована. Перезапустите приложение.",
     "databaseExported": "База данных экспортирована. Перезапустите приложение.",
     "opmlImportedRestartApp": "OPML импортирован. Перезапустите приложение.",
-    "opmlExported": "OPML экспортирован."
+    "opmlExported": "OPML экспортирован.",
+    "downloadingEpisode": "Загрузка эпизода",
+    "playbackTimedOutTitle": "Время воспроизведения истекло",
+    "playbackTimedOut": "Время воспроизведения истекло. Пожалуйста, проверьте ваше соединение или попробуйте снова.",
+    "errorCode": "Код ошибки:",
+    "notification": "Уведомление",
+    "removedAllDownloadedPodcasts": "Все загруженные подкасты удалены",
+    "downloadLimitOf": "Лимит загрузки",
+    "episodesReached": "эпизодов достигнут"
 }

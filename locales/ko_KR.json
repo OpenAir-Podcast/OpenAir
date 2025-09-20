@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "数据库已导入。请重启应用。",
     "databaseExported": "数据库已导出。请重启应用。",
     "opmlImportedRestartApp": "OPML 已导入。请重启应用。",
-    "opmlExported": "OPML 已导出。"
+    "opmlExported": "OPML 已导出。",
+    "downloadingEpisode": "正在下载剧集",
+    "playbackTimedOutTitle": "播放超时",
+    "playbackTimedOut": "播放超时。请检查您的连接或重试。",
+    "errorCode": "错误代码：",
+    "notification": "通知",
+    "removedAllDownloadedPodcasts": "所有已下载的播客已删除",
+    "downloadLimitOf": "下载限制",
+    "episodesReached": "剧集已达到"
 }

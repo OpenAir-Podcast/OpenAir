@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
@@ -7,6 +10,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
 class FyydSearchCard extends ConsumerStatefulWidget {
@@ -180,15 +184,26 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
                         }
 
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                snapshot.data!
-                                    ? 'Unsubscribed from ${podcastModel.title}'
-                                    : 'Subscribed to ${podcastModel.title}',
+                          if (!Platform.isAndroid && !Platform.isIOS) {
+                            ref
+                                .read(notificationServiceProvider)
+                                .showNotification(
+                                  'OpenAir ${Translations.of(context).text('notification')}',
+                                  snapshot.data!
+                                      ? 'Unsubscribed from ${podcastModel.title}'
+                                      : 'Subscribed to ${podcastModel.title}',
+                                );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  snapshot.data!
+                                      ? 'Unsubscribed from ${podcastModel.title}'
+                                      : 'Subscribed to ${podcastModel.title}',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       },
                       icon: isSub

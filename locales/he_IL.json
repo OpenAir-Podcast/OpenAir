@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "מסד הנתונים יובא. אנא הפעל מחדש את האפליקציה.",
     "databaseExported": "מסד הנתונים יוצא. אנא הפעל מחדש את האפליקציה.",
     "opmlImportedRestartApp": "OPML יובא. אנא הפעל מחדש את האפליקציה.",
-    "opmlExported": "OPML יוצא."
+    "opmlExported": "OPML יוצא.",
+    "downloadingEpisode": "מוריד פרק",
+    "playbackTimedOutTitle": "פג תוקף ההשמעה",
+    "playbackTimedOut": "פג תוקף ההשמעה. אנא בדוק את החיבור שלך או נסה שוב.",
+    "errorCode": "קוד שגיאה:",
+    "notification": "התראה",
+    "removedAllDownloadedPodcasts": "כל הפודקאסטים שהורדו הוסרו",
+    "downloadLimitOf": "מגבלת הורדה של",
+    "episodesReached": "פרקים הושגה"
 }

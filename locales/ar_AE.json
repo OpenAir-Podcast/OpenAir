@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "تم استيراد قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
     "databaseExported": "تم تصدير قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
     "opmlImportedRestartApp": "تم استيراد OPML. يرجى إعادة تشغيل التطبيق.",
-    "opmlExported": "تم تصدير OPML."
+    "opmlExported": "تم تصدير OPML.",
+    "downloadingEpisode": "جاري تحميل الحلقة",
+    "playbackTimedOutTitle": "انتهى وقت التشغيل",
+    "playbackTimedOut": "انتهى وقت التشغيل. يرجى التحقق من اتصالك أو المحاولة مرة أخرى.",
+    "errorCode": "رمز الخطأ:",
+    "notification": "إشعار",
+    "removedAllDownloadedPodcasts": "تمت إزالة جميع البودكاست التي تم تنزيلها",
+    "downloadLimitOf": "حد التحميل لـ",
+    "episodesReached": "حلقة تم الوصول إليه"
 }

@@ -3,6 +3,11 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/services/notification_service.dart';
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService();
+});
 
 final FutureProvider<Map?> notificationsSettingsDataProvider =
     FutureProvider((ref) async {
@@ -191,6 +196,13 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
                     ),
                   ],
                 )),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(notificationServiceProvider).showNotification(
+                      'Test Notification', 'This is a test notification');
+                },
+                child: Text('Show Notification'),
               ),
             ],
           );

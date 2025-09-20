@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/downloads_episode_card.dart';
 
 final getHistoryProvider = FutureProvider.autoDispose((ref) async {
@@ -95,14 +98,24 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                                   .clearHistory();
                               ref.invalidate(getHistoryProvider);
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      Translations.of(context)
-                                          .text('historyCleared'),
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('historyCleared'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('historyCleared'),
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               }
                             },
                           ),

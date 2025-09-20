@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "Databas importerad. Starta om appen.",
     "databaseExported": "Databas exporterad. Starta om appen.",
     "opmlImportedRestartApp": "OPML importerad. Starta om appen.",
-    "opmlExported": "OPML exporterad."
+    "opmlExported": "OPML exporterad.",
+    "downloadingEpisode": "Laddar ner avsnitt",
+    "playbackTimedOutTitle": "Uppspelning tidsgräns överskriden",
+    "playbackTimedOut": "Uppspelning tidsgräns överskriden. Kontrollera din anslutning eller försök igen.",
+    "errorCode": "Fel kod:",
+    "notification": "Avisering",
+    "removedAllDownloadedPodcasts": "Alla nedladdade podcasts har tagits bort",
+    "downloadLimitOf": "Nedladdningsgräns för",
+    "episodesReached": "avsnitt nådd"
 }

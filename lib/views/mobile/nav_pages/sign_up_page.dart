@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/mobile/account_page.dart';
 import 'package:openair/views/mobile/nav_pages/log_in_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -337,12 +339,22 @@ class _SignUpState extends ConsumerState<SignUp> {
                             );
                           } catch (e) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
-                                ),
-                              );
+                              if (!Platform.isAndroid && !Platform.isIOS) {
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .showNotification(
+                                      'OpenAir ${Translations.of(context).text('notification')}',
+                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                                    );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           }
                         },
@@ -362,12 +374,22 @@ class _SignUpState extends ConsumerState<SignUp> {
                             );
                           } catch (e) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}'),
-                                ),
-                              );
+                              if (!Platform.isAndroid && !Platform.isIOS) {
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .showNotification(
+                                      'OpenAir ${Translations.of(context).text('notification')}',
+                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                                    );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${Translations.of(context).text('oopsAnErrorOccurred')} ${Translations.of(context).text('oopsTryAgainLater')}',
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           }
                         },
@@ -403,41 +425,78 @@ class _SignUpState extends ConsumerState<SignUp> {
                               final email = emailInputControl.text.trim();
                               final password = passwordInputControl.text.trim();
 
-                              if (mounted) {
-                                try {
-                                  AuthResponse response = await supabaseService
-                                      .signUp(email, password, username);
+                              try {
+                                AuthResponse response = await supabaseService
+                                    .signUp(email, password, username);
 
-                                  if (response.user != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          Translations.of(context)
-                                              .text('checkYourEmail'),
+                                if (response.user != null) {
+                                  if (context.mounted) {
+                                    if (!Platform.isAndroid &&
+                                        !Platform.isIOS) {
+                                      ref
+                                          .read(notificationServiceProvider)
+                                          .showNotification(
+                                            'OpenAir ${Translations.of(context).text('notification')}',
+                                            Translations.of(context)
+                                                .text('checkYourEmail'),
+                                          );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            Translations.of(context)
+                                                .text('checkYourEmail'),
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    }
+                                  }
+                                } else {
+                                  if (context.mounted) {
+                                    if (!Platform.isAndroid &&
+                                        !Platform.isIOS) {
+                                      ref
+                                          .read(notificationServiceProvider)
+                                          .showNotification(
+                                            'OpenAir ${Translations.of(context).text('notification')}',
+                                            Translations.of(context)
+                                                .text('loginFailed'),
+                                          );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            Translations.of(context)
+                                                .text('loginFailed'),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                }
+                              } on AuthException catch (e) {
+                                if (context.mounted) {
+                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .showNotification(
+                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                          '${Translations.of(context).text('loginFailed')}: ${e.message}',
+                                        );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          Translations.of(context)
-                                              .text('loginFailed'),
+                                          '${Translations.of(context).text('loginFailed')}: ${e.message}',
                                         ),
                                       ),
                                     );
                                   }
-                                } on AuthException catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        '${Translations.of(context).text('loginFailed')}: ${e.message}',
-                                      ),
-                                    ),
-                                  );
-                                } catch (e) {
-                                  debugPrint(e.toString());
                                 }
+                              } catch (e) {
+                                debugPrint(e.toString());
                               }
                             }
                           }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -8,6 +10,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 
 class DiscoveryPodcastCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> podcastItem;
@@ -147,15 +150,28 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                                   context,
                                 );
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribed')} ${podcast.title}'
-                                  : '${Translations.of(context).text('subscribed')} ${podcast.title}',
-                            ),
-                          ),
-                        );
+                        if (context.mounted) {
+                          if (!Platform.isAndroid && !Platform.isIOS) {
+                            ref
+                                .read(notificationServiceProvider)
+                                .showNotification(
+                                  'OpenAir ${Translations.of(context).text('notification')}',
+                                  snapshot.data!
+                                      ? '${Translations.of(context).text('unsubscribed')} ${podcast.title}'
+                                      : '${Translations.of(context).text('subscribed')} ${podcast.title}',
+                                );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  snapshot.data!
+                                      ? '${Translations.of(context).text('unsubscribed')} ${podcast.title}'
+                                      : '${Translations.of(context).text('subscribed')} ${podcast.title}',
+                                ),
+                              ),
+                            );
+                          }
+                        }
 
                         ref.invalidate(
                             podcastDataByUrlProvider(podcast.feedUrl));

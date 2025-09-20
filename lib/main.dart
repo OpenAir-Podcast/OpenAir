@@ -16,6 +16,7 @@ import 'package:openair/responsive/responsive_layout.dart';
 import 'package:openair/responsive/tablet_scaffold.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:openair/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -32,6 +33,9 @@ void main() async {
   } on FileNotFoundError catch (_, e) {
     debugPrint('Error loading .env file: $e');
   }
+
+  final NotificationService notificationService = NotificationService();
+  await notificationService.init();
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_PROJECT_URL']!,

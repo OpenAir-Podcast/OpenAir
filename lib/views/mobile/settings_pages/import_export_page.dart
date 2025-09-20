@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 final FutureProvider<Map?> importExportSettingsDataProvider =
@@ -39,13 +40,20 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
       await ref.read(openAirProvider).importFromDb(file);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              Translations.of(context).text('databaseImportedRestartApp'),
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                Translations.of(context).text('databaseImportedRestartApp'),
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                Translations.of(context).text('databaseImportedRestartApp'),
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     }
   }
@@ -149,13 +157,22 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 onTap: () {
                   exportDatabase(context);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        Translations.of(context).text('databaseExported'),
-                      ),
-                    ),
-                  );
+                  if (mounted) {
+                    if (!Platform.isAndroid && !Platform.isIOS) {
+                      ref.read(notificationServiceProvider).showNotification(
+                            'OpenAir ${Translations.of(context).text('notification')}',
+                            Translations.of(context).text('databaseExported'),
+                          );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Translations.of(context).text('databaseExported'),
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               ListTile(
@@ -220,13 +237,22 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 onTap: () {
                   exportOpml(context);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        Translations.of(context).text('opmlExported'),
-                      ),
-                    ),
-                  );
+                  if (mounted) {
+                    if (!Platform.isAndroid && !Platform.isIOS) {
+                      ref.read(notificationServiceProvider).showNotification(
+                            'OpenAir ${Translations.of(context).text('notification')}',
+                            Translations.of(context).text('opmlExported'),
+                          );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Translations.of(context).text('opmlExported'),
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               Divider(),
@@ -319,23 +345,51 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
                               if (context.mounted) {
                                 if (i == true) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('subscribed'),
-                                      ),
-                                    ),
-                                  );
+                                  if (mounted) {
+                                    if (!Platform.isAndroid &&
+                                        !Platform.isIOS) {
+                                      ref
+                                          .read(notificationServiceProvider)
+                                          .showNotification(
+                                            'OpenAir ${Translations.of(context).text('notification')}',
+                                            Translations.of(context)
+                                                .text('subscribed'),
+                                          );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            Translations.of(context)
+                                                .text('subscribed'),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('errorAddingPodcast'),
-                                      ),
-                                    ),
-                                  );
+                                  if (mounted) {
+                                    if (!Platform.isAndroid &&
+                                        !Platform.isIOS) {
+                                      ref
+                                          .read(notificationServiceProvider)
+                                          .showNotification(
+                                            'OpenAir ${Translations.of(context).text('notification')}',
+                                            Translations.of(context)
+                                                .text('errorAddingPodcast'),
+                                          );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            Translations.of(context)
+                                                .text('errorAddingPodcast'),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
                                 }
                               }
                             },
@@ -425,11 +479,22 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                         .deleteEpisodes();
 
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(Translations.of(context)
-                                .text('allPodcastsCleared'))),
-                      );
+                      if (!Platform.isAndroid && !Platform.isIOS) {
+                        ref.read(notificationServiceProvider).showNotification(
+                              'OpenAir ${Translations.of(context).text('notification')}',
+                              Translations.of(context)
+                                  .text('allPodcastsCleared'),
+                            );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              Translations.of(context)
+                                  .text('allPodcastsCleared'),
+                            ),
+                          ),
+                        );
+                      }
                     }
                   }
                 },

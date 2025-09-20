@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "Base de datos importada. Reinicia la aplicación.",
     "databaseExported": "Base de datos exportada. Reinicia la aplicación.",
     "opmlImportedRestartApp": "OPML importado. Reinicia la aplicación.",
-    "opmlExported": "OPML exportado."
+    "opmlExported": "OPML exportado.",
+    "downloadingEpisode": "Descargando episodio",
+    "playbackTimedOutTitle": "Tiempo de reproducción agotado",
+    "playbackTimedOut": "Tiempo de reproducción agotado. Por favor, verifica tu conexión o inténtalo de nuevo.",
+    "errorCode": "Código de error:",
+    "notification": "Notificación",
+    "removedAllDownloadedPodcasts": "Se han eliminado todos los podcasts descargados",
+    "downloadLimitOf": "Límite de descarga de",
+    "episodesReached": "episodios alcanzado"
 }

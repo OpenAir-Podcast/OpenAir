@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
 
 final podcastDataByUrlProvider =
@@ -141,15 +144,26 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                                   context,
                                 );
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
+                        if (!Platform.isAndroid && !Platform.isIOS) {
+                          ref
+                              .read(notificationServiceProvider)
+                              .showNotification(
+                                'OpenAir ${Translations.of(context).text('notification')}',
+                                snapshot.data!
+                                    ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
+                                    : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
+                              );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                snapshot.data!
+                                    ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
+                                    : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
 
                         ref.invalidate(podcastDataByUrlProvider);
                       },

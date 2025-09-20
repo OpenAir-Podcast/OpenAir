@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/queue_card.dart';
 
 // FutureProvider for sorted Queue List
@@ -83,13 +86,22 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                         ref.invalidate(sortedProvider);
 
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                Translations.of(context).text('queueCleared'),
+                          if (!Platform.isAndroid && !Platform.isIOS) {
+                            ref
+                                .read(notificationServiceProvider)
+                                .showNotification(
+                                  'OpenAir ${Translations.of(context).text('notification')}',
+                                  Translations.of(context).text('queueCleared'),
+                                );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  Translations.of(context).text('queueCleared'),
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       },
                     ),
@@ -140,11 +152,24 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                 // Refresh the provider to update the UI
                 ref.invalidate(sortedProvider);
               } catch (e) {
+                debugPrint('Failed to reorder queue: $e');
+
                 // Optionally show a snackbar or error message to the user
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to reorder queue: $e')),
-                  );
+                  if (!Platform.isAndroid && !Platform.isIOS) {
+                    ref.read(notificationServiceProvider).showNotification(
+                          'OpenAir ${Translations.of(context).text('notification')}',
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}170',
+                        );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}170',
+                        ),
+                      ),
+                    );
+                  }
                 }
               }
             },

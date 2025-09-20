@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "Database geïmporteerd. Herstart de app.",
     "databaseExported": "Database geëxporteerd. Herstart de app.",
     "opmlImportedRestartApp": "OPML geïmporteerd. Herstart de app.",
-    "opmlExported": "OPML geëxporteerd."
+    "opmlExported": "OPML geëxporteerd.",
+    "downloadingEpisode": "Aflevering downloaden",
+    "playbackTimedOutTitle": "Afspeeltijd verstreken",
+    "playbackTimedOut": "Afspeeltijd verstreken. Controleer je verbinding of probeer het opnieuw.",
+    "errorCode": "Foutcode:",
+    "notification": "Melding",
+    "removedAllDownloadedPodcasts": "Alle gedownloade podcasts zijn verwijderd",
+    "downloadLimitOf": "Downloadlimiet van",
+    "episodesReached": "afleveringen bereikt"
 }

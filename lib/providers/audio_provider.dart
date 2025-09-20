@@ -21,6 +21,7 @@ import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -159,12 +160,20 @@ class AudioProvider extends ChangeNotifier {
       loadState = 'Detail';
       notifyListeners();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Playback timed out. Please check your connection or try again.'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error playing audio: $e');
@@ -174,11 +183,20 @@ class AudioProvider extends ChangeNotifier {
       notifyListeners();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to play audio: ${e.toString()}'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
+              ),
+            ),
+          );
+        }
       }
     }
   }
@@ -223,11 +241,20 @@ class AudioProvider extends ChangeNotifier {
   Future<void> removeAllDownloadedPodcasts(BuildContext context) async {
     if (kIsWeb) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('This action is not available on the web.'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+              ),
+            ),
+          );
+        }
       }
       return;
     }
@@ -248,20 +275,39 @@ class AudioProvider extends ChangeNotifier {
       ref.invalidate(getDownloadsProvider);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Removed all downloaded podcasts'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                Translations.of(context).text('removedAllDownloadedPodcasts'),
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                Translations.of(context).text('removedAllDownloadedPodcasts'),
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error removing all downloaded podcasts: $e');
+
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to remove downloaded podcasts.'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}145',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}145',
+              ),
+            ),
+          );
+        }
       }
     }
 
@@ -288,13 +334,20 @@ class AudioProvider extends ChangeNotifier {
     // Check if the limit has been reached.
     if (downloadLimit != null && downloadedCount >= downloadLimit) {
       if (context != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Download limit of $downloadLimit episodes reached.',
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('downloadLimitOf')} $downloadLimit ${Translations.of(context).text('episodesReached')}',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('downloadLimitOf')} $downloadLimit ${Translations.of(context).text('episodesReached')}',
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
 
       return;
@@ -343,12 +396,20 @@ class AudioProvider extends ChangeNotifier {
       ref.invalidate(sortedDownloadsProvider);
 
       if (context != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                '${Translations.of(context).text('downloadEpisode')}: \'${item['title']}\''),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('downloadEpisode')}: \'${item['title']}\'',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('downloadEpisode')}: \'${item['title']}\'',
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
@@ -363,11 +424,20 @@ class AudioProvider extends ChangeNotifier {
       }
 
       if (context != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(''),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}150',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}150',
+              ),
+            ),
+          );
+        }
       }
     } finally {
       downloadingPodcasts.remove(guid);
@@ -1084,22 +1154,39 @@ class AudioProvider extends ChangeNotifier {
       notifyListeners();
     } on DioException {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                '${Translations.of(context).text('oopsAnErrorOccurred')}}'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}160',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}160',
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Failed to subscribe to ${podcast.title}: $e');
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An unexpected error occurred while subscribing.'),
-          ),
-        );
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}163',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}163',
+              ),
+            ),
+          );
+        }
       }
     }
   }

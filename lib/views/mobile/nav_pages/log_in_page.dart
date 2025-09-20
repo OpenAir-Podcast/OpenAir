@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/mobile/account_page.dart';
 import 'package:openair/views/mobile/nav_pages/sign_up_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LogIn extends ConsumerStatefulWidget {
@@ -187,38 +190,72 @@ class _LogInState extends ConsumerState<LogIn> {
                             AuthResponse response = await supabaseService
                                 .signIn(username, password);
 
-                            if (response.user != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    Translations.of(context)
-                                        .text('loginSuccess'),
+                            if (response.user != null && context.mounted) {
+                              if (!Platform.isAndroid && !Platform.isIOS) {
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .showNotification(
+                                      'OpenAir ${Translations.of(context).text('notification')}',
+                                      Translations.of(context)
+                                          .text('loginSuccess'),
+                                    );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      Translations.of(context)
+                                          .text('loginSuccess'),
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              }
 
                               Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AccountPage()));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    Translations.of(context)
-                                        .text('loginFailed'),
-                                  ),
-                                ),
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AccountPage()),
                               );
+                            } else {
+                              if (context.mounted) {
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('loginFailed'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('loginFailed'),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
                             }
                           } on AuthException catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '${Translations.of(context).text('loginFailed')}: ${e.message}',
-                                ),
-                              ),
-                            );
+                            if (context.mounted) {
+                              if (!Platform.isAndroid && !Platform.isIOS) {
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .showNotification(
+                                      'OpenAir ${Translations.of(context).text('notification')}',
+                                      '${Translations.of(context).text('loginFailed')}: ${e.message}',
+                                    );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${Translations.of(context).text('loginFailed')}: ${e.message}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
                           } catch (e) {
                             debugPrint(e.toString());
                           }

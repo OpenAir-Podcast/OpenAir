@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "Database imported. Please restart the app.",
     "databaseExported": "Database exported.",
     "opmlImportedRestartApp": "OPML imported. Please restart the app.",
-    "opmlExported": "OPML exported."
+    "opmlExported": "OPML exported.",
+    "downloadingEpisode": "Downloading Episode",
+    "playbackTimedOutTitle": "Playback Timed Out",
+    "playbackTimedOut": "Playback timed out. Please check your connection or try again.",
+    "errorCode": "Error code:",
+    "notification": "Notification",
+    "removedAllDownloadedPodcasts": "Removed all downloaded podcasts",
+    "downloadLimitOf": "Download limit of",
+    "episodesReached": "episodes reached"
 }

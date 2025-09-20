@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +14,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/mobile/main_pages/episode_detail.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
 import 'package:styled_text/styled_text.dart';
 
@@ -214,15 +217,28 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             ref.invalidate(podcastDataByUrlProvider(
                                 widget.podcast.feedUrl));
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isQueued
-                                      ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
-                                      : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
-                                ),
-                              ),
-                            );
+                            if (context.mounted) {
+                              if (!Platform.isAndroid && !Platform.isIOS) {
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .showNotification(
+                                      'OpenAir ${Translations.of(context).text('notification')}',
+                                      isQueued
+                                          ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
+                                          : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
+                                    );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      isQueued
+                                          ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
+                                          : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
 
                             if (enqueueDownloadedConfig) {
                               ref
@@ -320,15 +336,26 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                             .read(audioProvider.notifier)
                                             .removeDownload(widget.episodeItem);
 
-                                        // Show feedback
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\''),
-                                            ),
-                                          );
+                                          if (!Platform.isAndroid &&
+                                              !Platform.isIOS) {
+                                            ref
+                                                .read(
+                                                    notificationServiceProvider)
+                                                .showNotification(
+                                                  'OpenAir ${Translations.of(context).text('notification')}',
+                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                ),
+                                              ),
+                                            );
+                                          }
                                         }
 
                                         ref.invalidate(sortedDownloadsProvider);
@@ -350,12 +377,26 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                             onPressed = () {
                               if (kIsWeb) {
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Downloading is not available on the web.'),
-                                    ),
-                                  );
+                                  if (context.mounted) {
+                                    if (!Platform.isAndroid &&
+                                        !Platform.isIOS) {
+                                      ref
+                                          .read(notificationServiceProvider)
+                                          .showNotification(
+                                            'OpenAir ${Translations.of(context).text('notification')}',
+                                            '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                          );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
                                 }
                               } else {
                                 ref
@@ -366,12 +407,22 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                       context,
                                     );
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        'Downloading \'${widget.episodeItem['title']}\''),
-                                  ),
-                                );
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        Translations.of(context)
+                                            .text('downloadingEpisode'),
+                                        '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\'',
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                    ),
+                                  );
+                                }
                               }
                             };
                           }
@@ -412,12 +463,22 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                   widget.episodeItem['guid']);
 
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}'),
-                                  ),
-                                );
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
+                                      ),
+                                    ),
+                                  );
+                                }
                               }
                             } else {
                               ref.read(audioProvider).addEpisodeToFavorite(
@@ -426,12 +487,22 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                               ref.invalidate(getFavoriteProvider);
 
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}'),
-                                  ),
-                                );
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
+                                      ),
+                                    ),
+                                  );
+                                }
                               }
                             }
                           },

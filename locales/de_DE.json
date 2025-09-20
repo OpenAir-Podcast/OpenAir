@@ -409,5 +409,13 @@
     "databaseImportedRestartApp": "Datenbank importiert. Bitte starten Sie die App neu.",
     "databaseExported": "Datenbank exportiert. Bitte starten Sie die App neu.",
     "opmlImportedRestartApp": "OPML importiert. Bitte starten Sie die App neu.",
-    "opmlExported": "OPML exportiert."
+    "opmlExported": "OPML exportiert.",
+    "downloadingEpisode": "Folge wird heruntergeladen",
+    "playbackTimedOutTitle": "Wiedergabezeit überschritten",
+    "playbackTimedOut": "Wiedergabeszeit überschritten. Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es erneut.",
+    "errorCode": "Fehlercode:",
+    "notification": "Benachrichtigung",
+    "removedAllDownloadedPodcasts": "Alle heruntergeladenen Podcasts entfernt",
+    "downloadLimitOf": "Download-Limit von",
+    "episodesReached": "Episoden erreicht"
 }
