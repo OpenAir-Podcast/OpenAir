@@ -5,6 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
@@ -83,6 +85,8 @@ class HiveService {
 
   late ScheduledTimer refreshTimer;
   late ScheduledTimer autoExportDBTimer;
+
+  late BuildContext context;
 
   Future<void> initial(BuildContext context) async {
     // Register all adapters
@@ -252,6 +256,8 @@ class HiveService {
         duration = Duration.zero;
     }
 
+    this.context = context;
+
     refreshTimer = ScheduledTimer(
       id: 'refresh_timer',
       onExecute: () {
@@ -399,7 +405,8 @@ class HiveService {
         debugPrint('Error updating subscription ${subscription.title}: $e');
       }
     }
-    await populateInbox(context);
+
+    if (context.mounted) await populateInbox();
   }
 
   Future<void> populateInbox(BuildContext context) async {

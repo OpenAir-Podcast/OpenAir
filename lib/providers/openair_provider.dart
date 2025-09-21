@@ -57,7 +57,7 @@ class OpenAirProvider extends ChangeNotifier {
     this.context = context;
 
     hiveService = ref.read(hiveServiceProvider);
-    await hiveService.initial(context;
+    if (context.mounted) await hiveService.initial(context);
     supabaseService = ref.read(supabaseServiceProvider);
 
     try {
