@@ -5,8 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
@@ -262,7 +260,7 @@ class HiveService {
       id: 'refresh_timer',
       onExecute: () {
         if (refreshPodcastsConfig != 'Never') {
-          updateSubscriptions(context);
+          updateSubscriptions();
           refreshTimer.schedule(DateTime.now().add(duration));
         } else {
           refreshTimer.clearSchedule();
@@ -357,7 +355,7 @@ class HiveService {
     await box.delete(id); // Add await
   }
 
-  Future<void> updateSubscriptions(BuildContext context) async {
+  Future<void> updateSubscriptions() async {
     final subscriptions = await getSubscriptions();
     final episodeBox = await this.episodeBox;
 
@@ -409,7 +407,7 @@ class HiveService {
     if (context.mounted) await populateInbox();
   }
 
-  Future<void> populateInbox(BuildContext context) async {
+  Future<void> populateInbox() async {
     final subscriptions = await getSubscriptions();
     final episodeBox = await this.episodeBox;
     final feedBox = await this.feedBox;
