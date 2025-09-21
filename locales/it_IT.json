@@ -417,5 +417,6 @@
     "notification": "Notifica",
     "removedAllDownloadedPodcasts": "Tutti i podcast scaricati sono stati rimossi",
     "downloadLimitOf": "Limite di download di",
-    "episodesReached": "episodi raggiunti"
+    "episodesReached": "episodi raggiunti",
+    "newEpisodeAvailable": "Nuovo episodio disponibile"
 }

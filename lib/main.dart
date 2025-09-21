@@ -34,9 +34,6 @@ void main() async {
     debugPrint('Error loading .env file: $e');
   }
 
-  final NotificationService notificationService = NotificationService();
-  await notificationService.init();
-
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_PROJECT_URL']!,
     anonKey: dotenv.env['SUPABASE_API_KEY']!,
@@ -68,6 +65,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
     if (mounted) await ref.read(audioProvider).initAudio(context);
+    if (mounted) await ref.read(notificationProvider).init(context);
   }
 
   @override

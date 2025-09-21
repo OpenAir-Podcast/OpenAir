@@ -417,5 +417,6 @@
     "notification": "通知",
     "removedAllDownloadedPodcasts": "ダウンロード済みのすべてのポッドキャストを削除しました",
     "downloadLimitOf": "ダウンロード制限",
-    "episodesReached": "エピソードに達しました"
+    "episodesReached": "エピソードに達しました",
+    "newEpisodeAvailable": "新しいエピソードが利用可能です"
 }

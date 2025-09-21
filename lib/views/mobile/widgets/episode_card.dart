@@ -336,7 +336,8 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                             .read(audioProvider.notifier)
                                             .removeDownload(widget.episodeItem);
 
-                                        if (context.mounted) {
+                                        if (context.mounted &&
+                                            receiveNotificationsWhenDownloadConfig) {
                                           if (!Platform.isAndroid &&
                                               !Platform.isIOS) {
                                             ref
@@ -407,21 +408,23 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                       context,
                                     );
 
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        Translations.of(context)
-                                            .text('downloadingEpisode'),
-                                        '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\'',
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
-                                    ),
-                                  );
+                                if (receiveNotificationsWhenDownloadConfig) {
+                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .showNotification(
+                                          Translations.of(context)
+                                              .text('downloadingEpisode'),
+                                          '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\'',
+                                        );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                      ),
+                                    );
+                                  }
                                 }
                               }
                             };

@@ -6,7 +6,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/notification_service.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
-  return NotificationService();
+  return NotificationService(ref);
 });
 
 final FutureProvider<Map?> notificationsSettingsDataProvider =
@@ -196,13 +196,6 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
                     ),
                   ],
                 )),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(notificationServiceProvider).showNotification(
-                      'Test Notification', 'This is a test notification');
-                },
-                child: Text('Show Notification'),
               ),
             ],
           );

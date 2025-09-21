@@ -139,6 +139,23 @@ class AudioProvider extends ChangeNotifier {
             .timeout(const Duration(seconds: 30));
       }
 
+      if (context.mounted && receiveNotificationsWhenPlayConfig) {
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                '${Translations.of(context).text('playing')}:${episodeItem['title']}',
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('playing')}:${episodeItem['title']}',
+              ),
+            ),
+          );
+        }
+      }
+
       if (episodeItem['guid'] == currentEpisode!['guid']) {
         isPlaying = PlayingStatus.playing;
       }
@@ -333,7 +350,7 @@ class AudioProvider extends ChangeNotifier {
 
     // Check if the limit has been reached.
     if (downloadLimit != null && downloadedCount >= downloadLimit) {
-      if (context != null && context.mounted) {
+      if (context!.mounted && receiveNotificationsWhenDownloadConfig) {
         if (!Platform.isAndroid && !Platform.isIOS) {
           ref.read(notificationServiceProvider).showNotification(
                 'OpenAir ${Translations.of(context).text('notification')}',
@@ -499,6 +516,23 @@ class AudioProvider extends ChangeNotifier {
         UrlSource(currentEpisode!['enclosureUrl']),
         position: position,
       );
+    }
+
+    if (context.mounted && receiveNotificationsWhenPlayConfig) {
+      if (!Platform.isAndroid && !Platform.isIOS) {
+        ref.read(notificationServiceProvider).showNotification(
+              'OpenAir ${Translations.of(context).text('notification')}',
+              '${Translations.of(context).text('playing')}:${currentEpisode!['title']}',
+            );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${Translations.of(context).text('playing')}:${currentEpisode!['title']}',
+            ),
+          ),
+        );
+      }
     }
 
     if (queueItem['guid'] == currentEpisode!['guid']) {

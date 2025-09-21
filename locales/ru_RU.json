@@ -417,5 +417,6 @@
     "notification": "Уведомление",
     "removedAllDownloadedPodcasts": "Все загруженные подкасты удалены",
     "downloadLimitOf": "Лимит загрузки",
-    "episodesReached": "эпизодов достигнут"
+    "episodesReached": "эпизодов достигнут",
+    "newEpisodeAvailable": "Доступен новый эпизод"
 }

@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
@@ -19,6 +21,7 @@ import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
+import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
@@ -81,7 +84,7 @@ class HiveService {
   late ScheduledTimer refreshTimer;
   late ScheduledTimer autoExportDBTimer;
 
-  Future<void> initial() async {
+  Future<void> initial(BuildContext context) async {
     // Register all adapters
     Hive.registerAdapter(PodcastModelAdapter());
     Hive.registerAdapter(FeedModelAdapter());
@@ -253,7 +256,7 @@ class HiveService {
       id: 'refresh_timer',
       onExecute: () {
         if (refreshPodcastsConfig != 'Never') {
-          updateSubscriptions();
+          updateSubscriptions(context);
           refreshTimer.schedule(DateTime.now().add(duration));
         } else {
           refreshTimer.clearSchedule();
@@ -348,7 +351,7 @@ class HiveService {
     await box.delete(id); // Add await
   }
 
-  Future<void> updateSubscriptions() async {
+  Future<void> updateSubscriptions(BuildContext context) async {
     final subscriptions = await getSubscriptions();
     final episodeBox = await this.episodeBox;
 
@@ -396,10 +399,10 @@ class HiveService {
         debugPrint('Error updating subscription ${subscription.title}: $e');
       }
     }
-    await populateInbox();
+    await populateInbox(context);
   }
 
-  Future<void> populateInbox() async {
+  Future<void> populateInbox(BuildContext context) async {
     final subscriptions = await getSubscriptions();
     final episodeBox = await this.episodeBox;
     final feedBox = await this.feedBox;
@@ -418,6 +421,22 @@ class HiveService {
             if (await episodeBox.get(guid) == null) {
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
+
+              if (receiveNotificationsForNewEpisodesConfig && context.mounted) {
+                if (!Platform.isAndroid && !Platform.isIOS) {
+                  ref.read(notificationServiceProvider).showNotification(
+                        Translations.of(context).text('newEpisodeAvailable'),
+                        episode['title'],
+                      );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          '${Translations.of(context).text('newEpisodeAvailable')} - ${episode['title']}'),
+                    ),
+                  );
+                }
+              }
             }
           }
         }

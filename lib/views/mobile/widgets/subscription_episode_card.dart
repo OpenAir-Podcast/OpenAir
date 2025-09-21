@@ -399,7 +399,8 @@ class _SubscriptionEpisodeCardState
                                           context,
                                         );
 
-                                    if (context.mounted) {
+                                    if (context.mounted &&
+                                        receiveNotificationsWhenDownloadConfig) {
                                       if (!Platform.isAndroid &&
                                           !Platform.isIOS) {
                                         ref

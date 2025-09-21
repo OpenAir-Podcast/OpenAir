@@ -417,5 +417,6 @@
     "notification": "Avisering",
     "removedAllDownloadedPodcasts": "Alla nedladdade podcasts har tagits bort",
     "downloadLimitOf": "Nedladdningsgräns för",
-    "episodesReached": "avsnitt nådd"
+    "episodesReached": "avsnitt nådd",
+    "newEpisodeAvailable": "Nytt avsnitt tillgängligt"
 }

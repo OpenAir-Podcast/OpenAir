@@ -417,5 +417,6 @@
     "notification": "通知",
     "removedAllDownloadedPodcasts": "所有已下载的播客已删除",
     "downloadLimitOf": "下载限制",
-    "episodesReached": "剧集已达到"
+    "episodesReached": "剧集已达到",
+    "newEpisodeAvailable": "새 에피소드 사용 가능"
 }

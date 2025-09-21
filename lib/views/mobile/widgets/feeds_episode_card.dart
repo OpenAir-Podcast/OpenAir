@@ -360,7 +360,8 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                                     context,
                                   );
 
-                              if (context.mounted) {
+                              if (context.mounted &&
+                                  receiveNotificationsWhenDownloadConfig) {
                                 if (!Platform.isAndroid && !Platform.isIOS) {
                                   ref
                                       .read(notificationServiceProvider)

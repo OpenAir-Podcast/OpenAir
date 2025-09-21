@@ -387,7 +387,8 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                                     context,
                                   );
 
-                              if (context.mounted) {
+                              if (context.mounted &&
+                                  receiveNotificationsWhenDownloadConfig) {
                                 if (!Platform.isAndroid && !Platform.isIOS) {
                                   ref
                                       .read(notificationServiceProvider)

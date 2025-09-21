@@ -417,5 +417,6 @@
     "notification": "إشعار",
     "removedAllDownloadedPodcasts": "تمت إزالة جميع البودكاست التي تم تنزيلها",
     "downloadLimitOf": "حد التحميل لـ",
-    "episodesReached": "حلقة تم الوصول إليه"
+    "episodesReached": "حلقة تم الوصول إليه",
+    "newEpisodeAvailable": "حلقة جديدة متاحة"
 }

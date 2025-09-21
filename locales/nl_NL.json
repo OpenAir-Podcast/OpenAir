@@ -417,5 +417,6 @@
     "notification": "Melding",
     "removedAllDownloadedPodcasts": "Alle gedownloade podcasts zijn verwijderd",
     "downloadLimitOf": "Downloadlimiet van",
-    "episodesReached": "afleveringen bereikt"
+    "episodesReached": "afleveringen bereikt",
+    "newEpisodeAvailable": "Nieuwe aflevering beschikbaar"
 }
