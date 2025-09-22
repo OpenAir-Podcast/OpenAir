@@ -74,53 +74,53 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 8.0,
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/images/openair-logo.png',
+                      width: circleSize,
+                      height: circleSize,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (session == null) {
+                        Navigator.pop(context);
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LogIn(),
+                          ),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                        supabaseService.signOut();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: Text(
+                      session == null
+                          ? Translations.of(context).text('login')
+                          : Translations.of(context).text('logout'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: ListView(
               children: [
-                DrawerHeader(
-                  decoration: const BoxDecoration(),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 8.0,
-                      children: [
-                        ClipOval(
-                          child: Image.asset(
-                            'assets/images/openair-logo.png',
-                            width: circleSize,
-                            height: circleSize,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (session == null) {
-                              Navigator.pop(context);
-
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const LogIn(),
-                                ),
-                              );
-                            } else {
-                              Navigator.pop(context);
-                              supabaseService.signOut();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
-                          child: Text(
-                            session == null
-                                ? Translations.of(context).text('login')
-                                : Translations.of(context).text('logout'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 // Home button
                 ListTile(
                   leading: const Icon(Icons.home_rounded),

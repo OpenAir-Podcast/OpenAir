@@ -161,46 +161,47 @@ class _DesktopDrawer extends ConsumerWidget {
 
     return Column(
       children: [
-        Expanded(
-          child: ListView(
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/images/openair-logo.png',
-                          width: circleSize,
-                          height: circleSize,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (session == null) {
-                            onPageSelected(const LogIn());
-                          } else {
-                            supabaseService.signOut();
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                        child: Text(
-                          session == null
-                              ? Translations.of(context).text('login')
-                              : Translations.of(context).text('logout'),
-                        ),
-                      ),
-                    ],
+        DrawerHeader(
+          decoration: const BoxDecoration(),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/openair-logo.png',
+                    width: circleSize,
+                    height: circleSize,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ),
+                const SizedBox(height: 8.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (session == null) {
+                      onPageSelected(const LogIn());
+                    } else {
+                      supabaseService.signOut();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    session == null
+                        ? Translations.of(context).text('login')
+                        : Translations.of(context).text('logout'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 4,
+          child: ListView(
+            children: [
               ListTile(
                 leading: const Icon(Icons.home_rounded),
                 title: Text(Translations.of(context).text('home')),

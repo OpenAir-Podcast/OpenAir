@@ -19,6 +19,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:openair/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,20 @@ void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions = const WindowOptions(
+      minimumSize: Size(1200, 768),
+      title: 'OpenAir',
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
+
   try {
     // Load the .env file
     await dotenv.load(fileName: '.env');
@@ -110,8 +124,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 0.875,
-                      ),
+                    fontSizeFactor: 0.875,
+                  ),
                   snackBarTheme: snackBarThemeLight,
                   listTileTheme: listTileThemeLight,
                 ),
@@ -128,8 +142,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.0,
-                      ),
+                    fontSizeFactor: 1.0,
+                  ),
                   snackBarTheme: snackBarThemeLight,
                   listTileTheme: listTileThemeLight,
                 ),
@@ -146,8 +160,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.125,
-                      ),
+                    fontSizeFactor: 1.125,
+                  ),
                   snackBarTheme: snackBarThemeLight,
                   listTileTheme: listTileThemeLight,
                 ),
@@ -164,8 +178,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.25,
-                      ),
+                    fontSizeFactor: 1.25,
+                  ),
                   snackBarTheme: snackBarThemeLight,
                   listTileTheme: listTileThemeLight,
                 ),
@@ -183,8 +197,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 0.875,
-                      ),
+                    fontSizeFactor: 0.875,
+                  ),
                   snackBarTheme: snackBarThemeDark,
                   listTileTheme: listTileThemeDark,
                 ),
@@ -201,8 +215,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.0,
-                      ),
+                    fontSizeFactor: 1.0,
+                  ),
                   snackBarTheme: snackBarThemeDark,
                   listTileTheme: listTileThemeDark,
                 ),
@@ -219,8 +233,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.125,
-                      ),
+                    fontSizeFactor: 1.125,
+                  ),
                   snackBarTheme: snackBarThemeDark,
                   listTileTheme: listTileThemeDark,
                 ),
@@ -237,8 +251,8 @@ class _MyAppState extends ConsumerState<MyApp> {
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
                   textTheme: const TextTheme().apply(
-                        fontSizeFactor: 1.25,
-                      ),
+                    fontSizeFactor: 1.25,
+                  ),
                   snackBarTheme: snackBarThemeDark,
                   listTileTheme: listTileThemeDark,
                 ),
