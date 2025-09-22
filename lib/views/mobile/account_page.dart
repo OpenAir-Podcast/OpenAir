@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,7 +13,7 @@ class AccountPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account'),
+        title: Text(Translations.of(context).text('account')),
       ),
       body: StreamBuilder<AuthState>(
         stream: supabaseService.client.auth.onAuthStateChange,

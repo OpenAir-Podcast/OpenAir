@@ -109,7 +109,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 0.875,
                       ),
                   snackBarTheme: snackBarThemeLight,
@@ -127,7 +127,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.0,
                       ),
                   snackBarTheme: snackBarThemeLight,
@@ -145,7 +145,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.125,
                       ),
                   snackBarTheme: snackBarThemeLight,
@@ -163,7 +163,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorLight,
                   colorScheme: colorSchemeLight,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.25,
                       ),
                   snackBarTheme: snackBarThemeLight,
@@ -182,7 +182,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 0.875,
                       ),
                   snackBarTheme: snackBarThemeDark,
@@ -200,7 +200,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.0,
                       ),
                   snackBarTheme: snackBarThemeDark,
@@ -218,7 +218,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.125,
                       ),
                   snackBarTheme: snackBarThemeDark,
@@ -236,7 +236,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                   floatingActionButtonTheme: floatingActionButtonTheme,
                   cardColor: cardColorDark,
                   colorScheme: colorSchemeDark,
-                  textTheme: Theme.of(context).textTheme.apply(
+                  textTheme: const TextTheme().apply(
                         fontSizeFactor: 1.25,
                       ),
                   snackBarTheme: snackBarThemeDark,
@@ -291,6 +291,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         if (!hasConnection) {
                           return const NoConnection();
                         }
+
                         return const ResponsiveLayout(
                           mobileScaffold: MobileScaffold(),
                           tabletScaffold: TabletScaffold(),
