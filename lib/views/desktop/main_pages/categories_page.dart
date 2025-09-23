@@ -192,8 +192,8 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 200,
               childAspectRatio: 3 / 2,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
             ),
             itemCount: sortedCategories.length,
             itemBuilder: (context, index) {
