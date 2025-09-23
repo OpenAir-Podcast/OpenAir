@@ -7,9 +7,9 @@ import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/main_pages/category_page.dart';
-import 'package:openair/views/mobile/main_pages/episodes_page.dart';
-import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
+import 'package:openair/views/desktop/main_pages/category_page.dart';
+import 'package:openair/views/desktop/main_pages/episodes_page.dart';
+import 'package:openair/views/desktop/main_pages/top_podcasts_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:theme_provider/theme_provider.dart';
@@ -215,7 +215,7 @@ class PodcastsCard extends ConsumerWidget {
               height: featuredCardHeight,
               width: double.infinity,
               child: GridView.builder(
-                itemCount: mobileItemCountPortrait,
+                itemCount: desktopItemCountLandscape,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: mobileCrossAxisCount,
                   mainAxisExtent: mobileMainAxisExtent,
@@ -333,10 +333,12 @@ class PodcastsCard extends ConsumerWidget {
                 width: double.infinity,
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: mobileItemCountPortrait,
+                  itemCount: desktopItemCountLandscape,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: mobileCrossAxisCount,
-                    mainAxisExtent: mobileMainAxisExtent,
+                    crossAxisCount:
+                        (MediaQuery.of(context).size.width ~/ cardImageWidth)
+                            .clamp(1, desktopItemCountLandscape),
+                    mainAxisExtent: desktopMainAxisExtent,
                   ),
                   itemBuilder: (context, index) {
                     return Padding(

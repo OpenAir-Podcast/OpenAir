@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/supabase_provider.dart';
-import 'package:openair/views/mobile/settings_pages/account_page.dart';
-import 'package:openair/views/mobile/nav_pages/sign_up_page.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/desktop/settings_pages/account_page.dart';
+import 'package:openair/views/desktop/nav_pages/sign_up_page.dart';
+import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LogIn extends ConsumerStatefulWidget {

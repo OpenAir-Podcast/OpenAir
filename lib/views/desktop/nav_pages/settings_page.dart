@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/views/mobile/settings_pages/account_page.dart';
-import 'package:openair/views/mobile/settings_pages/about_page.dart';
-import 'package:openair/views/mobile/settings_pages/donate_page.dart';
-import 'package:openair/views/mobile/settings_pages/automatic_page.dart';
-import 'package:openair/views/mobile/settings_pages/help_and_feedback_page.dart';
-import 'package:openair/views/mobile/settings_pages/import_export_page.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
-import 'package:openair/views/mobile/settings_pages/playback_page.dart';
-import 'package:openair/views/mobile/settings_pages/synchronization_page.dart';
-import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
+import 'package:openair/views/desktop/settings_pages/account_page.dart';
+import 'package:openair/views/desktop/settings_pages/about_page.dart';
+import 'package:openair/views/desktop/settings_pages/donate_page.dart';
+import 'package:openair/views/desktop/settings_pages/automatic_page.dart';
+import 'package:openair/views/desktop/settings_pages/help_and_feedback_page.dart';
+import 'package:openair/views/desktop/settings_pages/import_export_page.dart';
+import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
+import 'package:openair/views/desktop/settings_pages/playback_page.dart';
+import 'package:openair/views/desktop/settings_pages/synchronization_page.dart';
+import 'package:openair/views/desktop/settings_pages/user_interface_page.dart';
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});

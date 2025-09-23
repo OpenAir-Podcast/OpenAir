@@ -29,10 +29,16 @@ double blurRadius = 10.0;
 int mobileCrossAxisCount = 3;
 double mobileMainAxisExtent = 500.0;
 
+int desktopCrossAxisCount = 5;
+double desktopMainAxisExtent = 833.0;
+
 double subscribedMobileMainAxisExtent = 236.0;
 
 int mobileItemCountPortrait = 3;
 int mobileItemCountLandscape = 6;
+
+int desktopItemCountPortrait = 3;
+int desktopItemCountLandscape = 6;
 
 double featuredCardHeight = 230.0;
 

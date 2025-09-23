@@ -13,7 +13,6 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
-import 'package:openair/responsive/tablet_scaffold.dart';
 import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:openair/services/notification_service.dart';
@@ -308,7 +307,6 @@ class _MyAppState extends ConsumerState<MyApp> {
 
                         return const ResponsiveLayout(
                           mobileScaffold: MobileScaffold(),
-                          tabletScaffold: TabletScaffold(),
                           desktopScaffold: DesktopScaffold(),
                         );
                       },

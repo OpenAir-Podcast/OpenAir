@@ -45,7 +45,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
           children: [
             Expanded(
               child: CachedNetworkImage(
-                memCacheHeight: 150,
+                memCacheHeight: 300,
                 imageUrl: widget.podcastItem.imageUrl,
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(
@@ -99,8 +99,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
 
                 return IconButton(
                   tooltip: snapshot.data!
-                      ? Translations.of(context)
-                          .text('unsubscribeToPodcast')
+                      ? Translations.of(context).text('unsubscribeToPodcast')
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
@@ -114,9 +113,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
 
                     if (context.mounted) {
                       if (!Platform.isAndroid && !Platform.isIOS) {
-                        ref
-                            .read(notificationServiceProvider)
-                            .showNotification(
+                        ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
                               snapshot.data!
                                   ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'

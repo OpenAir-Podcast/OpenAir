@@ -4,21 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
-import 'package:openair/views/mobile/main_pages/categories_page.dart';
-import 'package:openair/views/mobile/main_pages/featured_page.dart';
-import 'package:openair/views/mobile/main_pages/trending_page.dart';
-import 'package:openair/views/mobile/nav_pages/add_podcast_page.dart';
-import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
-import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
-import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
-import 'package:openair/views/mobile/nav_pages/history_page.dart';
-import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
-import 'package:openair/views/mobile/nav_pages/log_in_page.dart';
-import 'package:openair/views/mobile/nav_pages/queue_page.dart';
-import 'package:openair/views/mobile/nav_pages/settings_page.dart';
-import 'package:openair/views/mobile/nav_pages/subscriptions_page.dart';
-import 'package:openair/views/mobile/player/banner_audio_player.dart';
-import 'package:openair/views/mobile/navigation/app_drawer.dart';
+import 'package:openair/views/desktop/main_pages/categories_page.dart';
+import 'package:openair/views/desktop/main_pages/featured_page.dart';
+import 'package:openair/views/desktop/main_pages/trending_page.dart';
+import 'package:openair/views/desktop/nav_pages/add_podcast_page.dart';
+import 'package:openair/views/desktop/nav_pages/downloads_page.dart';
+import 'package:openair/views/desktop/nav_pages/favorites_page.dart';
+import 'package:openair/views/desktop/nav_pages/feeds_page.dart';
+import 'package:openair/views/desktop/nav_pages/history_page.dart';
+import 'package:openair/views/desktop/nav_pages/inbox_page.dart';
+import 'package:openair/views/desktop/nav_pages/log_in_page.dart';
+import 'package:openair/views/desktop/nav_pages/queue_page.dart';
+import 'package:openair/views/desktop/nav_pages/settings_page.dart';
+import 'package:openair/views/desktop/nav_pages/subscriptions_page.dart';
+import 'package:openair/views/desktop/player/banner_audio_player.dart';
+import 'package:openair/views/desktop/navigation/app_drawer.dart';
 
 class DesktopScaffold extends ConsumerStatefulWidget {
   const DesktopScaffold({super.key});
@@ -77,7 +77,7 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
             child: IconButton(
               tooltip: Translations.of(context).text('refresh'),
               onPressed: () {
-                // TODO Implement refreash mechanic
+                // TODO Implement refresh mechanic
               },
               icon: const Icon(Icons.refresh_rounded),
             ),
