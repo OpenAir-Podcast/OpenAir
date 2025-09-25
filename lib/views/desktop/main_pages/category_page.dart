@@ -295,8 +295,8 @@ class CategoryPage extends ConsumerWidget {
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
                 childAspectRatio: 3 / 4,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
               ),
               itemCount: snapshot.count,
               itemBuilder: (context, index) {

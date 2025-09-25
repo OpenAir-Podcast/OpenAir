@@ -56,12 +56,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: paddingSpace,
-            ),
-            child: Icon(Icons.play_arrow_rounded),
-          ),
+          Icon(Icons.play_arrow_rounded),
           Text(
             ref.watch(audioProvider).getPodcastDuration(enclosureLengthVal),
             overflow: TextOverflow.ellipsis,

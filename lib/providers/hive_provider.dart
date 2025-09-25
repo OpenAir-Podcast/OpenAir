@@ -225,6 +225,20 @@ class HiveService {
     automaticExportDatabaseConfig =
         (await getImportExportSettings())?['autoBackup'] ?? true;
 
+    receiveNotificationsWhenPlayConfig = (await getNotificationsSettings())?[
+            'receiveNotificationsWhenPlaying'] ??
+        true;
+
+    receiveNotificationsWhenDownloadConfig =
+        (await getNotificationsSettings())?[
+                'receiveNotificationsWhenDownloading'] ??
+            true;
+
+    receiveNotificationsForNewEpisodesConfig =
+        (await getNotificationsSettings())?[
+                'receiveNotificationsForNewEpisodes'] ??
+            true;
+
     Duration duration;
 
     switch (refreshPodcastsConfig) {

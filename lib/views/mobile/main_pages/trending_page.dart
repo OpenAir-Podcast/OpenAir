@@ -134,7 +134,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
               ),
               const SizedBox(height: 20.0),
               Text(
-                Translations.of(context).text(']oopsAnErrorOccurred'),
+                Translations.of(context).text('oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,

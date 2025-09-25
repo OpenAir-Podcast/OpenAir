@@ -151,233 +151,77 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3.0),
-                child: StyledText(
-                  text: widget.episodeItem['description'],
-                  maxLines: 4,
-                  style: TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                    color: Brightness.dark == Theme.of(context).brightness
-                        ? Colors.white
-                        : Colors.black,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3.0),
+                  child: StyledText(
+                    text: widget.episodeItem['description'],
+                    maxLines: 4,
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                      color: Brightness.dark == Theme.of(context).brightness
+                          ? Colors.white
+                          : Colors.black,
+                    ),
                   ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
                     // Play button
-                    Expanded(
-                      // width: 200.0,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          elevation: 1.0,
-                          shape: const StadiumBorder(
-                            side: BorderSide(
-                              width: 1.0,
-                            ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 1.0,
+                        shape: const StadiumBorder(
+                          side: BorderSide(
+                            width: 1.0,
                           ),
                         ),
-                        onPressed: () {
-                          if (ref.read(audioProvider).currentEpisode !=
-                              widget.episodeItem) {
-                            ref
-                                .read(audioProvider.notifier)
-                                .playerPlayButtonClicked(
-                                  widget.episodeItem,
-                                );
-                          }
-                        },
-                        child: PlayButtonWidget(
-                          episodeItem: widget.episodeItem,
-                        ),
+                      ),
+                      onPressed: () {
+                        if (ref.read(audioProvider).currentEpisode !=
+                            widget.episodeItem) {
+                          ref
+                              .read(audioProvider.notifier)
+                              .playerPlayButtonClicked(
+                                widget.episodeItem,
+                              );
+                        }
+                      },
+                      child: PlayButtonWidget(
+                        episodeItem: widget.episodeItem,
                       ),
                     ),
-                    // Playlist button
-                    queueListAsync.when(
-                      data: (data) {
-                        isQueued = data.containsKey(widget.episodeItem['guid']);
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Playlist button
+                          queueListAsync.when(
+                            data: (data) {
+                              isQueued =
+                                  data.containsKey(widget.episodeItem['guid']);
 
-                        return IconButton(
-                          tooltip: Translations.of(context).text('addToQueue'),
-                          onPressed: () {
-                            isQueued
-                                ? ref
-                                    .read(audioProvider)
-                                    .removeFromQueue(widget.episodeItem['guid'])
-                                : ref.read(audioProvider).addToQueue(
-                                      widget.episodeItem,
-                                      widget.podcast,
-                                    );
+                              return IconButton(
+                                tooltip:
+                                    Translations.of(context).text('addToQueue'),
+                                onPressed: () {
+                                  isQueued
+                                      ? ref.read(audioProvider).removeFromQueue(
+                                          widget.episodeItem['guid'])
+                                      : ref.read(audioProvider).addToQueue(
+                                            widget.episodeItem,
+                                            widget.podcast,
+                                          );
 
-                            ref.invalidate(getQueueProvider);
-                            ref.invalidate(podcastDataByUrlProvider(
-                                widget.podcast.feedUrl));
+                                  ref.invalidate(getQueueProvider);
+                                  ref.invalidate(podcastDataByUrlProvider(
+                                      widget.podcast.feedUrl));
 
-                            if (context.mounted) {
-                              if (!Platform.isAndroid && !Platform.isIOS) {
-                                ref
-                                    .read(notificationServiceProvider)
-                                    .showNotification(
-                                      'OpenAir ${Translations.of(context).text('notification')}',
-                                      isQueued
-                                          ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
-                                          : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
-                                    );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      isQueued
-                                          ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
-                                          : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-
-                            if (enqueueDownloadedConfig) {
-                              ref
-                                  .watch(openAirProvider)
-                                  .downloadEnqueue(context);
-                            }
-                          },
-                          icon: isQueued
-                              ? const Icon(Icons.playlist_add_check_rounded)
-                              : const Icon(Icons.playlist_add_rounded),
-                        );
-                      },
-                      error: (error, stackTrace) {
-                        debugPrint(
-                            'Error in queueListAsync for EpisodeCard: $error');
-                        return IconButton(
-                          tooltip: Translations.of(context).text('addToQueue'),
-                          onPressed: () {},
-                          icon: const Icon(Icons.error_outline_rounded),
-                        );
-                      },
-                      loading: () {
-                        // Handle loading by showing previous state's icon, disabled
-                        final previousList = queueListAsync.valueOrNull;
-
-                        final isQueuedPreviously = previousList
-                                ?.containsKey(widget.episodeItem['guid']) ??
-                            false;
-
-                        return IconButton(
-                          tooltip: Translations.of(context).text('addToQueue'),
-                          onPressed: null, // Disable button while loading
-                          icon: isQueuedPreviously
-                              ? const Icon(Icons.playlist_add_check_rounded)
-                              : const Icon(Icons.playlist_add_rounded),
-                        );
-                      },
-                    ),
-                    // Download button
-                    if (!kIsWeb)
-                      downloadedListProvider.when(
-                        data: (downloads) {
-                          final isDownloaded = downloads
-                              .any((d) => d.guid == widget.episodeItem['guid']);
-
-                          final isDownloading = ref.watch(audioProvider.select(
-                              (p) => p.downloadingPodcasts
-                                  .contains(widget.episodeItem['guid'])));
-
-                          IconData iconData;
-                          String tooltip;
-                          VoidCallback? onPressed;
-
-                          if (isDownloading) {
-                            iconData = Icons.downloading_rounded;
-                            tooltip =
-                                Translations.of(context).text('downloading');
-                            onPressed = null;
-                          } else if (isDownloaded) {
-                            iconData = Icons.download_done_rounded;
-                            tooltip =
-                                Translations.of(context).text('deleteDownload');
-
-                            onPressed = () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext dialogContext) =>
-                                    AlertDialog(
-                                  title: Text(Translations.of(context)
-                                      .text('confirmDeletion')),
-                                  content: Text(
-                                      '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('cancel')),
-                                      onPressed: () {
-                                        Navigator.of(dialogContext)
-                                            .pop(); // Dismiss the dialog
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: Text(
-                                        Translations.of(context).text('remove'),
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        // Pop the dialog first
-                                        Navigator.of(dialogContext).pop();
-
-                                        // Then perform the removal
-                                        await ref
-                                            .read(audioProvider.notifier)
-                                            .removeDownload(widget.episodeItem);
-
-                                        if (context.mounted &&
-                                            receiveNotificationsWhenDownloadConfig) {
-                                          if (!Platform.isAndroid &&
-                                              !Platform.isIOS) {
-                                            ref
-                                                .read(
-                                                    notificationServiceProvider)
-                                                .showNotification(
-                                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
-                                                );
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }
-
-                                        ref.invalidate(sortedDownloadsProvider);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-
-                              ref.invalidate(sortedDownloadsProvider);
-                            };
-                          }
-                          // Not downloaded
-                          else {
-                            iconData = Icons.download_rounded;
-                            tooltip = Translations.of(context)
-                                .text('downloadEpisode');
-
-                            onPressed = () {
-                              if (kIsWeb) {
-                                if (context.mounted) {
                                   if (context.mounted) {
                                     if (!Platform.isAndroid &&
                                         !Platform.isIOS) {
@@ -385,148 +229,336 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                           .read(notificationServiceProvider)
                                           .showNotification(
                                             'OpenAir ${Translations.of(context).text('notification')}',
-                                            '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                            isQueued
+                                                ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
+                                                : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
                                           );
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                            isQueued
+                                                ? '${Translations.of(context).text('removedFromQueue')}: ${widget.episodeItem['title']}'
+                                                : '${Translations.of(context).text('addedToQueue')}: ${widget.episodeItem['title']}',
                                           ),
                                         ),
                                       );
                                     }
                                   }
-                                }
-                              } else {
-                                ref
-                                    .read(audioProvider.notifier)
-                                    .downloadEpisode(
-                                      widget.episodeItem,
-                                      widget.podcast,
-                                      context,
-                                    );
 
-                                if (receiveNotificationsWhenDownloadConfig) {
-                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                  if (enqueueDownloadedConfig) {
                                     ref
-                                        .read(notificationServiceProvider)
-                                        .showNotification(
-                                          Translations.of(context)
-                                              .text('downloadingEpisode'),
-                                          '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\'',
-                                        );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
+                                        .watch(openAirProvider)
+                                        .downloadEnqueue(context);
+                                  }
+                                },
+                                icon: isQueued
+                                    ? const Icon(
+                                        Icons.playlist_add_check_rounded)
+                                    : const Icon(Icons.playlist_add_rounded),
+                              );
+                            },
+                            error: (error, stackTrace) {
+                              debugPrint(
+                                  'Error in queueListAsync for EpisodeCard: $error');
+                              return IconButton(
+                                tooltip:
+                                    Translations.of(context).text('addToQueue'),
+                                onPressed: () {},
+                                icon: const Icon(Icons.error_outline_rounded),
+                              );
+                            },
+                            loading: () {
+                              // Handle loading by showing previous state's icon, disabled
+                              final previousList = queueListAsync.valueOrNull;
+
+                              final isQueuedPreviously =
+                                  previousList?.containsKey(
+                                          widget.episodeItem['guid']) ??
+                                      false;
+
+                              return IconButton(
+                                tooltip:
+                                    Translations.of(context).text('addToQueue'),
+                                onPressed: null, // Disable button while loading
+                                icon: isQueuedPreviously
+                                    ? const Icon(
+                                        Icons.playlist_add_check_rounded)
+                                    : const Icon(Icons.playlist_add_rounded),
+                              );
+                            },
+                          ),
+                          // Download button
+                          if (!kIsWeb)
+                            downloadedListProvider.when(
+                              data: (downloads) {
+                                final isDownloaded = downloads.any((d) =>
+                                    d.guid == widget.episodeItem['guid']);
+
+                                final isDownloading = ref.watch(audioProvider
+                                    .select((p) => p.downloadingPodcasts
+                                        .contains(widget.episodeItem['guid'])));
+
+                                IconData iconData;
+                                String tooltip;
+                                VoidCallback? onPressed;
+
+                                if (isDownloading) {
+                                  iconData = Icons.downloading_rounded;
+                                  tooltip = Translations.of(context)
+                                      .text('downloading');
+                                  onPressed = null;
+                                } else if (isDownloaded) {
+                                  iconData = Icons.download_done_rounded;
+                                  tooltip = Translations.of(context)
+                                      .text('deleteDownload');
+
+                                  onPressed = () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext dialogContext) =>
+                                          AlertDialog(
+                                        title: Text(Translations.of(context)
+                                            .text('confirmDeletion')),
                                         content: Text(
-                                            '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                            '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text(Translations.of(context)
+                                                .text('cancel')),
+                                            onPressed: () {
+                                              Navigator.of(dialogContext)
+                                                  .pop(); // Dismiss the dialog
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text(
+                                              Translations.of(context)
+                                                  .text('remove'),
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              // Pop the dialog first
+                                              Navigator.of(dialogContext).pop();
+
+                                              // Then perform the removal
+                                              await ref
+                                                  .read(audioProvider.notifier)
+                                                  .removeDownload(
+                                                      widget.episodeItem);
+
+                                              if (context.mounted &&
+                                                  receiveNotificationsWhenDownloadConfig) {
+                                                if (!Platform.isAndroid &&
+                                                    !Platform.isIOS) {
+                                                  ref
+                                                      .read(
+                                                          notificationServiceProvider)
+                                                      .showNotification(
+                                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                      );
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }
+
+                                              ref.invalidate(
+                                                  sortedDownloadsProvider);
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     );
-                                  }
-                                }
-                              }
-                            };
-                          }
 
-                          return IconButton(
-                            tooltip: tooltip,
-                            onPressed: onPressed,
-                            icon: Icon(iconData),
-                          );
-                        },
-                        error: (e, s) => const IconButton(
-                            icon: Icon(Icons.error), onPressed: null),
-                        loading: () => const IconButton(
-                            icon: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child:
-                                  CircularProgressIndicator(strokeWidth: 2.0),
+                                    ref.invalidate(sortedDownloadsProvider);
+                                  };
+                                }
+                                // Not downloaded
+                                else {
+                                  iconData = Icons.download_rounded;
+                                  tooltip = Translations.of(context)
+                                      .text('downloadEpisode');
+
+                                  onPressed = () {
+                                    if (kIsWeb) {
+                                      if (context.mounted) {
+                                        if (context.mounted) {
+                                          if (!Platform.isAndroid &&
+                                              !Platform.isIOS) {
+                                            ref
+                                                .read(
+                                                    notificationServiceProvider)
+                                                .showNotification(
+                                                  'OpenAir ${Translations.of(context).text('notification')}',
+                                                  '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                                );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}140',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      }
+                                    } else {
+                                      ref
+                                          .read(audioProvider.notifier)
+                                          .downloadEpisode(
+                                            widget.episodeItem,
+                                            widget.podcast,
+                                            context,
+                                          );
+
+                                      if (receiveNotificationsWhenDownloadConfig) {
+                                        if (!Platform.isAndroid &&
+                                            !Platform.isIOS) {
+                                          ref
+                                              .read(notificationServiceProvider)
+                                              .showNotification(
+                                                Translations.of(context)
+                                                    .text('downloadingEpisode'),
+                                                '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\'',
+                                              );
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '${Translations.of(context).text('downloading')} \'${widget.episodeItem['title']}\''),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                  };
+                                }
+
+                                return IconButton(
+                                  tooltip: tooltip,
+                                  onPressed: onPressed,
+                                  icon: Icon(iconData),
+                                );
+                              },
+                              error: (e, s) => const IconButton(
+                                  icon: Icon(Icons.error), onPressed: null),
+                              loading: () => const IconButton(
+                                  icon: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.0),
+                                  ),
+                                  onPressed: null),
                             ),
-                            onPressed: null),
+
+                          IconButton(
+                            tooltip: Translations.of(context).text('share'),
+                            onPressed: () => ref.watch(openAirProvider).share(),
+                            icon: const Icon(Icons.share_rounded),
+                          ),
+                          favoriteListAsync.when(
+                            data: (data) {
+                              isFavorite =
+                                  data.containsKey(widget.episodeItem['guid']);
+
+                              return IconButton(
+                                tooltip:
+                                    Translations.of(context).text('favourite'),
+                                onPressed: () async {
+                                  if (isFavorite) {
+                                    ref
+                                        .read(audioProvider)
+                                        .removeEpisodeFromFavorite(
+                                            widget.episodeItem['guid']);
+
+                                    if (context.mounted) {
+                                      if (!Platform.isAndroid &&
+                                          !Platform.isIOS) {
+                                        ref
+                                            .read(notificationServiceProvider)
+                                            .showNotification(
+                                              'OpenAir ${Translations.of(context).text('notification')}',
+                                              '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
+                                            );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } else {
+                                    ref
+                                        .read(audioProvider)
+                                        .addEpisodeToFavorite(
+                                            widget.episodeItem, widget.podcast);
+
+                                    ref.invalidate(getFavoriteProvider);
+
+                                    if (context.mounted) {
+                                      if (!Platform.isAndroid &&
+                                          !Platform.isIOS) {
+                                        ref
+                                            .read(notificationServiceProvider)
+                                            .showNotification(
+                                              'OpenAir ${Translations.of(context).text('notification')}',
+                                              '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
+                                            );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
+                                },
+                                icon: isFavorite
+                                    ? const Icon(Icons.favorite_rounded)
+                                    : const Icon(Icons.favorite_border_rounded),
+                              );
+                            },
+                            loading: () => IconButton(
+                              tooltip:
+                                  Translations.of(context).text('favourite'),
+                              onPressed: null,
+                              icon: const Icon(Icons.favorite_border_rounded),
+                            ),
+                            error: (error, stackTrace) {
+                              debugPrint(
+                                  'Error checking favorite status: $error');
+                              return IconButton(
+                                tooltip: Translations.of(context).text('error'),
+                                onPressed: null,
+                                icon: const Icon(Icons.error_outline_rounded),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-
-                    IconButton(
-                      tooltip: Translations.of(context).text('share'),
-                      onPressed: () => ref.watch(openAirProvider).share(),
-                      icon: const Icon(Icons.share_rounded),
-                    ),
-                    favoriteListAsync.when(
-                      data: (data) {
-                        isFavorite =
-                            data.containsKey(widget.episodeItem['guid']);
-
-                        return IconButton(
-                          tooltip: Translations.of(context).text('favourite'),
-                          onPressed: () async {
-                            if (isFavorite) {
-                              ref.read(audioProvider).removeEpisodeFromFavorite(
-                                  widget.episodeItem['guid']);
-
-                              if (context.mounted) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        '${Translations.of(context).text('removedFromFavorites')}: ${widget.episodeItem['title']}',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            } else {
-                              ref.read(audioProvider).addEpisodeToFavorite(
-                                  widget.episodeItem, widget.podcast);
-
-                              ref.invalidate(getFavoriteProvider);
-
-                              if (context.mounted) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        '${Translations.of(context).text('addedToFavorites')}: ${widget.episodeItem['title']}',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                          icon: isFavorite
-                              ? const Icon(Icons.favorite_rounded)
-                              : const Icon(Icons.favorite_border_rounded),
-                        );
-                      },
-                      loading: () => IconButton(
-                        tooltip: Translations.of(context).text('favourite'),
-                        onPressed: null,
-                        icon: const Icon(Icons.favorite_border_rounded),
-                      ),
-                      error: (error, stackTrace) {
-                        debugPrint('Error checking favorite status: $error');
-                        return IconButton(
-                          tooltip: Translations.of(context).text('error'),
-                          onPressed: null,
-                          icon: const Icon(Icons.error_outline_rounded),
-                        );
-                      },
                     ),
                   ],
                 ),

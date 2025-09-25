@@ -183,8 +183,14 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             child: RefreshIndicator(
               onRefresh: () async =>
                   ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-              child: ListView.builder(
-                cacheExtent: cacheExtent,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: desktopCrossAxisCount,
+                  childAspectRatio: 1.2,
+                  mainAxisExtent: 294,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => EpisodeCard(
                   title: snapshot['items'][index]['title'],

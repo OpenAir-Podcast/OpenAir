@@ -40,50 +40,50 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
       child: Card(
         color: Theme.of(context).cardColor,
         elevation: 2.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Row(
+          // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: CachedNetworkImage(
-                memCacheHeight: 150,
-                imageUrl: widget.podcastItem.imageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: cardImageShadow,
-                  child: const Icon(
-                    Icons.error,
-                    size: 56.0,
-                  ),
+            CachedNetworkImage(
+              memCacheHeight: 56,
+              imageUrl: widget.podcastItem.imageUrl,
+              fit: BoxFit.cover,
+              errorWidget: (context, url, error) => Container(
+                color: cardImageShadow,
+                child: const Icon(
+                  Icons.error,
+                  size: 56.0,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.podcastItem.title,
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.podcastItem.title,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Brightness.dark == Theme.of(context).brightness
+                            ? Colors.white
+                            : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
                     ),
-                    maxLines: 1,
-                  ),
-                  Text(
-                    widget.podcastItem.author ??
-                        Translations.of(context).text('unknown'),
-                    maxLines: 1,
-                    style: const TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      color: Colors.grey,
+                    Text(
+                      widget.podcastItem.author ??
+                          Translations.of(context).text('unknown'),
+                      maxLines: 1,
+                      style: const TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             FutureBuilder(
@@ -99,8 +99,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
 
                 return IconButton(
                   tooltip: snapshot.data!
-                      ? Translations.of(context)
-                          .text('unsubscribeToPodcast')
+                      ? Translations.of(context).text('unsubscribeToPodcast')
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
@@ -114,9 +113,7 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
 
                     if (context.mounted) {
                       if (!Platform.isAndroid && !Platform.isIOS) {
-                        ref
-                            .read(notificationServiceProvider)
-                            .showNotification(
+                        ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
                               snapshot.data!
                                   ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'

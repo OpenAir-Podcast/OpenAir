@@ -932,7 +932,7 @@ class AudioProvider extends ChangeNotifier {
     // int seconds = dateTime.second;
 
     String result =
-        "${hours != 0 ? hours < 10 ? '0$hours ${Translations.of(context).text('hour')} ' : '$hours ${Translations.of(context).text('hour')} ' : '00 ${Translations.of(context).text('hour')} '}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minute')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')} '}";
+        "${hours != 0 ? hours < 10 ? hours == 1 ? '01 ${Translations.of(context).text('hour')} ' : '0$hours ${Translations.of(context).text('hours')} ' : '$hours ${Translations.of(context).text('hours')} ' : ''}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minutes')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')}'}";
 
     return result;
   }
@@ -952,7 +952,7 @@ class AudioProvider extends ChangeNotifier {
         Duration(seconds: remainingSeconds).inSeconds % 60;
 
     currentPodcastTimeRemaining =
-        "${remainingHours != 0 ? '$remainingHours ${Translations.of(context).text('hour')} ' : ''}${remainingMinutes != 0 ? '$remainingMinutes ${Translations.of(context).text('minute')}' : '< 1 ${Translations.of(context).text('minute')}'} ${Translations.of(context).text('left')}";
+        "${remainingHours != 0 ? remainingHours == 1 ? '1 ${Translations.of(context).text('hour')} ' : '$remainingHours ${Translations.of(context).text('hours')} ' : ''}${remainingMinutes != 0 ? '$remainingMinutes ${Translations.of(context).text('minutes')}' : '< 1 ${Translations.of(context).text('minute')}'} ${Translations.of(context).text('left')}";
 
     String result =
         "${remainingHours != 0 ? remainingHours < 10 ? '0$remainingHours:' : '$remainingHours:' : '00:'}${remainingMinutes != 0 ? remainingMinutes < 10 ? '0$remainingMinutes:' : '$remainingMinutes:' : '00:'}${remainingSecondsAdjusted != 0 ? remainingSecondsAdjusted < 10 ? '0$remainingSecondsAdjusted' : '$remainingSecondsAdjusted' : '00'}";

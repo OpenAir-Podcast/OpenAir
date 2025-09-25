@@ -8,8 +8,8 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/mobile/main_pages/episodes_page.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/desktop/main_pages/episodes_page.dart';
+import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 
 class PodcastCard extends ConsumerStatefulWidget {
   final PodcastModel podcastItem;
