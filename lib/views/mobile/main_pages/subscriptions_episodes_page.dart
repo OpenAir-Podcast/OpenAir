@@ -171,7 +171,14 @@ class _SubscriptionsEpisodesPageState
             child: RefreshIndicator(
               onRefresh: () async =>
                   ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-              child: ListView.builder(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: desktopCrossAxisCount,
+                  childAspectRatio: 1.2,
+                  mainAxisExtent: 294,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
                 cacheExtent: cacheExtent,
                 itemCount: snapshot['count'],
                 itemBuilder: (context, index) => SubscriptionEpisodeCard(

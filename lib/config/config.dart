@@ -33,6 +33,7 @@ int desktopCrossAxisCount = 5;
 double desktopMainAxisExtent = 833.0;
 
 double subscribedMobileMainAxisExtent = 236.0;
+double subscribedDesktopMainAxisExtent = 236.0;
 
 int mobileItemCountPortrait = 3;
 int mobileItemCountLandscape = 6;

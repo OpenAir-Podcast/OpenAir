@@ -175,8 +175,10 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
             itemCount: subs.length,
             cacheExtent: cacheExtent,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: mobileCrossAxisCount,
-              mainAxisExtent: subscribedMobileMainAxisExtent,
+              crossAxisCount: desktopCrossAxisCount,
+              mainAxisExtent: subscribedDesktopMainAxisExtent,
+              crossAxisSpacing: 4,
+              mainAxisSpacing: 4,
             ),
             itemBuilder: (context, index) {
               return SubscriptionCard(
