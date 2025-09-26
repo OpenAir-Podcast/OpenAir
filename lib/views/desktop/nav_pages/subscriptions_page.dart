@@ -174,8 +174,8 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           body: GridView.builder(
             itemCount: subs.length,
             cacheExtent: cacheExtent,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: desktopCrossAxisCount,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200.0,
               mainAxisExtent: subscribedDesktopMainAxisExtent,
               crossAxisSpacing: 4,
               mainAxisSpacing: 4,

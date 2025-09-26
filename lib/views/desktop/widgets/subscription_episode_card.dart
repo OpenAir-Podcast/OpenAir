@@ -195,7 +195,6 @@ class _SubscriptionEpisodeCardState
                         children: [
                           // Play button
                           Expanded(
-                            // width: 200.0,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 elevation: 1.0,
