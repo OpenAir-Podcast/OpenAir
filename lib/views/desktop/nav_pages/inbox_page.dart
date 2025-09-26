@@ -73,7 +73,13 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                 await ref.read(hiveServiceProvider).updateSubscriptions();
                 ref.invalidate(getInboxProvider);
               },
-              child: ListView.builder(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 300.0,
+                  mainAxisExtent: 312.0,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
                 cacheExtent: cacheExtent,
                 itemCount: feedItems.length,
                 itemBuilder: (context, index) {

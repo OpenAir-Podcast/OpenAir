@@ -102,7 +102,13 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getDownloadsProvider),
-              child: ListView.builder(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 300.0,
+                  mainAxisExtent: 300.0,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {

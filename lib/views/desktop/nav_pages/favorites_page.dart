@@ -53,7 +53,13 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getFavoriteProvider),
-              child: ListView.builder(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 300.0,
+                  mainAxisExtent: 312.0,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                ),
                 cacheExtent: cacheExtent,
                 itemCount: data.length,
                 itemBuilder: (context, index) {
