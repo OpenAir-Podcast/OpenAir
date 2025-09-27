@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/desktop/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/desktop/widgets/discovery_podcast_card.dart';
 
@@ -34,9 +33,9 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
       ),
       body: getConnectionStatusValue.when(
         data: (connectionData) {
-          if (connectionData == false) {
-            return NoConnection();
-          }
+          // if (connectionData == false) {
+          //   return NoConnection();
+          // }
 
           return widget.podcastDataAsyncValue.when(
               loading: () => const Scaffold(

@@ -6,7 +6,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:openair/components/no_connection.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -298,12 +297,6 @@ class _MyAppState extends ConsumerState<MyApp> {
                     home: userInterfaceSettings.when(
                       data: (data) {
                         Translations.changeLanguage(data!['locale']);
-
-                        final hasConnection =
-                            ref.watch(openAirProvider).hasConnection;
-                        if (!hasConnection) {
-                          return const NoConnection();
-                        }
 
                         return const ResponsiveLayout(
                           mobileScaffold: MobileScaffold(),

@@ -12,6 +12,8 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:openair/views/desktop/widgets/subscription_card.dart';
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
   // Watch hiveServiceProvider as subscription data comes from Hive
@@ -132,7 +134,13 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                           .read(openAirProvider)
                                           .hiveService
                                           .deleteSubscriptions();
+
                                       ref.invalidate(subscriptionsProvider);
+                                      ref.invalidate(
+                                          getSubscriptionsCountProvider);
+
+                                      ref.invalidate(feedCountProvider);
+                                      ref.invalidate(getFeedsProvider);
 
                                       if (context.mounted) {
                                         if (!Platform.isAndroid &&
@@ -249,7 +257,9 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
         );
       },
       loading: () => Container(
-        color: Colors.white,
+        color: Brightness.dark == Theme.of(context).brightness
+            ? Colors.black
+            : Colors.white,
         child: const Center(
           child: CircularProgressIndicator(),
         ),

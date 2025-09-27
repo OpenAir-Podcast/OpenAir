@@ -142,8 +142,13 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
           ),
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+      loading: () => Container(
+        color: Brightness.dark == Theme.of(context).brightness
+            ? Colors.black
+            : Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

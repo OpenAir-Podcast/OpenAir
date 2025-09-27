@@ -21,6 +21,7 @@ import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
+import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -85,6 +86,8 @@ class HiveService {
   late ScheduledTimer autoExportDBTimer;
 
   late BuildContext context;
+
+  final List<Map> episodesList = [];
 
   Future<void> initial(BuildContext context) async {
     // Register all adapters
@@ -361,7 +364,15 @@ class HiveService {
 
   Future<void> deleteSubscriptions() async {
     final box = await subscriptionBox;
-    await box.clear(); // Add await
+    await box.clear();
+
+    final feedBox = await this.feedBox;
+    await feedBox.clear();
+
+    final epiBox = await episodeBox;
+    epiBox.clear();
+
+    episodesList.clear();
   }
 
   Future<void> deleteSubscription(String id) async {
@@ -487,7 +498,6 @@ class HiveService {
   Future<List<Map>> getEpisodes() async {
     final box = await episodeBox;
     final Map<String, Map> allEpisodes = await box.getAllValues();
-    final List<Map> episodesList = [];
 
     for (final entry in allEpisodes.entries) {
       episodesList.add(entry.value);
@@ -561,6 +571,8 @@ class HiveService {
   Future<void> clearQueue() async {
     final box = await queueBox;
     await box.clear();
+
+    ref.invalidate(sortedProvider);
   }
 
   Future<void> addEpisodeToQueue(Map episode, Map podcast) async {

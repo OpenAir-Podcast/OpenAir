@@ -10,48 +10,53 @@ class NoConnection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.wifi_off,
-            size: 75.0,
-            color: Colors.grey,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.wifi_off,
+          size: 75.0,
+          color: Colors.grey,
+        ),
+        const SizedBox(height: 20.0),
+        Text(
+          Translations.of(context).text('oopsAnErrorOccurred'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            color: Brightness.dark == Theme.of(context).brightness
+                ? Colors.white
+                : Colors.black,
           ),
-          const SizedBox(height: 20.0),
-          Text(
-            Translations.of(context).text('oopsAnErrorOccurred'),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+        Text(
+          Translations.of(context).text('pleaseConnectToNetwork'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16.0,
+            color: Brightness.dark == Theme.of(context).brightness
+                ? Colors.white
+                : Colors.black,
           ),
-          Text(
-            Translations.of(context).text('pleaseConnectToNetwork'),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16.0),
-          ),
-          const SizedBox(height: 20.0),
-          SizedBox(
-            width: 180.0,
-            height: 40.0,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
+        ),
+        const SizedBox(height: 20.0),
+        SizedBox(
+          width: 180.0,
+          height: 40.0,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-              onPressed: () async {
-                ref.read(openAirProvider).getConnectionStatusTriggered();
-              },
-              child: Text(Translations.of(context).text('retry')),
             ),
+            onPressed: () async {
+              ref.read(openAirProvider).getConnectionStatusTriggered();
+            },
+            child: Text(Translations.of(context).text('retry')),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -10,7 +10,7 @@ class NoDownloadedEpisodes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('noDownloadedEpisodes')),
+        title: Text(Translations.of(context).text('downloads')),
       ),
       body: Center(
         child: Padding(

@@ -184,7 +184,9 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
         );
       },
       loading: () => Container(
-        color: Colors.white,
+        color: Brightness.dark == Theme.of(context).brightness
+            ? Colors.black
+            : Colors.white,
         child: const Center(
           child: CircularProgressIndicator(),
         ),

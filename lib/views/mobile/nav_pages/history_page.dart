@@ -40,11 +40,6 @@ class _HistoryState extends ConsumerState<HistoryPage> {
           appBar: AppBar(
             title: Text(
               Translations.of(context).text('history'),
-              style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
-              ),
             ),
             actions: [
               Padding(

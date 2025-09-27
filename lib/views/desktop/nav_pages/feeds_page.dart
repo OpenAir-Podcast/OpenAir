@@ -5,6 +5,7 @@ import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
@@ -13,6 +14,7 @@ import 'package:openair/views/desktop/widgets/feeds_episode_card.dart';
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
   // Feeds data comes from subscribed episodes in Hive.
   // This provider will be manually invalidated when subscriptions (and their episodes) change.
+
   return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 
@@ -24,6 +26,13 @@ class FeedsPage extends ConsumerStatefulWidget {
 }
 
 class _FeedsPageState extends ConsumerState<FeedsPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ref.invalidate(getFeedsProvider);
+    debugPrint(ref.watch(hiveServiceProvider).episodesList.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<Map>> getEpisodesValue = ref.watch(getFeedsProvider);
@@ -148,8 +157,13 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
           ),
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+      loading: () => Container(
+        color: Brightness.dark == Theme.of(context).brightness
+            ? Colors.black
+            : Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

@@ -41,11 +41,6 @@ class _QueuePageState extends ConsumerState<QueuePage> {
       appBar: AppBar(
         title: Text(
           Translations.of(context).text('queue'),
-          style: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
-          ),
         ),
         actions: [
           IconButton(
@@ -175,7 +170,11 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Container(
+            color: Brightness.dark == Theme.of(context).brightness
+                ? Colors.black
+                : Colors.white,
+            child: const Center(child: CircularProgressIndicator())),
         error: (error, stack) {
           return Center(child: Text('Error loading queue: $error'));
         },

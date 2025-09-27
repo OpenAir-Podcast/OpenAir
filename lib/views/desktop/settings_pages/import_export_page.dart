@@ -130,376 +130,386 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
           automaticExportDatabase = importExportData['autoBackup'] ?? true;
 
-          return Column(
-            spacing: settingsSpacer,
-            children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('database'),
-                  style: TextStyle(color: Colors.blueGrey),
+          return SingleChildScrollView(
+            child: Column(
+              spacing: settingsSpacer,
+              children: [
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('database'),
+                    style: TextStyle(color: Colors.blueGrey),
+                  ),
+                  trailing: SizedBox(
+                    width: 200.0,
+                  ),
                 ),
-                trailing: SizedBox(
-                  width: 200.0,
+                ListTile(
+                  title: Text(Translations.of(context).text('importDatabase')),
+                  subtitle: Text(
+                    Translations.of(context).text('importDatabaseSubtitle'),
+                  ),
+                  onTap: importDatabase,
                 ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('importDatabase')),
-                subtitle: Text(
-                  Translations.of(context).text('importDatabaseSubtitle'),
-                ),
-                onTap: importDatabase,
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('exportDatabase')),
-                subtitle: Text(
-                  Translations.of(context).text('exportDatabaseSubtitle'),
-                ),
-                onTap: () {
-                  exportDatabase(context);
+                ListTile(
+                  title: Text(Translations.of(context).text('exportDatabase')),
+                  subtitle: Text(
+                    Translations.of(context).text('exportDatabaseSubtitle'),
+                  ),
+                  onTap: () {
+                    exportDatabase(context);
 
-                  if (mounted) {
-                    if (!Platform.isAndroid && !Platform.isIOS) {
-                      ref.read(notificationServiceProvider).showNotification(
-                            'OpenAir ${Translations.of(context).text('notification')}',
-                            Translations.of(context).text('databaseExported'),
-                          );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            Translations.of(context).text('databaseExported'),
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-              ListTile(
-                title: Text(
-                    Translations.of(context).text('automaticExportDatabase')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [
-                    automaticExportDatabase,
-                    !automaticExportDatabase
-                  ],
-                  onPressed: (int index) {
-                    setState(() {
-                      automaticExportDatabase = !automaticExportDatabase;
-                      importExportData['autoBackup'] = automaticExportDatabase;
-                      automaticExportDatabaseConfig = automaticExportDatabase;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveImportExportSettings(importExportData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('opml'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('importOpml')),
-                subtitle: Text(
-                  Translations.of(context).text('importOpmlSubtitle'),
-                ),
-                onTap: importOpml,
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('exportOpml')),
-                subtitle: Text(
-                  Translations.of(context).text('exportOpmlSubtitle'),
-                ),
-                onTap: () {
-                  exportOpml(context);
-
-                  if (mounted) {
-                    if (!Platform.isAndroid && !Platform.isIOS) {
-                      ref.read(notificationServiceProvider).showNotification(
-                            'OpenAir ${Translations.of(context).text('notification')}',
-                            Translations.of(context).text('opmlExported'),
-                          );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            Translations.of(context).text('opmlExported'),
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('rssUrl'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('addPodcastByRssUrl'),
-                ),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) {
-                    TextEditingController textInputControl =
-                        TextEditingController();
-
-                    return AlertDialog(
-                      title: Text(
-                        Translations.of(context).text('addPodcastByRssUrl'),
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        child: TextField(
-                          maxLength: 256,
-                          autofocus: true,
-                          controller: textInputControl,
-                          keyboardType: TextInputType.url,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          decoration: InputDecoration(
-                            icon: Icon(
-                              Icons.link_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            labelText: Translations.of(context).text('rssUrl'),
-                            suffix: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  textInputControl.text = '';
-                                  textInputControl.clear();
-                                });
-                              },
-                              icon: Icon(Icons.clear_rounded),
-                            ),
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              Translations.of(context).text('cancel'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-
-                              if (textInputControl.text.isEmpty) {
-                                return;
-                              }
-
-                              bool i = await ref
-                                  .watch(audioProvider)
-                                  .addPodcastByRssUrl(textInputControl.text);
-
-                              if (context.mounted) {
-                                if (i == true) {
-                                  if (mounted) {
-                                    if (!Platform.isAndroid &&
-                                        !Platform.isIOS) {
-                                      ref
-                                          .read(notificationServiceProvider)
-                                          .showNotification(
-                                            'OpenAir ${Translations.of(context).text('notification')}',
-                                            Translations.of(context)
-                                                .text('subscribed'),
-                                          );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            Translations.of(context)
-                                                .text('subscribed'),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    if (!Platform.isAndroid &&
-                                        !Platform.isIOS) {
-                                      ref
-                                          .read(notificationServiceProvider)
-                                          .showNotification(
-                                            'OpenAir ${Translations.of(context).text('notification')}',
-                                            Translations.of(context)
-                                                .text('errorAddingPodcast'),
-                                          );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            Translations.of(context)
-                                                .text('errorAddingPodcast'),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            child: Text(
-                              Translations.of(context).text('add'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('userData'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('deleteAllEpisode'),
-                ),
-                subtitle: Text(
-                  Translations.of(context).text('deleteAllEpisodeSubtitle'),
-                ),
-                onTap: () async {
-                  final bool? shouldDelete = await showDialog<bool>(
-                    context: context,
-                    builder: (BuildContext dialogContext) => AlertDialog(
-                      title: Text(
-                        Translations.of(context).text('deleteAllEpisode'),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      content: Text(
-                        Translations.of(context).text(
-                          'deleteAllEpisodeConfirmation',
-                        ),
-                        style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.black87,
-                          fontSize: 16,
-                        ),
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text(Translations.of(context).text('cancel')),
-                          onPressed: () {
-                            Navigator.of(dialogContext)
-                                .pop(false); // Dismiss the dialog
-                          },
-                        ),
-                        TextButton(
-                          child: Text(
-                            Translations.of(context).text('delete'),
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(dialogContext)
-                                .pop(true); // Dismiss the dialog
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-
-                  if (shouldDelete == true) {
-                    await ref
-                        .read(openAirProvider)
-                        .hiveService
-                        .deleteEpisodes();
-
-                    if (context.mounted) {
+                    if (mounted) {
                       if (!Platform.isAndroid && !Platform.isIOS) {
                         ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
-                              Translations.of(context)
-                                  .text('allPodcastsCleared'),
+                              Translations.of(context).text('databaseExported'),
                             );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              Translations.of(context)
-                                  .text('allPodcastsCleared'),
+                              Translations.of(context).text('databaseExported'),
                             ),
                           ),
                         );
                       }
                     }
-                  }
-                },
-              ),
-            ],
+                  },
+                ),
+                ListTile(
+                  title: Text(
+                      Translations.of(context).text('automaticExportDatabase')),
+                  trailing: SizedBox(
+                      child: ToggleButtons(
+                    isSelected: [
+                      automaticExportDatabase,
+                      !automaticExportDatabase
+                    ],
+                    onPressed: (int index) {
+                      setState(() {
+                        automaticExportDatabase = !automaticExportDatabase;
+                        importExportData['autoBackup'] =
+                            automaticExportDatabase;
+                        automaticExportDatabaseConfig = automaticExportDatabase;
+
+                        ref
+                            .watch(openAirProvider)
+                            .hiveService
+                            .saveImportExportSettings(importExportData);
+                      });
+                    },
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          Translations.of(context).text('on'),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          Translations.of(context).text('off'),
+                        ),
+                      ),
+                    ],
+                  )),
+                ),
+                Divider(),
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('opml'),
+                    style: TextStyle(color: Colors.blueGrey),
+                  ),
+                  trailing: SizedBox(
+                    width: 200.0,
+                  ),
+                ),
+                ListTile(
+                  title: Text(Translations.of(context).text('importOpml')),
+                  subtitle: Text(
+                    Translations.of(context).text('importOpmlSubtitle'),
+                  ),
+                  onTap: importOpml,
+                ),
+                ListTile(
+                  title: Text(Translations.of(context).text('exportOpml')),
+                  subtitle: Text(
+                    Translations.of(context).text('exportOpmlSubtitle'),
+                  ),
+                  onTap: () {
+                    exportOpml(context);
+
+                    if (mounted) {
+                      if (!Platform.isAndroid && !Platform.isIOS) {
+                        ref.read(notificationServiceProvider).showNotification(
+                              'OpenAir ${Translations.of(context).text('notification')}',
+                              Translations.of(context).text('opmlExported'),
+                            );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              Translations.of(context).text('opmlExported'),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('rssUrl'),
+                    style: TextStyle(color: Colors.blueGrey),
+                  ),
+                  trailing: SizedBox(
+                    width: 200.0,
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('addPodcastByRssUrl'),
+                  ),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) {
+                      TextEditingController textInputControl =
+                          TextEditingController();
+
+                      return AlertDialog(
+                        title: Text(
+                          Translations.of(context).text('addPodcastByRssUrl'),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        content: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: TextField(
+                            maxLength: 256,
+                            autofocus: true,
+                            controller: textInputControl,
+                            keyboardType: TextInputType.url,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              icon: Icon(
+                                Icons.link_rounded,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              labelText:
+                                  Translations.of(context).text('rssUrl'),
+                              suffix: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    textInputControl.text = '';
+                                    textInputControl.clear();
+                                  });
+                                },
+                                icon: Icon(Icons.clear_rounded),
+                              ),
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                Translations.of(context).text('cancel'),
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: TextButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+
+                                if (textInputControl.text.isEmpty) {
+                                  return;
+                                }
+
+                                bool i = await ref
+                                    .watch(audioProvider)
+                                    .addPodcastByRssUrl(textInputControl.text);
+
+                                if (context.mounted) {
+                                  if (i == true) {
+                                    if (mounted) {
+                                      if (!Platform.isAndroid &&
+                                          !Platform.isIOS) {
+                                        ref
+                                            .read(notificationServiceProvider)
+                                            .showNotification(
+                                              'OpenAir ${Translations.of(context).text('notification')}',
+                                              Translations.of(context)
+                                                  .text('subscribed'),
+                                            );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              Translations.of(context)
+                                                  .text('subscribed'),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } else {
+                                    if (mounted) {
+                                      if (!Platform.isAndroid &&
+                                          !Platform.isIOS) {
+                                        ref
+                                            .read(notificationServiceProvider)
+                                            .showNotification(
+                                              'OpenAir ${Translations.of(context).text('notification')}',
+                                              Translations.of(context)
+                                                  .text('errorAddingPodcast'),
+                                            );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              Translations.of(context)
+                                                  .text('errorAddingPodcast'),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              child: Text(
+                                Translations.of(context).text('add'),
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                Divider(),
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('userData'),
+                    style: TextStyle(color: Colors.blueGrey),
+                  ),
+                  trailing: SizedBox(
+                    width: 200.0,
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    Translations.of(context).text('deleteAllEpisode'),
+                  ),
+                  subtitle: Text(
+                    Translations.of(context).text('deleteAllEpisodeSubtitle'),
+                  ),
+                  onTap: () async {
+                    final bool? shouldDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext dialogContext) => AlertDialog(
+                        title: Text(
+                          Translations.of(context).text('deleteAllEpisode'),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        content: Text(
+                          Translations.of(context).text(
+                            'deleteAllEpisodeConfirmation',
+                          ),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.black87,
+                            fontSize: 16,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child:
+                                Text(Translations.of(context).text('cancel')),
+                            onPressed: () {
+                              Navigator.of(dialogContext)
+                                  .pop(false); // Dismiss the dialog
+                            },
+                          ),
+                          TextButton(
+                            child: Text(
+                              Translations.of(context).text('delete'),
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(dialogContext)
+                                  .pop(true); // Dismiss the dialog
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldDelete == true) {
+                      await ref
+                          .read(openAirProvider)
+                          .hiveService
+                          .deleteEpisodes();
+
+                      if (context.mounted) {
+                        if (!Platform.isAndroid && !Platform.isIOS) {
+                          ref
+                              .read(notificationServiceProvider)
+                              .showNotification(
+                                'OpenAir ${Translations.of(context).text('notification')}',
+                                Translations.of(context)
+                                    .text('allPodcastsCleared'),
+                              );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                Translations.of(context)
+                                    .text('allPodcastsCleared'),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
           );
         },
         error: (error, stackTrace) {

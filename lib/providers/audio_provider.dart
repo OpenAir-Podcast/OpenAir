@@ -21,6 +21,7 @@ import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
@@ -411,6 +412,7 @@ class AudioProvider extends ChangeNotifier {
       await hiveService.addToDownloads(downloadModel);
 
       ref.invalidate(sortedDownloadsProvider);
+      ref.invalidate(downloadsCountProvider);
 
       if (context != null && context.mounted) {
         if (!Platform.isAndroid && !Platform.isIOS) {
@@ -1148,6 +1150,7 @@ class AudioProvider extends ChangeNotifier {
       );
     }
 
+    ref.invalidate(feedCountProvider);
     notifyListeners();
   }
 
