@@ -23,6 +23,12 @@ class DownloadsPage extends ConsumerStatefulWidget {
 
 class _DownloadsState extends ConsumerState<DownloadsPage> {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ref.invalidate(getDownloadsProvider);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final AsyncValue<List<DownloadModel>> getEpisodesValue =
         ref.watch(getDownloadsProvider);

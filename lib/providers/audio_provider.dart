@@ -17,7 +17,6 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
-import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
@@ -290,7 +289,6 @@ class AudioProvider extends ChangeNotifier {
 
       final hiveService = ref.read(hiveServiceProvider);
       hiveService.clearDownloads();
-      ref.invalidate(getDownloadsProvider);
 
       if (context.mounted) {
         if (!Platform.isAndroid && !Platform.isIOS) {

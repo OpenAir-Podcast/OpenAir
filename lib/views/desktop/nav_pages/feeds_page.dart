@@ -5,7 +5,6 @@ import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
@@ -30,7 +29,6 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     ref.invalidate(getFeedsProvider);
-    debugPrint(ref.watch(hiveServiceProvider).episodesList.toString());
   }
 
   @override

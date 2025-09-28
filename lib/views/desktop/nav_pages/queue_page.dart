@@ -14,7 +14,7 @@ import 'package:openair/views/desktop/widgets/queue_card.dart';
 // FutureProvider for sorted Queue List
 final sortedProvider = FutureProvider(
   (ref) {
-    final hiveService = ref.watch(openAirProvider).hiveService;
+    final hiveService = ref.read(openAirProvider).hiveService;
     return hiveService.getQueue();
   },
 );
@@ -29,7 +29,7 @@ class QueuePage extends ConsumerStatefulWidget {
 class _QueuePageState extends ConsumerState<QueuePage> {
   @override
   Widget build(BuildContext context) {
-    final queueStream = ref.watch(sortedProvider);
+    final queueStream = ref.read(sortedProvider);
 
     final isPodcastSelected =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
@@ -77,7 +77,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
 
-                        ref.read(openAirProvider).hiveService.clearQueue();
+                        setState(() {
+                          ref.read(openAirProvider).hiveService.clearQueue();
+                        });
 
                         if (context.mounted) {
                           if (!Platform.isAndroid && !Platform.isIOS) {

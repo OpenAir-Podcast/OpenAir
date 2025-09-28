@@ -88,6 +88,7 @@ class HiveService {
   late BuildContext context;
 
   final List<Map> episodesList = [];
+  final List<DownloadModel> queueList = [];
 
   Future<void> initial(BuildContext context) async {
     // Register all adapters
@@ -656,15 +657,14 @@ class HiveService {
   Future<List<DownloadModel>> getSortedDownloads() async {
     final box = await downloadBox;
     final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
-    final List<DownloadModel> episodesList = [];
 
     for (final entry in allEpisodes.entries) {
-      episodesList.add(entry.value);
+      queueList.add(entry.value);
     }
     // Sort the list by datePublished in descending order (newest first)
-    episodesList.sort((a, b) => b.downloadDate.compareTo(a.downloadDate));
+    queueList.sort((a, b) => b.downloadDate.compareTo(a.downloadDate));
 
-    return episodesList;
+    return queueList;
   }
 
   Future<List<HistoryModel>> getSortedHistory() async {
@@ -689,6 +689,8 @@ class HiveService {
   Future<void> clearDownloads() async {
     final box = await downloadBox;
     await box.clear();
+    queueList.clear();
+    ref.invalidate(getDownloadsProvider);
   }
 
   // History Operations:
