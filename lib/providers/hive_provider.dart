@@ -690,7 +690,6 @@ class HiveService {
     final box = await downloadBox;
     await box.clear();
     queueList.clear();
-    ref.invalidate(getDownloadsProvider);
   }
 
   // History Operations:

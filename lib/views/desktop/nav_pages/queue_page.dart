@@ -32,10 +32,10 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     final queueStream = ref.read(sortedProvider);
 
     final isPodcastSelected =
-        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+        ref.read(audioProvider.select((p) => p.isPodcastSelected));
 
     final currentPlayingGuid =
-        ref.watch(audioProvider.select((p) => p.currentEpisode?['guid']));
+        ref.read(audioProvider.select((p) => p.currentEpisode?['guid']));
 
     return Scaffold(
       appBar: AppBar(
@@ -77,9 +77,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
 
-                        setState(() {
-                          ref.read(openAirProvider).hiveService.clearQueue();
-                        });
+                        ref.read(openAirProvider).hiveService.clearQueue();
+                        ref.invalidate(sortedProvider);
 
                         if (context.mounted) {
                           if (!Platform.isAndroid && !Platform.isIOS) {

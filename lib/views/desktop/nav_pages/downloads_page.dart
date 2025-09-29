@@ -93,6 +93,8 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                                   .read(audioProvider)
                                   .removeAllDownloadedPodcasts(context);
 
+                              // FIXME Does not refresh when all the episodes are removed
+
                               ref.invalidate(getDownloadsProvider);
                             },
                           ),

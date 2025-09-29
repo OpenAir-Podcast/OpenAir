@@ -288,7 +288,7 @@ class AudioProvider extends ChangeNotifier {
       }
 
       final hiveService = ref.read(hiveServiceProvider);
-      hiveService.clearDownloads();
+      await hiveService.clearDownloads();
 
       if (context.mounted) {
         if (!Platform.isAndroid && !Platform.isIOS) {
@@ -983,7 +983,7 @@ class AudioProvider extends ChangeNotifier {
 
   void removeFromQueue(String guid) async {
     final hiveService = ref.read(hiveServiceProvider);
-    hiveService.removeFromQueue(guid: guid);
+    await hiveService.removeFromQueue(guid: guid);
     ref.invalidate(sortedProvider);
     ref.invalidate(getQueueProvider);
     notifyListeners();
