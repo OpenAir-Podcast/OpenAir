@@ -13,6 +13,7 @@ import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:openair/views/desktop/widgets/subscription_card.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
 import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
@@ -130,17 +131,20 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                     ),
                                     onPressed: () async {
                                       Navigator.of(dialogContext).pop();
+
                                       await ref
                                           .read(openAirProvider)
                                           .hiveService
                                           .deleteSubscriptions();
 
                                       ref.invalidate(subscriptionsProvider);
-                                      ref.invalidate(
-                                          getSubscriptionsCountProvider);
+                                      ref.invalidate(subCountProvider);
 
-                                      ref.invalidate(feedCountProvider);
                                       ref.invalidate(getFeedsProvider);
+                                      ref.invalidate(feedCountProvider);
+
+                                      ref.invalidate(getInboxProvider);
+                                      ref.invalidate(inboxCountProvider);
 
                                       if (context.mounted) {
                                         if (!Platform.isAndroid &&

@@ -8,6 +8,9 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
+import 'package:openair/views/mobile/nav_pages/inbox_page.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
@@ -132,7 +135,15 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                           .read(openAirProvider)
                                           .hiveService
                                           .deleteSubscriptions();
+
                                       ref.invalidate(subscriptionsProvider);
+                                      ref.invalidate(subCountProvider);
+
+                                      ref.invalidate(getFeedsProvider);
+                                      ref.invalidate(feedCountProvider);
+
+                                      ref.invalidate(getInboxProvider);
+                                      ref.invalidate(inboxCountProvider);
 
                                       if (context.mounted) {
                                         if (!Platform.isAndroid &&

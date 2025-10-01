@@ -21,7 +21,6 @@ import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
-import 'package:openair/views/mobile/nav_pages/queue_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -32,28 +31,26 @@ final hiveServiceProvider = Provider<HiveService>(
   (ref) => HiveService(ref),
 );
 
-// StreamProvider for Subscriptions
 final subscriptionsProvider =
-    StreamProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async* {
+    FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
   final hiveService = ref.watch(hiveServiceProvider);
   final box = await hiveService.subscriptionBox;
 
   // Emit the initial state
-  yield await box.getAllValues();
+  return await box.getAllValues();
 });
 
-// FutureProvider for sorted Queue List
-final getQueueProvider = StreamProvider.autoDispose(
-  (ref) async* {
-    final hiveService = ref.watch(hiveServiceProvider);
-    yield* hiveService.getQueue().asStream();
-  },
-);
+final getQueueProvider = FutureProvider.autoDispose((ref) async {
+  final hiveService = ref.watch(hiveServiceProvider);
+  final box = await hiveService.queueBox;
 
-final sortedDownloadsProvider = StreamProvider.autoDispose<List<DownloadModel>>(
-  (ref) async* {
+  return await box.getAllValues();
+});
+
+final sortedDownloadsProvider = FutureProvider.autoDispose<List<DownloadModel>>(
+  (ref) async {
     final hiveService = ref.watch(hiveServiceProvider);
-    yield* hiveService.getSortedDownloads().asStream();
+    return hiveService.getSortedDownloads();
   },
 );
 
@@ -371,7 +368,7 @@ class HiveService {
     await feedBox.clear();
 
     final epiBox = await episodeBox;
-    epiBox.clear();
+    await epiBox.clear();
 
     episodesList.clear();
   }
@@ -572,8 +569,6 @@ class HiveService {
   Future<void> clearQueue() async {
     final box = await queueBox;
     await box.clear();
-
-    ref.invalidate(sortedProvider);
   }
 
   Future<void> addEpisodeToQueue(Map episode, Map podcast) async {

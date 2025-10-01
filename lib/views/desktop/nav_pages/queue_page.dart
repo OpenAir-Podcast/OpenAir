@@ -10,11 +10,12 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:openair/views/desktop/widgets/queue_card.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 // FutureProvider for sorted Queue List
-final sortedProvider = FutureProvider(
+final sortedProvider = FutureProvider.autoDispose(
   (ref) {
-    final hiveService = ref.read(openAirProvider).hiveService;
+    final hiveService = ref.watch(openAirProvider).hiveService;
     return hiveService.getQueue();
   },
 );
@@ -29,13 +30,13 @@ class QueuePage extends ConsumerStatefulWidget {
 class _QueuePageState extends ConsumerState<QueuePage> {
   @override
   Widget build(BuildContext context) {
-    final queueStream = ref.read(sortedProvider);
+    final queueStream = ref.watch(sortedProvider);
 
     final isPodcastSelected =
-        ref.read(audioProvider.select((p) => p.isPodcastSelected));
+        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
 
     final currentPlayingGuid =
-        ref.read(audioProvider.select((p) => p.currentEpisode?['guid']));
+        ref.watch(audioProvider.select((p) => p.currentEpisode?['guid']));
 
     return Scaffold(
       appBar: AppBar(
@@ -77,8 +78,14 @@ class _QueuePageState extends ConsumerState<QueuePage> {
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
 
-                        ref.read(openAirProvider).hiveService.clearQueue();
+                        await ref
+                            .read(openAirProvider)
+                            .hiveService
+                            .clearQueue();
+
+                        ref.invalidate(queueCountProvider);
                         ref.invalidate(sortedProvider);
+                        ref.invalidate(inboxCountProvider);
 
                         if (context.mounted) {
                           if (!Platform.isAndroid && !Platform.isIOS) {

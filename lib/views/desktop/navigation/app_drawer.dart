@@ -32,17 +32,17 @@ final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
 });
 
 final inboxCountProvider = FutureProvider.autoDispose<int>((ref) async {
-  return await ref.read(openAirProvider).getInboxCount();
+  return await ref.watch(openAirProvider).getInboxCount();
 });
 
 final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
   // Watch hiveServiceProvider as queue counts depend on Hive data
-  return await ref.read(openAirProvider).getQueueCount();
+  return await ref.watch(openAirProvider).getQueueCount();
 });
 
 final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   // Watch hiveServiceProvider as queue counts depend on Hive data
-  return await ref.read(openAirProvider).getDownloadsCount();
+  return await ref.watch(openAirProvider).getDownloadsCount();
 });
 
 class AppDrawer extends ConsumerStatefulWidget {

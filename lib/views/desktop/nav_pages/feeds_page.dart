@@ -9,6 +9,7 @@ import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/widgets/feeds_episode_card.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
   // Feeds data comes from subscribed episodes in Hive.
@@ -57,6 +58,8 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                         .updateSubscriptions();
 
                     ref.invalidate(getFeedsProvider);
+                    ref.invalidate(feedCountProvider);
+                    ref.invalidate(inboxCountProvider);
                   },
                 ),
               ),

@@ -253,6 +253,8 @@ class _DesktopDrawer extends ConsumerWidget {
                   title: Text(Translations.of(context).text('feeds')),
                   trailing: Text(data),
                   onTap: () {
+                    ref.invalidate(feedCountProvider);
+                    ref.invalidate(getFeedsProvider);
                     onPageSelected(FeedsPage());
                   },
                 ),
@@ -309,6 +311,8 @@ class _DesktopDrawer extends ConsumerWidget {
                   title: Text(Translations.of(context).text('queue')),
                   trailing: Text(data),
                   onTap: () {
+                    ref.invalidate(queueCountProvider);
+                    ref.invalidate(sortedProvider);
                     onPageSelected(QueuePage());
                   },
                 ),
