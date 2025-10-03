@@ -8,11 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/responsive/desktop_scaffold.dart';
 import 'package:openair/responsive/mobile_scaffold.dart';
 import 'package:openair/responsive/responsive_layout.dart';
-import 'package:openair/views/mobile/settings_pages/user_interface_page.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:openair/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -21,6 +21,25 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Translations.support(
+    [
+      Localization.ar_AE, // Arabic (UAE)
+      Localization.de_DE, // Germany
+      Localization.es_ES, // Spain
+      Localization.en_US, // United States
+      Localization.fr_FR, // France
+      Localization.he_IL, // Israel
+      Localization.it_IT, // Italy
+      Localization.ja_JP, // Japan
+      Localization.ko_KR, // South Korea
+      Localization.nl_NL, // Netherlands
+      Localization.pt_PT, // Portugal
+      Localization.ru_RU, // Russia
+      Localization.sv_SE, // Sweden
+      Localization.zh_CN, // China
+    ],
+  );
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
@@ -85,25 +104,6 @@ class _MyAppState extends ConsumerState<MyApp> {
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
-          Translations.support(
-            [
-              Localization.ar_AE, // Arabic (UAE)
-              Localization.de_DE, // Germany
-              Localization.es_ES, // Spain
-              Localization.en_US, // United States
-              Localization.fr_FR, // France
-              Localization.he_IL, // Israel
-              Localization.it_IT, // Italy
-              Localization.ja_JP, // Japan
-              Localization.ko_KR, // South Korea
-              Localization.nl_NL, // Netherlands
-              Localization.pt_PT, // Portugal
-              Localization.ru_RU, // Russia
-              Localization.sv_SE, // Sweden
-              Localization.zh_CN, // China
-            ],
-          );
-
           return ThemeProvider(
             defaultThemeId: 'blue_accent_light_medium',
             saveThemesOnChange: true,
@@ -263,6 +263,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return MaterialApp(
+                      locale: const Locale('en', 'US'),
                       supportedLocales: Translations.supportedLocales,
                       localizationsDelegates: const [
                         LocalizationsPlusDelegate(),
@@ -271,58 +272,30 @@ class _MyAppState extends ConsumerState<MyApp> {
                       debugShowCheckedModeBanner: false,
                       title: 'OpenAir',
                       theme: themeData,
-                      home: Scaffold(
+                      home: const Scaffold(
                         body: Center(child: CircularProgressIndicator()),
                       ),
                     );
                   }
 
-                  // Load user interface settings
-                  AsyncValue<Map?> userInterfaceSettings =
-                      ref.watch(userInterfaceSettingsDataProvider);
-
-                  Future.delayed(
-                    const Duration(milliseconds: 5000),
-                  );
-
-                  return MaterialApp(
-                    supportedLocales: Translations.supportedLocales,
-                    localizationsDelegates: const [
-                      LocalizationsPlusDelegate(),
-                      FallbackCupertinoLocalizationsDelegate()
-                    ],
-                    debugShowCheckedModeBanner: false,
-                    title: 'OpenAir',
-                    theme: themeData,
-                    home: userInterfaceSettings.when(
-                      data: (data) {
-                        Translations.changeLanguage(data!['locale']);
-
-                        return const ResponsiveLayout(
-                          mobileScaffold: MobileScaffold(),
-                          desktopScaffold: DesktopScaffold(),
-                        );
-                      },
-                      error: (error, stackTrace) {
-                        debugPrint(
-                            'Error loading user interface settings: $error\n$stackTrace');
-
-                        return Scaffold(
-                          body: Center(
-                            child: Text(
-                                textAlign: TextAlign.center,
-                                'Error loading user interface settings: $error\n$stackTrace',
-                                style: TextStyle(
-                                  color: Colors.red[700],
-                                )),
-                          ),
-                        );
-                      },
-                      loading: () => Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
+                  return Consumer(builder: (context, ref, _) {
+                    final locale = ref.watch(localeProvider);
+                    return MaterialApp(
+                      locale: locale,
+                      supportedLocales: Translations.supportedLocales,
+                      localizationsDelegates: const [
+                        LocalizationsPlusDelegate(),
+                        FallbackCupertinoLocalizationsDelegate()
+                      ],
+                      debugShowCheckedModeBanner: false,
+                      title: 'OpenAir',
+                      theme: themeData,
+                      home: const ResponsiveLayout(
+                        mobileScaffold: MobileScaffold(),
+                        desktopScaffold: DesktopScaffold(),
                       ),
-                    ),
-                  );
+                    );
+                  });
                 },
               ),
             ),

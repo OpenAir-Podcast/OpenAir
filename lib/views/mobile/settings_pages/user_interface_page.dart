@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -473,89 +474,92 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontWeight: FontWeight.w400,
                     ),
                     value: language,
-                    onChanged: (String? newValue) {
-                      String saveValue;
-                      String locale;
-
-                      if (newValue ==
-                          Translations.of(context).text('english')) {
-                        saveValue = 'English';
-                        locale = Localization.en_US;
-                      } else if (newValue ==
-                          Translations.of(context).text('spanish')) {
-                        saveValue = 'Spanish';
-                        locale = Localization.es_ES;
-                      } else if (newValue ==
-                          Translations.of(context).text('french')) {
-                        saveValue = 'French';
-                        locale = Localization.fr_FR;
-                      } else if (newValue ==
-                          Translations.of(context).text('german')) {
-                        saveValue = 'German';
-                        locale = Localization.de_DE;
-                      } else if (newValue ==
-                          Translations.of(context).text('italian')) {
-                        saveValue = 'Italian';
-                        locale = Localization.it_IT;
-                      } else if (newValue ==
-                          Translations.of(context).text('portuguese')) {
-                        saveValue = 'Portuguese';
-                        locale = Localization.pt_PT;
-                      } else if (newValue ==
-                          Translations.of(context).text('russian')) {
-                        saveValue = 'Russian';
-                        locale = Localization.ru_RU;
-                      } else if (newValue ==
-                          Translations.of(context).text('chinese')) {
-                        saveValue = 'Chinese';
-                        locale = Localization.zh_CN;
-                      } else if (newValue ==
-                          Translations.of(context).text('japanese')) {
-                        saveValue = 'Japanese';
-                        locale = Localization.ja_JP;
-                      } else if (newValue ==
-                          Translations.of(context).text('korean')) {
-                        saveValue = 'Korean';
-                        locale = Localization.ko_KR;
-                      } else if (newValue ==
-                          Translations.of(context).text('arabic')) {
-                        saveValue = 'Arabic';
-                        locale = Localization.ar_AE;
-                      } else if (newValue ==
-                          Translations.of(context).text('hebrew')) {
-                        saveValue = 'Hebrew';
-                        locale = Localization.he_IL;
-                      } else if (newValue ==
-                          Translations.of(context).text('dutch')) {
-                        saveValue = 'Dutch';
-                        locale = Localization.nl_NL;
-                      } else if (newValue ==
-                          Translations.of(context).text('swedish')) {
-                        saveValue = 'Swedish';
-                        locale = Localization.sv_SE;
-                      } else {
-                        saveValue = 'English';
-                        locale = Localization.en_US;
-                      }
-
-                      setState(() {
-                        userInterface['language'] = saveValue;
-                        userInterface['locale'] = locale;
-                        languageConfig = userInterface['language'];
-                        localeConfig = userInterface['locale'];
-
-                        localeSettings = locale;
-                        onChanged = false;
-
-                        Translations.changeLanguage(locale);
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveUserInterfaceSettings(userInterface);
-                      });
-                    },
-                    items: <String>[
+                                          onChanged: (String? newValue) {
+                                            String saveValue;
+                                            String locale;
+                    
+                                            if (newValue ==
+                                                Translations.of(context).text('english')) {
+                                              saveValue = 'English';
+                                              locale = Localization.en_US;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('spanish')) {
+                                              saveValue = 'Spanish';
+                                              locale = Localization.es_ES;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('french')) {
+                                              saveValue = 'French';
+                                              locale = Localization.fr_FR;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('german')) {
+                                              saveValue = 'German';
+                                              locale = Localization.de_DE;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('italian')) {
+                                              saveValue = 'Italian';
+                                              locale = Localization.it_IT;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('portuguese')) {
+                                              saveValue = 'Portuguese';
+                                              locale = Localization.pt_PT;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('russian')) {
+                                              saveValue = 'Russian';
+                                              locale = Localization.ru_RU;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('chinese')) {
+                                              saveValue = 'Chinese';
+                                              locale = Localization.zh_CN;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('japanese')) {
+                                              saveValue = 'Japanese';
+                                              locale = Localization.ja_JP;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('korean')) {
+                                              saveValue = 'Korean';
+                                              locale = Localization.ko_KR;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('arabic')) {
+                                              saveValue = 'Arabic';
+                                              locale = Localization.ar_AE;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('hebrew')) {
+                                              saveValue = 'Hebrew';
+                                              locale = Localization.he_IL;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('dutch')) {
+                                              saveValue = 'Dutch';
+                                              locale = Localization.nl_NL;
+                                            } else if (newValue ==
+                                                Translations.of(context).text('swedish')) {
+                                              saveValue = 'Swedish';
+                                              locale = Localization.sv_SE;
+                                            } else {
+                                              saveValue = 'English';
+                                              locale = Localization.en_US;
+                                            }
+                    
+                                            setState(() {
+                                              userInterface['language'] = saveValue;
+                                              userInterface['locale'] = locale;
+                                              languageConfig = userInterface['language'];
+                                              localeConfig = userInterface['locale'];
+                    
+                                              final localeParts = locale.split('_');
+                                              final languageCode = localeParts[0];
+                                              final countryCode = localeParts[1];
+                                              final newLocale =
+                                                  Locale(languageCode, countryCode);
+                                              ref
+                                                  .read(localeProvider.notifier)
+                                                  .setLocale(newLocale);
+                    
+                                              ref
+                                                  .watch(openAirProvider)
+                                                  .hiveService
+                                                  .saveUserInterfaceSettings(userInterface);
+                                            });
+                                          },                    items: <String>[
                       Translations.of(context).text('english'),
                       Translations.of(context).text('spanish'),
                       Translations.of(context).text('french'),

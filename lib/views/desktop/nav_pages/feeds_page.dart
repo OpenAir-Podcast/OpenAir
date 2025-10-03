@@ -57,7 +57,6 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                         .hiveService
                         .updateSubscriptions();
 
-                    ref.invalidate(getFeedsProvider);
                     ref.invalidate(feedCountProvider);
                     ref.invalidate(inboxCountProvider);
                   },

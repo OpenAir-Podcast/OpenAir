@@ -13,7 +13,12 @@ import 'package:openair/views/desktop/settings_pages/synchronization_page.dart';
 import 'package:openair/views/desktop/settings_pages/user_interface_page.dart';
 
 class Settings extends ConsumerStatefulWidget {
-  const Settings({super.key});
+  final Function() rebuildDrawer;
+
+  const Settings({
+    super.key,
+    required this.rebuildDrawer,
+  });
 
   @override
   ConsumerState createState() => _SettingsState();
@@ -58,6 +63,7 @@ class _SettingsState extends ConsumerState<Settings> {
               )
                   .then(
                 (value) {
+                  widget.rebuildDrawer();
                   setState(() {});
                 },
               ),

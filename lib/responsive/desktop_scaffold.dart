@@ -3,6 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/desktop/main_pages/categories_page.dart';
 import 'package:openair/views/desktop/main_pages/featured_page.dart';
@@ -18,7 +19,7 @@ import 'package:openair/views/desktop/nav_pages/queue_page.dart';
 import 'package:openair/views/desktop/nav_pages/settings_page.dart';
 import 'package:openair/views/desktop/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
-import 'package:openair/views/desktop/navigation/app_drawer.dart';
+import 'package:openair/views/mobile/navigation/app_drawer.dart';
 
 class DesktopScaffold extends ConsumerStatefulWidget {
   const DesktopScaffold({super.key});
@@ -49,6 +50,10 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
         _content = content;
       }
     });
+  }
+
+  void rebuildDrawer() {
+    setState(() {});
   }
 
   Widget _buildMainContent() {
@@ -129,7 +134,10 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.zero,
             ),
-            child: _DesktopDrawer(onPageSelected: _handleNavigation),
+            child: _DesktopDrawer(
+              onPageSelected: _handleNavigation,
+              rebuildDrawer: rebuildDrawer,
+            ),
           ),
         ),
         Expanded(
@@ -141,23 +149,39 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
   }
 }
 
-class _DesktopDrawer extends ConsumerWidget {
-  final Function(Widget) onPageSelected;
+final getSessionProvider = FutureProvider.autoDispose((ref) async {
+  final supabaseService = ref.watch(supabaseServiceProvider);
+  return supabaseService.client.auth.currentUser;
+});
 
-  const _DesktopDrawer({required this.onPageSelected});
+class _DesktopDrawer extends ConsumerStatefulWidget {
+  final Function(Widget) onPageSelected;
+  final Function() rebuildDrawer;
+
+  const _DesktopDrawer({
+    required this.onPageSelected,
+    required this.rebuildDrawer,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DesktopDrawer> createState() => __DesktopDrawerState();
+}
+
+class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(localeProvider);
+
     final getSubCountValue = ref.watch(subCountProvider);
     final getFeedsCountValue = ref.watch(feedCountProvider);
     final getInboxCountValue = ref.watch(inboxCountProvider);
     final getQueueCountValue = ref.watch(queueCountProvider);
     final getDownloadsCountValue = ref.watch(downloadsCountProvider);
 
-    double circleSize = 90.0;
-
+    final session = ref.watch(getSessionProvider);
     final supabaseService = ref.watch(supabaseServiceProvider);
-    final session = supabaseService.client.auth.currentUser;
+
+    double circleSize = 90.0;
 
     return Column(
       children: [
@@ -176,23 +200,32 @@ class _DesktopDrawer extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    if (session == null) {
-                      onPageSelected(const LogIn());
-                    } else {
-                      supabaseService.signOut();
-                    }
+                session.when(
+                  data: (data) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        if (session.value == null) {
+                          widget.onPageSelected(const LogIn());
+                        } else {
+                          supabaseService.signOut();
+                          ref.invalidate(getSessionProvider);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      child: Text(
+                        session.value == null
+                            ? Translations.of(context).text('login')
+                            : Translations.of(context).text('logout'),
+                      ),
+                    );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                  error: (error, stackTrace) => Text(
+                    Translations.of(context).text('errorLoadingData'),
                   ),
-                  child: Text(
-                    session == null
-                        ? Translations.of(context).text('login')
-                        : Translations.of(context).text('logout'),
-                  ),
+                  loading: () => const CircularProgressIndicator(),
                 ),
               ],
             ),
@@ -206,7 +239,7 @@ class _DesktopDrawer extends ConsumerWidget {
                 leading: const Icon(Icons.home_rounded),
                 title: Text(Translations.of(context).text('home')),
                 onTap: () {
-                  onPageSelected(const Text('home'));
+                  widget.onPageSelected(const Text('home'));
                 },
               ),
               const Divider(),
@@ -229,7 +262,7 @@ class _DesktopDrawer extends ConsumerWidget {
                   title: Text(Translations.of(context).text('subscriptions')),
                   trailing: Text(data),
                   onTap: () {
-                    onPageSelected(SubscriptionsPage());
+                    widget.onPageSelected(SubscriptionsPage());
                   },
                 ),
               ),
@@ -255,7 +288,7 @@ class _DesktopDrawer extends ConsumerWidget {
                   onTap: () {
                     ref.invalidate(feedCountProvider);
                     ref.invalidate(getFeedsProvider);
-                    onPageSelected(FeedsPage());
+                    widget.onPageSelected(FeedsPage());
                   },
                 ),
               ),
@@ -279,7 +312,7 @@ class _DesktopDrawer extends ConsumerWidget {
                   title: Text(Translations.of(context).text('inbox')),
                   trailing: Text('$data'),
                   onTap: () {
-                    onPageSelected(InboxPage());
+                    widget.onPageSelected(InboxPage());
                   },
                 ),
               ),
@@ -288,7 +321,7 @@ class _DesktopDrawer extends ConsumerWidget {
                 leading: const Icon(Icons.favorite_rounded),
                 title: Text(Translations.of(context).text('favorites')),
                 onTap: () {
-                  onPageSelected(FavoritesPage());
+                  widget.onPageSelected(FavoritesPage());
                 },
               ),
               const Divider(),
@@ -313,7 +346,7 @@ class _DesktopDrawer extends ConsumerWidget {
                   onTap: () {
                     ref.invalidate(queueCountProvider);
                     ref.invalidate(sortedProvider);
-                    onPageSelected(QueuePage());
+                    widget.onPageSelected(QueuePage());
                   },
                 ),
               ),
@@ -337,7 +370,7 @@ class _DesktopDrawer extends ConsumerWidget {
                   title: Text(Translations.of(context).text('downloads')),
                   trailing: Text(data.toString()),
                   onTap: () {
-                    onPageSelected(DownloadsPage());
+                    widget.onPageSelected(DownloadsPage());
                   },
                 ),
               ),
@@ -346,7 +379,7 @@ class _DesktopDrawer extends ConsumerWidget {
                 leading: const Icon(Icons.history_rounded),
                 title: Text(Translations.of(context).text('history')),
                 onTap: () {
-                  onPageSelected(HistoryPage());
+                  widget.onPageSelected(HistoryPage());
                 },
               ),
               const Divider(),
@@ -354,7 +387,7 @@ class _DesktopDrawer extends ConsumerWidget {
                 leading: const Icon(Icons.add_rounded),
                 title: Text(Translations.of(context).text('addPodcast')),
                 onTap: () {
-                  onPageSelected(AddPodcastPage());
+                  widget.onPageSelected(AddPodcastPage());
                 },
               ),
             ],
@@ -365,7 +398,9 @@ class _DesktopDrawer extends ConsumerWidget {
           leading: const Icon(Icons.settings_rounded),
           title: Text(Translations.of(context).text('settings')),
           onTap: () {
-            onPageSelected(Settings());
+            widget.onPageSelected(Settings(
+              rebuildDrawer: widget.rebuildDrawer,
+            ));
           },
         ),
       ],

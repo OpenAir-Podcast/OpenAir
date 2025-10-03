@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,7 +18,6 @@ class SupabaseService {
         email: email,
         password: password,
       );
-      // .signUp(email: email, password: password);
     } on AuthException catch (e) {
       // Handle sign-in errors
       debugPrint('Sign-in error: ${e.message}');
@@ -56,7 +55,10 @@ class SupabaseService {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: redirectToString,
+        redirectTo: kIsWeb ? null : redirectToString,
+        authScreenLaunchMode: kIsWeb
+            ? LaunchMode.platformDefault
+            : LaunchMode.externalApplication,
       );
     } on AuthException catch (e) {
       debugPrint('Google sign-in error: ${e.message}');
@@ -71,7 +73,10 @@ class SupabaseService {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.github,
-        redirectTo: redirectToString,
+        redirectTo: kIsWeb ? null : redirectToString,
+        authScreenLaunchMode: kIsWeb
+            ? LaunchMode.platformDefault
+            : LaunchMode.externalApplication,
       );
     } on AuthException catch (e) {
       debugPrint('GitHub sign-in error: ${e.message}');

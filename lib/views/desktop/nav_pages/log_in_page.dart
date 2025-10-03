@@ -36,7 +36,7 @@ class _LogInState extends ConsumerState<LogIn> {
     final supabaseService = ref.watch(supabaseServiceProvider);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: Platform.isAndroid ? AppBar() : null,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Form(
