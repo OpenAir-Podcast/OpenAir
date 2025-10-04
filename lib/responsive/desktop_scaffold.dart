@@ -14,7 +14,7 @@ import 'package:openair/views/desktop/nav_pages/favorites_page.dart';
 import 'package:openair/views/desktop/nav_pages/feeds_page.dart';
 import 'package:openair/views/desktop/nav_pages/history_page.dart';
 import 'package:openair/views/desktop/nav_pages/inbox_page.dart';
-import 'package:openair/views/desktop/nav_pages/log_in_page.dart';
+import 'package:openair/views/desktop/nav_pages/sign_in_page.dart';
 import 'package:openair/views/desktop/nav_pages/queue_page.dart';
 import 'package:openair/views/desktop/nav_pages/settings_page.dart';
 import 'package:openair/views/desktop/nav_pages/subscriptions_page.dart';
@@ -129,6 +129,7 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
         Expanded(
           flex: 1,
           child: Card(
+            color: Colors.grey.shade100,
             elevation: 2.0,
             margin: EdgeInsets.zero,
             shape: const RoundedRectangleBorder(
@@ -168,6 +169,12 @@ class _DesktopDrawer extends ConsumerStatefulWidget {
 }
 
 class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
+  void returnFromSignin() {
+    widget.onPageSelected(const Text('home'));
+    ref.invalidate(getSessionProvider);
+    widget.rebuildDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(localeProvider);
@@ -205,7 +212,9 @@ class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
                     return ElevatedButton(
                       onPressed: () {
                         if (session.value == null) {
-                          widget.onPageSelected(const LogIn());
+                          widget.onPageSelected(SignIn(
+                            returnFromSignin: returnFromSignin,
+                          ));
                         } else {
                           supabaseService.signOut();
                           ref.invalidate(getSessionProvider);
@@ -217,7 +226,7 @@ class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
                       ),
                       child: Text(
                         session.value == null
-                            ? Translations.of(context).text('login')
+                            ? Translations.of(context).text('signIn')
                             : Translations.of(context).text('logout'),
                       ),
                     );

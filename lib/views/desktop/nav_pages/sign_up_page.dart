@@ -7,7 +7,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/desktop/settings_pages/account_page.dart';
-import 'package:openair/views/desktop/nav_pages/log_in_page.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,13 +41,6 @@ class _SignUpState extends ConsumerState<SignUp> {
         final session = event.session;
 
         if (session != null) {
-          Navigator.removeRoute(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LogIn(),
-            ),
-          );
-
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -73,7 +65,20 @@ class _SignUpState extends ConsumerState<SignUp> {
     final supabaseService = ref.watch(supabaseServiceProvider);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            Translations.of(context).text('signUp'),
+            style: TextStyle(
+              color: Brightness.dark == Theme.of(context).brightness
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 42.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Form(
@@ -82,18 +87,6 @@ class _SignUpState extends ConsumerState<SignUp> {
             spacing: 16.0,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  Translations.of(context).text('signUp'),
-                  style: TextStyle(
-                    color: Brightness.dark == Theme.of(context).brightness
-                        ? Colors.white
-                        : Colors.black,
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               TextFormField(
                 style: TextStyle(
                   color: Brightness.dark == Theme.of(context).brightness

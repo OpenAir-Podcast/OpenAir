@@ -5,7 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
 
-  String? redirectToString = dotenv.env['CALLBACK_METHOD'];
+  String? supabaseRedirectToString = dotenv.env['CALLBACK_METHOD'];
+  String? googleRedirectToString = dotenv.env['SUPABASE_GOOGLE_CALLBACK'];
+  String? githubRedirectToString = dotenv.env['SUPABASE_GITHUB_CALLBACK'];
 
   // Example function to get user data
   Future<User?> getUser() async {
@@ -35,7 +37,7 @@ class SupabaseService {
         email: email,
         password: password,
         data: {'username': username},
-        emailRedirectTo: redirectToString,
+        // emailRedirectTo: supabaseRedirectToString,
       );
     } on AuthException catch (e) {
       // Handle sign-up errors
@@ -55,7 +57,7 @@ class SupabaseService {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: kIsWeb ? null : redirectToString,
+        // redirectTo: kIsWeb ? null : googleRedirectToString,
         authScreenLaunchMode: kIsWeb
             ? LaunchMode.platformDefault
             : LaunchMode.externalApplication,
@@ -73,10 +75,11 @@ class SupabaseService {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.github,
-        redirectTo: kIsWeb ? null : redirectToString,
-        authScreenLaunchMode: kIsWeb
-            ? LaunchMode.platformDefault
-            : LaunchMode.externalApplication,
+        // redirectTo: kIsWeb ? null : githubRedirectToString,
+        // authScreenLaunchMode: kIsWeb
+        //     ? LaunchMode.platformDefault
+        //     : LaunchMode.externalApplication,
+        authScreenLaunchMode: LaunchMode.inAppBrowserView,
       );
     } on AuthException catch (e) {
       debugPrint('GitHub sign-in error: ${e.message}');
