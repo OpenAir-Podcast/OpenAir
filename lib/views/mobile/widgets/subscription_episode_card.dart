@@ -511,6 +511,15 @@ class _SubscriptionEpisodeCardState
                                             }
                                           }
                                         }
+
+                                        Future.delayed(Duration(seconds: 1),
+                                            () {
+                                          if (mounted) {
+                                            ref.invalidate(getFavoriteProvider);
+                                            ref.invalidate(getFavoriteProvider);
+                                            setState(() {});
+                                          }
+                                        });
                                       });
                                     },
                                     icon: isFavorite

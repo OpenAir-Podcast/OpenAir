@@ -535,6 +535,11 @@ class _EpisodeCardState extends ConsumerState<EpisodeCard> {
                                       }
                                     }
                                   }
+
+                                  Future.delayed(Duration(seconds: 1), () {
+                                    ref.invalidate(getFavoriteProvider);
+                                    setState(() {});
+                                  });
                                 },
                                 icon: isFavorite
                                     ? const Icon(Icons.favorite_rounded)

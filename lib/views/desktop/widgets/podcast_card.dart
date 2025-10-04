@@ -134,6 +134,15 @@ class _PodcastCardState extends ConsumerState<PodcastCard> {
 
                     ref.invalidate(
                         podcastDataByUrlProvider(widget.podcastItem.feedUrl));
+
+                    Future.delayed(
+                      Duration(seconds: 1),
+                      () {
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                    );
                   },
                   icon: snapshot.data!
                       ? const Icon(Icons.check)

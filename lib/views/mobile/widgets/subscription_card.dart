@@ -53,6 +53,8 @@ class SubscriptionCard extends StatelessWidget {
       child: GestureDetector(
         onLongPress: () {
           // TODO Add a dropmenu here
+
+          debugPrint('Long press');
         },
         onTap: () {
           ref.read(audioProvider.notifier).currentPodcast =

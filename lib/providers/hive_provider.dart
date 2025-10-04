@@ -1074,6 +1074,11 @@ class HiveService {
     await box.put('trending', FetchDataModel.fromJson(data));
   }
 
+  Future<void> removeAllTrendingPodcast() async {
+    final box = await trendingBox;
+    await box.clear();
+  }
+
   Future<FetchDataModel?> getTopFeaturedPodcast() async {
     final box = await topFeaturedBox;
     return await box.get('top_featured');
@@ -1092,6 +1097,19 @@ class HiveService {
   void putCategoryPodcast(String category, Map<String, dynamic> data) async {
     final box = await categoryBox;
     await box.put(category, FetchDataModel.fromJson(data));
+  }
+
+  Future<void> removeAllFeaturedPodcasts() async {
+    final box = await topFeaturedBox;
+    await box.clear();
+
+    final box1 = await categoryBox;
+    await box1.deleteAll([
+      'Education',
+      'Health',
+      'Technology',
+      'Sports',
+    ]);
   }
 
   void addEpisodeToFavorite(
