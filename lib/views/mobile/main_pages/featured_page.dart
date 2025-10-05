@@ -6,7 +6,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/main_pages/category_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/top_podcasts_page.dart';
@@ -24,8 +24,8 @@ final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
     return topFeaturedPodcastData;
   }
 
-  final apiService = ref.read(podcastIndexProvider);
-  final data = await apiService.getTopPodcasts();
+  final podcastIndexService = ref.read(podcastIndexProvider);
+  final data = await podcastIndexService.getTopPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
@@ -41,8 +41,8 @@ final podcastDataByEducationProvider =
     return educationPodcastData;
   }
 
-  final apiService = ref.read(podcastIndexProvider);
-  final data = await apiService.getEducationPodcasts();
+  final podcastIndexService = ref.read(podcastIndexProvider);
+  final data = await podcastIndexService.getEducationPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
@@ -54,8 +54,8 @@ final podcastDataByHealthProvider = FutureProvider<FetchDataModel>((ref) async {
     return healthPodcastData;
   }
 
-  final apiService = ref.read(podcastIndexProvider);
-  final data = await apiService.getHealthPodcasts();
+  final podcastIndexService = ref.read(podcastIndexProvider);
+  final data = await podcastIndexService.getHealthPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
@@ -70,8 +70,8 @@ final podcastDataByTechnologyProvider =
     return technologyPodcastData;
   }
 
-  final apiService = ref.read(podcastIndexProvider);
-  final data = await apiService.getTechnologyPodcasts();
+  final podcastIndexService = ref.read(podcastIndexProvider);
+  final data = await podcastIndexService.getTechnologyPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
@@ -83,14 +83,14 @@ final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
     return sportsPodcastData;
   }
 
-  final apiService = ref.read(podcastIndexProvider);
-  final data = await apiService.getSportsPodcasts();
+  final podcastIndexService = ref.read(podcastIndexProvider);
+  final data = await podcastIndexService.getSportsPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
 final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-  final apiService = ref.read(openAirProvider);
-  return await apiService.getConnectionStatus();
+  final podcastIndexService = ref.read(openAirProvider);
+  return await podcastIndexService.getConnectionStatus();
 });
 
 class FeaturedPage extends ConsumerStatefulWidget {

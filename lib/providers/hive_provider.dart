@@ -19,7 +19,7 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:path/path.dart';

@@ -98,20 +98,20 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
-                        // SizedBox(
-                        //   width: MediaQuery.of(context).size.width - 140.0,
-                        //   child: Text(
-                        //     ref.watch(audioProvider).currentPodcast!.author ??
-                        //         Translations.of(context).text('unknown'),
-                        //     style: const TextStyle(
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: 14.0,
-                        //       color: Colors.grey,
-                        //     ),
-                        //     overflow: TextOverflow.ellipsis,
-                        //     maxLines: 2,
-                        //   ),
-                        // ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 140.0,
+                          child: Text(
+                            ref.watch(audioProvider).currentPodcast!.author ??
+                                Translations.of(context).text('unknown'),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.0,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),
                         // Podcast Published Date
                         Text(
                           ref

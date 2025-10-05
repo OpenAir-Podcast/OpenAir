@@ -6,8 +6,8 @@ import 'package:openair/views/desktop/main_pages/category_page.dart';
 import 'package:openair/components/no_connection.dart';
 
 final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-  final apiService = ref.read(openAirProvider);
-  return await apiService.getConnectionStatus();
+  final podcastIndexService = ref.read(openAirProvider);
+  return await podcastIndexService.getConnectionStatus();
 });
 
 class CategoriesPage extends ConsumerStatefulWidget {

@@ -15,7 +15,7 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:path_provider/path_provider.dart';

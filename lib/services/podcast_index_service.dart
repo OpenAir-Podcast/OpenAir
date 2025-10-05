@@ -228,4 +228,20 @@ class PodcastIndexProvider {
     final response = await _retry(() => _dio.get(fullUrl));
     return response.data;
   }
+
+  Future<Map<String, dynamic>> getPodcastDetailsByTitle(String title) async {
+    String cat = title
+        .replaceAll(' ', '+')
+        .replaceAll('/', '%2F')
+        .replaceAll('&', '%26')
+        .replaceAll('(', '%28')
+        .replaceAll(')', '%29')
+        .trim();
+
+    String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
+    String fullUrl = '$url&pretty';
+
+    final response = await _retry(() => _dio.get(fullUrl));
+    return response.data;
+  }
 }

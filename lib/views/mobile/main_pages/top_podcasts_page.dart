@@ -3,7 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
 final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
@@ -16,8 +16,8 @@ final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
   }
 
   debugPrint('Getting Top podcast from PodcastIndex');
-  final apiService = ref.watch(podcastIndexProvider);
-  final data = await apiService.getTrendingPodcasts();
+  final podcastIndexService = ref.watch(podcastIndexProvider);
+  final data = await podcastIndexService.getTrendingPodcasts();
   return FetchDataModel.fromJson(data);
 });
 

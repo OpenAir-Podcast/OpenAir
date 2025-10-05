@@ -7,7 +7,7 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/main_pages/subscriptions_episodes_page.dart';
 
 final getSubscriptionsCountProvider =
@@ -51,11 +51,6 @@ class SubscriptionCard extends StatelessWidget {
         cardTopPadding,
       ),
       child: GestureDetector(
-        onLongPress: () {
-          // TODO Add a dropmenu here
-
-          debugPrint('Long press');
-        },
         onTap: () {
           ref.read(audioProvider.notifier).currentPodcast =
               PodcastModel.fromJson(subs[index].toJson());

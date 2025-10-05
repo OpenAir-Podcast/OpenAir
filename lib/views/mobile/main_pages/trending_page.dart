@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
@@ -29,8 +29,8 @@ final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
 
 final getConnectionStatusProvider =
     FutureProvider.autoDispose<bool>((ref) async {
-  final apiService = ref.read(openAirProvider);
-  return await apiService.getConnectionStatus();
+  final podcastIndexService = ref.read(openAirProvider);
+  return await podcastIndexService.getConnectionStatus();
 });
 
 class TrendingPage extends ConsumerStatefulWidget {

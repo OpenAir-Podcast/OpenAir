@@ -10,7 +10,7 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/main_pages/discovery_page.dart';
 import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/main_pages/fyyd_search_page.dart';
@@ -22,8 +22,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
 final podcastDataFeaturedProvider = FutureProvider<List<dynamic>>((ref) async {
-  final apiService = ref.read(fyydProvider);
-  return await apiService.getFeaturedPodcasts();
+  final podcastIndexService = ref.read(fyydProvider);
+  return await podcastIndexService.getFeaturedPodcasts();
 });
 
 class AddPodcastPage extends ConsumerStatefulWidget {

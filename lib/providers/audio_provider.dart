@@ -16,7 +16,7 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
-import 'package:openair/services/podcast_index_provider.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
 import 'package:openair/views/mobile/nav_pages/queue_page.dart';
@@ -1114,10 +1114,10 @@ class AudioProvider extends ChangeNotifier {
   }
 
   Future<void> addPodcastEpisodes(SubscriptionModel podcast) async {
-    final apiService = ref.read(podcastIndexProvider);
+    final podcastIndexService = ref.read(podcastIndexProvider);
 
     Map<String, dynamic> episodes =
-        await apiService.getEpisodesByFeedUrl(podcast.feedUrl);
+        await podcastIndexService.getEpisodesByFeedUrl(podcast.feedUrl);
 
     Map episode;
 
