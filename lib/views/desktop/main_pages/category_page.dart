@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_provider.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
@@ -27,7 +28,7 @@ final podcastDataByCategoryProvider = FutureProvider.family
   return FetchDataModel.fromJson(data);
 });
 
-class CategoryPage extends ConsumerWidget {
+class CategoryPage extends ConsumerStatefulWidget {
   const CategoryPage({
     super.key,
     required this.category,
@@ -36,183 +37,241 @@ class CategoryPage extends ConsumerWidget {
   final String category;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends ConsumerState<CategoryPage> {
+  @override
+  Widget build(BuildContext context) {
     late String cat;
 
-    if (Translations.of(context).text('education') == category) {
+    if (Translations.of(context).text('education') == widget.category) {
       cat = 'Education';
-    } else if (Translations.of(context).text('health') == category) {
+    } else if (Translations.of(context).text('health') == widget.category) {
       cat = 'Health';
-    } else if (Translations.of(context).text('technology') == category) {
+    } else if (Translations.of(context).text('technology') == widget.category) {
       cat = 'Technology';
-    } else if (Translations.of(context).text('sports') == category) {
+    } else if (Translations.of(context).text('sports') == widget.category) {
       cat = 'Sports';
     }
     // For categories page
-    else if (Translations.of(context).text('categoryAnimals') == category) {
+    else if (Translations.of(context).text('categoryAnimals') ==
+        widget.category) {
       cat = 'Animals';
-    } else if (Translations.of(context).text('categoryAnimation') == category) {
+    } else if (Translations.of(context).text('categoryAnimation') ==
+        widget.category) {
       cat = 'Animation';
-    } else if (Translations.of(context).text('categoryArts') == category) {
+    } else if (Translations.of(context).text('categoryArts') ==
+        widget.category) {
       cat = 'Arts';
-    } else if (Translations.of(context).text('categoryAstronomy') == category) {
+    } else if (Translations.of(context).text('categoryAstronomy') ==
+        widget.category) {
       cat = 'Astronomy';
     } else if (Translations.of(context).text('categoryAutomotive') ==
-        category) {
+        widget.category) {
       cat = 'Automotive';
-    } else if (Translations.of(context).text('categoryAviation') == category) {
+    } else if (Translations.of(context).text('categoryAviation') ==
+        widget.category) {
       cat = 'Aviation';
-    } else if (Translations.of(context).text('categoryBeauty') == category) {
+    } else if (Translations.of(context).text('categoryBeauty') ==
+        widget.category) {
       cat = 'Beauty';
-    } else if (Translations.of(context).text('categoryBooks') == category) {
+    } else if (Translations.of(context).text('categoryBooks') ==
+        widget.category) {
       cat = 'Books';
-    } else if (Translations.of(context).text('categoryBusiness') == category) {
+    } else if (Translations.of(context).text('categoryBusiness') ==
+        widget.category) {
       cat = 'Business';
-    } else if (Translations.of(context).text('categoryCareers') == category) {
+    } else if (Translations.of(context).text('categoryCareers') ==
+        widget.category) {
       cat = 'Careers';
-    } else if (Translations.of(context).text('categoryChemistry') == category) {
+    } else if (Translations.of(context).text('categoryChemistry') ==
+        widget.category) {
       cat = 'Chemistry';
     } else if (Translations.of(context).text('categoryChristianity') ==
-        category) {
+        widget.category) {
       cat = 'Christianity';
-    } else if (Translations.of(context).text('categoryComedy') == category) {
+    } else if (Translations.of(context).text('categoryComedy') ==
+        widget.category) {
       cat = 'Comedy';
     } else if (Translations.of(context).text('categoryCommentary') ==
-        category) {
+        widget.category) {
       cat = 'Commentary';
-    } else if (Translations.of(context).text('categoryCourses') == category) {
+    } else if (Translations.of(context).text('categoryCourses') ==
+        widget.category) {
       cat = 'Courses';
-    } else if (Translations.of(context).text('categoryCrafts') == category) {
+    } else if (Translations.of(context).text('categoryCrafts') ==
+        widget.category) {
       cat = 'Crafts';
-    } else if (Translations.of(context).text('categoryDaily') == category) {
+    } else if (Translations.of(context).text('categoryDaily') ==
+        widget.category) {
       cat = 'Daily';
-    } else if (Translations.of(context).text('categoryDesign') == category) {
+    } else if (Translations.of(context).text('categoryDesign') ==
+        widget.category) {
       cat = 'Design';
-    } else if (Translations.of(context).text('categoryDrama') == category) {
+    } else if (Translations.of(context).text('categoryDrama') ==
+        widget.category) {
       cat = 'Drama';
-    } else if (Translations.of(context).text('categoryEarth') == category) {
+    } else if (Translations.of(context).text('categoryEarth') ==
+        widget.category) {
       cat = 'Earth';
-    } else if (Translations.of(context).text('categoryEducation') == category) {
+    } else if (Translations.of(context).text('categoryEducation') ==
+        widget.category) {
       cat = 'Education';
     } else if (Translations.of(context).text('categoryEntertainment') ==
-        category) {
+        widget.category) {
       cat = 'Entertainment';
     } else if (Translations.of(context).text('categoryEntrepreneurship') ==
-        category) {
+        widget.category) {
       cat = 'Entrepreneurship';
-    } else if (Translations.of(context).text('categoryFamily') == category) {
+    } else if (Translations.of(context).text('categoryFamily') ==
+        widget.category) {
       cat = 'Family';
-    } else if (Translations.of(context).text('categoryFashion') == category) {
+    } else if (Translations.of(context).text('categoryFashion') ==
+        widget.category) {
       cat = 'Fashion';
-    } else if (Translations.of(context).text('categoryFiction') == category) {
+    } else if (Translations.of(context).text('categoryFiction') ==
+        widget.category) {
       cat = 'Fiction';
-    } else if (Translations.of(context).text('categoryFitness') == category) {
+    } else if (Translations.of(context).text('categoryFitness') ==
+        widget.category) {
       cat = 'Fitness';
-    } else if (Translations.of(context).text('categoryFood') == category) {
+    } else if (Translations.of(context).text('categoryFood') ==
+        widget.category) {
       cat = 'Food';
-    } else if (Translations.of(context).text('categoryGames') == category) {
+    } else if (Translations.of(context).text('categoryGames') ==
+        widget.category) {
       cat = 'Games';
-    } else if (Translations.of(context).text('categoryGarden') == category) {
+    } else if (Translations.of(context).text('categoryGarden') ==
+        widget.category) {
       cat = 'Garden';
     } else if (Translations.of(context).text('categoryGovernment') ==
-        category) {
+        widget.category) {
       cat = 'Government';
-    } else if (Translations.of(context).text('categoryHealth') == category) {
+    } else if (Translations.of(context).text('categoryHealth') ==
+        widget.category) {
       cat = 'Health';
-    } else if (Translations.of(context).text('categoryHinduism') == category) {
+    } else if (Translations.of(context).text('categoryHinduism') ==
+        widget.category) {
       cat = 'Hinduism';
-    } else if (Translations.of(context).text('categoryHistory') == category) {
+    } else if (Translations.of(context).text('categoryHistory') ==
+        widget.category) {
       cat = 'History';
-    } else if (Translations.of(context).text('categoryHobbies') == category) {
+    } else if (Translations.of(context).text('categoryHobbies') ==
+        widget.category) {
       cat = 'Hobbies';
-    } else if (Translations.of(context).text('categoryHome') == category) {
+    } else if (Translations.of(context).text('categoryHome') ==
+        widget.category) {
       cat = 'Home';
-    } else if (Translations.of(context).text('categoryHowTo') == category) {
+    } else if (Translations.of(context).text('categoryHowTo') ==
+        widget.category) {
       cat = 'How To';
     } else if (Translations.of(context).text('categoryInterviews') ==
-        category) {
+        widget.category) {
       cat = 'Interviews';
-    } else if (Translations.of(context).text('categoryInvesting') == category) {
+    } else if (Translations.of(context).text('categoryInvesting') ==
+        widget.category) {
       cat = 'Investing';
-    } else if (Translations.of(context).text('categoryIslam') == category) {
+    } else if (Translations.of(context).text('categoryIslam') ==
+        widget.category) {
       cat = 'Islam';
-    } else if (Translations.of(context).text('categoryJudaism') == category) {
+    } else if (Translations.of(context).text('categoryJudaism') ==
+        widget.category) {
       cat = 'Judaism';
-    } else if (Translations.of(context).text('categoryKids') == category) {
+    } else if (Translations.of(context).text('categoryKids') ==
+        widget.category) {
       cat = 'Kids';
-    } else if (Translations.of(context).text('categoryLanguage') == category) {
+    } else if (Translations.of(context).text('categoryLanguage') ==
+        widget.category) {
       cat = 'Language';
-    } else if (Translations.of(context).text('categoryLearning') == category) {
+    } else if (Translations.of(context).text('categoryLearning') ==
+        widget.category) {
       cat = 'Learning';
-    } else if (Translations.of(context).text('categoryLeisure') == category) {
+    } else if (Translations.of(context).text('categoryLeisure') ==
+        widget.category) {
       cat = 'Leisure';
-    } else if (Translations.of(context).text('categoryLife') == category) {
+    } else if (Translations.of(context).text('categoryLife') ==
+        widget.category) {
       cat = 'Life';
     } else if (Translations.of(context).text('categoryManagement') ==
-        category) {
+        widget.category) {
       cat = 'Management';
-    } else if (Translations.of(context).text('categoryManga') == category) {
+    } else if (Translations.of(context).text('categoryManga') ==
+        widget.category) {
       cat = 'Manga';
-    } else if (Translations.of(context).text('categoryMarketing') == category) {
+    } else if (Translations.of(context).text('categoryMarketing') ==
+        widget.category) {
       cat = 'Marketing';
     } else if (Translations.of(context).text('categoryMathematics') ==
-        category) {
+        widget.category) {
       cat = 'Mathematics';
-    } else if (Translations.of(context).text('categoryMedicine') == category) {
+    } else if (Translations.of(context).text('categoryMedicine') ==
+        widget.category) {
       cat = 'Medicine';
-    } else if (Translations.of(context).text('categoryMental') == category) {
+    } else if (Translations.of(context).text('categoryMental') ==
+        widget.category) {
       cat = 'Mental';
-    } else if (Translations.of(context).text('categoryMusic') == category) {
+    } else if (Translations.of(context).text('categoryMusic') ==
+        widget.category) {
       cat = 'Music';
-    } else if (Translations.of(context).text('categoryNatural') == category) {
+    } else if (Translations.of(context).text('categoryNatural') ==
+        widget.category) {
       cat = 'Natural';
-    } else if (Translations.of(context).text('categoryNature') == category) {
+    } else if (Translations.of(context).text('categoryNature') ==
+        widget.category) {
       cat = 'Nature';
-    } else if (Translations.of(context).text('categoryNews') == category) {
+    } else if (Translations.of(context).text('categoryNews') ==
+        widget.category) {
       cat = 'News';
-    } else if (Translations.of(context).text('categoryNonProfit') == category) {
+    } else if (Translations.of(context).text('categoryNonProfit') ==
+        widget.category) {
       cat = 'Non-Profit';
-    } else if (Translations.of(context).text('categoryNutrition') == category) {
+    } else if (Translations.of(context).text('categoryNutrition') ==
+        widget.category) {
       cat = 'Nutrition';
-    } else if (Translations.of(context).text('categoryParenting') == category) {
+    } else if (Translations.of(context).text('categoryParenting') ==
+        widget.category) {
       cat = 'Parenting';
     } else if (Translations.of(context).text('categoryPerforming') ==
-        category) {
+        widget.category) {
       cat = 'Performing';
-    } else if (Translations.of(context).text('categoryPets') == category) {
+    } else if (Translations.of(context).text('categoryPets') ==
+        widget.category) {
       cat = 'Pets';
-    } else if (Translations.of(context).text('categoryPhysics') == category) {
+    } else if (Translations.of(context).text('categoryPhysics') ==
+        widget.category) {
       cat = 'Physics';
-    } else if (Translations.of(context).text('categoryPolitics') == category) {
+    } else if (Translations.of(context).text('categoryPolitics') ==
+        widget.category) {
       cat = 'Politics';
-    } else if (Translations.of(context).text('categoryReligion') == category) {
+    } else if (Translations.of(context).text('categoryReligion') ==
+        widget.category) {
       cat = 'Religion';
-    } else if (Translations.of(context).text('categoryScience') == category) {
+    } else if (Translations.of(context).text('categoryScience') ==
+        widget.category) {
       cat = 'Science';
     } else if (Translations.of(context).text('categorySelfImprovement') ==
-        category) {
+        widget.category) {
       cat = 'Self Improvement';
-    } else if (Translations.of(context).text('categorySexuality') == category) {
+    } else if (Translations.of(context).text('categorySexuality') == widget.category) {
       cat = 'Sexuality';
-    } else if (Translations.of(context).text('categorySocial') == category) {
+    } else if (Translations.of(context).text('categorySocial') == widget.category) {
       cat = 'Social';
-    } else if (Translations.of(context).text('categorySpirituality') ==
-        category) {
+    } else if (Translations.of(context).text('categorySpirituality') == widget.category) {
       cat = 'Spirituality';
-    } else if (Translations.of(context).text('categorySports') == category) {
+    } else if (Translations.of(context).text('categorySports') == widget.category) {
       cat = 'Sports';
-    } else if (Translations.of(context).text('categoryStandUp') == category) {
+    } else if (Translations.of(context).text('categoryStandUp') == widget.category) {
       cat = 'Stand-Up';
-    } else if (Translations.of(context).text('categoryStories') == category) {
+    } else if (Translations.of(context).text('categoryStories') == widget.category) {
       cat = 'Stories';
-    } else if (Translations.of(context).text('categoryVideoGames') ==
-        category) {
+    } else if (Translations.of(context).text('categoryVideoGames') == widget.category) {
       cat = 'Video Games';
-    } else if (Translations.of(context).text('categoryVisual') == category) {
+    } else if (Translations.of(context).text('categoryVisual') == widget.category) {
       cat = 'Visual';
-    } else if (Translations.of(context).text('categoryTrueCrime') == category) {
+    } else if (Translations.of(context).text('categoryTrueCrime') == widget.category) {
       cat = 'True Crime';
-    } else if (Translations.of(context).text('categoryTV') == category) {
+    } else if (Translations.of(context).text('categoryTV') == widget.category) {
       cat = 'TV';
     }
 
@@ -227,7 +286,7 @@ class CategoryPage extends ConsumerWidget {
       ),
       error: (error, stackTrace) => Scaffold(
         appBar: AppBar(
-          title: Text(category),
+          title: Text(widget.category),
         ),
         body: SizedBox(
           width: double.infinity,
@@ -275,14 +334,22 @@ class CategoryPage extends ConsumerWidget {
       data: (snapshot) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(category),
+            title: Text(widget.category),
             actions: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   tooltip: Translations.of(context).text('refresh'),
                   onPressed: () {
-                    // TODO Implement refreash mechanic
+                    ref
+                        .watch(hiveServiceProvider)
+                        .removeCategory(widget.category);
+
+                    ref.invalidate(
+                        podcastDataByCategoryProvider(widget.category));
+                    Future.delayed(const Duration(seconds: 1), () async {
+                      setState(() {});
+                    });
                   },
                   icon: const Icon(Icons.refresh_rounded),
                 ),

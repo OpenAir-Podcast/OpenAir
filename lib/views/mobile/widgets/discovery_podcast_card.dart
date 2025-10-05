@@ -142,7 +142,6 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                               .text('unsubscribeToPodcast')
                           : Translations.of(context).text('subscribeToPodcast'),
                       onPressed: () async {
-                        // FIXME: Doesn't subscribe/unsubscribe immediately
                         snapshot.data!
                             ? ref.read(audioProvider).unsubscribe(podcast)
                             : ref.read(audioProvider).subscribe(
@@ -173,9 +172,14 @@ class _DiscoveryPodcastCardState extends ConsumerState<DiscoveryPodcastCard> {
                           }
                         }
 
-                        ref.invalidate(
-                            podcastDataByUrlProvider(podcast.feedUrl));
-                        ref.invalidate(getFeedsProvider);
+                        Future.delayed(Duration(seconds: 1), () {
+                          ref.invalidate(
+                              podcastDataByUrlProvider(podcast.feedUrl));
+
+                          ref.invalidate(getFeedsProvider);
+
+                          setState(() {});
+                        });
                       },
                       icon: snapshot.data!
                           ? const Icon(Icons.check)

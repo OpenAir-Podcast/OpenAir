@@ -1099,6 +1099,11 @@ class HiveService {
     await box.put(category, FetchDataModel.fromJson(data));
   }
 
+  Future<void> removeCategory(String category) async {
+    final box = await categoryBox;
+    await box.delete(category);
+  }
+
   Future<void> removeAllFeaturedPodcasts() async {
     final box = await topFeaturedBox;
     await box.clear();

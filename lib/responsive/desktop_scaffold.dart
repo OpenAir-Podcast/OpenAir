@@ -102,7 +102,7 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
                     break;
                 }
 
-                // setState(() {});
+                setState(() {});
               },
               icon: const Icon(Icons.refresh_rounded),
             ),
