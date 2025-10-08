@@ -47,13 +47,6 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           appBar: AppBar(
             title: Text(Translations.of(context).text('subscriptions')),
             actions: [
-              IconButton(
-                onPressed: () {
-                  // TODO Add search functionality here
-                  // This is to search for podcast that the user has already sub to.
-                },
-                icon: const Icon(Icons.search),
-              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(

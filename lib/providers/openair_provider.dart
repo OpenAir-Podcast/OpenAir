@@ -289,7 +289,8 @@ class OpenAirProvider extends ChangeNotifier {
 
         await db.execute('''
           CREATE TABLE favorites (
-            guid TEXT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guid TEXT,
             title TEXT,
             author TEXT,
             image TEXT,
@@ -379,7 +380,24 @@ class OpenAirProvider extends ChangeNotifier {
     final localFavorites = await hiveService.getFavoriteEpisodes();
 
     for (final item in localFavorites.values) {
-      final favoriteItem = Map<String, dynamic>.from(item);
+      final favoriteItem = {
+        'guid': item['guid'],
+        'title': item['title'],
+        'author': item['author'],
+        'image': item['image'],
+        'datePublished': item['datePublished'],
+        'description': item['description'],
+        'feedUrl': item['feedUrl'],
+        'duration': item['duration'],
+        'enclosureType': item['enclosureType'],
+        'enclosureLength': item['enclosureLength'],
+        'enclosureUrl': item['enclosureUrl'],
+        'podcast': item['podcast'],
+        'size': item['size'],
+        'podcastId': item['podcastId'],
+        'downloadDate': item['downloadDate'],
+        'fileName': item['fileName'],
+      };
 
       if (favoriteItem['podcast'] != null) {
         favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
@@ -576,7 +594,160 @@ class OpenAirProvider extends ChangeNotifier {
     }
   }
 
-  void updateFontSize(String size) {}
+  void updateFontSize(String size) {
+    fontSizeConfig = size;
+    hiveService.saveUserInterfaceSettings({
+      'fontSizeFactor': fontSizeConfig,
+      'language': languageConfig,
+      'locale': localeConfig,
+    });
+
+    Brightness platformBrightness =
+        View.of(context).platformDispatcher.platformBrightness;
+
+    switch (themeModeConfig) {
+      case 'System':
+        if (platformBrightness == Brightness.dark) {
+          switch (fontSizeConfig) {
+            case 'small':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_small');
+              break;
+            case 'medium':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+              break;
+            case 'large':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_large');
+              break;
+            case 'extraLarge':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_extra_large');
+              break;
+            default:
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+          }
+        } else if (platformBrightness == Brightness.light) {
+          switch (fontSizeConfig) {
+            case 'small':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_small');
+              break;
+            case 'medium':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_medium');
+              break;
+            case 'large':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_large');
+              break;
+            case 'extraLarge':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_extra_large');
+              break;
+            default:
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_medium');
+          }
+        }
+        break;
+      case 'Light':
+        switch (fontSizeConfig) {
+          case 'small':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_light_small');
+            break;
+          case 'medium':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_light_medium');
+            break;
+          case 'large':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_light_large');
+            break;
+          case 'extraLarge':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_light_extra_large');
+            break;
+          default:
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_light_medium');
+        }
+        break;
+      case 'Dark':
+        switch (fontSizeConfig) {
+          case 'small':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_dark_small');
+            break;
+          case 'medium':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_dark_medium');
+            break;
+          case 'large':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_dark_large');
+            break;
+          case 'extraLarge':
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_dark_extra_large');
+            break;
+          default:
+            ThemeProvider.controllerOf(context)
+                .setTheme('blue_accent_dark_medium');
+        }
+        break;
+      default:
+        if (platformBrightness == Brightness.dark) {
+          switch (fontSizeConfig) {
+            case 'small':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_small');
+              break;
+            case 'medium':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+              break;
+            case 'large':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_large');
+              break;
+            case 'extraLarge':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_extra_large');
+              break;
+            default:
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+          }
+        } else if (platformBrightness == Brightness.light) {
+          switch (fontSizeConfig) {
+            case 'small':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_small');
+              break;
+            case 'medium':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_medium');
+              break;
+            case 'large':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_large');
+              break;
+            case 'extraLarge':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_extra_large');
+              break;
+            default:
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_light_medium');
+          }
+        }
+    }
+    notifyListeners();
+  }
 
   void downloadEnqueue(BuildContext context) async {
     Map queue = await hiveService.getQueue();
@@ -965,19 +1136,19 @@ class OpenAirProvider extends ChangeNotifier {
           case 'System':
             if (platformBrightness == Brightness.dark) {
               switch (fontSizeConfig) {
-                case 0.875:
+                case 'small':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_small');
                   break;
-                case 1.0:
+                case 'medium':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_medium');
                   break;
-                case 1.125:
+                case 'large':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_large');
                   break;
-                case 1.25:
+                case 'extraLarge':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_extra_large');
                   break;
@@ -987,19 +1158,19 @@ class OpenAirProvider extends ChangeNotifier {
               }
             } else if (platformBrightness == Brightness.light) {
               switch (fontSizeConfig) {
-                case 0.875:
+                case 'small':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_small');
                   break;
-                case 1.0:
+                case 'medium':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_medium');
                   break;
-                case 1.125:
+                case 'large':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_large');
                   break;
-                case 1.25:
+                case 'extraLarge':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_extra_large');
                   break;
@@ -1012,19 +1183,19 @@ class OpenAirProvider extends ChangeNotifier {
             break;
           case 'Light':
             switch (fontSizeConfig) {
-              case 0.875:
+              case 'small':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_light_small');
                 break;
-              case 1.0:
+              case 'medium':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_light_medium');
                 break;
-              case 1.125:
+              case 'large':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_light_large');
                 break;
-              case 1.25:
+              case 'extraLarge':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_light_extra_large');
                 break;
@@ -1036,19 +1207,19 @@ class OpenAirProvider extends ChangeNotifier {
             break;
           case 'Dark':
             switch (fontSizeConfig) {
-              case 0.875:
+              case 'small':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_dark_small');
                 break;
-              case 1.0:
+              case 'medium':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_dark_medium');
                 break;
-              case 1.125:
+              case 'large':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_dark_large');
                 break;
-              case 1.25:
+              case 'extraLarge':
                 ThemeProvider.controllerOf(context)
                     .setTheme('blue_accent_dark_extra_large');
                 break;
@@ -1061,19 +1232,19 @@ class OpenAirProvider extends ChangeNotifier {
           default:
             if (platformBrightness == Brightness.dark) {
               switch (fontSizeConfig) {
-                case 0.875:
+                case 'small':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_small');
                   break;
-                case 1.0:
+                case 'medium':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_.dark_medium');
                   break;
-                case 1.125:
+                case 'large':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_large');
                   break;
-                case 1.25:
+                case 'extraLarge':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_dark_extra_large');
                   break;
@@ -1083,19 +1254,19 @@ class OpenAirProvider extends ChangeNotifier {
               }
             } else if (platformBrightness == Brightness.light) {
               switch (fontSizeConfig) {
-                case 0.875:
+                case 'small':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_small');
                   break;
-                case 1.0:
+                case 'medium':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_medium');
                   break;
-                case 1.125:
+                case 'large':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_large');
                   break;
-                case 1.25:
+                case 'extraLarge':
                   ThemeProvider.controllerOf(context)
                       .setTheme('blue_accent_light_extra_large');
                   break;

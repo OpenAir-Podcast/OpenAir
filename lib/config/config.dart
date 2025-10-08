@@ -191,3 +191,9 @@ late bool automaticExportDatabaseConfig;
 late bool receiveNotificationsForNewEpisodesConfig;
 late bool receiveNotificationsWhenPlayConfig;
 late bool receiveNotificationsWhenDownloadConfig;
+
+// Font size
+double smallFontSize = 0.875;
+double mediumFontSize = 1.0;
+double largeFontSize = 1.125;
+double extraLargeFontSize = 1.25;

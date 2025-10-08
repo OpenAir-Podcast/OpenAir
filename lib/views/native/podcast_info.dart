@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final podcastDetailsProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, title) async {
@@ -11,8 +13,8 @@ final podcastDetailsProvider =
   return await podcastIndexService.getPodcastDetailsByTitle(title);
 });
 
-class PodcastDetailsPage extends ConsumerWidget {
-  const PodcastDetailsPage({super.key, required this.podcast});
+class PodcastInfoPage extends ConsumerWidget {
+  const PodcastInfoPage({super.key, required this.podcast});
 
   final PodcastModel podcast;
 
@@ -104,14 +106,18 @@ class PodcastDetailsPage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CachedNetworkImage(
-                        imageUrl: feed['image'],
                         width: 150,
                         height: 150,
+                        memCacheHeight: 300,
+                        imageUrl: feed['image'],
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                        errorWidget: (context, url, error) => Container(
+                          color: cardImageShadow,
+                          child: const Icon(
+                            Icons.error,
+                            size: 56.0,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -152,13 +158,26 @@ class PodcastDetailsPage extends ConsumerWidget {
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Website: ${feed['link']}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
+                  Row(
+                    children: [
+                      Text('Link: '),
+                      TextButton(
+                        onPressed: () async {
+                          await launchUrl(
+                            Uri.parse(feed['link']),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                        child: Text(
+                          feed['link'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Text(

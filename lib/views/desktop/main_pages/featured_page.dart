@@ -309,9 +309,15 @@ class PodcastsCard extends ConsumerWidget {
                 tileColor: ThemeProvider.themeOf(context).data.primaryColor,
                 leading: Text(
                   title,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
                 ),
                 trailing: Text(
                   Translations.of(context).text('seeAll'),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(context).push(

@@ -12,7 +12,7 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:openair/views/desktop/widgets/subscription_episode_card.dart';
-import 'package:openair/views/native/podcast_details.dart';
+import 'package:openair/views/native/podcast_info.dart';
 
 final podcastDataByUrlProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
@@ -107,7 +107,7 @@ class _SubscriptionsEpisodesPageState
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PodcastDetailsPage(
+                        builder: (context) => PodcastInfoPage(
                           podcast: widget.podcast,
                         ),
                       ));

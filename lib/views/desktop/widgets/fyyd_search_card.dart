@@ -9,8 +9,8 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
-import 'package:openair/views/mobile/main_pages/episodes_page.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/desktop/main_pages/episodes_page.dart';
+import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
 class FyydSearchCard extends ConsumerStatefulWidget {
@@ -26,9 +26,11 @@ class FyydSearchCard extends ConsumerStatefulWidget {
 }
 
 class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
+  late PodcastModel podcastMod;
+
   @override
   Widget build(BuildContext context) {
-    bool isSub = false;
+    podcastMod = PodcastModel.fromJson(widget.podcastItem);
 
     return GestureDetector(
       onTap: () async {
@@ -59,162 +61,115 @@ class _FyydSearchCardState extends ConsumerState<FyydSearchCard> {
         }
       },
       child: Card(
-        color: Colors.blueGrey[100],
+        color: Theme.of(context).cardColor,
         elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 62.0,
-                height: 62.0,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: CachedNetworkImage(
-                  memCacheHeight: 62,
-                  memCacheWidth: 62,
-                  imageUrl: widget.podcastItem['imgURL'],
-                  fit: BoxFit.fill,
-                  errorWidget: (context, url, error) => Container(
-                    color: cardImageShadow,
-                    child: Icon(
-                      Icons.error,
-                      size: 56.0,
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                memCacheHeight: 300,
+                imageUrl: podcastMod.imageUrl,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(
+                  color: cardImageShadow,
+                  child: const Icon(
+                    Icons.error,
+                    size: 56.0,
                   ),
                 ),
               ),
-              Expanded(
-                child: SizedBox(
-                  width: 500.0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 105.0,
-                          child: Text(
-                            widget.podcastItem['title'],
-                            maxLines: 2,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 120.0,
-                          child: Text(
-                            widget.podcastItem['subtitle'].isNotEmpty
-                                ? widget.podcastItem['subtitle']
-                                : 'Unknown',
-                            maxLines: 2,
-                            style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    podcastMod.title,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: Brightness.dark == Theme.of(context).brightness
+                          ? Colors.white
+                          : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 1,
+                  ),
+                  Text(
+                    podcastMod.author ??
+                        Translations.of(context).text('unknown'),
+                    maxLines: 1,
+                    style: const TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                      color: Colors.grey,
                     ),
                   ),
-                ),
+                ],
               ),
-              FutureBuilder(
-                future: ref
-                    .watch(openAirProvider)
-                    .isSubscribed(widget.podcastItem['title']),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text('...'),
-                    );
-                  } else if (snapshot.hasError) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Icon(Icons.error_outline_rounded),
-                    );
-                  }
+            ),
+            FutureBuilder(
+              future: ref.watch(openAirProvider).isSubscribed(podcastMod.title),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const SizedBox.shrink();
+                } else if (snapshot.hasError) {
+                  return const SizedBox.shrink();
+                }
 
-                  isSub = snapshot.data!;
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: IconButton(
-                      tooltip: snapshot.data!
-                          ? 'Unsubscribe to podcast'
-                          : 'Subscribe to podcast',
-                      onPressed: () async {
-                        final xmlString = await ref
-                            .watch(fyydProvider)
-                            .getPodcastXml(widget.podcastItem['xmlURL']);
-
-                        var rssFeed = RssFeed.parse(xmlString);
-
-                        PodcastModel podcastModel = PodcastModel(
-                          id: widget.podcastItem['id'],
-                          feedUrl: widget.podcastItem['xmlURL'],
-                          title: rssFeed.title!,
-                          author: rssFeed.author ?? 'unknown',
-                          imageUrl: widget.podcastItem['imgURL'],
-                          artwork: widget.podcastItem['imgURL'],
-                          description: rssFeed.description!,
-                        );
-
-                        if (snapshot.data!) {
-                          ref.read(audioProvider).unsubscribe(podcastModel);
-                          setState(() {
-                            isSub = false;
-                          });
-                        } else {
-                          if (context.mounted) {
-                            ref.read(audioProvider).subscribe(
-                                  podcastModel,
-                                  context,
-                                );
-                          }
-                          setState(() {
-                            isSub = true;
-                          });
-                        }
-
-                        if (context.mounted) {
-                          if (!Platform.isAndroid && !Platform.isIOS) {
-                            ref
-                                .read(notificationServiceProvider)
-                                .showNotification(
-                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                  snapshot.data!
-                                      ? 'Unsubscribed from ${podcastModel.title}'
-                                      : 'Subscribed to ${podcastModel.title}',
-                                );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  snapshot.data!
-                                      ? 'Unsubscribed from ${podcastModel.title}'
-                                      : 'Subscribed to ${podcastModel.title}',
-                                ),
-                              ),
+                return IconButton(
+                  tooltip: snapshot.data!
+                      ? Translations.of(context).text('unsubscribeToPodcast')
+                      : Translations.of(context).text('subscribeToPodcast'),
+                  onPressed: () async {
+                    snapshot.data!
+                        ? ref.read(audioProvider).unsubscribe(podcastMod)
+                        : ref.read(audioProvider).subscribe(
+                              podcastMod,
+                              context,
                             );
-                          }
+
+                    if (context.mounted) {
+                      if (!Platform.isAndroid && !Platform.isIOS) {
+                        ref.read(notificationServiceProvider).showNotification(
+                              'OpenAir ${Translations.of(context).text('notification')}',
+                              snapshot.data!
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
+                            );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              snapshot.data!
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
+                            ),
+                          ),
+                        );
+                      }
+                    }
+
+                    ref.invalidate(
+                        podcastDataByUrlProvider(podcastMod.feedUrl));
+
+                    Future.delayed(
+                      Duration(seconds: 1),
+                      () {
+                        if (mounted) {
+                          setState(() {});
                         }
                       },
-                      icon: isSub
-                          ? const Icon(Icons.check_rounded)
-                          : const Icon(Icons.add_rounded),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                    );
+                  },
+                  icon: snapshot.data!
+                      ? const Icon(Icons.check)
+                      : const Icon(Icons.add),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

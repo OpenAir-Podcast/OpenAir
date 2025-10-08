@@ -8,7 +8,7 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/native/podcast_details.dart';
+import 'package:openair/views/native/podcast_info.dart';
 import 'package:openair/views/mobile/player/banner_audio_player.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/episode_card.dart';
@@ -116,7 +116,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PodcastDetailsPage(
+                        builder: (context) => PodcastInfoPage(
                           podcast: widget.podcast,
                         ),
                       ));

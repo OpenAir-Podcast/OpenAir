@@ -766,12 +766,9 @@ class HiveService {
 
     if (userInterfaceSettings == null) {
       userInterfaceSettings = {
-        'fontSizeFactor': 1.0,
+        'fontSizeFactor': 'medium',
         'language': 'English',
         'locale': 'en_US',
-        'voice': 'System',
-        'speechRate': 'Medium',
-        'pitch': 'Medium',
       };
       await box.put('userInterface', userInterfaceSettings);
     }
@@ -1087,6 +1084,11 @@ class HiveService {
   void putTopFeaturedPodcast(Map<String, dynamic> data) async {
     final box = await topFeaturedBox;
     await box.put('top_featured', FetchDataModel.fromJson(data));
+  }
+
+  Future<void> removeAllTopFeaturedPodcasts() async {
+    final box = await topFeaturedBox;
+    await box.clear();
   }
 
   Future<FetchDataModel?> getCategoryPodcast(String category) async {

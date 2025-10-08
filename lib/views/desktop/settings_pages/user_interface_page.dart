@@ -30,7 +30,7 @@ class UserInterface extends ConsumerStatefulWidget {
 class _UserInterfaceState extends ConsumerState<UserInterface> {
   late Map userInterface;
 
-  late String fontSize;
+  late String fontSizeVal;
   late String themeMode;
   late String language;
 
@@ -58,20 +58,20 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
           userInterface = data!;
 
           switch (userInterface['fontSizeFactor']) {
-            case 0.875:
-              fontSize = Translations.of(context).text('small');
+            case 'Small':
+              fontSizeVal = Translations.of(context).text('small');
               break;
-            case 1.0:
-              fontSize = Translations.of(context).text('medium');
+            case 'Medium':
+              fontSizeVal = Translations.of(context).text('medium');
               break;
-            case 1.125:
-              fontSize = Translations.of(context).text('large');
+            case 'Large':
+              fontSizeVal = Translations.of(context).text('large');
               break;
-            case 1.25:
-              fontSize = Translations.of(context).text('extraLarge');
+            case 'Extra Large':
+              fontSizeVal = Translations.of(context).text('extraLarge');
               break;
             default:
-              fontSize = Translations.of(context).text('medium');
+              fontSizeVal = Translations.of(context).text('medium');
               break;
           }
 
@@ -221,19 +221,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
                           if (platformBrightness == Brightness.dark) {
                             switch (data['fontSizeFactor']) {
-                              case 0.875:
+                              case 'Small':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_small');
                                 break;
-                              case 1.0:
+                              case 'Medium':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_medium');
                                 break;
-                              case 1.125:
+                              case 'Large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_large');
                                 break;
-                              case 1.25:
+                              case 'Extra Large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_extra_large');
                                 break;
@@ -243,19 +243,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             }
                           } else if (platformBrightness == Brightness.light) {
                             switch (data['fontSizeFactor']) {
-                              case 0.875:
+                              case 'Small':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_small');
                                 break;
-                              case 1.0:
+                              case 'Medium':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_medium');
                                 break;
-                              case 1.125:
+                              case 'Large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_large');
                                 break;
-                              case 1.25:
+                              case 'extraLarge':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_extra_large');
                                 break;
@@ -270,19 +270,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           userInterface['themeMode'] = 'Light';
 
                           switch (userInterface['fontSizeFactor']) {
-                            case 0.875:
+                            case 'Small':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_small');
                               break;
-                            case 1.0:
+                            case 'Medium':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_medium');
                               break;
-                            case 1.125:
+                            case 'Large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_large');
                               break;
-                            case 1.25:
+                            case 'Extra Large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_extra_large');
                               break;
@@ -296,19 +296,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           userInterface['themeMode'] = 'Dark';
 
                           switch (userInterface['fontSizeFactor']) {
-                            case 0.875:
+                            case 'Small':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_small');
                               break;
-                            case 1.0:
+                            case 'Medium':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_medium');
                               break;
-                            case 1.125:
+                            case 'Large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_large');
                               break;
-                            case 1.25:
+                            case 'Extra Large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_extra_large');
                               break;
@@ -363,27 +363,26 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: fontSize,
+                    value: fontSizeVal,
                     onChanged: (String? newValue) {
                       setState(() {
-                        fontSize = newValue!;
-                        double scaleFactor;
+                        fontSizeVal = newValue!;
+                        String scaleFactor;
 
-                        // TODO: Research system font size scaling
                         if (newValue ==
                             Translations.of(context).text('small')) {
-                          scaleFactor = 0.875;
+                          scaleFactor = 'Small';
                         } else if (newValue ==
                             Translations.of(context).text('medium')) {
-                          scaleFactor = 1.0;
+                          scaleFactor = 'Medium';
                         } else if (newValue ==
                             Translations.of(context).text('large')) {
-                          scaleFactor = 1.125;
+                          scaleFactor = 'Large';
                         } else if (newValue ==
                             Translations.of(context).text('extraLarge')) {
-                          scaleFactor = 1.25;
+                          scaleFactor = 'Extra Large';
                         } else {
-                          scaleFactor = 1.0;
+                          scaleFactor = 'Medium';
                         }
 
                         userInterface['fontSizeFactor'] = scaleFactor;
@@ -394,54 +393,34 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             .hiveService
                             .saveUserInterfaceSettings(userInterface);
 
-                        switch (
-                            ThemeProvider.themeOf(context).data.brightness) {
-                          case Brightness.dark:
-                            switch (scaleFactor) {
-                              case 0.875:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_small');
-                                break;
-                              case 1.0:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                                break;
-                              case 1.125:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_large');
-                                break;
-                              case 1.25:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                            }
-                            break;
-                          case Brightness.light:
-                            switch (scaleFactor) {
-                              case 0.875:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_small');
-                                break;
-                              case 1.0:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                                break;
-                              case 1.125:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_large');
-                                break;
-                              case 1.25:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                            }
-                            break;
+                        if (themeModeConfig == 'Dark') {
+                          if (scaleFactor == 'Small') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_small');
+                          } else if (scaleFactor == 'Medium') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_medium');
+                          } else if (scaleFactor == 'Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_large');
+                          } else if (scaleFactor == 'Extra Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_extra_large');
+                          }
+                        } else if (themeModeConfig == 'Light') {
+                          if (scaleFactor == 'Small') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_small');
+                          } else if (scaleFactor == 'Medium') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_medium');
+                          } else if (scaleFactor == 'Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_large');
+                          } else if (scaleFactor == 'Extra Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_extra_large');
+                          }
                         }
                       });
                     },

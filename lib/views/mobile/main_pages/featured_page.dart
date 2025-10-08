@@ -208,8 +208,18 @@ class PodcastsCard extends ConsumerWidget {
         loading: () => Column(
           children: [
             ListTile(
-              leading: Text(title),
-              trailing: Text(Translations.of(context).text('seeAll')),
+              leading: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
+              trailing: Text(
+                Translations.of(context).text('seeAll'),
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+              ),
             ),
             SizedBox(
               height: featuredCardHeight,

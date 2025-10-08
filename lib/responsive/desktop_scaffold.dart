@@ -268,7 +268,7 @@ class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
                 leading: const Icon(Icons.home_rounded),
                 title: Text(Translations.of(context).text('home')),
                 onTap: () {
-                  widget.onPageSelected(const Text('home'));
+                  widget.onPageSelected(Text('home'));
                 },
               ),
               const Divider(),

@@ -31,7 +31,7 @@ class UserInterface extends ConsumerStatefulWidget {
 class _UserInterfaceState extends ConsumerState<UserInterface> {
   late Map userInterface;
 
-  late String fontSize;
+  late String fontSizeVal;
   late String themeMode;
   late String language;
 
@@ -59,20 +59,20 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
           userInterface = data!;
 
           switch (userInterface['fontSizeFactor']) {
-            case 0.875:
-              fontSize = Translations.of(context).text('small');
+            case 'Small':
+              fontSizeVal = Translations.of(context).text('small');
               break;
-            case 1.0:
-              fontSize = Translations.of(context).text('medium');
+            case 'Medium':
+              fontSizeVal = Translations.of(context).text('medium');
               break;
-            case 1.125:
-              fontSize = Translations.of(context).text('large');
+            case 'Large':
+              fontSizeVal = Translations.of(context).text('large');
               break;
-            case 1.25:
-              fontSize = Translations.of(context).text('extraLarge');
+            case 'Extra Large':
+              fontSizeVal = Translations.of(context).text('extraLarge');
               break;
             default:
-              fontSize = Translations.of(context).text('medium');
+              fontSizeVal = Translations.of(context).text('medium');
               break;
           }
 
@@ -222,19 +222,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
                           if (platformBrightness == Brightness.dark) {
                             switch (data['fontSizeFactor']) {
-                              case 0.875:
+                              case 'small':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_small');
                                 break;
-                              case 1.0:
+                              case 'medium':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_medium');
                                 break;
-                              case 1.125:
+                              case 'large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_large');
                                 break;
-                              case 1.25:
+                              case 'extraLarge':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_dark_extra_large');
                                 break;
@@ -244,19 +244,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             }
                           } else if (platformBrightness == Brightness.light) {
                             switch (data['fontSizeFactor']) {
-                              case 0.875:
+                              case 'small':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_small');
                                 break;
-                              case 1.0:
+                              case 'medium':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_medium');
                                 break;
-                              case 1.125:
+                              case 'large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_large');
                                 break;
-                              case 1.25:
+                              case 'extraLarge':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_extra_large');
                                 break;
@@ -271,19 +271,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           userInterface['themeMode'] = 'Light';
 
                           switch (userInterface['fontSizeFactor']) {
-                            case 0.875:
+                            case 'small':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_small');
                               break;
-                            case 1.0:
+                            case 'medium':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_medium');
                               break;
-                            case 1.125:
+                            case 'large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_large');
                               break;
-                            case 1.25:
+                            case 'extraLarge':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_light_extra_large');
                               break;
@@ -297,19 +297,19 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           userInterface['themeMode'] = 'Dark';
 
                           switch (userInterface['fontSizeFactor']) {
-                            case 0.875:
+                            case 'small':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_small');
                               break;
-                            case 1.0:
+                            case 'medium':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_medium');
                               break;
-                            case 1.125:
+                            case 'large':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_large');
                               break;
-                            case 1.25:
+                            case 'extraLarge':
                               ThemeProvider.controllerOf(context)
                                   .setTheme('blue_accent_dark_extra_large');
                               break;
@@ -364,27 +364,26 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
                     ),
-                    value: fontSize,
+                    value: fontSizeVal,
                     onChanged: (String? newValue) {
                       setState(() {
-                        fontSize = newValue!;
-                        double scaleFactor;
+                        fontSizeVal = newValue!;
+                        String scaleFactor;
 
-                        // TODO: Research system font size scaling
                         if (newValue ==
                             Translations.of(context).text('small')) {
-                          scaleFactor = 0.875;
+                          scaleFactor = 'Small';
                         } else if (newValue ==
                             Translations.of(context).text('medium')) {
-                          scaleFactor = 1.0;
+                          scaleFactor = 'Medium';
                         } else if (newValue ==
                             Translations.of(context).text('large')) {
-                          scaleFactor = 1.125;
+                          scaleFactor = 'Large';
                         } else if (newValue ==
                             Translations.of(context).text('extraLarge')) {
-                          scaleFactor = 1.25;
+                          scaleFactor = 'Extra Large';
                         } else {
-                          scaleFactor = 1.0;
+                          scaleFactor = 'Medium';
                         }
 
                         userInterface['fontSizeFactor'] = scaleFactor;
@@ -395,54 +394,34 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             .hiveService
                             .saveUserInterfaceSettings(userInterface);
 
-                        switch (
-                            ThemeProvider.themeOf(context).data.brightness) {
-                          case Brightness.dark:
-                            switch (scaleFactor) {
-                              case 0.875:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_small');
-                                break;
-                              case 1.0:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                                break;
-                              case 1.125:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_large');
-                                break;
-                              case 1.25:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                            }
-                            break;
-                          case Brightness.light:
-                            switch (scaleFactor) {
-                              case 0.875:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_small');
-                                break;
-                              case 1.0:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                                break;
-                              case 1.125:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_large');
-                                break;
-                              case 1.25:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                            }
-                            break;
+                        if (themeModeConfig == 'Dark') {
+                          if (scaleFactor == 'Small') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_small');
+                          } else if (scaleFactor == 'Medium') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_medium');
+                          } else if (scaleFactor == 'Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_large');
+                          } else if (scaleFactor == 'Extra Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_dark_extra_large');
+                          }
+                        } else if (themeModeConfig == 'Light') {
+                          if (scaleFactor == 'Small') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_small');
+                          } else if (scaleFactor == 'Medium') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_medium');
+                          } else if (scaleFactor == 'Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_large');
+                          } else if (scaleFactor == 'Extra Large') {
+                            ThemeProvider.controllerOf(context)
+                                .setTheme('blue_accent_light_extra_large');
+                          }
                         }
                       });
                     },
@@ -474,92 +453,90 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       fontWeight: FontWeight.w400,
                     ),
                     value: language,
-                                          onChanged: (String? newValue) {
-                                            String saveValue;
-                                            String locale;
-                    
-                                            if (newValue ==
-                                                Translations.of(context).text('english')) {
-                                              saveValue = 'English';
-                                              locale = Localization.en_US;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('spanish')) {
-                                              saveValue = 'Spanish';
-                                              locale = Localization.es_ES;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('french')) {
-                                              saveValue = 'French';
-                                              locale = Localization.fr_FR;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('german')) {
-                                              saveValue = 'German';
-                                              locale = Localization.de_DE;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('italian')) {
-                                              saveValue = 'Italian';
-                                              locale = Localization.it_IT;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('portuguese')) {
-                                              saveValue = 'Portuguese';
-                                              locale = Localization.pt_PT;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('russian')) {
-                                              saveValue = 'Russian';
-                                              locale = Localization.ru_RU;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('chinese')) {
-                                              saveValue = 'Chinese';
-                                              locale = Localization.zh_CN;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('japanese')) {
-                                              saveValue = 'Japanese';
-                                              locale = Localization.ja_JP;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('korean')) {
-                                              saveValue = 'Korean';
-                                              locale = Localization.ko_KR;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('arabic')) {
-                                              saveValue = 'Arabic';
-                                              locale = Localization.ar_AE;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('hebrew')) {
-                                              saveValue = 'Hebrew';
-                                              locale = Localization.he_IL;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('dutch')) {
-                                              saveValue = 'Dutch';
-                                              locale = Localization.nl_NL;
-                                            } else if (newValue ==
-                                                Translations.of(context).text('swedish')) {
-                                              saveValue = 'Swedish';
-                                              locale = Localization.sv_SE;
-                                            } else {
-                                              saveValue = 'English';
-                                              locale = Localization.en_US;
-                                            }
-                    
-                                            setState(() {
-                                              userInterface['language'] = saveValue;
-                                              userInterface['locale'] = locale;
-                                              languageConfig = userInterface['language'];
-                                              localeConfig = userInterface['locale'];
-                    
-                                              final localeParts = locale.split('_');
-                                              final languageCode = localeParts[0];
-                                              final countryCode = localeParts[1];
-                                              final newLocale =
-                                                  Locale(languageCode, countryCode);
-                                              ref
-                                                  .read(localeProvider.notifier)
-                                                  .setLocale(newLocale);
-                    
-                                              ref
-                                                  .watch(openAirProvider)
-                                                  .hiveService
-                                                  .saveUserInterfaceSettings(userInterface);
-                                            });
-                                          },                    items: <String>[
+                    onChanged: (String? newValue) {
+                      String saveValue;
+                      String locale;
+
+                      if (newValue ==
+                          Translations.of(context).text('english')) {
+                        saveValue = 'English';
+                        locale = Localization.en_US;
+                      } else if (newValue ==
+                          Translations.of(context).text('spanish')) {
+                        saveValue = 'Spanish';
+                        locale = Localization.es_ES;
+                      } else if (newValue ==
+                          Translations.of(context).text('french')) {
+                        saveValue = 'French';
+                        locale = Localization.fr_FR;
+                      } else if (newValue ==
+                          Translations.of(context).text('german')) {
+                        saveValue = 'German';
+                        locale = Localization.de_DE;
+                      } else if (newValue ==
+                          Translations.of(context).text('italian')) {
+                        saveValue = 'Italian';
+                        locale = Localization.it_IT;
+                      } else if (newValue ==
+                          Translations.of(context).text('portuguese')) {
+                        saveValue = 'Portuguese';
+                        locale = Localization.pt_PT;
+                      } else if (newValue ==
+                          Translations.of(context).text('russian')) {
+                        saveValue = 'Russian';
+                        locale = Localization.ru_RU;
+                      } else if (newValue ==
+                          Translations.of(context).text('chinese')) {
+                        saveValue = 'Chinese';
+                        locale = Localization.zh_CN;
+                      } else if (newValue ==
+                          Translations.of(context).text('japanese')) {
+                        saveValue = 'Japanese';
+                        locale = Localization.ja_JP;
+                      } else if (newValue ==
+                          Translations.of(context).text('korean')) {
+                        saveValue = 'Korean';
+                        locale = Localization.ko_KR;
+                      } else if (newValue ==
+                          Translations.of(context).text('arabic')) {
+                        saveValue = 'Arabic';
+                        locale = Localization.ar_AE;
+                      } else if (newValue ==
+                          Translations.of(context).text('hebrew')) {
+                        saveValue = 'Hebrew';
+                        locale = Localization.he_IL;
+                      } else if (newValue ==
+                          Translations.of(context).text('dutch')) {
+                        saveValue = 'Dutch';
+                        locale = Localization.nl_NL;
+                      } else if (newValue ==
+                          Translations.of(context).text('swedish')) {
+                        saveValue = 'Swedish';
+                        locale = Localization.sv_SE;
+                      } else {
+                        saveValue = 'English';
+                        locale = Localization.en_US;
+                      }
+
+                      setState(() {
+                        userInterface['language'] = saveValue;
+                        userInterface['locale'] = locale;
+                        languageConfig = userInterface['language'];
+                        localeConfig = userInterface['locale'];
+
+                        final localeParts = locale.split('_');
+                        final languageCode = localeParts[0];
+                        final countryCode = localeParts[1];
+                        final newLocale = Locale(languageCode, countryCode);
+                        ref.read(localeProvider.notifier).setLocale(newLocale);
+
+                        ref
+                            .watch(openAirProvider)
+                            .hiveService
+                            .saveUserInterfaceSettings(userInterface);
+                      });
+                    },
+                    items: <String>[
                       Translations.of(context).text('english'),
                       Translations.of(context).text('spanish'),
                       Translations.of(context).text('french'),

@@ -21,26 +21,23 @@ class PodcastIndexSearchPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Search for "$searchWord"'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              tooltip: 'Refreash',
-              onPressed: () {
-                // TODO Implement refreash mechanic
-              },
-              icon: const Icon(Icons.refresh_rounded),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemCount: podcasts.count,
-          itemBuilder: (context, index) => PodcastIndexSearchCard(
-            podcastItem: podcasts.feeds[index],
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 3 / 4,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
           ),
+          cacheExtent: cacheExtent,
+          itemCount: podcasts.count,
+          itemBuilder: (context, index) {
+            return PodcastIndexSearchCard(
+              podcastItem: podcasts.feeds[index],
+            );
+          },
         ),
       ),
       bottomNavigationBar: SizedBox(

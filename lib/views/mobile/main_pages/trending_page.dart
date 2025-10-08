@@ -8,8 +8,6 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/mobile/widgets/podcast_card.dart';
 
-// TODO Add a button to refresh data
-
 final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     FutureProvider.autoDispose((ref) async {
   final FetchDataModel? trendingPodcastData =

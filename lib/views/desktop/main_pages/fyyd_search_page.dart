@@ -20,26 +20,29 @@ class FyydSearchPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Search for "$searchWord"'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              tooltip: 'Refreash',
-              onPressed: () {
-                // TODO Implement refreash mechanic
-              },
-              icon: const Icon(Icons.refresh_rounded),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemCount: podcasts.length,
-          itemBuilder: (context, index) => FyydSearchCard(
-            podcastItem: podcasts[index],
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 3 / 4,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
           ),
+          cacheExtent: cacheExtent,
+          itemCount: podcasts.length,
+          itemBuilder: (context, index) {
+            debugPrint(podcasts[index].toString());
+
+            if (podcasts[index]['imgURL'] == null) {
+              return Container();
+            }
+
+            return FyydSearchCard(
+              podcastItem: podcasts[index],
+            );
+          },
         ),
       ),
       bottomNavigationBar: SizedBox(

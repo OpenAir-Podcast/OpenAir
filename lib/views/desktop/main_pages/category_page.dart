@@ -347,6 +347,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
 
                     ref.invalidate(
                         podcastDataByCategoryProvider(widget.category));
+
                     Future.delayed(const Duration(seconds: 1), () async {
                       setState(() {});
                     });

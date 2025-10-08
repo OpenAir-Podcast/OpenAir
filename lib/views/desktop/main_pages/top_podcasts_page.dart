@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/desktop/widgets/podcast_card.dart';
@@ -15,17 +16,21 @@ final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     return topFeaturedPodcastData;
   }
 
-  debugPrint('Getting Top podcast from PodcastIndex');
   final podcastIndexService = ref.watch(podcastIndexProvider);
   final data = await podcastIndexService.getTrendingPodcasts();
   return FetchDataModel.fromJson(data);
 });
 
-class TopPodcastsPage extends ConsumerWidget {
+class TopPodcastsPage extends ConsumerStatefulWidget {
   const TopPodcastsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TopPodcastsPage> createState() => _TopPodcastsPageState();
+}
+
+class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
+  @override
+  Widget build(BuildContext context) {
     final podcastDataAsyncTrendingValue =
         ref.watch(podcastDataByTrendingProvider);
 
@@ -83,15 +88,35 @@ class TopPodcastsPage extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(Translations.of(context).text('topPodcasts')),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  tooltip: Translations.of(context).text('refresh'),
+                  onPressed: () {
+                    ref
+                        .watch(hiveServiceProvider)
+                        .removeAllTopFeaturedPodcasts();
+
+                    ref.invalidate(podcastDataByTrendingProvider);
+
+                    Future.delayed(const Duration(seconds: 1), () async {
+                      setState(() {});
+                    });
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
+              ),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
-                childAspectRatio: 3 / 2,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
+                childAspectRatio: 3 / 4,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
               ),
               itemCount: snapshot.feeds.length,
               itemBuilder: (context, index) {
