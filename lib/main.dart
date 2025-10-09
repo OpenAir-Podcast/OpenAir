@@ -111,39 +111,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             themes: [
               // Light Theme
               AppTheme(
-                id: "blue_accent_light_small",
-                description: "Light theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.light,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
-                  primaryColor: primaryColorLight,
-                  appBarTheme: appBarThemeLight,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorLight,
-                  colorScheme: colorSchemeLight,
-                  textTheme: const TextTheme(
-                    bodyLarge: TextStyle(fontSize: 12.0),
-                    bodyMedium: TextStyle(fontSize: 11.0),
-                    bodySmall: TextStyle(fontSize: 10.0),
-                    displayLarge: TextStyle(fontSize: 12.0),
-                    displayMedium: TextStyle(fontSize: 11.0),
-                    displaySmall: TextStyle(fontSize: 10.0),
-                    headlineLarge: TextStyle(fontSize: 12.0),
-                    headlineMedium: TextStyle(fontSize: 11.0),
-                    headlineSmall: TextStyle(fontSize: 10.0),
-                    labelLarge: TextStyle(fontSize: 12.0),
-                    labelMedium: TextStyle(fontSize: 11.0),
-                    labelSmall: TextStyle(fontSize: 10.0),
-                    titleLarge: TextStyle(fontSize: 12.0),
-                    titleMedium: TextStyle(fontSize: 11.0),
-                    titleSmall: TextStyle(fontSize: 10.0),
-                  ),
-                  snackBarTheme: snackBarThemeLight,
-                  listTileTheme: listTileThemeLight,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_light_medium",
+                id: "blue_accent_light_small", // Previously Medium
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
@@ -175,7 +143,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 ),
               ),
               AppTheme(
-                id: "blue_accent_light_large",
+                id: "blue_accent_light_medium", // Previously Large
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
@@ -207,7 +175,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 ),
               ),
               AppTheme(
-                id: "blue_accent_light_extra_large",
+                id: "blue_accent_light_large", // Previously Extra Large
                 description: "Light theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.light,
@@ -233,6 +201,38 @@ class _MyAppState extends ConsumerState<MyApp> {
                     titleLarge: TextStyle(fontSize: 18.0),
                     titleMedium: TextStyle(fontSize: 17.0),
                     titleSmall: TextStyle(fontSize: 16.0),
+                  ),
+                  snackBarTheme: snackBarThemeLight,
+                  listTileTheme: listTileThemeLight,
+                ),
+              ),
+              AppTheme(
+                id: "blue_accent_light_extra_large", // New Extra Large
+                description: "Light theme with blue accent",
+                data: ThemeData(
+                  brightness: Brightness.light,
+                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+                  primaryColor: primaryColorLight,
+                  appBarTheme: appBarThemeLight,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorLight,
+                  colorScheme: colorSchemeLight,
+                  textTheme: const TextTheme(
+                    bodyLarge: TextStyle(fontSize: 20.0),
+                    bodyMedium: TextStyle(fontSize: 19.0),
+                    bodySmall: TextStyle(fontSize: 18.0),
+                    displayLarge: TextStyle(fontSize: 20.0),
+                    displayMedium: TextStyle(fontSize: 19.0),
+                    displaySmall: TextStyle(fontSize: 18.0),
+                    headlineLarge: TextStyle(fontSize: 20.0),
+                    headlineMedium: TextStyle(fontSize: 19.0),
+                    headlineSmall: TextStyle(fontSize: 18.0),
+                    labelLarge: TextStyle(fontSize: 20.0),
+                    labelMedium: TextStyle(fontSize: 19.0),
+                    labelSmall: TextStyle(fontSize: 18.0),
+                    titleLarge: TextStyle(fontSize: 20.0),
+                    titleMedium: TextStyle(fontSize: 19.0),
+                    titleSmall: TextStyle(fontSize: 18.0),
                   ),
                   snackBarTheme: snackBarThemeLight,
                   listTileTheme: listTileThemeLight,
@@ -240,39 +240,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               ),
               // Dark Theme
               AppTheme(
-                id: "blue_accent_dark_small",
-                description: "Dark theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
-                  primaryColor: primaryColorDark,
-                  appBarTheme: appBarThemeDark,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorDark,
-                  colorScheme: colorSchemeDark,
-                  textTheme: const TextTheme(
-                    bodyLarge: TextStyle(fontSize: 12.0),
-                    bodyMedium: TextStyle(fontSize: 11.0),
-                    bodySmall: TextStyle(fontSize: 10.0),
-                    displayLarge: TextStyle(fontSize: 12.0),
-                    displayMedium: TextStyle(fontSize: 11.0),
-                    displaySmall: TextStyle(fontSize: 10.0),
-                    headlineLarge: TextStyle(fontSize: 12.0),
-                    headlineMedium: TextStyle(fontSize: 11.0),
-                    headlineSmall: TextStyle(fontSize: 10.0),
-                    labelLarge: TextStyle(fontSize: 12.0),
-                    labelMedium: TextStyle(fontSize: 11.0),
-                    labelSmall: TextStyle(fontSize: 10.0),
-                    titleLarge: TextStyle(fontSize: 12.0),
-                    titleMedium: TextStyle(fontSize: 11.0),
-                    titleSmall: TextStyle(fontSize: 10.0),
-                  ),
-                  snackBarTheme: snackBarThemeDark,
-                  listTileTheme: listTileThemeDark,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_dark_medium",
+                id: "blue_accent_dark_small", // Previously Medium
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
@@ -304,7 +272,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 ),
               ),
               AppTheme(
-                id: "blue_accent_dark_large",
+                id: "blue_accent_dark_medium", // Previously Large
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
@@ -336,7 +304,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 ),
               ),
               AppTheme(
-                id: "blue_accent_dark_extra_large",
+                id: "blue_accent_dark_large", // Previously Extra Large
                 description: "Dark theme with blue accent",
                 data: ThemeData(
                   brightness: Brightness.dark,
@@ -362,6 +330,38 @@ class _MyAppState extends ConsumerState<MyApp> {
                     titleLarge: TextStyle(fontSize: 18.0),
                     titleMedium: TextStyle(fontSize: 17.0),
                     titleSmall: TextStyle(fontSize: 16.0),
+                  ),
+                  snackBarTheme: snackBarThemeDark,
+                  listTileTheme: listTileThemeDark,
+                ),
+              ),
+              AppTheme(
+                id: "blue_accent_dark_extra_large", // New Extra Large
+                description: "Dark theme with blue accent",
+                data: ThemeData(
+                  brightness: Brightness.dark,
+                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+                  primaryColor: primaryColorDark,
+                  appBarTheme: appBarThemeDark,
+                  floatingActionButtonTheme: floatingActionButtonTheme,
+                  cardColor: cardColorDark,
+                  colorScheme: colorSchemeDark,
+                  textTheme: const TextTheme(
+                    bodyLarge: TextStyle(fontSize: 20.0),
+                    bodyMedium: TextStyle(fontSize: 19.0),
+                    bodySmall: TextStyle(fontSize: 18.0),
+                    displayLarge: TextStyle(fontSize: 20.0),
+                    displayMedium: TextStyle(fontSize: 19.0),
+                    displaySmall: TextStyle(fontSize: 18.0),
+                    headlineLarge: TextStyle(fontSize: 20.0),
+                    headlineMedium: TextStyle(fontSize: 19.0),
+                    headlineSmall: TextStyle(fontSize: 18.0),
+                    labelLarge: TextStyle(fontSize: 20.0),
+                    labelMedium: TextStyle(fontSize: 19.0),
+                    labelSmall: TextStyle(fontSize: 18.0),
+                    titleLarge: TextStyle(fontSize: 20.0),
+                    titleMedium: TextStyle(fontSize: 19.0),
+                    titleSmall: TextStyle(fontSize: 18.0),
                   ),
                   snackBarTheme: snackBarThemeDark,
                   listTileTheme: listTileThemeDark,
