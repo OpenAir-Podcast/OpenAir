@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -16,7 +17,7 @@ import 'package:openair/views/mobile/main_pages/episodes_page.dart';
 import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:openair/views/mobile/widgets/play_button_widget.dart';
-import 'package:styled_text/styled_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final isEpisodeNewProvider =
     FutureProvider.family<bool, String>((ref, guid) async {
@@ -179,16 +180,23 @@ class _SubscriptionEpisodeCardState
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: SizedBox(
                         height: 88.0,
-                        child: StyledText(
-                          text: widget.episodeItem['description'],
-                          maxLines: 4,
-                          style: TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            color:
-                                Brightness.dark == Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                          ),
+                        child: Html(
+                          data: widget.episodeItem['description'],
+                          onLinkTap: (url, attributes, element) async {
+                            await launchUrl(Uri.parse(url!));
+                          },
+                          style: {
+                            "body": Style(
+                              maxLines: 4,
+                              textOverflow: TextOverflow.ellipsis,
+                              margin: Margins.zero,
+                              fontSize: FontSize(14.0),
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          },
                         ),
                       ),
                     ),

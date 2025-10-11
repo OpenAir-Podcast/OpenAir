@@ -197,3 +197,56 @@ double smallFontSize = 0.875;
 double mediumFontSize = 1.0;
 double largeFontSize = 1.125;
 double extraLargeFontSize = 1.25;
+
+const TextTheme baseTextTheme = TextTheme(
+  displayLarge: TextStyle(fontSize: 57.0, fontWeight: FontWeight.w400),
+  displayMedium: TextStyle(fontSize: 45.0, fontWeight: FontWeight.w400),
+  displaySmall: TextStyle(fontSize: 36.0, fontWeight: FontWeight.w400),
+  headlineLarge: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w400),
+  headlineMedium: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w400),
+  headlineSmall: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w400),
+  titleLarge: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500),
+  titleMedium: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+  titleSmall: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+  labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+  labelMedium: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500),
+  labelSmall: TextStyle(fontSize: 11.0, fontWeight: FontWeight.w500),
+  bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+  bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400),
+  bodySmall: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w400),
+);
+
+TextTheme scaleTextTheme(TextTheme base, double scaleFactor) {
+  return base.copyWith(
+    displayLarge: base.displayLarge
+        ?.copyWith(fontSize: base.displayLarge!.fontSize! * scaleFactor),
+    displayMedium: base.displayMedium
+        ?.copyWith(fontSize: base.displayMedium!.fontSize! * scaleFactor),
+    displaySmall: base.displaySmall
+        ?.copyWith(fontSize: base.displaySmall!.fontSize! * scaleFactor),
+    headlineLarge: base.headlineLarge
+        ?.copyWith(fontSize: base.headlineLarge!.fontSize! * scaleFactor),
+    headlineMedium: base.headlineMedium
+        ?.copyWith(fontSize: base.headlineMedium!.fontSize! * scaleFactor),
+    headlineSmall: base.headlineSmall
+        ?.copyWith(fontSize: base.headlineSmall!.fontSize! * scaleFactor),
+    titleLarge: base.titleLarge
+        ?.copyWith(fontSize: base.titleLarge!.fontSize! * scaleFactor),
+    titleMedium: base.titleMedium
+        ?.copyWith(fontSize: base.titleMedium!.fontSize! * scaleFactor),
+    titleSmall: base.titleSmall
+        ?.copyWith(fontSize: base.titleSmall!.fontSize! * scaleFactor),
+    labelLarge: base.labelLarge
+        ?.copyWith(fontSize: base.labelLarge!.fontSize! * scaleFactor),
+    labelMedium: base.labelMedium
+        ?.copyWith(fontSize: base.labelMedium!.fontSize! * scaleFactor),
+    labelSmall: base.labelSmall
+        ?.copyWith(fontSize: base.labelSmall!.fontSize! * scaleFactor),
+    bodyLarge: base.bodyLarge
+        ?.copyWith(fontSize: base.bodyLarge!.fontSize! * scaleFactor),
+    bodyMedium: base.bodyMedium
+        ?.copyWith(fontSize: base.bodyMedium!.fontSize! * scaleFactor),
+    bodySmall: base.bodySmall
+        ?.copyWith(fontSize: base.bodySmall!.fontSize! * scaleFactor),
+  );
+}

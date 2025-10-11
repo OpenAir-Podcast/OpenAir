@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "ダウンロード済みのすべてのポッドキャストを削除しました",
     "downloadLimitOf": "ダウンロード制限",
     "episodesReached": "エピソードに達しました",
-    "newEpisodeAvailable": "新しいエピソードが利用可能です"
+    "newEpisodeAvailable": "新しいエピソードが利用可能です",
+    "provider": "プロバイダー",
+    "userID": "ユーザーID",
+    "accountCreated": "アカウント作成日",
+    "lastSignIn": "最終サインイン",
+    "lastUpdate": "最終更新",
+    "sync": "同期",
+    "loginSuccess": "ログイン成功"
 }

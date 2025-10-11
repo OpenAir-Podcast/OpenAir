@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "כל הפודקאסטים שהורדו הוסרו",
     "downloadLimitOf": "מגבלת הורדה של",
     "episodesReached": "פרקים הושגה",
-    "newEpisodeAvailable": "פרק חדש זמין"
+    "newEpisodeAvailable": "פרק חדש זמין",
+    "provider": "ספק",
+    "userID": "מזהה משתמש",
+    "accountCreated": "החשבון נוצר",
+    "lastSignIn": "כניסה אחרונה",
+    "lastUpdate": "עדכון אחרון",
+    "sync": "סנכרן",
+    "loginSuccess": "ההתחברות הצליחה"
 }

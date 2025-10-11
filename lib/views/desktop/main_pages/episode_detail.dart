@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -14,7 +15,7 @@ import 'package:openair/views/desktop/nav_pages/favorites_page.dart';
 import 'package:openair/views/desktop/player/banner_audio_player.dart';
 import 'package:openair/views/desktop/settings_pages/notifications_page.dart';
 import 'package:openair/views/desktop/widgets/play_button_widget.dart';
-import 'package:styled_text/widgets/styled_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
   const EpisodeDetail({
@@ -451,17 +452,23 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 ),
               ),
               // Episode Description
-              // TODO: Use a rich text widget to display the description
               SingleChildScrollView(
-                child: StyledText(
-                  text: widget.episodeItem!['description'],
-                  maxLines: 4,
-                  style: TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                    color: Brightness.dark == Theme.of(context).brightness
-                        ? Colors.white
-                        : Colors.black,
-                  ),
+                child: Html(
+                  data: widget.episodeItem!['description'],
+                  onLinkTap: (url, attributes, element) async {
+                    await launchUrl(Uri.parse(url!));
+                  },
+                  style: {
+                    "body": Style(
+                      maxLines: 4,
+                      textOverflow: TextOverflow.ellipsis,
+                      margin: Margins.zero,
+                      fontSize: FontSize(14.0),
+                      color: Brightness.dark == Theme.of(context).brightness
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  },
                 ),
               ),
             ],

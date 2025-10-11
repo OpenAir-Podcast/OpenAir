@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "تمت إزالة جميع البودكاست التي تم تنزيلها",
     "downloadLimitOf": "حد التحميل لـ",
     "episodesReached": "حلقة تم الوصول إليه",
-    "newEpisodeAvailable": "حلقة جديدة متاحة"
+    "newEpisodeAvailable": "حلقة جديدة متاحة",
+    "provider": "المزود",
+    "userID": "معرف المستخدم",
+    "accountCreated": "تم إنشاء الحساب",
+    "lastSignIn": "آخر تسجيل دخول",
+    "lastUpdate": "آخر تحديث",
+    "sync": "مزامنة",
+    "loginSuccess": "تم تسجيل الدخول بنجاح"
 }

@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "Все загруженные подкасты удалены",
     "downloadLimitOf": "Лимит загрузки",
     "episodesReached": "эпизодов достигнут",
-    "newEpisodeAvailable": "Доступен новый эпизод"
+    "newEpisodeAvailable": "Доступен новый эпизод",
+    "userID": "ID пользователя",
+    "provider": "Провайдер",
+    "accountCreated": "Аккаунт создан",
+    "lastSignIn": "Последний вход",
+    "lastUpdate": "Последнее обновление",
+    "sync": "Синхронизировать",
+    "loginSuccess": "Вход выполнен успешно"
 }

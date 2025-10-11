@@ -149,7 +149,7 @@ class _DesktopScaffoldState extends ConsumerState<DesktopScaffold>
         Expanded(
           flex: 1,
           child: Card(
-            color: Colors.grey.shade100,
+            color: Theme.of(context).cardColor,
             elevation: 2.0,
             margin: EdgeInsets.zero,
             shape: const RoundedRectangleBorder(

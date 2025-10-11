@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "Alle gedownloade podcasts zijn verwijderd",
     "downloadLimitOf": "Downloadlimiet van",
     "episodesReached": "afleveringen bereikt",
-    "newEpisodeAvailable": "Nieuwe aflevering beschikbaar"
+    "newEpisodeAvailable": "Nieuwe aflevering beschikbaar",
+    "provider": "Provider",
+    "userID": "Gebruikers-ID",
+    "accountCreated": "Account aangemaakt",
+    "lastSignIn": "Laatste aanmelding",
+    "lastUpdate": "Laatste update",
+    "sync": "Synchroniseren",
+    "loginSuccess": "Inloggen succesvol"
 }

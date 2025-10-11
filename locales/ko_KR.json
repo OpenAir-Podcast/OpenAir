@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "所有已下载的播客已删除",
     "downloadLimitOf": "下载限制",
     "episodesReached": "剧集已达到",
-    "newEpisodeAvailable": "새 에피소드 사용 가능"
+    "newEpisodeAvailable": "새 에피소드 사용 가능",
+    "provider": "제공자",
+    "userID": "사용자 ID",
+    "accountCreated": "계정 생성됨",
+    "lastSignIn": "마지막 로그인",
+    "lastUpdate": "마지막 업데이트",
+    "sync": "동기화",
+    "loginSuccess": "로그인 성공"
 }

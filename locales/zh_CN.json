@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "所有已下载的播客都已删除",
     "downloadLimitOf": "下载限制",
     "episodesReached": "剧集已达到",
-    "newEpisodeAvailable": "新剧集可用"
+    "newEpisodeAvailable": "新剧集可用",
+    "provider": "提供者",
+    "userID": "用户ID",
+    "accountCreated": "账户已创建",
+    "lastSignIn": "上次登录",
+    "lastUpdate": "上次更新",
+    "sync": "同步",
+    "loginSuccess": "登录成功"
 }

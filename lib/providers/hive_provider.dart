@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
@@ -170,6 +171,41 @@ class HiveService {
 
     localeConfig = await getUserInterfaceSettings()
         .then((value) => value['locale'] ?? 'en_US');
+
+    switch (languageConfig) {
+      case 'English':
+        Translations.changeLanguage(Localization.en_US);
+        break;
+      case 'Spanish':
+        Translations.changeLanguage(Localization.es_ES);
+        break;
+      case 'French':
+        Translations.changeLanguage(Localization.fr_FR);
+        break;
+      case 'German':
+        Translations.changeLanguage(Localization.de_DE);
+        break;
+      case 'Italian':
+        Translations.changeLanguage(Localization.it_IT);
+        break;
+      case 'Portuguese':
+        Translations.changeLanguage(Localization.pt_PT);
+        break;
+      case 'Russian':
+        Translations.changeLanguage(Localization.ru_RU);
+        break;
+      case 'Chinese':
+        Translations.changeLanguage(Localization.zh_CN);
+        break;
+      case 'Japanese':
+        Translations.changeLanguage(Localization.ja_JP);
+        break;
+      case 'Korean':
+        Translations.changeLanguage(Localization.ko_KR);
+        break;
+      default:
+        Translations.changeLanguage(Localization.en_US);
+    }
 
     rewindIntervalConfig =
         playbackSettings['rewindInterval'].toString().split(' ').first;

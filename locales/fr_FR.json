@@ -418,5 +418,12 @@
     "removedAllDownloadedPodcasts": "Tous les podcasts téléchargés ont été supprimés",
     "downloadLimitOf": "Limite de téléchargement de",
     "episodesReached": "épisodes atteinte",
-    "newEpisodeAvailable": "Nouvel épisode disponible"
+    "newEpisodeAvailable": "Nouvel épisode disponible",
+    "provider": "Fournisseur",
+    "userID": "ID utilisateur",
+    "accountCreated": "Compte créé",
+    "lastSignIn": "Dernière connexion",
+    "lastUpdate": "Dernière mise à jour",
+    "sync": "Synchroniser",
+    "loginSuccess": "Connexion réussie"
 }
