@@ -6,7 +6,7 @@ description:
 
 publish_to: "none"
 
-version: 0.7.0+1
+version: 0.8.3+1
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
@@ -58,6 +58,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_ce_generator: ^1.9.2
+  rename: ^3.1.0
+  flutter_launcher_icons: ^0.13.0
 
 flutter:
   uses-material-design: true
@@ -65,7 +67,8 @@ flutter:
   assets:
     - .env
     - locales/
-    - assets/images/openair-logo.png
+    - assets/icons/icon.png
+    - assets/icons/org.openair.podcast.svg
     - assets/images/github-white-logo.png
     - assets/images/github-black-logo.png
     - assets/images/google-white-logo.png

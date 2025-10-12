@@ -220,7 +220,7 @@ class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
               children: [
                 ClipOval(
                   child: Image.asset(
-                    'assets/images/openair-logo.png',
+                    'assets/icons/icon.png',
                     width: circleSize,
                     height: circleSize,
                     fit: BoxFit.cover,
