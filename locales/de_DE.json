@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Fehler beim Laden der Warteschlange:",
     "settings": "Einstellungen",
     "userInterface": "Benutzeroberfläche",
-    "userInterfaceSubtitle": "Erscheinungsbild, Thema, Schriftgröße, Sprache, Stimme",
+    "userInterfaceSubtitle": "Erscheinungsbild, Thema, Schriftgröße, Sprache",
     "playback": "Wiedergabe",
     "playbackSubtitle": "Überspring-Intervall, Warteschlange, Geschwindigkeit, Timer",
     "downloadsSubtitle": "Aktualisierungsintervall, Auto-Download, Auto-Löschen",

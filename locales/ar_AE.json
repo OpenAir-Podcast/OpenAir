@@ -146,7 +146,7 @@
     "errorLoadingQueue": "خطأ في تحميل قائمة الانتظار:",
     "settings": "الإعدادات",
     "userInterface": "واجهة المستخدم",
-    "userInterfaceSubtitle": "المظهر، السمة، حجم الخط، اللغة، الصوت",
+    "userInterfaceSubtitle": "المظهر، السمة، حجم الخط، اللغة",
     "playback": "التشغيل",
     "playbackSubtitle": "تخطي الفاصل، قائمة الانتظار، السرعة، المؤقت",
     "downloadsSubtitle": "فاصل التحديث، التحميل التلقائي، الحذف التلقائي",

@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Erreur de chargement de la file d'attente :",
     "settings": "Paramètres",
     "userInterface": "Interface utilisateur",
-    "userInterfaceSubtitle": "Apparence, Thème, Taille de police, Langue, Voix",
+    "userInterfaceSubtitle": "Apparence, Thème, Taille de police, Langue",
     "playback": "Lecture",
     "playbackSubtitle": "Intervalle de saut, File d'attente, Vitesse, Minuterie",
     "downloadsSubtitle": "Intervalle d'actualisation, Téléchargement automatique, Suppression automatique",

@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Errore nel caricamento della coda:",
     "settings": "Impostazioni",
     "userInterface": "Interfaccia utente",
-    "userInterfaceSubtitle": "Aspetto, Tema, Dimensione carattere, Lingua, Voce",
+    "userInterfaceSubtitle": "Aspetto, Tema, Dimensione carattere, Lingua",
     "playback": "Riproduzione",
     "playbackSubtitle": "Intervallo salto, Coda, Velocità, Timer",
     "downloadsSubtitle": "Intervallo aggiornamento, Download automatico, Eliminazione automatica",

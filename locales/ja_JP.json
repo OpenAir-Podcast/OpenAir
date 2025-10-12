@@ -146,7 +146,7 @@
     "errorLoadingQueue": "キューの読み込みエラー:",
     "settings": "設定",
     "userInterface": "ユーザーインターフェース",
-    "userInterfaceSubtitle": "外観, テーマ, フォントサイズ, 言語, 音声",
+    "userInterfaceSubtitle": "外観, テーマ, フォントサイズ, 言語",
     "playback": "再生",
     "playbackSubtitle": "スキップ間隔, キュー, 速度, タイマー",
     "downloadsSubtitle": "更新間隔, 自動ダウンロード, 自動削除",

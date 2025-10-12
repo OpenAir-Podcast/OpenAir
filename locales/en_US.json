@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Error loading queue:",
     "settings": "Settings",
     "userInterface": "User Interface",
-    "userInterfaceSubtitle": "Appearance, Theme, Font Size, Language, Voice",
+    "userInterfaceSubtitle": "Appearance, Theme, Font Size, Language",
     "playback": "Playback",
     "playbackSubtitle": "Skip Interval, Queue, Speed, Timer",
     "downloadsSubtitle": "Refresh Interval, Auto Download, Auto Delete",

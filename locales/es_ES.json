@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Error al cargar la cola:",
     "settings": "Ajustes",
     "userInterface": "Interfaz de usuario",
-    "userInterfaceSubtitle": "Apariencia, Tema, Tamaño de fuente, Idioma, Voz",
+    "userInterfaceSubtitle": "Apariencia, Tema, Tamaño de fuente, Idioma",
     "playback": "Reproducción",
     "playbackSubtitle": "Intervalo de salto, Cola, Velocidad, Temporizador",
     "downloadsSubtitle": "Intervalo de actualización, Descarga automática, Eliminación automática",

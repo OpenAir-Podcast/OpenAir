@@ -1,0 +1,13 @@
+modules:
+  - name: openair
+    buildsystem: simple
+    build-commands:
+      - flutter build linux --release --no-pub
+    sources:
+      - type: git
+        url: https://github.com/OpenAir-Podcast/OpenAir.git
+        commit: 10caeaa9908cb8699f02da2d80d94e24e4701ac4
+      - type: git
+        url: https://github.com/flutter/flutter.git
+        tag: 3.48.0
+        dest: flutter

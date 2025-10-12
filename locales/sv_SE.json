@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Fel vid laddning av kö:",
     "settings": "Inställningar",
     "userInterface": "Användargränssnitt",
-    "userInterfaceSubtitle": "Utseende, Tema, Teckenstorlek, Språk, Röst",
+    "userInterfaceSubtitle": "Utseende, Tema, Teckenstorlek, Språk",
     "playback": "Uppspelning",
     "playbackSubtitle": "Hoppa intervall, Kö, Hastighet, Timer",
     "downloadsSubtitle": "Uppdateringsintervall, Automatiska nedladdningar, Automatisk radering",

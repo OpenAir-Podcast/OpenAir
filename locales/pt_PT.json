@@ -146,7 +146,7 @@
     "errorLoadingQueue": "Erro ao carregar a fila:",
     "settings": "Configurações",
     "userInterface": "Interface do usuário",
-    "userInterfaceSubtitle": "Aparência, Tema, Tamanho da fonte, Idioma, Voz",
+    "userInterfaceSubtitle": "Aparência, Tema, Tamanho da fonte, Idioma",
     "playback": "Reprodução",
     "playbackSubtitle": "Intervalo de pulo, Fila, Velocidade, Temporizador",
     "downloadsSubtitle": "Intervalo de atualização, Download automático, Exclusão automática",

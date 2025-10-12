@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/mobile/nav_pages/sign_up_page.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
@@ -385,6 +386,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   const SizedBox(height: 32),
                   ElevatedButton(
                     onPressed: () async {
+                      await ref.read(openAirProvider).synchronize(context);
                       await supabaseService.client.auth.refreshSession();
                     },
                     child: Text(Translations.of(context).text('sync')),

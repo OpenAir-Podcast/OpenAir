@@ -146,7 +146,7 @@
     "errorLoadingQueue": "加载队列错误:",
     "settings": "设置",
     "userInterface": "用户界面",
-    "userInterfaceSubtitle": "外观, 主题, 字体大小, 语言, 语音",
+    "userInterfaceSubtitle": "外观, 主题, 字体大小, 语言",
     "playback": "播放",
     "playbackSubtitle": "跳过间隔, 队列, 速度, 计时器",
     "downloadsSubtitle": "更新间隔, 自动下载, 自动删除",

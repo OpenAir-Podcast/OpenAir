@@ -799,7 +799,7 @@ class OpenAirProvider extends ChangeNotifier {
     }
   }
 
-  void synchronize(BuildContext context) async {
+  Future<void> synchronize(BuildContext context) async {
     if (syncFavouritesConfig) {
       final user = supabaseService.client.auth.currentUser;
 
