@@ -176,22 +176,27 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
               ),
             ],
           ),
-          body: GridView.builder(
-            itemCount: subs.length,
-            cacheExtent: cacheExtent,
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200.0,
-              mainAxisExtent: subscribedDesktopMainAxisExtent,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 4.0,
             ),
-            itemBuilder: (context, index) {
-              return SubscriptionCard(
-                subs: subs,
-                ref: ref,
-                index: index,
-              );
-            },
+            child: GridView.builder(
+              itemCount: subs.length,
+              cacheExtent: cacheExtent,
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200.0,
+                mainAxisExtent: subscribedDesktopMainAxisExtent,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+              ),
+              itemBuilder: (context, index) {
+                return SubscriptionCard(
+                  subs: subs,
+                  ref: ref,
+                  index: index,
+                );
+              },
+            ),
           ),
           bottomNavigationBar: SizedBox(
             height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))

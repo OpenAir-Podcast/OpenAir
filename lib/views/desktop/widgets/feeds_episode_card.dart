@@ -194,6 +194,7 @@ class _EpisodeCardState extends ConsumerState<FeedsEpisodeCard> {
                               .read(audioProvider.notifier)
                               .playerPlayButtonClicked(
                                 widget.episodeItem,
+                                context,
                               );
                         }
                       },

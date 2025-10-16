@@ -24,6 +24,7 @@ import 'package:openair/views/mobile/navigation/app_drawer.dart';
 import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
@@ -41,8 +42,6 @@ class AudioProvider extends ChangeNotifier {
   AudioProvider(this.ref);
 
   Ref ref;
-
-  late BuildContext context;
 
   late AudioPlayer player;
 
@@ -76,7 +75,6 @@ class AudioProvider extends ChangeNotifier {
   List downloadingPodcasts = [];
 
   Future<void> initAudio(BuildContext context) async {
-    this.context = context;
     player = AudioPlayer();
 
     podcastSubtitle = 'podcastImage';
@@ -116,6 +114,7 @@ class AudioProvider extends ChangeNotifier {
 
   Future<void> playerPlayButtonClicked(
     Map<String, dynamic> episodeItem,
+    BuildContext context,
   ) async {
     currentEpisode = episodeItem;
     bool isDownloaded = await isAudioFileDownloaded(currentEpisode!['guid']);
@@ -168,7 +167,7 @@ class AudioProvider extends ChangeNotifier {
       audioState = 'Play';
       loadState = 'Play';
       nextEpisode = currentEpisode;
-      updatePlaybackBar();
+      if (context.mounted) updatePlaybackBar(context);
       notifyListeners();
     } on TimeoutException catch (e) {
       debugPrint('Timeout playing audio: $e');
@@ -183,13 +182,13 @@ class AudioProvider extends ChangeNotifier {
                 '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
               );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
-              ),
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
+          //     ),
+          //   ),
+          // );
         }
       }
     } catch (e) {
@@ -206,13 +205,13 @@ class AudioProvider extends ChangeNotifier {
                 '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
               );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
-              ),
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
+          //     ),
+          //   ),
+          // );
         }
       }
     }
@@ -490,6 +489,7 @@ class AudioProvider extends ChangeNotifier {
   Future<void> queuePlayButtonClicked(
     Map<String, dynamic> queueItem,
     Duration position,
+    BuildContext context,
   ) async {
     bool isDownloaded = await isAudioFileDownloaded(queueItem['guid']);
 
@@ -547,7 +547,7 @@ class AudioProvider extends ChangeNotifier {
     audioState = 'Play';
     loadState = 'Play';
     nextEpisode = currentEpisode;
-    updatePlaybackBar();
+    if (context.mounted) updatePlaybackBar(context);
     notifyListeners();
   }
 
@@ -574,9 +574,9 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
-  void previousButtonClicked() => playPreviousEpisode();
-
-  Future<void> playPreviousEpisode() async {
+  Future<void> playPreviousEpisode(
+    BuildContext context,
+  ) async {
     // 1. Check if currentEpisode is set
     if (currentEpisode == null || currentEpisode!.isEmpty) {
       return;
@@ -628,10 +628,13 @@ class AudioProvider extends ChangeNotifier {
     currentPodcast = previousEpisode[
         'podcast']; // Assuming 'podcast' is stored in queue item
 
-    await queuePlayButtonClicked(
-      previousEpisode,
-      previousEpisode['playerPosition'], // Use the saved position
-    );
+    if (context.mounted) {
+      await queuePlayButtonClicked(
+        previousEpisode,
+        previousEpisode['playerPosition'],
+        context,
+      );
+    }
 
     notifyListeners();
   }
@@ -652,9 +655,7 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
-  void nextButtonClicked() => playNextEpisode();
-
-  Future<void> playNextEpisode() async {
+  Future<void> playNextEpisode(BuildContext context) async {
     // 1. Check if there's a current episode playing.
     if (currentEpisode == null || currentEpisode!.isEmpty) {
       return;
@@ -704,7 +705,10 @@ class AudioProvider extends ChangeNotifier {
     currentEpisode = nextEpisode;
     currentPodcast = nextEpisode['podcast'];
 
-    await queuePlayButtonClicked(nextEpisode, nextEpisode['playerPosition']);
+    if (context.mounted) {
+      await queuePlayButtonClicked(
+          nextEpisode, nextEpisode['playerPosition'], context);
+    }
 
     notifyListeners();
   }
@@ -719,14 +723,14 @@ class AudioProvider extends ChangeNotifier {
 
   void timerButtonClicked() {}
 
-  void updatePlaybackBar() async {
+  void updatePlaybackBar(BuildContext context) async {
     player.getDuration().then((Duration? value) {
       if (value != null) {
         playerTotalDuration = value;
         notifyListeners();
       } else {
         player.setSourceUrl(currentEpisode!['enclosureUrl']);
-        updatePlaybackBar();
+        if (context.mounted) updatePlaybackBar(context);
       }
     });
 
@@ -736,8 +740,10 @@ class AudioProvider extends ChangeNotifier {
       currentPlaybackPositionString =
           formatCurrentPlaybackPosition(playerPosition);
 
-      currentPlaybackRemainingTimeString = formatCurrentPlaybackRemainingTime(
-          playerPosition, playerTotalDuration);
+      if (context.mounted) {
+        currentPlaybackRemainingTimeString = formatCurrentPlaybackRemainingTime(
+            playerPosition, playerTotalDuration, context);
+      }
 
       podcastCurrentPositionInMilliseconds =
           (playerPosition.inMilliseconds / playerTotalDuration.inMilliseconds)
@@ -787,7 +793,9 @@ class AudioProvider extends ChangeNotifier {
             playerPosition,
           );
 
-          if (autoplayNextInQueueConfig) playNextInQueue();
+          if (autoplayNextInQueueConfig && context.mounted) {
+            playNextInQueue(context);
+          }
         }
       } else if (playerState == PlayerState.paused) {
         if (!onceQueueComplete) {
@@ -810,7 +818,10 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> playNewQueueItem(Map<String, dynamic> newItem) async {
+  Future<void> playNewQueueItem(
+    Map<String, dynamic> newItem,
+    BuildContext context,
+  ) async {
     // 1. Save progress of the current episode if one is active.
     if ((isPlaying == PlayingStatus.playing ||
             isPlaying == PlayingStatus.paused) &&
@@ -825,14 +836,17 @@ class AudioProvider extends ChangeNotifier {
       );
     }
 
-    // 2. Play the new item from its saved position.
-    await queuePlayButtonClicked(
-      newItem,
-      newItem['playerPosition'],
-    );
+    if (context.mounted) {
+      // 2. Play the new item from its saved position.
+      await queuePlayButtonClicked(
+        newItem,
+        newItem['playerPosition'],
+        context,
+      );
+    }
   }
 
-  void playNextInQueue() async {
+  void playNextInQueue(BuildContext context) async {
     if (currentEpisode == null || currentEpisode!['guid'] == null) {
       isPodcastSelected = false;
       audioState = 'Stop';
@@ -880,7 +894,7 @@ class AudioProvider extends ChangeNotifier {
         PodcastModel podcastData = episodeData['podcast'];
         currentPodcast = podcastData;
 
-        playNewQueueItem(episodeData);
+        if (context.mounted) playNewQueueItem(episodeData, context);
       } else {
         // 5. If the queue is empty, reset player state.
         isPodcastSelected = false;
@@ -925,7 +939,7 @@ class AudioProvider extends ChangeNotifier {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-  String getPodcastDuration(int epoch) {
+  String getPodcastDuration(int epoch, BuildContext context) {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
     int hours = dateTime.hour;
     int minutes = dateTime.minute;
@@ -940,6 +954,7 @@ class AudioProvider extends ChangeNotifier {
   String formatCurrentPlaybackRemainingTime(
     Duration timelinePosition,
     Duration timelineDuration,
+    BuildContext context,
   ) {
     int remainingSeconds =
         timelineDuration.inSeconds - timelinePosition.inSeconds;
@@ -1079,9 +1094,9 @@ class AudioProvider extends ChangeNotifier {
       initialPositionString = formatCurrentPlaybackPosition(Duration.zero);
     }
 
-    // When adding to queue, currentPlaybackRemainingTimeString in QueueModel will store the formatted total duration.
     final String formattedTotalDurationString =
-        formatCurrentPlaybackRemainingTime(Duration.zero, episodeTotalDuration);
+        formatCurrentPlaybackRemainingTime(
+            Duration.zero, episodeTotalDuration, context as BuildContext);
 
     hiveService.addToQueue({
       'guid': episode['guid'],
@@ -1123,7 +1138,8 @@ class AudioProvider extends ChangeNotifier {
 
     for (int i = 0; i < episodes['count']; i++) {
       int enclosureLength = episodes['items'][i]['enclosureLength'];
-      String duration = getPodcastDuration(enclosureLength);
+      String duration =
+          getPodcastDuration(enclosureLength, context as BuildContext);
       String size = getEpisodeSize(enclosureLength);
 
       episode = {
@@ -1273,8 +1289,9 @@ class AudioProvider extends ChangeNotifier {
 
   Future<bool> addPodcastByRssUrl(String rssUrl) async {
     try {
-      String? xmlString =
-          await ref.watch(fyydProvider).getPodcastXml(rssUrl, context);
+      String? xmlString = await ref
+          .watch(fyydProvider)
+          .getPodcastXml(rssUrl, context as BuildContext?);
 
       RssFeed rssFeed = RssFeed.parse(xmlString);
 

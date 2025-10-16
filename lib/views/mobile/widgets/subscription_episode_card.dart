@@ -205,6 +205,7 @@ class _SubscriptionEpisodeCardState
                                   .read(audioProvider.notifier)
                                   .playerPlayButtonClicked(
                                     widget.episodeItem,
+                                    context,
                                   );
                             }
                           },

@@ -212,51 +212,52 @@ class __DesktopDrawerState extends ConsumerState<_DesktopDrawer> {
 
     return Column(
       children: [
-        DrawerHeader(
-          decoration: const BoxDecoration(),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipOval(
-                  child: Image.asset(
-                    'assets/icons/icon.png',
-                    width: circleSize,
-                    height: circleSize,
-                    fit: BoxFit.cover,
+        Expanded(
+          flex: 2,
+          child: DrawerHeader(
+            child: Center(
+              child: Column(
+                spacing: 16.0,
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/icons/icon.png',
+                      width: circleSize,
+                      height: circleSize,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8.0),
-                session.when(
-                  data: (data) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        if (session.value == null) {
-                          widget.onPageSelected(SignIn(
-                            returnFromSignin: returnFromSignin,
-                          ));
-                        } else {
-                          supabaseService.signOut();
-                          ref.invalidate(getSessionProvider);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                      ),
-                      child: Text(
-                        session.value == null
-                            ? Translations.of(context).text('signIn')
-                            : Translations.of(context).text('logout'),
-                      ),
-                    );
-                  },
-                  error: (error, stackTrace) => Text(
-                    Translations.of(context).text('errorLoadingData'),
+                  session.when(
+                    data: (data) {
+                      return ElevatedButton(
+                        onPressed: () {
+                          if (session.value == null) {
+                            widget.onPageSelected(SignIn(
+                              returnFromSignin: returnFromSignin,
+                            ));
+                          } else {
+                            supabaseService.signOut();
+                            ref.invalidate(getSessionProvider);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        child: Text(
+                          session.value == null
+                              ? Translations.of(context).text('signIn')
+                              : Translations.of(context).text('logout'),
+                        ),
+                      );
+                    },
+                    error: (error, stackTrace) => Text(
+                      Translations.of(context).text('errorLoadingData'),
+                    ),
+                    loading: () => const CircularProgressIndicator(),
                   ),
-                  loading: () => const CircularProgressIndicator(),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -150,7 +150,8 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                   ),
                 ],
               ),
-              SingleChildScrollView(
+              SizedBox(
+                height: 68.0,
                 child: Html(
                   data: widget.episodeItem['description'],
                   onLinkTap: (url, attributes, element) async {
@@ -193,6 +194,7 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                               .read(audioProvider.notifier)
                               .playerPlayButtonClicked(
                                 widget.episodeItem,
+                                context,
                               );
                         }
                       },

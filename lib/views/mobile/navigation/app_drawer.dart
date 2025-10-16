@@ -83,7 +83,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 children: [
                   ClipOval(
                     child: Image.asset(
-                      'assets/images/icons/icon.png',
+                      'assets/icons/icon.png',
                       width: circleSize,
                       height: circleSize,
                       fit: BoxFit.cover,

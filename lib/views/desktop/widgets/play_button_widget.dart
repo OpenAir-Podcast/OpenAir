@@ -58,7 +58,10 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
         children: [
           Icon(Icons.play_arrow_rounded),
           Text(
-            ref.watch(audioProvider).getPodcastDuration(enclosureLengthVal),
+            ref.watch(audioProvider).getPodcastDuration(
+                  enclosureLengthVal,
+                  context,
+                ),
             overflow: TextOverflow.ellipsis,
           ),
         ],

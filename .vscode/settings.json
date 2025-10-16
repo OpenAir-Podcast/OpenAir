@@ -12,5 +12,6 @@
     "Trajan",
     "webfeed"
   ],
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "git.ignoreLimitWarning": true
 }

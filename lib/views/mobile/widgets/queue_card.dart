@@ -195,7 +195,8 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               openAir.currentPodcast = widget.episodeItem['podcast'];
               openAir.currentEpisode = widget.episodeItem;
 
-              audioProviderNotifier.playNewQueueItem(widget.episodeItem);
+              audioProviderNotifier.playNewQueueItem(
+                  widget.episodeItem, context);
             }
           },
         ),

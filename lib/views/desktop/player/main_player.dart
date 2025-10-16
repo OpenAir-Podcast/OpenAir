@@ -154,7 +154,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 children: [
                   // Previous
                   IconButton(
-                    onPressed: ref.read(audioProvider).previousButtonClicked,
+                    onPressed: () =>
+                        ref.read(audioProvider).playPreviousEpisode(context),
                     icon: SizedBox(
                       width: 52.0,
                       height: 52.0,
@@ -197,7 +198,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       ref.read(audioProvider).audioState == 'Play'
                           ? ref.read(audioProvider).playerPauseButtonClicked()
                           : ref.read(audioProvider).playerPlayButtonClicked(
-                              ref.read(audioProvider).currentEpisode!);
+                                ref.read(audioProvider).currentEpisode!,
+                                context,
+                              );
                     },
                     icon: ref.watch(audioProvider).audioState == 'Play'
                         ? const Icon(Icons.pause_rounded)
@@ -236,7 +239,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   // Next
                   IconButton(
-                    onPressed: ref.read(audioProvider).nextButtonClicked,
+                    onPressed: () =>
+                        ref.read(audioProvider).playNextEpisode(context),
                     icon: SizedBox(
                       width: 52.0,
                       height: 52.0,

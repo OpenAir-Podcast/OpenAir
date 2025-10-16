@@ -790,8 +790,7 @@ class OpenAirProvider extends ChangeNotifier {
         if (!isDownloaded) {
           ref.read(audioProvider).downloadEpisode(
                 itemMap,
-                PodcastModel.fromJson(
-                    Map<String, dynamic>.from(itemMap['podcast'])),
+                itemMap['podcast'],
                 null,
               );
         }

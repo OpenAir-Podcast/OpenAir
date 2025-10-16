@@ -94,7 +94,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                       }
 
                       PodcastModel podcastModel = PodcastModel(
-                        id: episodeData['id'],
+                        id: episodeData['id'] ?? -1,
                         title: episodeData['title'],
                         author: episodeData['author'],
                         feedUrl: episodeData['feedUrl'],
