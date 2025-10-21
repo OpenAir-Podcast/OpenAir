@@ -464,7 +464,9 @@ class OpenAirProvider extends ChangeNotifier {
       final subscription = SubscriptionModel.fromJson(mutableSubMap);
 
       await hiveService.subscribe(subscription);
-      await ref.read(audioProvider).addPodcastEpisodes(subscription);
+      if (context.mounted) {
+        await ref.read(audioProvider).addPodcastEpisodes(subscription, context);
+      }
     }
 
     // Import queue
@@ -533,6 +535,7 @@ class OpenAirProvider extends ChangeNotifier {
     // Import settings
     final List<Map<String, dynamic>> settingsMaps =
         await database.query('settings');
+        
     if (settingsMaps.isNotEmpty) {
       final settings = settingsMaps.first;
 
@@ -592,6 +595,8 @@ class OpenAirProvider extends ChangeNotifier {
       receiveNotificationsWhenPlayConfig =
           notificationsSettings['receiveNotificationsWhenPlaying'];
     }
+
+    debugPrint('Database imported from ${file.path}');
   }
 
   void updateFontSize(String size) {
@@ -867,7 +872,11 @@ class OpenAirProvider extends ChangeNotifier {
             );
 
             await hiveService.subscribe(subscription);
-            await ref.read(audioProvider).addPodcastEpisodes(subscription);
+            if (context.mounted) {
+              await ref
+                  .read(audioProvider)
+                  .addPodcastEpisodes(subscription, context);
+            }
           } catch (e) {
             debugPrint('Error parsing remote subscription item: $e');
           }
@@ -1278,8 +1287,7 @@ class OpenAirProvider extends ChangeNotifier {
       }
 
       hiveService.savePlaybackSettings({
-        'fastForwardRewindInterval':
-            remotePlayback['fastForwardRewindInterval'],
+        'fastForwardInterval': remotePlayback['fastForwardInterval'],
         'rewindInterval': remotePlayback['rewindInterval'],
         'playbackSpeed': remotePlayback['playbackSpeed'],
         'enqueuePosition': remotePlayback['enqueuePosition'],

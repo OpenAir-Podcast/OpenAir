@@ -447,7 +447,8 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
 
                               bool i = await ref
                                   .watch(audioProvider)
-                                  .addPodcastByRssUrl(textInputControl.text);
+                                  .addPodcastByRssUrl(
+                                      textInputControl.text, context);
 
                               if (context.mounted) {
                                 if (i == true) {

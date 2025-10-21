@@ -936,7 +936,7 @@ class HiveService {
     for (final outline in outlines) {
       final feedUrl = outline.getAttribute('xmlUrl');
       if (feedUrl != null) {
-        await ref.read(audioProvider).addPodcastByRssUrl(feedUrl);
+        await ref.read(audioProvider).addPodcastByRssUrl(feedUrl, context);
       }
     }
   }

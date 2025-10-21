@@ -1128,7 +1128,8 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addPodcastEpisodes(SubscriptionModel podcast) async {
+  Future<void> addPodcastEpisodes(
+      SubscriptionModel podcast, BuildContext context) async {
     final podcastIndexService = ref.read(podcastIndexProvider);
 
     Map<String, dynamic> episodes =
@@ -1138,8 +1139,12 @@ class AudioProvider extends ChangeNotifier {
 
     for (int i = 0; i < episodes['count']; i++) {
       int enclosureLength = episodes['items'][i]['enclosureLength'];
-      String duration =
-          getPodcastDuration(enclosureLength, context as BuildContext);
+      String? duration;
+
+      if (context.mounted) {
+        duration = getPodcastDuration(enclosureLength, context);
+      }
+
       String size = getEpisodeSize(enclosureLength);
 
       episode = {
@@ -1197,7 +1202,7 @@ class AudioProvider extends ChangeNotifier {
 
       final hiveService = ref.read(hiveServiceProvider);
       hiveService.subscribe(subscription);
-      await addPodcastEpisodes(subscription);
+      if (context.mounted) await addPodcastEpisodes(subscription, context);
 
       // subscriptionsProvider (from hive_provider.dart) will update reactively
       // as it watches hiveServiceProvider, which is notified by the subscribe call.
@@ -1244,6 +1249,7 @@ class AudioProvider extends ChangeNotifier {
 
   void subscribeByRssFeed(
     SubscriptionModel podcast,
+    BuildContext context,
   ) async {
     try {
       int podcastEpisodeCount = await ref
@@ -1264,7 +1270,7 @@ class AudioProvider extends ChangeNotifier {
 
       final hiveService = ref.read(hiveServiceProvider);
       hiveService.subscribe(subscription);
-      await addPodcastEpisodes(podcast);
+      if (context.mounted) await addPodcastEpisodes(podcast, context);
     } on DioException catch (e) {
       debugPrint(
           'Failed to subscribe to ${podcast.title}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
@@ -1287,7 +1293,7 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> addPodcastByRssUrl(String rssUrl) async {
+  Future<bool> addPodcastByRssUrl(String rssUrl, BuildContext context) async {
     try {
       String? xmlString = await ref
           .watch(fyydProvider)
@@ -1307,7 +1313,7 @@ class AudioProvider extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      subscribeByRssFeed(podcast);
+      subscribeByRssFeed(podcast, context);
       return true;
     } on DioException catch (e) {
       debugPrint('DioError: ${e.message}');
@@ -1347,7 +1353,7 @@ class AudioProvider extends ChangeNotifier {
       final doc = OpmlDocument.parse(xml);
 
       for (var feed in doc.body) {
-        await addPodcastByRssUrl(feed.xmlUrl!);
+        if (context.mounted) await addPodcastByRssUrl(feed.xmlUrl!, context);
       }
 
       return true;
