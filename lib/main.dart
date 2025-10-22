@@ -48,8 +48,9 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
-      minimumSize: Size(1200, 768),
+      minimumSize: Size(800, 600),
       title: 'OpenAir',
+      titleBarStyle: TitleBarStyle.normal,
     );
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {

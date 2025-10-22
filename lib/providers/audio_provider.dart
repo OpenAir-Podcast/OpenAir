@@ -1313,7 +1313,7 @@ class AudioProvider extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      subscribeByRssFeed(podcast, context);
+      if (context.mounted) subscribeByRssFeed(podcast, context);
       return true;
     } on DioException catch (e) {
       debugPrint('DioError: ${e.message}');

@@ -393,6 +393,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                             .hiveService
                             .saveUserInterfaceSettings(userInterface);
 
+                        // Apply the theme change immediately
                         if (themeModeConfig == 'Dark') {
                           if (scaleFactor == 'Small') {
                             ThemeProvider.controllerOf(context)
@@ -420,6 +421,38 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                           } else if (scaleFactor == 'Extra Large') {
                             ThemeProvider.controllerOf(context)
                                 .setTheme('blue_accent_light_extra_large');
+                          }
+                        }
+                        // System Theme
+                        else {
+                          if (platformBrightness == Brightness.dark) {
+                            if (scaleFactor == 'Small') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_small');
+                            } else if (scaleFactor == 'Medium') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_medium');
+                            } else if (scaleFactor == 'Large') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_large');
+                            } else if (scaleFactor == 'Extra Large') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_dark_extra_large');
+                            }
+                          } else if (platformBrightness == Brightness.light) {
+                            if (scaleFactor == 'Small') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_small');
+                            } else if (scaleFactor == 'Medium') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_medium');
+                            } else if (scaleFactor == 'Large') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_large');
+                            } else if (scaleFactor == 'Extra Large') {
+                              ThemeProvider.controllerOf(context)
+                                  .setTheme('blue_accent_light_extra_large');
+                            }
                           }
                         }
                       });

@@ -535,7 +535,7 @@ class OpenAirProvider extends ChangeNotifier {
     // Import settings
     final List<Map<String, dynamic>> settingsMaps =
         await database.query('settings');
-        
+
     if (settingsMaps.isNotEmpty) {
       final settings = settingsMaps.first;
 
@@ -843,7 +843,7 @@ class OpenAirProvider extends ChangeNotifier {
             'podcast_episode_count': localSub.episodeCount,
             'updated_at': DateTime.now().toIso8601String(),
           },
-          onConflict: 'user_id',
+          onConflict: 'podcast_id',
         );
       }
 
@@ -884,6 +884,7 @@ class OpenAirProvider extends ChangeNotifier {
       }
 
       ref.invalidate(getFeedsProvider);
+      debugPrint('Subscriptions synchronized');
     }
 
     if (syncQueueConfig || syncPlaybackPositionConfig) {
@@ -992,6 +993,7 @@ class OpenAirProvider extends ChangeNotifier {
       }
 
       ref.invalidate(getQueueProvider);
+      debugPrint('Queue synchronized');
     }
 
     if (syncHistoryConfig) {
@@ -1064,6 +1066,8 @@ class OpenAirProvider extends ChangeNotifier {
           }
         }
       }
+
+      debugPrint('History synchronized');
     }
 
     if (syncSettingsConfig) {
@@ -1357,6 +1361,10 @@ class OpenAirProvider extends ChangeNotifier {
 
       receiveNotificationsWhenPlayConfig =
           remoteNotifications['receiveNotificationsWhenPlaying'];
+
+      debugPrint('Settings synchronized');
     }
+
+    debugPrint('Synchronization complete');
   }
 }

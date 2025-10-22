@@ -171,8 +171,9 @@ class _EpisodeCardState extends ConsumerState<DownloadsEpisodeCard> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 28.0),
                 child: Column(
+                  spacing: 12.0,
                   children: [
                     // Play button
                     ElevatedButton(
