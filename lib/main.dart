@@ -7,12 +7,10 @@ import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/home.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/responsive/desktop_scaffold.dart';
-import 'package:openair/responsive/mobile_scaffold.dart';
-import 'package:openair/responsive/responsive_layout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:openair/services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -275,10 +273,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                       debugShowCheckedModeBanner: false,
                       title: 'OpenAir',
                       theme: themeData,
-                      home: const ResponsiveLayout(
-                        mobileScaffold: MobileScaffold(),
-                        desktopScaffold: DesktopScaffold(),
-                      ),
+                      home: Home(),
                     );
                   });
                 },

@@ -21,8 +21,8 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/mobile/nav_pages/downloads_page.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:openair/views/nav_pages/downloads_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+int wideScreenMinWidth = 1060;
+
 double bannerAudioPlayerHeight = 85.0;
 
 Color? highlightColor = Colors.grey[100];
@@ -26,20 +28,20 @@ FontWeight subscriptionCountBoxFontWeight = FontWeight.normal;
 
 double blurRadius = 10.0;
 
-int mobileCrossAxisCount = 3;
-double mobileMainAxisExtent = 500.0;
+int narrowCrossAxisCount = 3;
+double narrowMainAxisExtent = 500.0;
 
-int desktopCrossAxisCount = 5;
-double desktopMainAxisExtent = 833.0;
+int wideCrossAxisCount = 5;
+double wideMainAxisExtent = 833.0;
 
-double subscribedMobileMainAxisExtent = 236.0;
-double subscribedDesktopMainAxisExtent = 250.0;
+double subscribedNarrowMainAxisExtent = 236.0;
+double subscribedWideMainAxisExtent = 250.0;
 
-int mobileItemCountPortrait = 3;
-int mobileItemCountLandscape = 6;
+int narrowItemCountPortrait = 3;
+int narrowItemCountLandscape = 6;
 
-int desktopItemCountPortrait = 3;
-int desktopItemCountLandscape = 6;
+int wideItemCountPortrait = 3;
+int wideItemCountLandscape = 6;
 
 double featuredCardHeight = 230.0;
 
