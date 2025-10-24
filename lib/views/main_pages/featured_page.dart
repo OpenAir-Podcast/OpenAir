@@ -215,10 +215,20 @@ class PodcastsCard extends ConsumerWidget {
               height: featuredCardHeight,
               width: double.infinity,
               child: GridView.builder(
-                itemCount: narrowItemCountLandscape,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: wideScreenMinWidth < MediaQuery.sizeOf(context).width
+                    ? wideItemCount
+                    : narrowItemCount,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: narrowCrossAxisCount,
-                  mainAxisExtent: narrowMainAxisExtent,
+                  crossAxisCount: MediaQuery.sizeOf(context).width >
+                          wideScreenMinWidth
+                      ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
+                          .clamp(1, wideItemCount)
+                      : narrowCrossAxisCount,
+                  mainAxisExtent:
+                      wideScreenMinWidth < MediaQuery.sizeOf(context).width
+                          ? wideMainAxisExtent
+                          : narrowMainAxisExtent,
                 ),
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
@@ -341,13 +351,13 @@ class PodcastsCard extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount:
                       wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                          ? wideItemCountLandscape
-                          : narrowItemCountPortrait,
+                          ? wideItemCount
+                          : narrowItemCount,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: MediaQuery.sizeOf(context).width >
                             wideScreenMinWidth
                         ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
-                            .clamp(1, wideItemCountLandscape)
+                            .clamp(1, wideItemCount)
                         : narrowCrossAxisCount,
                     mainAxisExtent:
                         wideScreenMinWidth < MediaQuery.sizeOf(context).width

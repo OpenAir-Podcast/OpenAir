@@ -38,11 +38,9 @@ double wideMainAxisExtent = 833.0;
 double subscribedNarrowMainAxisExtent = 236.0;
 double subscribedWideMainAxisExtent = 250.0;
 
-int narrowItemCountPortrait = 3;
-int narrowItemCountLandscape = 6;
 
-int wideItemCountPortrait = 3;
-int wideItemCountLandscape = 6;
+int narrowItemCount = 3;
+int wideItemCount = 6;
 
 double featuredCardHeight = 230.0;
 
