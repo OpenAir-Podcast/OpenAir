@@ -369,7 +369,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               Navigator.of(context)
                   .push(
                 MaterialPageRoute(
-                    // FIXME: rebuildDrawer does not work as intended
                     builder: (context) => Settings(
                           rebuildDrawer: () => setState(() {}),
                         )),
