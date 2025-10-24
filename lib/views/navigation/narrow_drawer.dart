@@ -1,6 +1,7 @@
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
@@ -45,16 +46,19 @@ final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   return await ref.read(openAirProvider).getDownloadsCount();
 });
 
-class AppDrawer extends ConsumerStatefulWidget {
-  const AppDrawer({
+class NarrowDrawer extends ConsumerStatefulWidget {
+  final Function() languageChanged;
+
+  const NarrowDrawer({
     super.key,
+    required this.languageChanged,
   });
 
   @override
-  ConsumerState<AppDrawer> createState() => _AppDrawerState();
+  ConsumerState<NarrowDrawer> createState() => _NarrowDrawerState();
 }
 
-class _AppDrawerState extends ConsumerState<AppDrawer> {
+class _NarrowDrawerState extends ConsumerState<NarrowDrawer> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
@@ -63,8 +67,6 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
     final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
     final AsyncValue<int> getDownloadsCountValue =
         ref.watch(downloadsCountProvider);
-
-    double circleSize = 90.0;
 
     final supabaseService = ref.watch(supabaseServiceProvider);
     final session = supabaseService.client.auth.currentUser;
@@ -369,15 +371,14 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
               Navigator.of(context)
                   .push(
                 MaterialPageRoute(
-                    builder: (context) => Settings(
-                          rebuildDrawer: () => setState(() {}),
-                        )),
+                  builder: (context) =>
+                      Settings(functionBuild: widget.languageChanged),
+                ),
               )
-                  .then(
-                (value) {
-                  if (context.mounted) Navigator.pop(context);
-                },
-              );
+                  .then((_) {
+                if (context.mounted) Navigator.pop(context);
+                widget.languageChanged();
+              });
             },
           ),
         ],

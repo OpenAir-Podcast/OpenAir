@@ -25,7 +25,7 @@ class PodcastIndexSearchPage extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: MediaQuery.sizeOf(context).width > wideScreenMinWidth
+        child: wideScreenMinWidth < MediaQuery.sizeOf(context).width
             ? GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 200,

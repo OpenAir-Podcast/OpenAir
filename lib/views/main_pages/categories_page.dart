@@ -187,7 +187,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
           return NoConnection();
         }
 
-        if (MediaQuery.sizeOf(context).width > wideScreenMinWidth) {
+        if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(

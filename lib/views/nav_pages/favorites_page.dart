@@ -54,7 +54,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
               onRefresh: () async => ref.invalidate(getFavoriteProvider),
-              child: MediaQuery.sizeOf(context).width > wideScreenMinWidth
+              child: wideScreenMinWidth < MediaQuery.sizeOf(context).width
                   ? GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 300.0,

@@ -88,7 +88,7 @@ class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
         ),
       ),
       data: (snapshot) {
-        if (MediaQuery.sizeOf(context).width > wideScreenMinWidth) {
+        if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
           return Scaffold(
             appBar: AppBar(
               title: Text(Translations.of(context).text('topPodcasts')),

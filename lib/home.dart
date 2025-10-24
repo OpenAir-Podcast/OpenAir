@@ -11,8 +11,8 @@ import 'package:openair/views/main_pages/trending_page.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/navigation/app_drawer.dart';
-import 'package:openair/views/widgets/desktop_drawer.dart';
+import 'package:openair/views/navigation/narrow_drawer.dart';
+import 'package:openair/views/widgets/wide_drawer.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -23,11 +23,18 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   late Widget _content;
+  late TabController _tabController;
   bool _initialized = false;
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
+    super.didChangeDependencies(); // Call super.didChangeDependencies() first
     if (!_initialized) {
       _content = _buildMainContent(null);
       _initialized = true;
@@ -48,11 +55,31 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  Widget _buildMainContent(Widget? drawer) {
-    TabController tabController = TabController(length: 3, vsync: this);
+  void languageChanged() {
+    debugPrint(_tabController.index.toString());
 
+    if (_tabController.index == 0) {
+      _tabController.animateTo(1);
+      Future.delayed(const Duration(seconds: 1), () {
+        _tabController.animateTo(0);
+      });
+    } else if (_tabController.index == 1) {
+      _tabController.animateTo(0);
+      Future.delayed(const Duration(seconds: 1), () {
+        _tabController.animateTo(1);
+      });
+    } else if (_tabController.index == 2) {
+      _tabController.animateTo(1);
+      Future.delayed(const Duration(seconds: 1), () {
+        _tabController.animateTo(2);
+      });
+    }
+  }
+
+  Widget _buildMainContent(Widget? drawer) {
     return Scaffold(
       drawer: drawer,
+      key: ValueKey(_tabController.index),
       appBar: AppBar(
         elevation: 4.0,
         shadowColor: Colors.grey,
@@ -76,7 +103,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
             child: IconButton(
               tooltip: Translations.of(context).text('refresh'),
               onPressed: () async {
-                switch (tabController.index) {
+                switch (_tabController.index) {
                   case 0:
                     await ref
                         .watch(hiveServiceProvider)
@@ -102,7 +129,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
           ),
         ],
         bottom: TabBar(
-          controller: tabController,
+          controller: _tabController,
           tabs: const [
             Tab(
               icon: Icon(Icons.home_rounded),
@@ -117,7 +144,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
         ),
       ),
       body: TabBarView(
-        controller: tabController,
+        controller: _tabController,
         children: const [
           FeaturedPage(),
           TrendingPage(),
@@ -136,33 +163,43 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (MediaQuery.sizeOf(context).width > wideScreenMinWidth) {
-      _buildMainContent(AppDrawer());
-    }
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Card(
-            color: Theme.of(context).cardColor,
-            elevation: 2.0,
-            margin: EdgeInsets.zero,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            child: WideDrawer(
-              onPageSelected: _handleNavigation,
-              rebuildDrawer: rebuildDrawer,
+  @override
+  Widget build(BuildContext context) {
+    // Desktop layout
+    if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
+      return Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Card(
+              color: Theme.of(context).cardColor,
+              elevation: 2.0,
+              margin: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+              child: WideDrawer(
+                onPageSelected: _handleNavigation,
+                rebuildDrawer: rebuildDrawer,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          flex: 4,
-          child: _content,
-        ),
-      ],
-    );
+          Expanded(
+            flex: 4,
+            child: _content,
+          ),
+        ],
+      );
+    }
+
+    // Mobile layout
+    return _buildMainContent(NarrowDrawer(
+      languageChanged: languageChanged,
+    ));
   }
 }

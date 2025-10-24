@@ -10,7 +10,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/queue_card.dart';
-import 'package:openair/views/navigation/app_drawer.dart';
+import 'package:openair/views/navigation/narrow_drawer.dart';
 
 // FutureProvider for sorted Queue List
 final sortedProvider = FutureProvider.autoDispose(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/config/config.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
@@ -13,7 +14,7 @@ import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
 import 'package:openair/views/nav_pages/sign_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
-import 'package:openair/views/navigation/app_drawer.dart';
+import 'package:openair/views/navigation/narrow_drawer.dart';
 
 final getSessionProvider = FutureProvider.autoDispose((ref) async {
   final supabaseService = ref.watch(supabaseServiceProvider);
@@ -53,8 +54,6 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
 
     final session = ref.watch(getSessionProvider);
     final supabaseService = ref.watch(supabaseServiceProvider);
-
-    double circleSize = 90.0;
 
     return Column(
       children: [
@@ -274,9 +273,9 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
           leading: const Icon(Icons.settings_rounded),
           title: Text(Translations.of(context).text('settings')),
           onTap: () {
-            widget.onPageSelected(Settings(
-              rebuildDrawer: widget.rebuildDrawer,
-            ));
+            widget.onPageSelected(
+              Settings(functionBuild: widget.rebuildDrawer),
+            );
           },
         ),
       ],

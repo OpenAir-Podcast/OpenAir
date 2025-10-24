@@ -340,7 +340,7 @@ class PodcastsCard extends ConsumerWidget {
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount:
-                      MediaQuery.sizeOf(context).width > wideScreenMinWidth
+                      wideScreenMinWidth < MediaQuery.sizeOf(context).width
                           ? wideItemCountLandscape
                           : narrowItemCountPortrait,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -350,7 +350,7 @@ class PodcastsCard extends ConsumerWidget {
                             .clamp(1, wideItemCountLandscape)
                         : narrowCrossAxisCount,
                     mainAxisExtent:
-                        MediaQuery.sizeOf(context).width > wideScreenMinWidth
+                        wideScreenMinWidth < MediaQuery.sizeOf(context).width
                             ? wideMainAxisExtent
                             : narrowMainAxisExtent,
                   ),

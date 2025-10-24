@@ -7,6 +7,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
+import 'package:openair/views/widgets/podcast_card_list.dart';
 
 final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
     FutureProvider.autoDispose((ref) async {
@@ -104,7 +105,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                   ),
                 ),
             data: (FetchDataModel trendingData) {
-              if (MediaQuery.sizeOf(context).width > wideScreenMinWidth) {
+              if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GridView.builder(
@@ -131,7 +132,7 @@ class _TrendingPageState extends ConsumerState<TrendingPage> {
                     cacheExtent: cacheExtent,
                     itemCount: trendingData.count,
                     itemBuilder: (context, index) {
-                      return PodcastCardGrid(
+                      return PodcastCardList(
                         podcastItem: trendingData.feeds[index],
                       );
                     },

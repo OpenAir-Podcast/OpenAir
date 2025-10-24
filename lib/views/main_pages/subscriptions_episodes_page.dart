@@ -189,7 +189,7 @@ class _SubscriptionsEpisodesPageState
             child: RefreshIndicator(
               onRefresh: () async =>
                   ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-              child: MediaQuery.sizeOf(context).width > wideScreenMinWidth
+              child: wideScreenMinWidth < MediaQuery.sizeOf(context).width
                   ? GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: wideCrossAxisCount,

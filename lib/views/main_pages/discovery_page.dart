@@ -90,7 +90,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                     ),
                   ),
               data: (data) {
-                if (MediaQuery.sizeOf(context).width > wideScreenMinWidth) {
+                if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-int wideScreenMinWidth = 1060;
+int wideScreenMinWidth = 800;
+double circleSize = 70.0;
 
 double bannerAudioPlayerHeight = 85.0;
 

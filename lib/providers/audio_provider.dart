@@ -19,7 +19,7 @@ import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
-import 'package:openair/views/navigation/app_drawer.dart';
+import 'package:openair/views/navigation/narrow_drawer.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:opml/opml.dart';

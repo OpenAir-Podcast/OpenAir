@@ -186,7 +186,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
               ),
             ],
           ),
-          body: MediaQuery.sizeOf(context).width > wideScreenMinWidth
+          body: wideScreenMinWidth < MediaQuery.sizeOf(context).width
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: RefreshIndicator(
