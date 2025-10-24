@@ -42,15 +42,18 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
         elevation: 2.0,
         child: Row(
           children: [
-            CachedNetworkImage(
-              memCacheHeight: 56,
-              imageUrl: widget.podcastItem.imageUrl,
-              fit: BoxFit.cover,
-              errorWidget: (context, url, error) => Container(
-                color: cardImageShadow,
-                child: const Icon(
-                  Icons.error,
-                  size: 56.0,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CachedNetworkImage(
+                memCacheHeight: 56,
+                imageUrl: widget.podcastItem.imageUrl,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(
+                  color: cardImageShadow,
+                  child: const Icon(
+                    Icons.error,
+                    size: 56.0,
+                  ),
                 ),
               ),
             ),

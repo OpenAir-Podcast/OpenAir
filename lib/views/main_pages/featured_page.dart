@@ -224,7 +224,7 @@ class PodcastsCard extends ConsumerWidget {
                           wideScreenMinWidth
                       ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
                           .clamp(1, wideItemCount)
-                      : narrowCrossAxisCount,
+                      : narrowItemCount,
                   mainAxisExtent:
                       wideScreenMinWidth < MediaQuery.sizeOf(context).width
                           ? wideMainAxisExtent
@@ -358,7 +358,7 @@ class PodcastsCard extends ConsumerWidget {
                             wideScreenMinWidth
                         ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
                             .clamp(1, wideItemCount)
-                        : narrowCrossAxisCount,
+                        : narrowItemCount,
                     mainAxisExtent:
                         wideScreenMinWidth < MediaQuery.sizeOf(context).width
                             ? wideMainAxisExtent

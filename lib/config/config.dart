@@ -29,7 +29,6 @@ FontWeight subscriptionCountBoxFontWeight = FontWeight.normal;
 
 double blurRadius = 10.0;
 
-int narrowCrossAxisCount = 3;
 double narrowMainAxisExtent = 500.0;
 
 int wideCrossAxisCount = 5;
@@ -38,8 +37,7 @@ double wideMainAxisExtent = 833.0;
 double subscribedNarrowMainAxisExtent = 236.0;
 double subscribedWideMainAxisExtent = 250.0;
 
-
-int narrowItemCount = 3;
+int narrowItemCount = 4;
 int wideItemCount = 6;
 
 double featuredCardHeight = 230.0;
