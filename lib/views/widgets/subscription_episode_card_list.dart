@@ -25,12 +25,12 @@ final isEpisodeNewProvider =
   return await ref.read(openAirProvider).isEpisodeNew(guid);
 });
 
-class SubscriptionEpisodeCardNarrow extends ConsumerStatefulWidget {
+class SubscriptionEpisodeCardList extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final PodcastModel podcast;
   final String title;
 
-  const SubscriptionEpisodeCardNarrow({
+  const SubscriptionEpisodeCardList({
     super.key,
     required this.episodeItem,
     required this.podcast,
@@ -38,12 +38,12 @@ class SubscriptionEpisodeCardNarrow extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SubscriptionEpisodeCardNarrow> createState() =>
-      _SubscriptionEpisodeCardNarrowState();
+  ConsumerState<SubscriptionEpisodeCardList> createState() =>
+      _SubscriptionEpisodeCardListState();
 }
 
-class _SubscriptionEpisodeCardNarrowState
-    extends ConsumerState<SubscriptionEpisodeCardNarrow> {
+class _SubscriptionEpisodeCardListState
+    extends ConsumerState<SubscriptionEpisodeCardList> {
   String podcastDate = "";
 
   late bool isQueued;

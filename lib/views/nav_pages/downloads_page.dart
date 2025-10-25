@@ -8,8 +8,8 @@ import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/downloads_episode_card_narrow.dart';
-import 'package:openair/views/widgets/downloads_episode_card_wide.dart';
+import 'package:openair/views/widgets/downloads_episode_card_list.dart';
+import 'package:openair/views/widgets/downloads_episode_card_grid.dart';
 
 final getDownloadsProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSortedDownloadedEpisodes();
@@ -151,7 +151,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                           artwork: data[index].image,
                         );
 
-                        return DownloadsEpisodeCardNarrow(
+                        return DownloadsEpisodeCardList(
                           title: data[index].title,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,

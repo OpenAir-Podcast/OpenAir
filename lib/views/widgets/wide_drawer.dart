@@ -14,7 +14,7 @@ import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
 import 'package:openair/views/nav_pages/sign_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
-import 'package:openair/views/navigation/narrow_drawer.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 
 final getSessionProvider = FutureProvider.autoDispose((ref) async {
   final supabaseService = ref.watch(supabaseServiceProvider);

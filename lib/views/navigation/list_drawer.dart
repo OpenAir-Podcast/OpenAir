@@ -46,19 +46,19 @@ final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   return await ref.read(openAirProvider).getDownloadsCount();
 });
 
-class NarrowDrawer extends ConsumerStatefulWidget {
+class ListDrawer extends ConsumerStatefulWidget {
   final Function() languageChanged;
 
-  const NarrowDrawer({
+  const ListDrawer({
     super.key,
     required this.languageChanged,
   });
 
   @override
-  ConsumerState<NarrowDrawer> createState() => _NarrowDrawerState();
+  ConsumerState<ListDrawer> createState() => _ListDrawerState();
 }
 
-class _NarrowDrawerState extends ConsumerState<NarrowDrawer> {
+class _ListDrawerState extends ConsumerState<ListDrawer> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/fyyd_search_card_wide.dart';
+import 'package:openair/views/widgets/fyyd_search_card_grid.dart';
 
 class FyydSearchPage extends ConsumerWidget {
   const FyydSearchPage({
@@ -40,14 +40,14 @@ class FyydSearchPage extends ConsumerWidget {
                     return Container();
                   }
 
-                  return FyydSearchCardWide(
+                  return FyydSearchCardGrid(
                     podcastItem: podcasts[index],
                   );
                 },
               )
             : ListView.builder(
                 itemCount: podcasts.length,
-                itemBuilder: (context, index) => FyydSearchCardWide(
+                itemBuilder: (context, index) => FyydSearchCardGrid(
                   podcastItem: podcasts[index],
                 ),
               ),

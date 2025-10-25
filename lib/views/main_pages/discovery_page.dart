@@ -5,8 +5,8 @@ import 'package:openair/components/no_connection.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
-import 'package:openair/views/widgets/discovery_podcast_card_narrow.dart';
-import 'package:openair/views/widgets/discovery_podcast_card_wide.dart';
+import 'package:openair/views/widgets/discovery_podcast_card_list.dart';
+import 'package:openair/views/widgets/discovery_podcast_card_grid.dart';
 
 final getConnectionStatusProvider =
     FutureProvider.autoDispose<bool>((ref) async {
@@ -101,7 +101,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                     ),
                     itemCount: data.length,
                     itemBuilder: (context, index) {
-                      return DiscoveryPodcastCardWide(
+                      return DiscoveryPodcastCardGrid(
                         podcastItem: data[index],
                       );
                     },
@@ -113,7 +113,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                       cacheExtent: cacheExtent,
                       itemCount: data.length,
                       itemBuilder: (context, index) {
-                        return DiscoveryPodcastCardNarrow(
+                        return DiscoveryPodcastCardList(
                           podcastItem: data[index],
                         );
                       },

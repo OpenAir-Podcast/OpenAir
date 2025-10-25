@@ -8,8 +8,8 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/episode_card_wide.dart';
-import 'package:openair/views/widgets/episode_card_narrow.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/episode_card_list.dart';
 
 final getFavoriteProvider = StreamProvider.autoDispose((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
@@ -68,7 +68,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         final episodeData = data.values.elementAt(index);
                         PodcastModel podcastData = episodeData['podcast'];
 
-                        return EpisodeCardWide(
+                        return EpisodeCardGrid(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
                           podcast: PodcastModel(
@@ -90,7 +90,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         final episodeData = data.values.elementAt(index);
                         PodcastModel podcastData = episodeData['podcast'];
 
-                        return EpisodeCardNarrow(
+                        return EpisodeCardList(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
                           podcast: PodcastModel(

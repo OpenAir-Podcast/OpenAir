@@ -8,54 +8,34 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:webfeed_plus/domain/rss_feed.dart';
 
-class FyydSearchCardWide extends ConsumerStatefulWidget {
-  final Map<String, dynamic> podcastItem;
+class PodcastIndexSearchCardGrid extends ConsumerStatefulWidget {
+  final PodcastModel podcastItem;
 
-  const FyydSearchCardWide({
+  const PodcastIndexSearchCardGrid({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<FyydSearchCardWide> createState() => _FyydSearchCardWideState();
+  ConsumerState<PodcastIndexSearchCardGrid> createState() =>
+      _PodcastIndexSearchCardGridState();
 }
 
-class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
-  late PodcastModel podcastMod;
-
+class _PodcastIndexSearchCardGridState
+    extends ConsumerState<PodcastIndexSearchCardGrid> {
   @override
   Widget build(BuildContext context) {
-    podcastMod = PodcastModel.fromJson(widget.podcastItem);
-
     return GestureDetector(
       onTap: () async {
-        final xmlString = await ref
-            .watch(fyydProvider)
-            .getPodcastXml(widget.podcastItem['xmlURL']);
-
-        var rssFeed = RssFeed.parse(xmlString);
-
-        PodcastModel podcastModel = PodcastModel(
-          id: widget.podcastItem['id'],
-          feedUrl: widget.podcastItem['xmlURL'],
-          title: rssFeed.title!,
-          author: rssFeed.author ?? 'unknown',
-          imageUrl: widget.podcastItem['imgURL'],
-          artwork: widget.podcastItem['imgURL'],
-          description: rssFeed.description!,
-        );
-
-        ref.read(audioProvider).currentPodcast = podcastModel;
+        ref.read(audioProvider).currentPodcast = widget.podcastItem;
 
         if (context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => EpisodesPage(podcast: podcastModel),
+              builder: (context) => EpisodesPage(podcast: widget.podcastItem),
             ),
           );
         }
@@ -69,7 +49,7 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
             Expanded(
               child: CachedNetworkImage(
                 memCacheHeight: 300,
-                imageUrl: podcastMod.imageUrl,
+                imageUrl: widget.podcastItem.imageUrl,
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(
                   color: cardImageShadow,
@@ -86,7 +66,7 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    podcastMod.title,
+                    widget.podcastItem.title,
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Brightness.dark == Theme.of(context).brightness
@@ -98,7 +78,7 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
                     maxLines: 1,
                   ),
                   Text(
-                    podcastMod.author ??
+                    widget.podcastItem.author ??
                         Translations.of(context).text('unknown'),
                     maxLines: 1,
                     style: const TextStyle(
@@ -110,7 +90,9 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
               ),
             ),
             FutureBuilder(
-              future: ref.watch(openAirProvider).isSubscribed(podcastMod.title),
+              future: ref
+                  .watch(openAirProvider)
+                  .isSubscribed(widget.podcastItem.title),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const SizedBox.shrink();
@@ -124,9 +106,11 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
-                        ? ref.read(audioProvider).unsubscribe(podcastMod)
+                        ? ref
+                            .read(audioProvider)
+                            .unsubscribe(widget.podcastItem)
                         : ref.read(audioProvider).subscribe(
-                              podcastMod,
+                              widget.podcastItem,
                               context,
                             );
 
@@ -135,16 +119,16 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
                         ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
                               snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                             );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                             ),
                           ),
                         );
@@ -152,7 +136,7 @@ class _FyydSearchCardWideState extends ConsumerState<FyydSearchCardWide> {
                     }
 
                     ref.invalidate(
-                        podcastDataByUrlProvider(podcastMod.feedUrl));
+                        podcastDataByUrlProvider(widget.podcastItem.feedUrl));
 
                     Future.delayed(
                       Duration(seconds: 1),

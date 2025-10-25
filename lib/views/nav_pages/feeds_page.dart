@@ -8,9 +8,9 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/feeds_episode_card_narrow.dart';
-import 'package:openair/views/widgets/feeds_episode_card_wide.dart';
-import 'package:openair/views/navigation/narrow_drawer.dart';
+import 'package:openair/views/widgets/feeds_episode_card_list.dart';
+import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 
 final getFeedsProvider = FutureProvider.autoDispose((ref) async {
   // Feeds data comes from subscribed episodes in Hive.
@@ -82,7 +82,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                       itemBuilder: (context, index) {
                         final episodeData = data[index];
 
-                        return FeedsEpisodeCardWide(
+                        return FeedsEpisodeCardGrid(
                           title: episodeData['title'],
                           episodeItem: episodeData.cast<String, dynamic>(),
                           podcast: PodcastModel(
@@ -105,7 +105,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                       itemBuilder: (context, index) {
                         final episodeData = data[index];
 
-                        return FeedsEpisodeCardNarrow(
+                        return FeedsEpisodeCardList(
                           title: episodeData['title'],
                           episodeItem: episodeData.cast<String, dynamic>(),
                           podcast: PodcastModel(

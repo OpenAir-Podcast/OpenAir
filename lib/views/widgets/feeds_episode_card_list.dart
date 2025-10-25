@@ -18,12 +18,12 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class FeedsEpisodeCardNarrow extends ConsumerStatefulWidget {
+class FeedsEpisodeCardList extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
   final PodcastModel podcast;
 
-  const FeedsEpisodeCardNarrow({
+  const FeedsEpisodeCardList({
     super.key,
     required this.episodeItem,
     required this.title,
@@ -31,11 +31,11 @@ class FeedsEpisodeCardNarrow extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<FeedsEpisodeCardNarrow> createState() =>
-      _EpisodeCardNarrowState();
+  ConsumerState<FeedsEpisodeCardList> createState() =>
+      _EpisodeCardListState();
 }
 
-class _EpisodeCardNarrowState extends ConsumerState<FeedsEpisodeCardNarrow> {
+class _EpisodeCardListState extends ConsumerState<FeedsEpisodeCardList> {
   String podcastDate = "";
   late bool isFavorite;
 

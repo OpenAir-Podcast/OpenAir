@@ -13,18 +13,18 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
-import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/main_pages/subscriptions_episodes_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class EpisodeCardWide extends ConsumerStatefulWidget {
+class FeedsEpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
   final PodcastModel podcast;
 
-  const EpisodeCardWide({
+  const FeedsEpisodeCardGrid({
     super.key,
     required this.episodeItem,
     required this.title,
@@ -32,27 +32,25 @@ class EpisodeCardWide extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<EpisodeCardWide> createState() => _EpisodeCardWideState();
+  ConsumerState<FeedsEpisodeCardGrid> createState() => _EpisodeCardGridState();
 }
 
-class _EpisodeCardWideState extends ConsumerState<EpisodeCardWide> {
+class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
   String podcastDate = "";
-  bool cancel = false;
-  late bool isQueued;
   late bool isFavorite;
 
   @override
   Widget build(BuildContext context) {
+    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
+
     podcastDate = ref
-        .read(audioProvider)
+        .watch(audioProvider)
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
-    final AsyncValue<List<DownloadModel>> downloadedListProvider =
+    final AsyncValue<List<DownloadModel>> downloadedListAsync =
         ref.watch(sortedDownloadsProvider);
-
-    final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     return GestureDetector(
       onTap: () {
@@ -213,7 +211,7 @@ class _EpisodeCardWideState extends ConsumerState<EpisodeCardWide> {
                           // Playlist button
                           queueListAsync.when(
                             data: (data) {
-                              isQueued =
+                              final isQueued =
                                   data.containsKey(widget.episodeItem['guid']);
 
                               return IconButton(
@@ -301,7 +299,7 @@ class _EpisodeCardWideState extends ConsumerState<EpisodeCardWide> {
                           ),
                           // Download button
                           if (!kIsWeb)
-                            downloadedListProvider.when(
+                            downloadedListAsync.when(
                               data: (downloads) {
                                 final isDownloaded = downloads.any((d) =>
                                     d.guid == widget.episodeItem['guid']);
@@ -545,11 +543,6 @@ class _EpisodeCardWideState extends ConsumerState<EpisodeCardWide> {
                                       }
                                     }
                                   }
-
-                                  Future.delayed(Duration(seconds: 1), () {
-                                    ref.invalidate(getFavoriteProvider);
-                                    setState(() {});
-                                  });
                                 },
                                 icon: isFavorite
                                     ? const Icon(Icons.favorite_rounded)

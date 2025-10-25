@@ -9,8 +9,8 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/feeds_episode_card_narrow.dart';
-import 'package:openair/views/widgets/feeds_episode_card_wide.dart';
+import 'package:openair/views/widgets/feeds_episode_card_list.dart';
+import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
 
 final getInboxProvider = FutureProvider.autoDispose((ref) async {
   final Map<String, FeedModel> inboxEpisodes =
@@ -105,7 +105,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                               artwork: episodeData['image'],
                             );
 
-                            return FeedsEpisodeCardWide(
+                            return FeedsEpisodeCardGrid(
                               title: episodeData['title'],
                               episodeItem: episodeData.cast<String, dynamic>(),
                               podcast: podcastModel,
@@ -141,7 +141,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                               artwork: episodeData['image'],
                             );
 
-                            return FeedsEpisodeCardNarrow(
+                            return FeedsEpisodeCardList(
                               title: episodeData['title'],
                               episodeItem: episodeData.cast<String, dynamic>(),
                               podcast: podcastModel,

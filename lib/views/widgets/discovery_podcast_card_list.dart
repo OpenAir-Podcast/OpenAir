@@ -12,21 +12,21 @@ import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 
-class DiscoveryPodcastCardNarrow extends ConsumerStatefulWidget {
+class DiscoveryPodcastCardList extends ConsumerStatefulWidget {
   final Map<String, dynamic> podcastItem;
 
-  const DiscoveryPodcastCardNarrow({
+  const DiscoveryPodcastCardList({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<DiscoveryPodcastCardNarrow> createState() =>
-      _DiscoveryPodcastCardNarrowState();
+  ConsumerState<DiscoveryPodcastCardList> createState() =>
+      _DiscoveryPodcastCardListState();
 }
 
-class _DiscoveryPodcastCardNarrowState
-    extends ConsumerState<DiscoveryPodcastCardNarrow> {
+class _DiscoveryPodcastCardListState
+    extends ConsumerState<DiscoveryPodcastCardList> {
   @override
   Widget build(BuildContext context) {
     PodcastModel podcast = PodcastModel(

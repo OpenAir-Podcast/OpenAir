@@ -11,8 +11,8 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/native/podcast_info.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/widgets/episode_card_wide.dart';
-import 'package:openair/views/widgets/episode_card_narrow.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/episode_card_list.dart';
 
 final podcastDataByUrlProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
@@ -201,7 +201,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                         mainAxisSpacing: 4,
                       ),
                       itemCount: snapshot['count'],
-                      itemBuilder: (context, index) => EpisodeCardWide(
+                      itemBuilder: (context, index) => EpisodeCardGrid(
                         title: snapshot['items'][index]['title'],
                         episodeItem: snapshot['items'][index],
                         podcast: widget.podcast,
@@ -217,7 +217,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                     child: ListView.builder(
                       cacheExtent: cacheExtent,
                       itemCount: snapshot['count'],
-                      itemBuilder: (context, index) => EpisodeCardNarrow(
+                      itemBuilder: (context, index) => EpisodeCardList(
                         title: snapshot['items'][index]['title'],
                         episodeItem: snapshot['items'][index],
                         podcast: widget.podcast,

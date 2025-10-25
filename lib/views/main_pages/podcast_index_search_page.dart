@@ -4,8 +4,8 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/podcast_index_search_card_narrow.dart';
-import 'package:openair/views/widgets/podcast_index_search_card_wide.dart';
+import 'package:openair/views/widgets/podcast_index_search_card_list.dart';
+import 'package:openair/views/widgets/podcast_index_search_card_grid.dart';
 
 class PodcastIndexSearchPage extends ConsumerWidget {
   const PodcastIndexSearchPage({
@@ -36,14 +36,14 @@ class PodcastIndexSearchPage extends ConsumerWidget {
                 cacheExtent: cacheExtent,
                 itemCount: podcasts.count,
                 itemBuilder: (context, index) {
-                  return PodcastIndexSearchCardWide(
+                  return PodcastIndexSearchCardGrid(
                     podcastItem: podcasts.feeds[index],
                   );
                 },
               )
             : ListView.builder(
                 itemCount: podcasts.count,
-                itemBuilder: (context, index) => PodcastIndexSearchCardNarrow(
+                itemBuilder: (context, index) => PodcastIndexSearchCardList(
                   podcastItem: podcasts.feeds[index],
                 ),
               ),

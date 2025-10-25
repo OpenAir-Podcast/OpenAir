@@ -11,8 +11,8 @@ import 'package:openair/services/podcast_index_service.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/widgets/subscription_episode_card_narrow.dart';
-import 'package:openair/views/widgets/subscription_episode_card_wide.dart';
+import 'package:openair/views/widgets/subscription_episode_card_list.dart';
+import 'package:openair/views/widgets/subscription_episode_card_grid.dart';
 import 'package:openair/views/native/podcast_info.dart';
 
 final podcastDataByUrlProvider =
@@ -201,7 +201,7 @@ class _SubscriptionsEpisodesPageState
                       cacheExtent: cacheExtent,
                       itemCount: snapshot['count'],
                       itemBuilder: (context, index) =>
-                          SubscriptionEpisodeCardWide(
+                          SubscriptionEpisodeCardGrid(
                         title: snapshot['items'][index]['title'],
                         episodeItem: snapshot['items'][index],
                         podcast: widget.podcast,
@@ -210,7 +210,7 @@ class _SubscriptionsEpisodesPageState
                   : ListView.builder(
                       itemCount: snapshot['count'],
                       itemBuilder: (context, index) {
-                        return SubscriptionEpisodeCardNarrow(
+                        return SubscriptionEpisodeCardList(
                           title: snapshot['items'][index]['title'],
                           episodeItem: snapshot['items'][index],
                           podcast: widget.podcast,

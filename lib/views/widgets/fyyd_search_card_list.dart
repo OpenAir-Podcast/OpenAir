@@ -13,20 +13,19 @@ import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
-class FyydSearchCardNarrow extends ConsumerStatefulWidget {
+class FyydSearchCardList extends ConsumerStatefulWidget {
   final Map<String, dynamic> podcastItem;
 
-  const FyydSearchCardNarrow({
+  const FyydSearchCardList({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<FyydSearchCardNarrow> createState() =>
-      _FyydSearchCardNarrowState();
+  ConsumerState<FyydSearchCardList> createState() => _FyydSearchCardListState();
 }
 
-class _FyydSearchCardNarrowState extends ConsumerState<FyydSearchCardNarrow> {
+class _FyydSearchCardListState extends ConsumerState<FyydSearchCardList> {
   @override
   Widget build(BuildContext context) {
     bool isSub = false;

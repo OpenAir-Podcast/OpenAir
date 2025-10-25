@@ -11,7 +11,7 @@ import 'package:openair/views/main_pages/trending_page.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/navigation/narrow_drawer.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/widgets/wide_drawer.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -198,7 +198,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     }
 
     // Mobile layout
-    return _buildMainContent(NarrowDrawer(
+    return _buildMainContent(ListDrawer(
       languageChanged: languageChanged,
     ));
   }

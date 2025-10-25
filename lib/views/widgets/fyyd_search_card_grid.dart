@@ -8,34 +8,54 @@ import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:webfeed_plus/domain/rss_feed.dart';
 
-class PodcastIndexSearchCardWide extends ConsumerStatefulWidget {
-  final PodcastModel podcastItem;
+class FyydSearchCardGrid extends ConsumerStatefulWidget {
+  final Map<String, dynamic> podcastItem;
 
-  const PodcastIndexSearchCardWide({
+  const FyydSearchCardGrid({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<PodcastIndexSearchCardWide> createState() =>
-      _PodcastIndexSearchCardWideState();
+  ConsumerState<FyydSearchCardGrid> createState() => _FyydSearchCardGridState();
 }
 
-class _PodcastIndexSearchCardWideState
-    extends ConsumerState<PodcastIndexSearchCardWide> {
+class _FyydSearchCardGridState extends ConsumerState<FyydSearchCardGrid> {
+  late PodcastModel podcastMod;
+
   @override
   Widget build(BuildContext context) {
+    podcastMod = PodcastModel.fromJson(widget.podcastItem);
+
     return GestureDetector(
       onTap: () async {
-        ref.read(audioProvider).currentPodcast = widget.podcastItem;
+        final xmlString = await ref
+            .watch(fyydProvider)
+            .getPodcastXml(widget.podcastItem['xmlURL']);
+
+        var rssFeed = RssFeed.parse(xmlString);
+
+        PodcastModel podcastModel = PodcastModel(
+          id: widget.podcastItem['id'],
+          feedUrl: widget.podcastItem['xmlURL'],
+          title: rssFeed.title!,
+          author: rssFeed.author ?? 'unknown',
+          imageUrl: widget.podcastItem['imgURL'],
+          artwork: widget.podcastItem['imgURL'],
+          description: rssFeed.description!,
+        );
+
+        ref.read(audioProvider).currentPodcast = podcastModel;
 
         if (context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => EpisodesPage(podcast: widget.podcastItem),
+              builder: (context) => EpisodesPage(podcast: podcastModel),
             ),
           );
         }
@@ -49,7 +69,7 @@ class _PodcastIndexSearchCardWideState
             Expanded(
               child: CachedNetworkImage(
                 memCacheHeight: 300,
-                imageUrl: widget.podcastItem.imageUrl,
+                imageUrl: podcastMod.imageUrl,
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(
                   color: cardImageShadow,
@@ -66,7 +86,7 @@ class _PodcastIndexSearchCardWideState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.podcastItem.title,
+                    podcastMod.title,
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Brightness.dark == Theme.of(context).brightness
@@ -78,7 +98,7 @@ class _PodcastIndexSearchCardWideState
                     maxLines: 1,
                   ),
                   Text(
-                    widget.podcastItem.author ??
+                    podcastMod.author ??
                         Translations.of(context).text('unknown'),
                     maxLines: 1,
                     style: const TextStyle(
@@ -90,9 +110,7 @@ class _PodcastIndexSearchCardWideState
               ),
             ),
             FutureBuilder(
-              future: ref
-                  .watch(openAirProvider)
-                  .isSubscribed(widget.podcastItem.title),
+              future: ref.watch(openAirProvider).isSubscribed(podcastMod.title),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const SizedBox.shrink();
@@ -106,11 +124,9 @@ class _PodcastIndexSearchCardWideState
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
-                        ? ref
-                            .read(audioProvider)
-                            .unsubscribe(widget.podcastItem)
+                        ? ref.read(audioProvider).unsubscribe(podcastMod)
                         : ref.read(audioProvider).subscribe(
-                              widget.podcastItem,
+                              podcastMod,
                               context,
                             );
 
@@ -119,16 +135,16 @@ class _PodcastIndexSearchCardWideState
                         ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
                               snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
                             );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
+                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${podcastMod.title}'
+                                  : '${Translations.of(context).text('subscribedTo')} ${podcastMod.title}',
                             ),
                           ),
                         );
@@ -136,7 +152,7 @@ class _PodcastIndexSearchCardWideState
                     }
 
                     ref.invalidate(
-                        podcastDataByUrlProvider(widget.podcastItem.feedUrl));
+                        podcastDataByUrlProvider(podcastMod.feedUrl));
 
                     Future.delayed(
                       Duration(seconds: 1),

@@ -11,21 +11,21 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 
-class DiscoveryPodcastCardWide extends ConsumerStatefulWidget {
+class DiscoveryPodcastCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> podcastItem;
 
-  const DiscoveryPodcastCardWide({
+  const DiscoveryPodcastCardGrid({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<DiscoveryPodcastCardWide> createState() =>
-      _DiscoveryPodcastCardWideState();
+  ConsumerState<DiscoveryPodcastCardGrid> createState() =>
+      _DiscoveryPodcastCardGridState();
 }
 
-class _DiscoveryPodcastCardWideState
-    extends ConsumerState<DiscoveryPodcastCardWide> {
+class _DiscoveryPodcastCardGridState
+    extends ConsumerState<DiscoveryPodcastCardGrid> {
   @override
   Widget build(BuildContext context) {
     PodcastModel podcast = PodcastModel(

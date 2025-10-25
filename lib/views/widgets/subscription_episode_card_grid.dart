@@ -24,12 +24,12 @@ final isEpisodeNewProvider =
   return await ref.read(openAirProvider).isEpisodeNew(guid);
 });
 
-class SubscriptionEpisodeCardWide extends ConsumerStatefulWidget {
+class SubscriptionEpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final PodcastModel podcast;
   final String title;
 
-  const SubscriptionEpisodeCardWide({
+  const SubscriptionEpisodeCardGrid({
     super.key,
     required this.episodeItem,
     required this.podcast,
@@ -37,12 +37,12 @@ class SubscriptionEpisodeCardWide extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SubscriptionEpisodeCardWide> createState() =>
-      _SubscriptionEpisodeCardWideState();
+  ConsumerState<SubscriptionEpisodeCardGrid> createState() =>
+      _SubscriptionEpisodeCardGridState();
 }
 
-class _SubscriptionEpisodeCardWideState
-    extends ConsumerState<SubscriptionEpisodeCardWide> {
+class _SubscriptionEpisodeCardGridState
+    extends ConsumerState<SubscriptionEpisodeCardGrid> {
   String podcastDate = "";
 
   @override
