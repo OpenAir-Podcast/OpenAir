@@ -42,10 +42,6 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
 
     dynamic episodeDuration;
 
-    for (var element in widget.episodeItem.entries) {
-      debugPrint('Key: ${element.key}, Value: ${element.value}');
-    }
-
     if (widget.episodeItem['duration'].runtimeType == String) {
       episodeDuration = int.parse(widget.episodeItem['duration']);
     } else if (widget.episodeItem['duration'].runtimeType == int) {
