@@ -958,6 +958,17 @@ class AudioProvider extends ChangeNotifier {
     return result;
   }
 
+  String convertSecondsToDuration(int sec, BuildContext context) {
+    Duration duration = Duration(seconds: sec);
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes.remainder(60);
+
+    String result =
+        "${hours != 0 ? hours < 10 ? hours == 1 ? '01 ${Translations.of(context).text('hour')} ' : '0$hours ${Translations.of(context).text('hours')} ' : '$hours ${Translations.of(context).text('hours')} ' : ''}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minutes')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')}'}";
+
+    return result;
+  }
+
   String formatCurrentPlaybackRemainingTime(
     Duration timelinePosition,
     Duration timelineDuration,
@@ -1495,7 +1506,6 @@ class AudioProvider extends ChangeNotifier {
         await hiveService.favoritesBox.then((box) => box.get(guid));
 
     if (favoriteEpisodes != null) {
-      return true;
     }
 
     return false;

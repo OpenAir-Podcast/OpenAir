@@ -27,9 +27,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }
-    }
-    // EpisodeItem is the same as currentEpisode
-    else {
+    } else {
       if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
       } else if (ref.watch(audioProvider).isPlaying == PlayingStatus.paused) {
@@ -42,14 +40,16 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       }
     }
 
-    dynamic enclosureLengthVal;
+    dynamic episodeDuration;
 
-    if (widget.episodeItem['enclosureLength'].runtimeType == String) {
-      enclosureLengthVal = int.parse(widget.episodeItem['enclosureLength']);
-    } else if (widget.episodeItem['enclosureLength'].runtimeType == int) {
-      enclosureLengthVal = widget.episodeItem['enclosureLength'];
-    } else {
-      enclosureLengthVal = '0';
+    for (var element in widget.episodeItem.entries) {
+      debugPrint('Key: ${element.key}, Value: ${element.value}');
+    }
+
+    if (widget.episodeItem['duration'].runtimeType == String) {
+      episodeDuration = int.parse(widget.episodeItem['duration']);
+    } else if (widget.episodeItem['duration'].runtimeType == int) {
+      episodeDuration = widget.episodeItem['duration'];
     }
 
     if (playStatus case PlayingStatus.detail) {
@@ -58,8 +58,8 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
         children: [
           Icon(Icons.play_arrow_rounded),
           Text(
-            ref.watch(audioProvider).getPodcastDuration(
-                  enclosureLengthVal,
+            ref.watch(audioProvider).convertSecondsToDuration(
+                  episodeDuration,
                   context,
                 ),
             overflow: TextOverflow.ellipsis,

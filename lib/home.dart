@@ -56,8 +56,6 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   }
 
   void languageChanged() {
-    debugPrint(_tabController.index.toString());
-
     if (_tabController.index == 0) {
       _tabController.animateTo(1);
       Future.delayed(const Duration(seconds: 1), () {
