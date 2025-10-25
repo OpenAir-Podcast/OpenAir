@@ -19,7 +19,7 @@ import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
-import 'package:openair/views/navigation/narrow_drawer.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:opml/opml.dart';
@@ -65,6 +65,7 @@ class AudioProvider extends ChangeNotifier {
   late double podcastCurrentPositionInMilliseconds;
   late String currentPlaybackPositionString;
   late String currentPlaybackRemainingTimeString;
+  late String currentPlaybackDurationString;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -137,6 +138,12 @@ class AudioProvider extends ChangeNotifier {
             .play(UrlSource(currentEpisode!['enclosureUrl']))
             .timeout(const Duration(seconds: 30));
       }
+
+      player.getDuration().then((Duration? value) =>
+          currentPlaybackDurationString =
+              formatCurrentPlaybackPosition(value!));
+
+      notifyListeners();
 
       if (context.mounted && receiveNotificationsWhenPlayConfig) {
         if (!Platform.isAndroid && !Platform.isIOS) {
