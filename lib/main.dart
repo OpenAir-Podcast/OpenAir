@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -70,6 +71,15 @@ void main() async {
   );
 
   await Hive.initFlutter('OpenAir/.hive_config');
+
+  await AudioService.init(
+    builder: () => AudioProvider(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'org.openair.podcast.channel.audio',
+      androidNotificationChannelName: 'Music playback',
+    ),
+  );
+
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -94,7 +104,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initApp() async {
     // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
-    if (mounted) await ref.read(audioProvider).initAudio(context);
+    if (mounted) await ref.read(audioProvider).initAudio(context, ref);
     if (mounted) await ref.read(notificationProvider).init(context);
   }
 
@@ -263,6 +273,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
                   return Consumer(builder: (context, ref, _) {
                     final locale = ref.watch(localeProvider);
+
                     return MaterialApp(
                       locale: locale,
                       supportedLocales: Translations.supportedLocales,
