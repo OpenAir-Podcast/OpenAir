@@ -17,11 +17,11 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/mobile/nav_pages/favorites_page.dart';
-import 'package:openair/views/mobile/nav_pages/feeds_page.dart';
-import 'package:openair/views/mobile/nav_pages/queue_page.dart';
-import 'package:openair/views/mobile/navigation/app_drawer.dart';
-import 'package:openair/views/mobile/settings_pages/notifications_page.dart';
+import 'package:openair/views/nav_pages/queue_page.dart';
+import 'package:openair/views/nav_pages/feeds_page.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart' as path;
 import 'package:path/path.dart';
@@ -65,6 +65,7 @@ class AudioProvider extends ChangeNotifier {
   late double podcastCurrentPositionInMilliseconds;
   late String currentPlaybackPositionString;
   late String currentPlaybackRemainingTimeString;
+  late String currentPlaybackDurationString;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -137,6 +138,12 @@ class AudioProvider extends ChangeNotifier {
             .play(UrlSource(currentEpisode!['enclosureUrl']))
             .timeout(const Duration(seconds: 30));
       }
+
+      player.getDuration().then((Duration? value) =>
+          currentPlaybackDurationString =
+              formatCurrentPlaybackPosition(value!));
+
+      notifyListeners();
 
       if (context.mounted && receiveNotificationsWhenPlayConfig) {
         if (!Platform.isAndroid && !Platform.isIOS) {
@@ -951,6 +958,17 @@ class AudioProvider extends ChangeNotifier {
     return result;
   }
 
+  String convertSecondsToDuration(int sec, BuildContext context) {
+    Duration duration = Duration(seconds: sec);
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes.remainder(60);
+
+    String result =
+        "${hours != 0 ? hours < 10 ? hours == 1 ? '01 ${Translations.of(context).text('hour')} ' : '0$hours ${Translations.of(context).text('hours')} ' : '$hours ${Translations.of(context).text('hours')} ' : ''}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minutes')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')}'}";
+
+    return result;
+  }
+
   String formatCurrentPlaybackRemainingTime(
     Duration timelinePosition,
     Duration timelineDuration,
@@ -1488,7 +1506,6 @@ class AudioProvider extends ChangeNotifier {
         await hiveService.favoritesBox.then((box) => box.get(guid));
 
     if (favoriteEpisodes != null) {
-      return true;
     }
 
     return false;
