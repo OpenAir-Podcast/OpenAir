@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/feed_model.dart';
@@ -19,9 +22,8 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:theme_provider/theme_provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:convert';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
   (ref) => OpenAirProvider(ref),
@@ -205,248 +207,38 @@ class OpenAirProvider extends ChangeNotifier {
 
   void exportPodcastToOpml() async {}
 
-  Future<void> exportToDb(String path) async {
-    // Delete the database if it exists
-    await deleteDatabase(path);
+  Future<void> exportDb() async {
+    final String date = DateTime.now().toIso8601String().split('T')[0];
+    String fileName = 'openair-backup-$date.db';
 
-    final database = await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE subscriptions (
-            id INTEGER PRIMARY KEY,
-            url TEXT,
-            title TEXT,
-            author TEXT,
-            image TEXT,
-            artwork TEXT,
-            description TEXT,
-            episodeCount INTEGER,
-            updated_at TEXT
-          )
-        ''');
+    String? initialDirectory;
+    if (!kIsWeb) {
+      if (Platform.isAndroid || Platform.isIOS) {
+        final List<Directory>? externalStorageDirs =
+            await getExternalStorageDirectories();
+        if (externalStorageDirs != null && externalStorageDirs.isNotEmpty) {
+          initialDirectory = externalStorageDirs.first.path;
+        }
+      } else {
+        Directory appDocDir = await getApplicationDocumentsDirectory();
+        initialDirectory = appDocDir.path;
+      }
+    }
 
-        await db.execute('''
-          CREATE TABLE queue (
-            guid TEXT PRIMARY KEY,
-            title TEXT,
-            author TEXT,
-            image TEXT,
-            datePublished INTEGER,
-            description TEXT,
-            feedUrl TEXT,
-            duration TEXT,
-            downloadSize TEXT,
-            enclosureType TEXT,
-            enclosureLength INTEGER,
-            enclosureUrl TEXT,
-            podcast TEXT,
-            pos INTEGER,
-            podcastCurrentPositionInMilliseconds REAL,
-            currentPlaybackPositionString TEXT,
-            currentPlaybackRemainingTimeString TEXT,
-            playerPosition INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE history (
-            guid TEXT PRIMARY KEY,
-            image TEXT,
-            title TEXT,
-            author TEXT,
-            datePublished INTEGER,
-            description TEXT,
-            feedUrl TEXT,
-            duration TEXT,
-            size TEXT,
-            podcastId TEXT,
-            enclosureLength INTEGER,
-            enclosureUrl TEXT,
-            playDate INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE downloads (
-            guid TEXT PRIMARY KEY,
-            image TEXT,
-            title TEXT,
-            author TEXT,
-            datePublished INTEGER,
-            description TEXT,
-            feedUrl TEXT,
-            duration INTEGER,
-            size TEXT,
-            podcastId INTEGER,
-            enclosureLength INTEGER,
-            enclosureUrl TEXT,
-            downloadDate INTEGER,
-            fileName TEXT
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE favorites (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            guid TEXT,
-            title TEXT,
-            author TEXT,
-            image TEXT,
-            datePublished INTEGER,
-            description TEXT,
-            feedUrl TEXT,
-            duration INTEGER,
-            enclosureType TEXT,
-            enclosureLength INTEGER,
-            enclosureUrl TEXT,
-            podcast TEXT,
-            size TEXT,
-            podcastId TEXT,
-            downloadDate INTEGER,
-            fileName TEXT
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE feed (
-            guid TEXT PRIMARY KEY
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE settings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_interface TEXT,
-            playback TEXT,
-            automatic TEXT,
-            synchronization TEXT,
-            import_export TEXT,
-            notifications TEXT
-          )
-        ''');
-      },
+    final String? filePath = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save OpenAir Backup',
+      fileName: fileName,
+      initialDirectory: initialDirectory,
+      type: FileType.custom,
+      allowedExtensions: ['db'],
+      bytes: (kIsWeb || Platform.isAndroid || Platform.isIOS)
+          ? Uint8List(0)
+          : null,
     );
 
-    // Export subscriptions
-    final localSubscriptions = await hiveService.getSubscriptions();
-    for (final sub in localSubscriptions.values) {
-      await database.insert('subscriptions', sub.toJson(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
+    if (filePath != null) {
+      await compute((_) => exportDBIsolated, filePath);
     }
-
-    // Export queue
-    final localQueue = await hiveService.getQueue();
-    for (final item in localQueue.values) {
-      final queueItem = Map<String, dynamic>.from(item);
-
-      if (queueItem['podcast'] != null) {
-        queueItem['podcast'] = jsonEncode(queueItem['podcast']);
-      }
-
-      if (queueItem['playerPosition'] is Duration) {
-        queueItem['playerPosition'] =
-            (queueItem['playerPosition'] as Duration).inMilliseconds;
-      }
-
-      await database.insert('queue', queueItem,
-          conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    // Export history
-    final history = await hiveService.getHistory();
-
-    for (final episode in history.values) {
-      await database.insert('history', episode.toJson(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    // Export downloads
-    final downloads = await hiveService.getDownloads();
-
-    for (final episode in downloads.values) {
-      final downloadItem = episode.toJson();
-      downloadItem['duration'] = episode.duration.inMilliseconds;
-
-      downloadItem['downloadDate'] =
-          episode.downloadDate.millisecondsSinceEpoch;
-
-      await database.insert('downloads', downloadItem.cast<String, Object?>(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    // Export favorites
-    final localFavorites = await hiveService.getFavoriteEpisodes();
-
-    for (final item in localFavorites.values) {
-      final favoriteItem = {
-        'guid': item['guid'],
-        'title': item['title'],
-        'author': item['author'],
-        'image': item['image'],
-        'datePublished': item['datePublished'],
-        'description': item['description'],
-        'feedUrl': item['feedUrl'],
-        'duration': item['duration'],
-        'enclosureType': item['enclosureType'],
-        'enclosureLength': item['enclosureLength'],
-        'enclosureUrl': item['enclosureUrl'],
-        'podcast': item['podcast'],
-        'size': item['size'],
-        'podcastId': item['podcastId'],
-        'downloadDate': item['downloadDate'],
-        'fileName': item['fileName'],
-      };
-
-      if (favoriteItem['podcast'] != null) {
-        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
-      }
-
-      if (favoriteItem['downloadDate'] is DateTime) {
-        favoriteItem['downloadDate'] =
-            (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
-      }
-
-      if (favoriteItem['duration'] is Duration) {
-        favoriteItem['duration'] =
-            (favoriteItem['duration'] as Duration).inMilliseconds;
-      }
-
-      await database.insert('favorites', favoriteItem,
-          conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    // Export feed
-    final localFeed = await hiveService.getFeed();
-
-    for (final item in localFeed.values) {
-      await database.insert('feed', item.toJson(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    // Export settings
-    final userInterfaceSettings = await hiveService.getUserInterfaceSettings();
-    final playbackSettings = await hiveService.getPlaybackSettings();
-    final automaticSettings = await hiveService.getAutomaticSettings();
-    final synchronizationSettings =
-        await hiveService.getSynchronizationSettings();
-    final importExport = await hiveService.getImportExportSettings();
-    final notifications = await hiveService.getNotificationsSettings();
-
-    await database.insert(
-        'settings',
-        {
-          'user_interface': jsonEncode(userInterfaceSettings),
-          'playback': jsonEncode(playbackSettings),
-          'automatic': jsonEncode(automaticSettings),
-          'synchronization': jsonEncode(synchronizationSettings),
-          'import_export': jsonEncode(importExport),
-          'notifications': jsonEncode(notifications),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace);
-
-    debugPrint('Database exported to $path');
   }
 
   Future<void> importFromDb(File file) async {
@@ -1367,4 +1159,269 @@ class OpenAirProvider extends ChangeNotifier {
 
     debugPrint('Synchronization complete');
   }
+}
+
+exportDBIsolated(String filePath) async {
+  debugPrint('OpenAir path: $filePath');
+
+  databaseFactory = databaseFactoryFfi;
+
+  // Explicitly delete the database file if it exists
+  final file = File(filePath);
+
+  if (await file.exists()) {
+    try {
+      await file.delete();
+      debugPrint('Existing database file deleted: $filePath');
+    } catch (e) {
+      debugPrint('Error deleting existing database file: $e');
+    }
+  }
+
+  final database = await openDatabase(
+    filePath,
+    version: 1,
+    onCreate: (db, version) async {
+      await db.execute('''
+          CREATE TABLE subscriptions (
+            id INTEGER PRIMARY KEY,
+            url TEXT,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            artwork TEXT,
+            description TEXT,
+            episodeCount INTEGER,
+            updated_at TEXT
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE queue (
+            guid TEXT PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            downloadSize TEXT,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT,
+            pos INTEGER,
+            podcastCurrentPositionInMilliseconds REAL,
+            currentPlaybackPositionString TEXT,
+            currentPlaybackRemainingTimeString TEXT,
+            playerPosition INTEGER
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE history (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            size TEXT,
+            podcastId TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            playDate INTEGER
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE downloads (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            size TEXT,
+            podcastId INTEGER,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guid TEXT,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT,
+            size TEXT,
+            podcastId TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE feed (
+            guid TEXT PRIMARY KEY
+          )
+        ''');
+
+      await db.execute('''
+          CREATE TABLE settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_interface TEXT,
+            playback TEXT,
+            automatic TEXT,
+            synchronization TEXT,
+            import_export TEXT,
+            notifications TEXT
+          )
+        ''');
+    },
+  );
+
+  IsolatedBox subscriptionBox = await IsolatedHive.openBox('subscriptions');
+  IsolatedBox queueBox = await IsolatedHive.openBox('queue');
+  IsolatedBox historyBox = await IsolatedHive.openBox('history');
+  IsolatedBox downloadsBox = await IsolatedHive.openBox('downloads');
+  IsolatedBox favoritesBox = await IsolatedHive.openBox('favorites');
+  IsolatedBox feedBox = await IsolatedHive.openBox('feed');
+  IsolatedBox settingsBox = await IsolatedHive.openBox('settings');
+
+  // Export subscriptions
+  final localSubscriptions = await subscriptionBox.values;
+
+  for (final sub in localSubscriptions) {
+    await database.insert('subscriptions', sub.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export queue
+  final localQueue = await queueBox.values;
+
+  for (final item in localQueue) {
+    final queueItem = Map<String, dynamic>.from(item);
+
+    if (queueItem['podcast'] != null) {
+      queueItem['podcast'] = jsonEncode(queueItem['podcast']);
+    }
+
+    if (queueItem['playerPosition'] is Duration) {
+      queueItem['playerPosition'] =
+          (queueItem['playerPosition'] as Duration).inMilliseconds;
+    }
+
+    await database.insert('queue', queueItem,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export history
+  final history = await historyBox.values;
+
+  for (final episode in history) {
+    await database.insert('history', episode.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export downloads
+  final downloads = await downloadsBox.values;
+
+  for (final episode in downloads) {
+    final downloadItem = episode.toJson();
+    downloadItem['duration'] = episode.duration.inMilliseconds;
+
+    downloadItem['downloadDate'] = episode.downloadDate.millisecondsSinceEpoch;
+
+    await database.insert('downloads', downloadItem.cast<String, Object?>(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export favorites
+  final localFavorites = await favoritesBox.values;
+
+  for (final item in localFavorites) {
+    final favoriteItem = {
+      'guid': item['guid'],
+      'title': item['title'],
+      'author': item['author'],
+      'image': item['image'],
+      'datePublished': item['datePublished'],
+      'description': item['description'],
+      'feedUrl': item['feedUrl'],
+      'duration': item['duration'],
+      'enclosureType': item['enclosureType'],
+      'enclosureLength': item['enclosureLength'],
+      'enclosureUrl': item['enclosureUrl'],
+      'podcast': item['podcast'],
+      'size': item['size'],
+      'podcastId': item['podcastId'],
+      'downloadDate': item['downloadDate'],
+      'fileName': item['fileName'],
+    };
+
+    if (favoriteItem['podcast'] != null) {
+      favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
+    }
+
+    if (favoriteItem['downloadDate'] is DateTime) {
+      favoriteItem['downloadDate'] =
+          (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
+    }
+
+    if (favoriteItem['duration'] is Duration) {
+      favoriteItem['duration'] =
+          (favoriteItem['duration'] as Duration).inMilliseconds;
+    }
+
+    await database.insert('favorites', favoriteItem,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export feed
+  final localFeed = await feedBox.values;
+
+  for (final item in localFeed) {
+    await database.insert('feed', item.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // Export settings
+  final userInterfaceSettings = await settingsBox.get('userInterface');
+  final playbackSettings = await settingsBox.get('playback');
+  final automaticSettings = await settingsBox.get('automatic');
+  final synchronizationSettings = await settingsBox.get('synchronization');
+  final importExport = await settingsBox.get('importExport');
+  final notifications = await settingsBox.get('notifications');
+
+  await database.insert(
+      'settings',
+      {
+        'user_interface': jsonEncode(userInterfaceSettings.values),
+        'playback': jsonEncode(playbackSettings.values),
+        'automatic': jsonEncode(automaticSettings.values),
+        'synchronization': jsonEncode(synchronizationSettings.values),
+        'import_export': jsonEncode(importExport.values),
+        'notifications': jsonEncode(notifications.values),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace);
+
+  debugPrint('Database exported to $filePath');
 }

@@ -58,26 +58,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     }
   }
 
-  void exportDatabase(BuildContext context) async {
-    final String date = DateTime.now().toIso8601String().split('T')[0];
-    String fileName = 'openair-backup-$date.db';
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String getOpenAirPath = '${appDocDir.path}/OpenAir';
-
-    if (context.mounted) {
-      String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: Translations.of(context).text('exportDatabase'),
-          fileName: fileName,
-          type: FileType.custom,
-          allowedExtensions: ['db'],
-          initialDirectory: getOpenAirPath);
-
-      if (outputFile != null) {
-        ref.read(openAirProvider).exportToDb(outputFile);
-      }
-    }
-  }
+  void exportDatabase() async => ref.read(openAirProvider).exportDb();
 
   void importOpml() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -156,7 +137,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                     Translations.of(context).text('exportDatabaseSubtitle'),
                   ),
                   onTap: () {
-                    exportDatabase(context);
+                    exportDatabase();
 
                     if (mounted) {
                       if (!Platform.isAndroid && !Platform.isIOS) {

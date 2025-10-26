@@ -18,7 +18,6 @@ import 'package:openair/hive_models/history_model.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
 import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
@@ -337,8 +336,8 @@ class HiveService {
           final exportPath =
               join(openAirDir.path, 'openair_backup_$formattedDate.db');
 
-          // await exportOpml(exportPath);
-          ref.read(openAirProvider).exportToDb(exportPath);
+          // FIXME: Need to have a different function for this
+          // ref.read(openAirProvider).exportDb(exportPath);
 
           debugPrint('Database exported to $exportPath');
 
