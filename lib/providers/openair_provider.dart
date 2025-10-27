@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -22,7 +24,8 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi_sqflite;
+import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:theme_provider/theme_provider.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
@@ -237,19 +240,35 @@ class OpenAirProvider extends ChangeNotifier {
     );
 
     if (filePath != null) {
-      await compute((_) => exportDBIsolated, filePath);
+      await compute(exportDatabaseIsolated, filePath);
     }
   }
 
   Future<void> importFromDb(File file) async {
-    final database = await openDatabase(
-      file.path,
-      version: 1,
-    );
+    sqflite.Database? database;
+
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      database = await sqflite.openDatabase(
+        file.path,
+        version: 1,
+      );
+    }
+
+    // FIXME: FFI sqflite import not working properly
+    // else if (!kIsWeb &&
+    //     (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    //   ffi_sqflite.sqfliteFfiInit(); // Initialize FFI in this isolate
+    //   ffi_sqflite.databaseFactory = ffi_sqflite.databaseFactoryFfi;
+
+    //   database = await ffi_sqflite.openDatabase(
+    //     file.path,
+    //     version: 1,
+    //   );
+    // }
 
     // Import subscriptions
     final List<Map<String, dynamic>> subscriptionsMaps =
-        await database.query('subscriptions');
+        await database!.query('subscriptions');
 
     for (var subMap in subscriptionsMaps) {
       final mutableSubMap = Map<String, dynamic>.from(subMap);
@@ -382,144 +401,61 @@ class OpenAirProvider extends ChangeNotifier {
 
       receiveNotificationsForNewEpisodesConfig =
           notificationsSettings['receiveNotificationsForNewEpisodes'];
-      receiveNotificationsWhenDownloadConfig =
-          notificationsSettings['receiveNotificationsWhenDownloading'];
-      receiveNotificationsWhenPlayConfig =
-          notificationsSettings['receiveNotificationsWhenPlaying'];
-    }
 
-    debugPrint('Database imported from ${file.path}');
-  }
-
-  void updateFontSize(String size) {
-    fontSizeConfig = size;
-    hiveService.saveUserInterfaceSettings({
-      'fontSizeFactor': fontSizeConfig,
-      'language': languageConfig,
-      'locale': localeConfig,
-    });
-
-    Brightness platformBrightness =
-        View.of(context).platformDispatcher.platformBrightness;
-
-    switch (themeModeConfig) {
-      case 'System':
-        if (platformBrightness == Brightness.dark) {
-          switch (fontSizeConfig) {
-            case 'small':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_small');
-              break;
-            case 'medium':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_medium');
-              break;
-            case 'large':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_large');
-              break;
-            case 'extraLarge':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_extra_large');
-              break;
-            default:
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_medium');
+      Brightness platformBrightness = context.mounted
+          ? View.of(context).platformDispatcher.platformBrightness
+          : Brightness.light;
+      // The operands of the operator '&&' must be assignable to 'bool'.
+      switch (themeModeConfig) {
+        case 'System':
+          if (platformBrightness == Brightness.dark) {
+            switch (fontSizeConfig) {
+              case 'small':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_small');
+                break;
+              case 'medium':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+                break;
+              case 'large':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_large');
+                break;
+              case 'extraLarge':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+            }
+          } else if (platformBrightness == Brightness.light &&
+              context.mounted) {
+            switch (fontSizeConfig) {
+              case 'small':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_small');
+                break;
+              case 'medium':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+                break;
+              case 'large':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_large');
+                break;
+              case 'extraLarge':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+            }
           }
-        } else if (platformBrightness == Brightness.light) {
-          switch (fontSizeConfig) {
-            case 'small':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_light_small');
-              break;
-            case 'medium':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_light_medium');
-              break;
-            case 'large':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_light_large');
-              break;
-            case 'extraLarge':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_light_extra_large');
-              break;
-            default:
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_light_medium');
-          }
-        }
-        break;
-      case 'Light':
-        switch (fontSizeConfig) {
-          case 'small':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_light_small');
-            break;
-          case 'medium':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_light_medium');
-            break;
-          case 'large':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_light_large');
-            break;
-          case 'extraLarge':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_light_extra_large');
-            break;
-          default:
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_light_medium');
-        }
-        break;
-      case 'Dark':
-        switch (fontSizeConfig) {
-          case 'small':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_dark_small');
-            break;
-          case 'medium':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_dark_medium');
-            break;
-          case 'large':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_dark_large');
-            break;
-          case 'extraLarge':
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_dark_extra_large');
-            break;
-          default:
-            ThemeProvider.controllerOf(context)
-                .setTheme('blue_accent_dark_medium');
-        }
-        break;
-      default:
-        if (platformBrightness == Brightness.dark) {
-          switch (fontSizeConfig) {
-            case 'small':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_small');
-              break;
-            case 'medium':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_medium');
-              break;
-            case 'large':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_large');
-              break;
-            case 'extraLarge':
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_extra_large');
-              break;
-            default:
-              ThemeProvider.controllerOf(context)
-                  .setTheme('blue_accent_dark_medium');
-          }
-        } else if (platformBrightness == Brightness.light) {
+          break;
+        case 'Light':
           switch (fontSizeConfig) {
             case 'small':
               ThemeProvider.controllerOf(context)
@@ -541,9 +477,79 @@ class OpenAirProvider extends ChangeNotifier {
               ThemeProvider.controllerOf(context)
                   .setTheme('blue_accent_light_medium');
           }
-        }
+          break;
+        case 'Dark':
+          switch (fontSizeConfig) {
+            case 'small':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_small');
+              break;
+            case 'medium':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+              break;
+            case 'large':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_large');
+              break;
+            case 'extraLarge':
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_extra_large');
+              break;
+            default:
+              ThemeProvider.controllerOf(context)
+                  .setTheme('blue_accent_dark_medium');
+          }
+          break;
+        default:
+          if (platformBrightness == Brightness.dark) {
+            switch (fontSizeConfig) {
+              case 'small':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_small');
+                break;
+              case 'medium':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+                break;
+              case 'large':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_large');
+                break;
+              case 'extraLarge':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_dark_medium');
+            }
+          } else if (platformBrightness == Brightness.light) {
+            switch (fontSizeConfig) {
+              case 'small':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_small');
+                break;
+              case 'medium':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+                break;
+              case 'large':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_large');
+                break;
+              case 'extraLarge':
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_extra_large');
+                break;
+              default:
+                ThemeProvider.controllerOf(context)
+                    .setTheme('blue_accent_light_medium');
+            }
+          }
+      }
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void downloadEnqueue(BuildContext context) async {
@@ -1161,28 +1167,33 @@ class OpenAirProvider extends ChangeNotifier {
   }
 }
 
-exportDBIsolated(String filePath) async {
-  debugPrint('OpenAir path: $filePath');
+Future<void> exportDatabaseIsolated(String filePath) async {
+  debugPrint('OpenAir path (Isolate): $filePath');
+  if (!kIsWeb && Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    ffi_sqflite.sqfliteFfiInit();
+    ffi_sqflite.databaseFactory = ffi_sqflite.databaseFactoryFfi;
+  }
 
-  databaseFactory = databaseFactoryFfi;
-
-  // Explicitly delete the database file if it exists
   final file = File(filePath);
-
   if (await file.exists()) {
     try {
       await file.delete();
       debugPrint('Existing database file deleted: $filePath');
     } catch (e) {
       debugPrint('Error deleting existing database file: $e');
+      return;
     }
   }
 
-  final database = await openDatabase(
-    filePath,
-    version: 1,
-    onCreate: (db, version) async {
-      await db.execute('''
+  if (!kIsWeb && Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    ffi_sqflite.Database? database;
+
+    database = await ffi_sqflite.openDatabase(
+      filePath,
+      version: 1,
+      onCreate: (db, version) async {
+        // --- Table Creation Queries (Unchanged from original) ---
+        await db.execute('''
           CREATE TABLE subscriptions (
             id INTEGER PRIMARY KEY,
             url TEXT,
@@ -1196,7 +1207,7 @@ exportDBIsolated(String filePath) async {
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE queue (
             guid TEXT PRIMARY KEY,
             title TEXT,
@@ -1219,7 +1230,7 @@ exportDBIsolated(String filePath) async {
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE history (
             guid TEXT PRIMARY KEY,
             image TEXT,
@@ -1237,7 +1248,7 @@ exportDBIsolated(String filePath) async {
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE downloads (
             guid TEXT PRIMARY KEY,
             image TEXT,
@@ -1256,7 +1267,7 @@ exportDBIsolated(String filePath) async {
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE favorites (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             guid TEXT,
@@ -1278,13 +1289,13 @@ exportDBIsolated(String filePath) async {
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE feed (
             guid TEXT PRIMARY KEY
           )
         ''');
 
-      await db.execute('''
+        await db.execute('''
           CREATE TABLE settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_interface TEXT,
@@ -1295,133 +1306,386 @@ exportDBIsolated(String filePath) async {
             notifications TEXT
           )
         ''');
-    },
-  );
-
-  IsolatedBox subscriptionBox = await IsolatedHive.openBox('subscriptions');
-  IsolatedBox queueBox = await IsolatedHive.openBox('queue');
-  IsolatedBox historyBox = await IsolatedHive.openBox('history');
-  IsolatedBox downloadsBox = await IsolatedHive.openBox('downloads');
-  IsolatedBox favoritesBox = await IsolatedHive.openBox('favorites');
-  IsolatedBox feedBox = await IsolatedHive.openBox('feed');
-  IsolatedBox settingsBox = await IsolatedHive.openBox('settings');
-
-  // Export subscriptions
-  final localSubscriptions = await subscriptionBox.values;
-
-  for (final sub in localSubscriptions) {
-    await database.insert('subscriptions', sub.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export queue
-  final localQueue = await queueBox.values;
-
-  for (final item in localQueue) {
-    final queueItem = Map<String, dynamic>.from(item);
-
-    if (queueItem['podcast'] != null) {
-      queueItem['podcast'] = jsonEncode(queueItem['podcast']);
-    }
-
-    if (queueItem['playerPosition'] is Duration) {
-      queueItem['playerPosition'] =
-          (queueItem['playerPosition'] as Duration).inMilliseconds;
-    }
-
-    await database.insert('queue', queueItem,
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export history
-  final history = await historyBox.values;
-
-  for (final episode in history) {
-    await database.insert('history', episode.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export downloads
-  final downloads = await downloadsBox.values;
-
-  for (final episode in downloads) {
-    final downloadItem = episode.toJson();
-    downloadItem['duration'] = episode.duration.inMilliseconds;
-
-    downloadItem['downloadDate'] = episode.downloadDate.millisecondsSinceEpoch;
-
-    await database.insert('downloads', downloadItem.cast<String, Object?>(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export favorites
-  final localFavorites = await favoritesBox.values;
-
-  for (final item in localFavorites) {
-    final favoriteItem = {
-      'guid': item['guid'],
-      'title': item['title'],
-      'author': item['author'],
-      'image': item['image'],
-      'datePublished': item['datePublished'],
-      'description': item['description'],
-      'feedUrl': item['feedUrl'],
-      'duration': item['duration'],
-      'enclosureType': item['enclosureType'],
-      'enclosureLength': item['enclosureLength'],
-      'enclosureUrl': item['enclosureUrl'],
-      'podcast': item['podcast'],
-      'size': item['size'],
-      'podcastId': item['podcastId'],
-      'downloadDate': item['downloadDate'],
-      'fileName': item['fileName'],
-    };
-
-    if (favoriteItem['podcast'] != null) {
-      favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
-    }
-
-    if (favoriteItem['downloadDate'] is DateTime) {
-      favoriteItem['downloadDate'] =
-          (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
-    }
-
-    if (favoriteItem['duration'] is Duration) {
-      favoriteItem['duration'] =
-          (favoriteItem['duration'] as Duration).inMilliseconds;
-    }
-
-    await database.insert('favorites', favoriteItem,
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export feed
-  final localFeed = await feedBox.values;
-
-  for (final item in localFeed) {
-    await database.insert('feed', item.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // Export settings
-  final userInterfaceSettings = await settingsBox.get('userInterface');
-  final playbackSettings = await settingsBox.get('playback');
-  final automaticSettings = await settingsBox.get('automatic');
-  final synchronizationSettings = await settingsBox.get('synchronization');
-  final importExport = await settingsBox.get('importExport');
-  final notifications = await settingsBox.get('notifications');
-
-  await database.insert(
-      'settings',
-      {
-        'user_interface': jsonEncode(userInterfaceSettings.values),
-        'playback': jsonEncode(playbackSettings.values),
-        'automatic': jsonEncode(automaticSettings.values),
-        'synchronization': jsonEncode(synchronizationSettings.values),
-        'import_export': jsonEncode(importExport.values),
-        'notifications': jsonEncode(notifications.values),
+        // --- End of Table Creation Queries ---
       },
-      conflictAlgorithm: ConflictAlgorithm.replace);
+    );
+
+    IsolatedBox subscriptionBox = await IsolatedHive.openBox('subscriptions');
+    IsolatedBox queueBox = await IsolatedHive.openBox('queue');
+    IsolatedBox historyBox = await IsolatedHive.openBox('history');
+    IsolatedBox downloadsBox = await IsolatedHive.openBox('downloads');
+    IsolatedBox favoritesBox = await IsolatedHive.openBox('favorites');
+    IsolatedBox feedBox = await IsolatedHive.openBox('feed');
+    IsolatedBox settingsBox = await IsolatedHive.openBox('settings');
+
+    // Export subscriptions
+    final localSubscriptions = await subscriptionBox.values;
+
+    for (final sub in localSubscriptions) {
+      await database.insert('subscriptions', sub.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export queue
+    final localQueue = await queueBox.values;
+
+    for (final item in localQueue) {
+      final queueItem = Map<String, dynamic>.from(item);
+
+      if (queueItem['podcast'] != null) {
+        queueItem['podcast'] = jsonEncode(queueItem['podcast']);
+      }
+
+      if (queueItem['playerPosition'] is Duration) {
+        queueItem['playerPosition'] =
+            (queueItem['playerPosition'] as Duration).inMilliseconds;
+      }
+
+      await database.insert('queue', queueItem,
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export history
+    final history = await historyBox.values;
+
+    for (final episode in history) {
+      await database.insert('history', episode.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export downloads
+    final downloads = await downloadsBox.values;
+
+    for (final episode in downloads) {
+      final downloadItem = episode.toJson();
+      downloadItem['duration'] = episode.duration.inMilliseconds;
+
+      downloadItem['downloadDate'] =
+          episode.downloadDate.millisecondsSinceEpoch;
+
+      await database.insert('downloads', downloadItem.cast<String, Object?>(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export favorites
+    final localFavorites = await favoritesBox.values;
+
+    for (final item in localFavorites) {
+      final favoriteItem = {
+        'guid': item['guid'],
+        'title': item['title'],
+        'author': item['author'],
+        'image': item['image'],
+        'datePublished': item['datePublished'],
+        'description': item['description'],
+        'feedUrl': item['feedUrl'],
+        'duration': item['duration'],
+        'enclosureType': item['enclosureType'],
+        'enclosureLength': item['enclosureLength'],
+        'enclosureUrl': item['enclosureUrl'],
+        'podcast': item['podcast'],
+        'size': item['size'],
+        'podcastId': item['podcastId'],
+        'downloadDate': item['downloadDate'],
+        'fileName': item['fileName'],
+      };
+
+      if (favoriteItem['podcast'] != null) {
+        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
+      }
+
+      if (favoriteItem['downloadDate'] is DateTime) {
+        favoriteItem['downloadDate'] =
+            (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
+      }
+
+      if (favoriteItem['duration'] is Duration) {
+        favoriteItem['duration'] =
+            (favoriteItem['duration'] as Duration).inMilliseconds;
+      }
+
+      await database.insert('favorites', favoriteItem,
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export feed
+    final localFeed = await feedBox.values;
+
+    for (final item in localFeed) {
+      await database.insert('feed', item.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export settings
+    final userInterfaceSettings = await settingsBox.get('userInterface');
+    final playbackSettings = await settingsBox.get('playback');
+    final automaticSettings = await settingsBox.get('automatic');
+    final synchronizationSettings = await settingsBox.get('synchronization');
+    final importExport = await settingsBox.get('importExport');
+    final notifications = await settingsBox.get('notifications');
+
+    await database.insert(
+        'settings',
+        {
+          'user_interface': jsonEncode(userInterfaceSettings ?? {}),
+          'playback': jsonEncode(playbackSettings ?? {}),
+          'automatic': jsonEncode(automaticSettings ?? {}),
+          'synchronization': jsonEncode(synchronizationSettings ?? {}),
+          'import_export': jsonEncode(importExport ?? {}),
+          'notifications': jsonEncode(notifications ?? {}),
+        },
+        conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+  } else if (Platform.isAndroid || Platform.isIOS || Platform.isFuchsia) {
+    sqflite.Database? database;
+
+    database = await sqflite.openDatabase(
+      filePath,
+      version: 1,
+      onCreate: (db, version) async {
+        // --- Table Creation Queries (Unchanged from original) ---
+        await db.execute('''
+          CREATE TABLE subscriptions (
+            id INTEGER PRIMARY KEY,
+            url TEXT,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            artwork TEXT,
+            description TEXT,
+            episodeCount INTEGER,
+            updated_at TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE queue (
+            guid TEXT PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            downloadSize TEXT,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT,
+            pos INTEGER,
+            podcastCurrentPositionInMilliseconds REAL,
+            currentPlaybackPositionString TEXT,
+            currentPlaybackRemainingTimeString TEXT,
+            playerPosition INTEGER
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE history (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration TEXT,
+            size TEXT,
+            podcastId TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            playDate INTEGER
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE downloads (
+            guid TEXT PRIMARY KEY,
+            image TEXT,
+            title TEXT,
+            author TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            size TEXT,
+            podcastId INTEGER,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guid TEXT,
+            title TEXT,
+            author TEXT,
+            image TEXT,
+            datePublished INTEGER,
+            description TEXT,
+            feedUrl TEXT,
+            duration INTEGER,
+            enclosureType TEXT,
+            enclosureLength INTEGER,
+            enclosureUrl TEXT,
+            podcast TEXT,
+            size TEXT,
+            podcastId TEXT,
+            downloadDate INTEGER,
+            fileName TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE feed (
+            guid TEXT PRIMARY KEY
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE settings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_interface TEXT,
+            playback TEXT,
+            automatic TEXT,
+            synchronization TEXT,
+            import_export TEXT,
+            notifications TEXT
+          )
+        ''');
+        // --- End of Table Creation Queries ---
+      },
+    );
+
+    IsolatedBox subscriptionBox = await IsolatedHive.openBox('subscriptions');
+    IsolatedBox queueBox = await IsolatedHive.openBox('queue');
+    IsolatedBox historyBox = await IsolatedHive.openBox('history');
+    IsolatedBox downloadsBox = await IsolatedHive.openBox('downloads');
+    IsolatedBox favoritesBox = await IsolatedHive.openBox('favorites');
+    IsolatedBox feedBox = await IsolatedHive.openBox('feed');
+    IsolatedBox settingsBox = await IsolatedHive.openBox('settings');
+
+    // Export subscriptions
+    final localSubscriptions = await subscriptionBox.values;
+
+    for (final sub in localSubscriptions) {
+      await database.insert('subscriptions', sub.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export queue
+    final localQueue = await queueBox.values;
+
+    for (final item in localQueue) {
+      final queueItem = Map<String, dynamic>.from(item);
+
+      if (queueItem['podcast'] != null) {
+        queueItem['podcast'] = jsonEncode(queueItem['podcast']);
+      }
+
+      if (queueItem['playerPosition'] is Duration) {
+        queueItem['playerPosition'] =
+            (queueItem['playerPosition'] as Duration).inMilliseconds;
+      }
+
+      await database.insert('queue', queueItem,
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export history
+    final history = await historyBox.values;
+
+    for (final episode in history) {
+      await database.insert('history', episode.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export downloads
+    final downloads = await downloadsBox.values;
+
+    for (final episode in downloads) {
+      final downloadItem = episode.toJson();
+      downloadItem['duration'] = episode.duration.inMilliseconds;
+
+      downloadItem['downloadDate'] =
+          episode.downloadDate.millisecondsSinceEpoch;
+
+      await database.insert('downloads', downloadItem.cast<String, Object?>(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export favorites
+    final localFavorites = await favoritesBox.values;
+
+    for (final item in localFavorites) {
+      final favoriteItem = {
+        'guid': item['guid'],
+        'title': item['title'],
+        'author': item['author'],
+        'image': item['image'],
+        'datePublished': item['datePublished'],
+        'description': item['description'],
+        'feedUrl': item['feedUrl'],
+        'duration': item['duration'],
+        'enclosureType': item['enclosureType'],
+        'enclosureLength': item['enclosureLength'],
+        'enclosureUrl': item['enclosureUrl'],
+        'podcast': item['podcast'],
+        'size': item['size'],
+        'podcastId': item['podcastId'],
+        'downloadDate': item['downloadDate'],
+        'fileName': item['fileName'],
+      };
+
+      if (favoriteItem['podcast'] != null) {
+        favoriteItem['podcast'] = jsonEncode(favoriteItem['podcast']);
+      }
+
+      if (favoriteItem['downloadDate'] is DateTime) {
+        favoriteItem['downloadDate'] =
+            (favoriteItem['downloadDate'] as DateTime).millisecondsSinceEpoch;
+      }
+
+      if (favoriteItem['duration'] is Duration) {
+        favoriteItem['duration'] =
+            (favoriteItem['duration'] as Duration).inMilliseconds;
+      }
+
+      await database.insert('favorites', favoriteItem,
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export feed
+    final localFeed = await feedBox.values;
+
+    for (final item in localFeed) {
+      await database.insert('feed', item.toJson(),
+          conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    // Export settings
+    final userInterfaceSettings = await settingsBox.get('userInterface');
+    final playbackSettings = await settingsBox.get('playback');
+    final automaticSettings = await settingsBox.get('automatic');
+    final synchronizationSettings = await settingsBox.get('synchronization');
+    final importExport = await settingsBox.get('importExport');
+    final notifications = await settingsBox.get('notifications');
+
+    await database.insert(
+        'settings',
+        {
+          'user_interface': jsonEncode(userInterfaceSettings ?? {}),
+          'playback': jsonEncode(playbackSettings ?? {}),
+          'automatic': jsonEncode(automaticSettings ?? {}),
+          'synchronization': jsonEncode(synchronizationSettings ?? {}),
+          'import_export': jsonEncode(importExport ?? {}),
+          'notifications': jsonEncode(notifications ?? {}),
+        },
+        conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+  }
 
   debugPrint('Database exported to $filePath');
 }
