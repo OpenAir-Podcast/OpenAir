@@ -93,6 +93,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         return EpisodeCardList(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
+                          author: podcastData.author ?? 'Unknown',
                           podcast: PodcastModel(
                             id: podcastData.id,
                             title: podcastData.title,
