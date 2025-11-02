@@ -43,7 +43,7 @@ class PodcastIndexSearchPage extends ConsumerWidget {
               )
             : ListView.builder(
                 itemCount: podcasts.count,
-                itemBuilder: (context, index) => PodcastIndexSearchCardList(
+                itemBuilder: (context, index) => PodcastIndexSearchCard(
                   podcastItem: podcasts.feeds[index],
                 ),
               ),

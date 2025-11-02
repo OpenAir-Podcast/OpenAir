@@ -64,6 +64,7 @@ class _SettingsState extends ConsumerState<Settings> {
                   .then(
                 (value) {
                   setState(() {});
+                  widget.functionBuild();
                 },
               ),
             ),

@@ -139,9 +139,16 @@ class AudioProvider extends ChangeNotifier {
             .timeout(const Duration(seconds: 30));
       }
 
-      player.getDuration().then((Duration? value) =>
-          currentPlaybackDurationString =
-              formatCurrentPlaybackPosition(value!));
+      player.getDuration().then((Duration? value) {
+        if (value != null) {
+          currentPlaybackDurationString = formatCurrentPlaybackPosition(value);
+        } else {
+          // Handle the case where duration is null, e.g., set to a default or log an error.
+          currentPlaybackDurationString = '00:00:00';
+          debugPrint(
+              'Player duration is null after playing episode: ${episodeItem['title']}');
+        }
+      });
 
       notifyListeners();
 
@@ -1505,8 +1512,7 @@ class AudioProvider extends ChangeNotifier {
     final Map<dynamic, dynamic>? favoriteEpisodes =
         await hiveService.favoritesBox.then((box) => box.get(guid));
 
-    if (favoriteEpisodes != null) {
-    }
+    if (favoriteEpisodes != null) {}
 
     return false;
   }

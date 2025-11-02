@@ -55,6 +55,22 @@ final sortedDownloadsProvider = FutureProvider.autoDispose<List<DownloadModel>>(
   },
 );
 
+// Create a FutureProvider to fetch the podcast data
+final getPodcastInfoByTitleProvider =
+    FutureProvider.family.autoDispose<Map, String>((ref, title) async {
+  final Map<String, dynamic>? podcastInfoData =
+      await ref.read(openAirProvider).hiveService.getPodcastInfo(title);
+
+  if (podcastInfoData != null) {
+    return podcastInfoData;
+  }
+
+  final data =
+      await ref.watch(podcastIndexProvider).getPodcastDetailsByTitle(title);
+
+  return data;
+});
+
 class HiveService {
   late final BoxCollection collection;
   late final Future<CollectionBox<SubscriptionModel>> subscriptionBox;
@@ -72,6 +88,8 @@ class HiveService {
   late final Future<CollectionBox<FetchDataModel>> topFeaturedBox;
 
   late final Future<CollectionBox<FetchDataModel>> categoryBox;
+
+  late final Future<CollectionBox<Map>> podcastInfoBox;
 
   late final Future<CollectionBox<Map>> favoritesBox;
 
@@ -129,6 +147,7 @@ class HiveService {
         'trending',
         'category',
         'favorites',
+        'podcast_info',
       },
       path: kIsWeb ? null : openAirDir.path,
     );
@@ -155,6 +174,8 @@ class HiveService {
 
     // Category page
     categoryBox = collection.openBox<FetchDataModel>('category');
+
+    podcastInfoBox = collection.openBox<Map>('podcast_info');
 
     favoritesBox = collection.openBox<Map>('favorites');
 
@@ -1135,6 +1156,17 @@ class HiveService {
   void putCategoryPodcast(String category, Map<String, dynamic> data) async {
     final box = await categoryBox;
     await box.put(category, FetchDataModel.fromJson(data));
+  }
+
+  Future<Map<String, dynamic>?> getPodcastInfo(String title) async {
+    final box = await podcastInfoBox;
+    final Map? data = await box.get(title);
+    return data?.cast<String, dynamic>();
+  }
+
+  void putPodcastInfo(String title, Map<String, dynamic> data) async {
+    final box = await podcastInfoBox;
+    await box.put(title, data.cast<String, dynamic>());
   }
 
   Future<void> removeCategory(String category) async {

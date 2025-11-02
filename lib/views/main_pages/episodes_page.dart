@@ -109,6 +109,7 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
       ),
       data: (snapshot) {
         return FutureBuilder(
+          // TODO: Fix podcast info future builder to prevent multiple calls (MAYBE)
           future: ref
               .watch(podcastIndexProvider)
               .getPodcastDetailsByTitle(widget.podcast.title),

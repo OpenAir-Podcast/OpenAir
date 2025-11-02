@@ -11,21 +11,21 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 
-class PodcastIndexSearchCardList extends ConsumerStatefulWidget {
+class PodcastIndexSearchCard extends ConsumerStatefulWidget {
   final PodcastModel podcastItem;
 
-  const PodcastIndexSearchCardList({
+  const PodcastIndexSearchCard({
     super.key,
     required this.podcastItem,
   });
 
   @override
-  ConsumerState<PodcastIndexSearchCardList> createState() =>
+  ConsumerState<PodcastIndexSearchCard> createState() =>
       _PodcastIndexSearchCardListState();
 }
 
 class _PodcastIndexSearchCardListState
-    extends ConsumerState<PodcastIndexSearchCardList> {
+    extends ConsumerState<PodcastIndexSearchCard> {
   @override
   Widget build(BuildContext context) {
     bool isSub = false;

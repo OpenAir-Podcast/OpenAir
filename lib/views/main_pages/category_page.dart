@@ -3,6 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -10,6 +11,7 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
 import 'package:openair/views/widgets/podcast_card_list.dart';
+import 'package:openair/views/widgets/podcast_card_placeholder.dart';
 
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider = FutureProvider.family
@@ -371,16 +373,50 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                     ),
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
-                      return PodcastCardGrid(
-                        podcastItem: snapshot.feeds[index],
+                      final podcastDataInfoAsyncValue =
+                          ref.watch(getPodcastInfoByTitleProvider(
+                        snapshot.feeds[index].title,
+                      ));
+
+                      return podcastDataInfoAsyncValue.when(
+                        loading: () => PodcastCardPlaceholder(),
+                        error: (error, stackTrace) => PodcastCardPlaceholder(),
+                        data: (podcastInfoData) {
+                          PodcastModel podcast = snapshot.feeds[index];
+
+                          podcast.author =
+                              podcastInfoData['feeds'][0]['author'];
+
+                          return PodcastCardGrid(
+                            podcastItem: podcast,
+                          );
+                        },
                       );
                     },
                   )
                 : ListView.builder(
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
-                      return PodcastCardList(
-                        podcastItem: snapshot.feeds[index],
+                      return FutureBuilder(
+                        future: ref
+                            .watch(podcastIndexProvider)
+                            .getPodcastDetailsByTitle(
+                                snapshot.feeds[index].title),
+                        builder: (context, podcastInfoSnapshot) {
+                          if (podcastInfoSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return PodcastCardPlaceholder();
+                          }
+
+                          PodcastModel podcast = snapshot.feeds[index];
+
+                          podcast.author =
+                              podcastInfoSnapshot.data!['feeds'][0]['author'];
+
+                          return PodcastCardList(
+                            podcastItem: podcast,
+                          );
+                        },
                       );
                     },
                   ),

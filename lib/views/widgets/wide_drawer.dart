@@ -121,12 +121,22 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
               getSubCountValue.when(
                 loading: () => ListTile(
                   leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(Translations.of(context).text('subscriptions')),
+                  title: Text(
+                    Translations.of(context).text('subscriptions'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: const Text('...'),
                 ),
                 error: (error, stackTrace) => ListTile(
                   leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(Translations.of(context).text('subscriptions')),
+                  title: Text(
+                    Translations.of(context).text('subscriptions'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: ElevatedButton(
                     child: const Text('Retry'),
                     onPressed: () => ref.invalidate(subCountProvider),
@@ -134,7 +144,12 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                 ),
                 data: (data) => ListTile(
                   leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(Translations.of(context).text('subscriptions')),
+                  title: Text(
+                    Translations.of(context).text('subscriptions'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: Text(data),
                   onTap: () {
                     widget.onPageSelected(SubscriptionsPage());
@@ -229,12 +244,22 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
               getDownloadsCountValue.when(
                 loading: () => ListTile(
                   leading: const Icon(Icons.download_rounded),
-                  title: Text(Translations.of(context).text('downloads')),
+                  title: Text(
+                    Translations.of(context).text('downloads'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: const Text('...'),
                 ),
                 error: (error, stackTrace) => ListTile(
                   leading: const Icon(Icons.download_rounded),
-                  title: Text(Translations.of(context).text('downloads')),
+                  title: Text(
+                    Translations.of(context).text('downloads'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: ElevatedButton(
                     child: const Text('Retry'),
                     onPressed: () => ref.invalidate(downloadsCountProvider),
@@ -242,7 +267,12 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                 ),
                 data: (data) => ListTile(
                   leading: const Icon(Icons.download_rounded),
-                  title: Text(Translations.of(context).text('downloads')),
+                  title: Text(
+                    Translations.of(context).text('downloads'),
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   trailing: Text(data.toString()),
                   onTap: () {
                     widget.onPageSelected(DownloadsPage());
@@ -274,7 +304,12 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
           title: Text(Translations.of(context).text('settings')),
           onTap: () {
             widget.onPageSelected(
-              Settings(functionBuild: widget.rebuildDrawer),
+              Settings(
+                functionBuild: () {
+                  widget.rebuildDrawer();
+                  setState(() {});
+                },
+              ),
             );
           },
         ),

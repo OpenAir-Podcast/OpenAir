@@ -242,6 +242,10 @@ class PodcastIndexProvider {
     String fullUrl = '$url&pretty';
 
     final response = await _retry(() => _dio.get(fullUrl));
-    return response.data;
+
+    ref.watch(openAirProvider).hiveService.putPodcastInfo(
+        response.data['feeds'][0]['title'], response.data['feeds'][0]);
+
+    return response.data['feeds'][0];
   }
 }

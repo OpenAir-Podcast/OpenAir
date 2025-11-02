@@ -43,7 +43,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
     dynamic episodeDuration;
 
     if (widget.episodeItem['duration'].runtimeType == String) {
-      episodeDuration = int.parse(widget.episodeItem['duration']);
+      episodeDuration = widget.episodeItem['duration'];
     } else if (widget.episodeItem['duration'].runtimeType == int) {
       episodeDuration = widget.episodeItem['duration'];
     }
@@ -54,10 +54,12 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
         children: [
           Icon(Icons.play_arrow_rounded),
           Text(
-            ref.watch(audioProvider).convertSecondsToDuration(
-                  episodeDuration,
-                  context,
-                ),
+            episodeDuration.runtimeType == String
+                ? episodeDuration
+                : ref.watch(audioProvider).convertSecondsToDuration(
+                      episodeDuration,
+                      context,
+                    ),
             overflow: TextOverflow.ellipsis,
           ),
         ],
