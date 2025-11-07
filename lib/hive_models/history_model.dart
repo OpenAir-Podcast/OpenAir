@@ -43,7 +43,7 @@ class HistoryModel extends HiveObject {
   String feedUrl;
 
   @HiveField(7)
-  String duration;
+  int duration;
 
   @HiveField(8)
   String size;

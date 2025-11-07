@@ -22,12 +22,14 @@ import 'package:url_launcher/url_launcher.dart';
 class EpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
+  final String aurthor;
   final PodcastModel podcast;
 
   const EpisodeCardGrid({
     super.key,
     required this.episodeItem,
     required this.title,
+    required this.aurthor,
     required this.podcast,
   });
 
@@ -129,8 +131,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              widget.podcast.author ??
-                                  Translations.of(context).text('unknown'),
+                              widget.aurthor,
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -174,7 +175,6 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                   ),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.only(top: 28.0),
                 child: Column(
@@ -226,6 +226,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                       : ref.read(audioProvider).addToQueue(
                                             widget.episodeItem,
                                             widget.podcast,
+                                            context,
                                           );
 
                                   ref.invalidate(getQueueProvider);

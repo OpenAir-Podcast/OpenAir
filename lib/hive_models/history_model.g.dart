@@ -24,7 +24,7 @@ class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
       datePublished: (fields[4] as num).toInt(),
       description: fields[5] as String,
       feedUrl: fields[6] as String,
-      duration: fields[7] as String,
+      duration: (fields[7] as num).toInt(),
       size: fields[8] as String,
       podcastId: fields[9] as String,
       enclosureLength: (fields[10] as num).toInt(),

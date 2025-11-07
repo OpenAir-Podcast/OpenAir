@@ -102,7 +102,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            ref.watch(audioProvider).currentPodcast!.author ??
+                            widget.podcast!.author ??
                                 Translations.of(context).text('unknown'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -171,6 +171,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 : ref.read(audioProvider).addToQueue(
                                       widget.episodeItem!,
                                       widget.podcast,
+                                      context,
                                     );
 
                             if (!Platform.isAndroid && !Platform.isIOS) {

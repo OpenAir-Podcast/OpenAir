@@ -133,7 +133,8 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                       ref.invalidate(subscriptionsProvider);
                                       ref.invalidate(subCountProvider);
 
-                                      ref.invalidate(getFeedsProvider);
+                                      ref.invalidate(
+                                          getSubscribedEpisodesProvider);
                                       ref.invalidate(feedCountProvider);
 
                                       ref.invalidate(getInboxProvider);

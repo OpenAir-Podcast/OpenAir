@@ -80,6 +80,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                             artwork: podcastData.artwork,
                             imageUrl: podcastData.imageUrl,
                           ),
+                          aurthor: podcastData.author ?? 'Unknown',
                         );
                       },
                     )

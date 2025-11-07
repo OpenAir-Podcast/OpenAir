@@ -90,9 +90,13 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                   : const Icon(Icons.play_arrow_rounded),
             ),
           ),
-          LinearProgressIndicator(
-            value: ref.watch(audioProvider
-                .select((p) => p.podcastCurrentPositionInMilliseconds)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: LinearProgressIndicator(
+              value: ref.watch(audioProvider
+                  .select((p) => p.podcastCurrentPositionInMilliseconds)),
+              backgroundColor: Colors.purple.shade100,
+            ),
           ),
         ],
       ),

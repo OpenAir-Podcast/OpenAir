@@ -384,8 +384,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                         data: (podcastInfoData) {
                           PodcastModel podcast = snapshot.feeds[index];
 
-                          podcast.author =
-                              podcastInfoData['feeds'][0]['author'];
+                          podcast.author = podcastInfoData['author'];
 
                           return PodcastCardGrid(
                             podcastItem: podcast,

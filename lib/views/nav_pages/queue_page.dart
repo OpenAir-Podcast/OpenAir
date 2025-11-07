@@ -138,11 +138,14 @@ class _QueuePageState extends ConsumerState<QueuePage> {
 
               final bool isQueueSelected = currentPlayingGuid == item['guid'];
 
-              return QueueCard(
+              return Padding(
                 key: ValueKey(item['guid']),
-                episodeItem: item,
-                index: index,
-                isQueueSelected: isQueueSelected,
+                padding: const EdgeInsets.all(8.0),
+                child: QueueCard(
+                  episodeItem: item,
+                  index: index,
+                  isQueueSelected: isQueueSelected,
+                ),
               );
             },
             itemCount: sortedQueueList.length,

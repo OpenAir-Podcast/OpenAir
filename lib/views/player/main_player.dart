@@ -109,6 +109,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       ref.read(audioProvider).mainPlayerSliderClicked(
                           value); // Use read for actions
                     },
+                    inactiveColor: Colors.purple.shade100,
                   ),
                   // Seek positions
                   Padding(

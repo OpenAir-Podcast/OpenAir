@@ -44,7 +44,7 @@ class DownloadModel extends HiveObject {
   String feedUrl;
 
   @HiveField(7)
-  Duration duration;
+  int duration;
 
   @HiveField(8)
   String size;

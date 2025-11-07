@@ -177,7 +177,7 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                   trailing: Text(data),
                   onTap: () {
                     ref.invalidate(feedCountProvider);
-                    ref.invalidate(getFeedsProvider);
+                    ref.invalidate(getSubscribedEpisodesProvider);
                     widget.onPageSelected(FeedsPage());
                   },
                 ),

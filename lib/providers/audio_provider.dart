@@ -23,7 +23,6 @@ import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:opml/opml.dart';
-import 'package:path/path.dart' as path;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
@@ -128,7 +127,7 @@ class AudioProvider extends ChangeNotifier {
       // Checks if the episode has already been downloaded
       if (isDownloaded == true) {
         final downloadsDir = await getDownloadsDir();
-        final filePath = path.join(downloadsDir, '${episodeItem['guid']}.mp3');
+        final filePath = join(downloadsDir, '${episodeItem['guid']}.mp3');
 
         await player
             .play(DeviceFileSource(filePath))
@@ -244,7 +243,7 @@ class AudioProvider extends ChangeNotifier {
     final baseDir = hiveService.openAirDir;
 
     // Define a specific subdirectory for downloads to keep things organized.
-    final downloadsDirPath = path.join(baseDir.path, '.downloaded_episodes');
+    final downloadsDirPath = join(baseDir.path, '.downloaded_episodes');
 
     final downloadsDir = Directory(downloadsDirPath);
 
@@ -264,7 +263,7 @@ class AudioProvider extends ChangeNotifier {
     // The filename is consistently the GUID with a .mp3 extension.
     final filename = '$guid.mp3';
     final downloadsDir = await getDownloadsDir();
-    final filePath = path.join(downloadsDir, filename);
+    final filePath = join(downloadsDir, filename);
     return File(filePath).exists();
   }
 
@@ -399,7 +398,7 @@ class AudioProvider extends ChangeNotifier {
     try {
       String filename = '${item['guid']}.mp3';
       final downloadsDir = await getDownloadsDir();
-      final savePath = path.join(downloadsDir, filename);
+      final savePath = join(downloadsDir, filename);
 
       await dio.download(url, savePath);
 
@@ -411,7 +410,7 @@ class AudioProvider extends ChangeNotifier {
         datePublished: item['datePublished'],
         description: item['description'],
         feedUrl: item['feedUrl'],
-        duration: Duration(milliseconds: item['duration']),
+        duration: item['duration'],
         size: size,
         podcastId: podcast.id,
         enclosureLength: item['enclosureLength'],
@@ -953,20 +952,46 @@ class AudioProvider extends ChangeNotifier {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-  String getPodcastDuration(int epoch, BuildContext context) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-    int hours = dateTime.hour;
-    int minutes = dateTime.minute;
-    // int seconds = dateTime.second;
+// NOTE: I am assuming your Translations class provides locale-aware strings
+// for 'hour', 'hours', 'minute', and 'minutes'.
+  String convertSecondsToDuration(int totalSeconds, BuildContext context) {
+    // Use a temporary list to hold the formatted parts (e.g., ["1 hr", "05 min"])
+    final List<String> parts = [];
 
-    String result =
-        "${hours != 0 ? hours < 10 ? hours == 1 ? '01 ${Translations.of(context).text('hour')} ' : '0$hours ${Translations.of(context).text('hours')} ' : '$hours ${Translations.of(context).text('hours')} ' : ''}${minutes != 0 ? minutes < 10 ? '0$minutes ${Translations.of(context).text('minutes')} ' : '$minutes ${Translations.of(context).text('minute')} ' : '00 ${Translations.of(context).text('minute')}'}";
+    // Calculate duration components
+    final duration = Duration(seconds: totalSeconds);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
 
-    return result;
+    // 1. Add Hours (only if present)
+    if (hours > 0) {
+      // This assumes your translation system handles pluralization correctly.
+      // E.g., if hours is 1, it uses the 'hour' key; if > 1, it uses the 'hours' key.
+      final hourUnit = hours == 1
+          ? Translations.of(context).text('hour')
+          : Translations.of(context).text('hours');
+
+      parts.add('$hours $hourUnit');
+    }
+
+    // 2. Add Minutes (always add if hours are absent, or if minutes > 0)
+    if (minutes > 0 || hours == 0) {
+      // Handling minutes pluralization
+      final minuteUnit = minutes == 1
+          ? Translations.of(context).text('minute')
+          : Translations.of(context).text('minutes');
+
+      // Use String.padLeft to ensure two digits if hours were not displayed.
+      final paddedMinutes = minutes.toString().padLeft(2, '0');
+      parts.add('$paddedMinutes $minuteUnit');
+    }
+
+    // Join the parts with a space
+    return parts.join(' ');
   }
 
-  String convertSecondsToDuration(int sec, BuildContext context) {
-    Duration duration = Duration(seconds: sec);
+  String convertMillisecondsToDuration(int millisec, BuildContext context) {
+    Duration duration = Duration(milliseconds: millisec);
     int hours = duration.inHours;
     int minutes = duration.inMinutes.remainder(60);
 
@@ -1032,6 +1057,7 @@ class AudioProvider extends ChangeNotifier {
   void addToQueue(
     Map<String, dynamic> episode,
     PodcastModel? podcast,
+    BuildContext context,
   ) async {
     final hiveService = ref.read(hiveServiceProvider);
     Map queue = await hiveService.getQueue();
@@ -1101,9 +1127,6 @@ class AudioProvider extends ChangeNotifier {
     int enclosureLength = episode['enclosureLength'];
     String downloadSize = getEpisodeSize(enclosureLength);
 
-    Duration episodeTotalDuration =
-        getEpisodeDuration(episode['enclosureLength']);
-
     // Determine initial playback state for the queue item
     double initialPositionMilliseconds;
     String initialPositionString;
@@ -1119,9 +1142,23 @@ class AudioProvider extends ChangeNotifier {
       initialPositionString = formatCurrentPlaybackPosition(Duration.zero);
     }
 
-    final String formattedTotalDurationString =
-        formatCurrentPlaybackRemainingTime(
-            Duration.zero, episodeTotalDuration, context as BuildContext);
+    String formattedTotalDurationString = '';
+
+    if (context.mounted) {
+      Duration getEpisodeDuration(int epoch) {
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
+        int hours = dateTime.hour;
+        int minutes = dateTime.minute;
+        int seconds = dateTime.second;
+
+        return Duration(hours: hours, minutes: minutes, seconds: seconds);
+      }
+
+      formattedTotalDurationString = formatCurrentPlaybackRemainingTime(
+          Duration.zero,
+          getEpisodeDuration(episode['enclosureLength']),
+          context);
+    }
 
     hiveService.addToQueue({
       'guid': episode['guid'],
@@ -1131,7 +1168,7 @@ class AudioProvider extends ChangeNotifier {
       'datePublished': episode['datePublished'],
       'description': episode['description'],
       'feedUrl': episode['feedUrl'],
-      'duration': episodeTotalDuration.inMilliseconds,
+      'duration': episode['duration'],
       'downloadSize': downloadSize,
       'enclosureType': episode['enclosureType'] ?? 'audio/mpeg',
       'enclosureLength': episode['enclosureLength'],
@@ -1164,26 +1201,20 @@ class AudioProvider extends ChangeNotifier {
 
     for (int i = 0; i < episodes['count']; i++) {
       int enclosureLength = episodes['items'][i]['enclosureLength'];
-      String? duration;
-
-      if (context.mounted) {
-        duration = getPodcastDuration(enclosureLength, context);
-      }
-
       String size = getEpisodeSize(enclosureLength);
 
       episode = {
         'podcastId': podcast.id.toString(),
         'guid': episodes['items'][i]['guid'],
         'title': episodes['items'][i]['title'],
-        'author': episodes['items'][i]['author'],
+        'author': podcast.author,
         'image': episodes['items'][i]['feedImage'],
         'datePublished': episodes['items'][i]['datePublished'],
         'description': episodes['items'][i]['description'],
         'feedUrl': episodes['items'][i]['feedUrl'],
-        'duration': duration,
+        'duration': episodes['items'][i]['duration'],
         'size': size,
-        'enclosureLength': enclosureLength,
+        'enclosureLength': episodes['items'][i]['enclosureLength'],
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
       };
 
@@ -1200,7 +1231,7 @@ class AudioProvider extends ChangeNotifier {
 
   void removePodcastEpisodes(PodcastModel podcast) async {
     final hiveService = ref.read(hiveServiceProvider);
-    hiveService.deleteEpisode(podcast.title);
+    hiveService.removePodcastEpisodes(podcast);
     notifyListeners();
   }
 
@@ -1231,7 +1262,7 @@ class AudioProvider extends ChangeNotifier {
 
       // subscriptionsProvider (from hive_provider.dart) will update reactively
       // as it watches hiveServiceProvider, which is notified by the subscribe call.
-      ref.invalidate(getFeedsProvider);
+      ref.invalidate(getSubscribedEpisodesProvider);
       notifyListeners();
     } on DioException {
       if (context.mounted) {
@@ -1298,11 +1329,11 @@ class AudioProvider extends ChangeNotifier {
       if (context.mounted) await addPodcastEpisodes(podcast, context);
     } on DioException catch (e) {
       debugPrint(
-          'Failed to subscribe to ${podcast.title}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
+          'Failed to subscribe (RSS Feed) to ${podcast.title}. DioError: ${e.message}. Stack trace: ${e.stackTrace}');
 
       rethrow;
     } catch (e) {
-      debugPrint('Failed to subscribe to ${podcast.title}: $e');
+      debugPrint('Failed to subscribe (RSS Feed) to ${podcast.title}: $e');
       rethrow;
     }
   }
@@ -1314,7 +1345,7 @@ class AudioProvider extends ChangeNotifier {
 
     // subscriptionsProvider (from hive_provider.dart) will update reactively
     // as it watches hiveServiceProvider, which is notified by the unsubscribe call.
-    ref.invalidate(getFeedsProvider);
+    ref.invalidate(getSubscribedEpisodesProvider);
     notifyListeners();
   }
 
@@ -1387,15 +1418,6 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
-  Duration getEpisodeDuration(int epoch) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-    int hours = dateTime.hour;
-    int minutes = dateTime.minute;
-    int seconds = dateTime.second;
-
-    return Duration(hours: hours, minutes: minutes, seconds: seconds);
-  }
-
   String getEpisodeSize(int size) {
     // Check if size is in bytes, kilobytes, or megabytes
     if (size < 1024) {
@@ -1420,12 +1442,6 @@ class AudioProvider extends ChangeNotifier {
   ) async {
     final String downloadSize = getEpisodeSize(episode['enclosureLength']);
 
-    final Duration episodeTotalDuration = getEpisodeDuration(
-      episode['enclosureLength'].runtimeType == String
-          ? int.parse(episode['enclosureLength'])
-          : episode['enclosureLength'],
-    );
-
     String historyPodcastId;
     String historyPodcastImage;
     String? historyPodcastAuthor;
@@ -1449,7 +1465,7 @@ class AudioProvider extends ChangeNotifier {
       datePublished: episode['datePublished'],
       description: episode['description'],
       feedUrl: episode['feedUrl'],
-      duration: episodeTotalDuration.inSeconds.toString(),
+      duration: episode['duration'],
       size: downloadSize,
       podcastId: historyPodcastId,
       enclosureLength: episode['enclosureLength'],

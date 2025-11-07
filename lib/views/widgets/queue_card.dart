@@ -30,7 +30,6 @@ class _QueueCardState extends ConsumerState<QueueCard> {
 
     final double currentPositionMilliseconds;
     final String currentPositionString;
-    final String currentRemainingString;
     final String audioState;
 
     // If this card is the selected one (playing or paused), get its state
@@ -41,8 +40,6 @@ class _QueueCardState extends ConsumerState<QueueCard> {
 
       currentPositionString = openAir.currentPlaybackPositionString;
 
-      currentRemainingString = openAir.currentPlaybackRemainingTimeString;
-
       audioState = openAir.audioState;
     } else {
       // This is an inactive item in the queue. Show its saved progress.
@@ -52,13 +49,13 @@ class _QueueCardState extends ConsumerState<QueueCard> {
       currentPositionString =
           widget.episodeItem['currentPlaybackPositionString'];
 
-      currentRemainingString =
-          widget.episodeItem['currentPlaybackRemainingTimeString'];
-
       audioState = 'Pause';
     }
 
     return Card(
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).bottomAppBarTheme.color
+          : Theme.of(context).colorScheme.primaryContainer,
       key: ValueKey(widget.episodeItem['guid']),
       child: ListTile(
         onTap: () {
@@ -144,6 +141,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               ),
               child: LinearProgressIndicator(
                 value: currentPositionMilliseconds,
+                backgroundColor: Colors.purple.shade100,
               ),
             ),
             // Seek positions
@@ -156,7 +154,11 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     currentPositionString,
                   ),
                   Text(
-                    '-$currentRemainingString',
+                    openAir.formatCurrentPlaybackPosition(
+                      Duration(
+                        seconds: widget.episodeItem['duration'],
+                      ),
+                    ),
                   ),
                 ],
               ),

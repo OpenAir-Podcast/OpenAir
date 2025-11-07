@@ -95,6 +95,9 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                               return const SizedBox.shrink();
                             }
 
+
+                            
+
                             PodcastModel podcastModel = PodcastModel(
                               id: episodeData['id'] ?? -1,
                               title: episodeData['title'],
@@ -107,6 +110,9 @@ class _InboxPageState extends ConsumerState<InboxPage> {
 
                             return FeedsEpisodeCardGrid(
                               title: episodeData['title'],
+                              // FIXME need to get the podcast info
+                              author: episodeData['author'] ??
+                                  Translations.of(context).text('unknown'),
                               episodeItem: episodeData.cast<String, dynamic>(),
                               podcast: podcastModel,
                             );

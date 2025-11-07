@@ -11,8 +11,8 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/widgets/downloads_episode_card_list.dart';
-import 'package:openair/views/widgets/downloads_episode_card_grid.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/episode_card_list.dart';
 
 final getHistoryProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSortedHistory();
@@ -148,8 +148,9 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                           artwork: data[index].image,
                         );
 
-                        return DownloadsEpisodeCardWide(
+                        return EpisodeCardGrid(
                           title: data[index].title,
+                          aurthor: data[index].author!,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
                         );
@@ -169,8 +170,9 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                           artwork: data[index].image,
                         );
 
-                        return DownloadsEpisodeCardList(
+                        return EpisodeCardList(
                           title: data[index].title,
+                          author: data[index].author!,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
                         );

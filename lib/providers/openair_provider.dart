@@ -367,7 +367,7 @@ class OpenAirProvider extends ChangeNotifier {
 
     for (final episode in downloads.values) {
       final downloadItem = episode.toJson();
-      downloadItem['duration'] = episode.duration.inMilliseconds;
+      downloadItem['duration'] = episode.duration;
 
       downloadItem['downloadDate'] =
           episode.downloadDate.millisecondsSinceEpoch;
@@ -883,7 +883,7 @@ class OpenAirProvider extends ChangeNotifier {
         }
       }
 
-      ref.invalidate(getFeedsProvider);
+      ref.invalidate(getSubscribedEpisodesProvider);
       debugPrint('Subscriptions synchronized');
     }
 

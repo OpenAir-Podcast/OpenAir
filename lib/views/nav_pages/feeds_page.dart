@@ -12,10 +12,7 @@ import 'package:openair/views/widgets/feeds_episode_card_list.dart';
 import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-final getFeedsProvider = FutureProvider.autoDispose((ref) async {
-  // Feeds data comes from subscribed episodes in Hive.
-  // This provider will be manually invalidated when subscriptions (and their episodes) change.
-
+final getSubscribedEpisodesProvider = FutureProvider.autoDispose((ref) async {
   return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 
@@ -30,16 +27,17 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    ref.invalidate(getFeedsProvider);
+    ref.invalidate(getSubscribedEpisodesProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Map>> getEpisodesValue = ref.watch(getFeedsProvider);
+    final AsyncValue<List<Map>> getEpisodesValue =
+        ref.watch(getSubscribedEpisodesProvider);
 
     return getEpisodesValue.when(
-      data: (List<Map> data) {
-        if (data.isEmpty) {
+      data: (List<Map> episodesDataSet) {
+        if (episodesDataSet.isEmpty) {
           return NoSubscriptions(title: 'Feeds');
         }
 
@@ -58,7 +56,6 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                         .hiveService
                         .updateSubscriptions();
 
-                    ref.invalidate(feedCountProvider);
                     ref.invalidate(inboxCountProvider);
                   },
                 ),
@@ -68,7 +65,8 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: RefreshIndicator(
-              onRefresh: () async => ref.invalidate(getFeedsProvider),
+              onRefresh: () async =>
+                  ref.invalidate(getSubscribedEpisodesProvider),
               child: MediaQuery.sizeOf(context).width > 1060
                   ? GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -78,46 +76,44 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                         mainAxisSpacing: 4,
                       ),
                       cacheExtent: cacheExtent,
-                      itemCount: data.length,
+                      itemCount: episodesDataSet.length,
                       itemBuilder: (context, index) {
-                        final episodeData = data[index];
-
                         return FeedsEpisodeCardGrid(
-                          title: episodeData['title'],
-                          episodeItem: episodeData.cast<String, dynamic>(),
+                          title: episodesDataSet[index]['title'],
+                          episodeItem:
+                              episodesDataSet[index].cast<String, dynamic>(),
+                          author: episodesDataSet[index]['author'] ??
+                              Translations.of(context).text('unknown'),
                           podcast: PodcastModel(
-                            id: episodeData['id'] ?? -1,
-                            title: episodeData['title'],
-                            description: episodeData['description'],
-                            author: episodeData['author'] ??
-                                Translations.of(context).text('unknown'),
-                            feedUrl: episodeData['feedUrl'],
-                            artwork: episodeData['image'],
-                            imageUrl: episodeData['feedImage'] ??
-                                episodeData['image'],
+                            id: episodesDataSet[index]['id'] ?? -1,
+                            title: episodesDataSet[index]['title'],
+                            description: episodesDataSet[index]['description'],
+                            author: episodesDataSet[index]['author'],
+                            feedUrl: episodesDataSet[index]['feedUrl'],
+                            artwork: episodesDataSet[index]['image'],
+                            imageUrl: episodesDataSet[index]['feedImage'] ??
+                                episodesDataSet[index]['image'],
                           ),
                         );
                       },
                     )
                   : ListView.builder(
                       cacheExtent: cacheExtent,
-                      itemCount: data.length,
+                      itemCount: episodesDataSet.length,
                       itemBuilder: (context, index) {
-                        final episodeData = data[index];
-
                         return FeedsEpisodeCardList(
-                          title: episodeData['title'],
-                          episodeItem: episodeData.cast<String, dynamic>(),
+                          title: episodesDataSet[index]['title'],
+                          episodeItem:
+                              episodesDataSet[index].cast<String, dynamic>(),
                           podcast: PodcastModel(
-                            id: episodeData['id'] ?? -1,
-                            title: episodeData['title'],
-                            description: episodeData['description'],
-                            author: episodeData['author'] ??
-                                Translations.of(context).text('unknown'),
-                            feedUrl: episodeData['feedUrl'],
-                            artwork: episodeData['image'],
-                            imageUrl: episodeData['feedImage'] ??
-                                episodeData['image'],
+                            id: episodesDataSet[index]['id'] ?? -1,
+                            title: episodesDataSet[index]['title'],
+                            description: episodesDataSet[index]['description'],
+                            author: episodesDataSet[index]['author'],
+                            feedUrl: episodesDataSet[index]['feedUrl'],
+                            artwork: episodesDataSet[index]['image'],
+                            imageUrl: episodesDataSet[index]['feedImage'] ??
+                                episodesDataSet[index]['image'],
                           ),
                         );
                       },
@@ -172,7 +168,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                       ),
                     ),
                     onPressed: () async {
-                      ref.invalidate(getFeedsProvider);
+                      ref.invalidate(getSubscribedEpisodesProvider);
                     },
                     child: const Text('Retry'),
                   ),

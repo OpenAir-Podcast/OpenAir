@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/native/podcast_info.dart';
@@ -37,10 +38,13 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
   @override
   Widget build(BuildContext context) {
     final podcastUrl = ref.watch(audioProvider).currentPodcast!.feedUrl;
-    late final Map podcastInfo;
 
     final podcastDataAsyncValue =
         ref.watch(podcastDataByUrlProvider(podcastUrl));
+
+    final podcastDataInfoAsyncValue = ref.watch(getPodcastInfoByTitleProvider(
+      widget.podcast.title,
+    ));
 
     return podcastDataAsyncValue.when(
       loading: () => Scaffold(
@@ -108,58 +112,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
         ),
       ),
       data: (snapshot) {
-        return FutureBuilder(
-          // TODO: Fix podcast info future builder to prevent multiple calls (MAYBE)
-          future: ref
-              .watch(podcastIndexProvider)
-              .getPodcastDetailsByTitle(widget.podcast.title),
-          builder: (context, podcasDataSnapshot) {
-            if (podcasDataSnapshot.connectionState == ConnectionState.waiting) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: const Center(child: CircularProgressIndicator()),
-              );
-            } else if (podcasDataSnapshot.hasError) {
-              return Scaffold(
-                body: SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        size: 75.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 20.0),
-                      Text(
-                        Translations.of(context).text('oopsAnErrorOccurred'),
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Brightness.dark == Theme.of(context).brightness
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      ),
-                      Text(
-                        Translations.of(context).text('oopsTryAgainLater'),
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Brightness.dark == Theme.of(context).brightness
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-
-            podcastInfo = podcasDataSnapshot.data!['feeds'][0];
-
+        return podcastDataInfoAsyncValue.when(
+          data: (podcastInfo) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(ref.watch(audioProvider).currentPodcast!.title),
@@ -196,6 +150,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                                       .text('subscribeToPodcast')
                               : '...',
                           onPressed: () async {
+                            widget.podcast.author = podcastInfo['author'];
+
                             snapshot.data! && snapshot.hasData
                                 ? ref
                                     .read(audioProvider)
@@ -255,11 +211,16 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                             mainAxisSpacing: 4,
                           ),
                           itemCount: snapshot['count'],
-                          itemBuilder: (context, index) => EpisodeCardGrid(
-                            title: snapshot['items'][index]['title'],
-                            episodeItem: snapshot['items'][index],
-                            podcast: widget.podcast,
-                          ),
+                          itemBuilder: (context, index) {
+                            widget.podcast.author = podcastInfo['author'];
+
+                            return EpisodeCardGrid(
+                              title: snapshot['items'][index]['title'],
+                              aurthor: podcastInfo['author'],
+                              episodeItem: snapshot['items'][index],
+                              podcast: widget.podcast,
+                            );
+                          },
                         ),
                       ),
                     )
@@ -271,12 +232,16 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                         child: ListView.builder(
                           cacheExtent: cacheExtent,
                           itemCount: snapshot['count'],
-                          itemBuilder: (context, index) => EpisodeCardList(
-                            title: snapshot['items'][index]['title'],
-                            episodeItem: snapshot['items'][index],
-                            podcast: widget.podcast,
-                            author: podcastInfo['author'],
-                          ),
+                          itemBuilder: (context, index) {
+                            widget.podcast.author = podcastInfo['author'];
+
+                            return EpisodeCardList(
+                              title: snapshot['items'][index]['title'],
+                              episodeItem: snapshot['items'][index],
+                              podcast: widget.podcast,
+                              author: podcastInfo['author'],
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -288,6 +253,50 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                     ? const BannerAudioPlayer()
                     : const SizedBox(),
               ),
+            );
+          },
+          error: (error, stackTrace) {
+            return Scaffold(
+              body: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      size: 75.0,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 20.0),
+                    Text(
+                      Translations.of(context).text('oopsAnErrorOccurred'),
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Brightness.dark == Theme.of(context).brightness
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                    Text(
+                      Translations.of(context).text('oopsTryAgainLater'),
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Brightness.dark == Theme.of(context).brightness
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () {
+            return Scaffold(
+              appBar: AppBar(),
+              body: const Center(child: CircularProgressIndicator()),
             );
           },
         );

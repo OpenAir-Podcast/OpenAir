@@ -40,26 +40,16 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
       }
     }
 
-    dynamic episodeDuration;
-
-    if (widget.episodeItem['duration'].runtimeType == String) {
-      episodeDuration = widget.episodeItem['duration'];
-    } else if (widget.episodeItem['duration'].runtimeType == int) {
-      episodeDuration = widget.episodeItem['duration'];
-    }
-
     if (playStatus case PlayingStatus.detail) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.play_arrow_rounded),
           Text(
-            episodeDuration.runtimeType == String
-                ? episodeDuration
-                : ref.watch(audioProvider).convertSecondsToDuration(
-                      episodeDuration,
-                      context,
-                    ),
+            ref.watch(audioProvider).convertSecondsToDuration(
+                  widget.episodeItem['duration'],
+                  context,
+                ),
             overflow: TextOverflow.ellipsis,
           ),
         ],

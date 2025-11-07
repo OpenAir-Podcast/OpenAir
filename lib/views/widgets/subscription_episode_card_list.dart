@@ -248,6 +248,7 @@ class _SubscriptionEpisodeCardListState
                                           : ref.read(audioProvider).addToQueue(
                                                 widget.episodeItem,
                                                 widget.podcast,
+                                                context,
                                               );
 
                                       ref.invalidate(getQueueProvider);

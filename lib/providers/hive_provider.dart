@@ -540,6 +540,17 @@ class HiveService {
     await box.put(guid, episode);
   }
 
+  Future<void> removePodcastEpisodes(PodcastModel podcast) async {
+    final box = await episodeBox;
+    Map<String, Map> episodes = await box.getAllValues();
+
+    for (final episode in episodes.entries) {
+      if (episode.value['author'] == podcast.author) {
+        await box.delete(episode.key);
+      }
+    }
+  }
+
   Future<void> deleteEpisode(String guid) async {
     final box = await episodeBox;
     box.delete(guid);
@@ -553,6 +564,8 @@ class HiveService {
   Future<List<Map>> getEpisodes() async {
     final box = await episodeBox;
     final Map<String, Map> allEpisodes = await box.getAllValues();
+
+    episodesList.clear();
 
     for (final entry in allEpisodes.entries) {
       episodesList.add(entry.value);
@@ -709,6 +722,8 @@ class HiveService {
   Future<List<DownloadModel>> getSortedDownloads() async {
     final box = await downloadBox;
     final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
+
+    queueList.clear();
 
     for (final entry in allEpisodes.entries) {
       queueList.add(entry.value);

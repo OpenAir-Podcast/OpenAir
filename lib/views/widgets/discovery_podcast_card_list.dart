@@ -176,7 +176,7 @@ class _DiscoveryPodcastCardListState
                         Future.delayed(Duration(seconds: 1), () {
                           ref.invalidate(
                               podcastDataByUrlProvider(podcast.feedUrl));
-                          ref.invalidate(getFeedsProvider);
+                          ref.invalidate(getSubscribedEpisodesProvider);
 
                           setState(() {});
                         });

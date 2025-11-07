@@ -218,6 +218,7 @@ class _EpisodeCardListState extends ConsumerState<FeedsEpisodeCardList> {
                                 : ref.read(audioProvider).addToQueue(
                                       widget.episodeItem,
                                       widget.podcast,
+                                      context,
                                     );
 
                             if (context.mounted) {

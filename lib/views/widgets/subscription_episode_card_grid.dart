@@ -235,6 +235,7 @@ class _SubscriptionEpisodeCardGridState
                                           : ref.watch(audioProvider).addToQueue(
                                                 widget.episodeItem,
                                                 widget.podcast,
+                                                context,
                                               );
 
                                       if (context.mounted) {
