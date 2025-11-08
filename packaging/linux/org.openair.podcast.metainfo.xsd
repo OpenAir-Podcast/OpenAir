@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="component">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="summary" type="xs:string" />
+                <xs:element name="developer_name" type="xs:string" />
+                <xs:element name="url">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attribute name="type" use="required" />
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="metadata_license" type="xs:string" />
+                <xs:element name="project_license" type="xs:string" />
+                <xs:element name="supports">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="control" maxOccurs="unbounded" type="xs:string" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="description">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="p" maxOccurs="unbounded" type="xs:string" />
+                            <xs:element name="ul">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="li" maxOccurs="unbounded" type="xs:string" />
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="launchable">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attribute name="type" use="required" />
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="screenshots">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="screenshot">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="image" type="xs:string" />
+                                    </xs:sequence>
+                                    <xs:attribute name="type" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="content_rating">
+                    <xs:complexType>
+                        <xs:attribute name="type" use="required" />
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="releases">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="release">
+                                <xs:complexType>
+                                    <xs:attribute name="version" use="required" />
+                                    <xs:attribute name="date" type="xs:date" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="type" use="required" />
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

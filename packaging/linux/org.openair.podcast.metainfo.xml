@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application" xmlns="https://specifications.freedesktop.org/appstream/1.0">
+    <id type="desktop">org.openair.podcast</id>
+    <name>OpenAir</name>
+    <summary>A Free and Open Source Podcast Player</summary>
+    <developer_name>OpenAir Team and contributors</developer_name>
+    <url type="homepage">https://github.com/OpenAir-Podcast/OpenAir</url>
+    <metadata_license>MIT</metadata_license>
+    <project_license>MIT</project_license>
+    
+    <mimetypes>
+        <mimetype>application/x-feed</mimetype>
+        <mimetype>application/rss+xml</mimetype>
+        <mimetype>application/atom+xml</mimetype>
+    </mimetypes>
+    
+    <supports>
+        <control>pointing</control>
+        <control>keyboard</control>
+        <control>touch</control>
+    </supports>
+    <description>
+        <p>OpenAir is a free and open-source cross-platform podcast app that empowers you to
+            explore and enjoy the vast world of podcasts.</p>
+        <p>Features</p>
+        <ul>
+            <li>Listen to your favorite podcasts</li>
+            <li>Discover new podcasts</li>
+            <li>Download podcasts for offline listening</li>
+            <li>Manage your podcast subscriptions</li>
+            <li>Add episodes to queue</li>
+        </ul>
+    </description>
+    
+    <launchable type="desktop-id">org.openair.podcast</launchable>
+    
+    <screenshots>
+        <screenshot type="default" alt="Main window showing podcast list">
+            <image>https://github.com/user-attachments/assets/c897d272-de0e-4014-8904-c4abda1922bc</image>
+        </screenshot>
+        <screenshot type="default" alt="Podcast details view">
+            <image>https://github.com/user-attachments/assets/5a6f7e9a-d2f0-4f59-bbd2-06c0968d3abb</image>
+        </screenshot>
+        <screenshot type="default" alt="Episode playback screen">
+            <image>https://github.com/user-attachments/assets/ff93f19f-88ed-49ef-86be-01b5dbe9b96a</image>
+        </screenshot>
+        <screenshot type="default" alt="Another screenshot">
+            <image>https://github.com/user-attachments/assets/64996ad3-3ffe-40bc-92bd-564ac0fc01fd</image>
+        </screenshot>
+        <screenshot type="default" alt="Yet another screenshot">
+            <image>https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168</image>
+        </screenshot>
+        <screenshot type="default" alt="Final screenshot">
+            <image>https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6</image>
+        </screenshot>
+    </screenshots>
+    <content_rating type="oars-1.1" />
+    <releases>
+        <release version="1.0.0" date="2022-02-25" />
+    </releases>
+</component>

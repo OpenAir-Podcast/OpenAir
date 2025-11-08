@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=OpenAir
+Comment=A Free and Open Source Podcast Player
+Categories=Utility;Audio;
+
+Icon=org.openair.podcast
+Exec=openair
+Terminal=false
+StartupWMClass=openair
