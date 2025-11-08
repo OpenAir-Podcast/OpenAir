@@ -199,6 +199,9 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                 widget.episodeItem,
                                 context,
                               );
+
+                          ref.watch(audioProvider).currentEpisode!['author'] =
+                              widget.aurthor;
                         }
                       },
                       child: PlayButtonWidget(

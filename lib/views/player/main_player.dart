@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
+
+import '../main_pages/episode_detail.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
@@ -51,13 +52,20 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   ),
                   // Podcast Title
                   TextButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EpisodeDetail(
-                          episodeItem: ref.watch(audioProvider).currentEpisode!,
+                    onPressed: () {
+                      debugPrint(
+                          ref.watch(audioProvider).currentEpisode.toString());
+
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EpisodeDetail(
+                            episodeItem:
+                                ref.watch(audioProvider).currentEpisode,
+                            podcast: ref.watch(audioProvider).currentPodcast,
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                     child: Text(
                       ref.watch(audioProvider).currentEpisode!['title'],
                       style: const TextStyle(
@@ -132,7 +140,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         Text(
                           ref
                               .watch(audioProvider)
-                              .currentPlaybackDurationString,
+                              .currentPlaybackDurationString!,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color:

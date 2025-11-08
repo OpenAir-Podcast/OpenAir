@@ -17,11 +17,11 @@ import 'package:openair/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/nav_pages/queue_page.dart';
+import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
+import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:opml/opml.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -64,7 +64,7 @@ class AudioProvider extends ChangeNotifier {
   late double podcastCurrentPositionInMilliseconds;
   late String currentPlaybackPositionString;
   late String currentPlaybackRemainingTimeString;
-  late String currentPlaybackDurationString;
+  late String? currentPlaybackDurationString;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -86,6 +86,7 @@ class AudioProvider extends ChangeNotifier {
     podcastCurrentPositionInMilliseconds = 0;
     currentPlaybackPositionString = '00:00:00';
     currentPlaybackRemainingTimeString = '00:00:00';
+    currentPlaybackDurationString = '00:00:00';
 
     currentEpisode = {};
     nextEpisode = {};
@@ -138,16 +139,15 @@ class AudioProvider extends ChangeNotifier {
             .timeout(const Duration(seconds: 30));
       }
 
-      player.getDuration().then((Duration? value) {
-        if (value != null) {
-          currentPlaybackDurationString = formatCurrentPlaybackPosition(value);
-        } else {
-          // Handle the case where duration is null, e.g., set to a default or log an error.
-          currentPlaybackDurationString = '00:00:00';
-          debugPrint(
-              'Player duration is null after playing episode: ${episodeItem['title']}');
-        }
-      });
+      Future.delayed(
+        Duration(seconds: 3),
+        () {
+          player.getDuration().then((Duration? value) {
+            currentPlaybackDurationString =
+                formatCurrentPlaybackPosition(value!);
+          });
+        },
+      );
 
       notifyListeners();
 
@@ -195,13 +195,13 @@ class AudioProvider extends ChangeNotifier {
                 '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
               );
         } else {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
-          //     ),
-          //   ),
-          // );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}125',
+              ),
+            ),
+          );
         }
       }
     } catch (e) {
@@ -218,13 +218,13 @@ class AudioProvider extends ChangeNotifier {
                 '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
               );
         } else {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
-          //     ),
-          //   ),
-          // );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${Translations.of(context).text('oopsAnErrorOccurred')} - ${Translations.of(context).text('errorCode')}130',
+              ),
+            ),
+          );
         }
       }
     }
@@ -573,9 +573,6 @@ class AudioProvider extends ChangeNotifier {
       isPlaying = PlayingStatus.playing;
       notifyListeners();
     }
-    // If player was stopped but currentEpisode is set, one might consider
-    // re-playing it from its last known position, but that's more complex
-    // than a simple resume. For now, resume only works from paused state.
   }
 
   Future<void> playerPauseButtonClicked() async {
@@ -990,8 +987,8 @@ class AudioProvider extends ChangeNotifier {
     return parts.join(' ');
   }
 
-  String convertMillisecondsToDuration(int millisec, BuildContext context) {
-    Duration duration = Duration(milliseconds: millisec);
+  String convertMillisecondsToDuration(int milliseconds, BuildContext context) {
+    Duration duration = Duration(milliseconds: milliseconds);
     int hours = duration.inHours;
     int minutes = duration.inMinutes.remainder(60);
 

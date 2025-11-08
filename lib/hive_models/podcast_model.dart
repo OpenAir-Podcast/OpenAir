@@ -37,7 +37,7 @@ class PodcastModel extends HiveObject {
   String description;
 
   factory PodcastModel.fromJson(Map<String, dynamic> json) => PodcastModel(
-        id: json['id'],
+        id: json['id'] ?? json['podcast']['id'],
         feedUrl: json['url'] ?? json['feedUrl'] ?? json['xmlURL'],
         title: json['title'],
         author: json['author'] ?? json['subtitle'],

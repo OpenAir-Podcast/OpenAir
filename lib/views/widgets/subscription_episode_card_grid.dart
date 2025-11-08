@@ -207,6 +207,11 @@ class _SubscriptionEpisodeCardGridState
                                     widget.episodeItem,
                                     context,
                                   );
+
+                              ref
+                                      .watch(audioProvider)
+                                      .currentEpisode!['author'] =
+                                  widget.podcast.author;
                             }
                           },
                           child: PlayButtonWidget(

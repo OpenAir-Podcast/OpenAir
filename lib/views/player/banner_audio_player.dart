@@ -80,10 +80,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               onPressed: () {
                 ref.read(audioProvider).audioState == 'Play'
                     ? ref.read(audioProvider).playerPauseButtonClicked()
-                    : ref.read(audioProvider).playerPlayButtonClicked(
-                          ref.read(audioProvider).currentEpisode!,
-                          context,
-                        );
+                    : ref.read(audioProvider).playerResumeButtonClicked();
               },
               icon: ref.watch(audioProvider).audioState == 'Play'
                   ? const Icon(Icons.pause_rounded)

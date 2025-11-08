@@ -146,11 +146,15 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             ),
                           ),
                         ),
-                        onPressed: () =>
-                            ref.read(audioProvider).playerPlayButtonClicked(
-                                  widget.episodeItem!,
-                                  context,
-                                ),
+                        onPressed: () {
+                          ref.read(audioProvider).playerPlayButtonClicked(
+                                widget.episodeItem!,
+                                context,
+                              );
+
+                          ref.watch(audioProvider).currentEpisode!['author'] =
+                              widget.podcast!.author;
+                        },
                         child: PlayButtonWidget(
                           episodeItem: widget.episodeItem!,
                         ),

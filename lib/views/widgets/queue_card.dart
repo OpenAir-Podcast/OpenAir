@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 
@@ -63,7 +64,8 @@ class _QueueCardState extends ConsumerState<QueueCard> {
             MaterialPageRoute(
               builder: (context) => EpisodeDetail(
                 episodeItem: (widget.episodeItem).cast<String, dynamic>(),
-                podcast: widget.episodeItem['podcast'],
+                podcast: PodcastModel.fromJson(
+                    widget.episodeItem['podcast'].cast<String, dynamic>()),
               ),
             ),
           );
@@ -179,7 +181,6 @@ class _QueueCardState extends ConsumerState<QueueCard> {
               audioProviderNotifier.playerPauseButtonClicked();
             } else if (widget.isQueueSelected &&
                 openAir.isPlaying == PlayingStatus.paused) {
-              debugPrint('Resuming');
               audioProviderNotifier.playerResumeButtonClicked();
             } else if (!widget.isQueueSelected) {
               if (openAir.currentEpisode!.isNotEmpty) {
@@ -194,7 +195,9 @@ class _QueueCardState extends ConsumerState<QueueCard> {
 
               openAir.playerPosition = widget.episodeItem['playerPosition'];
 
-              openAir.currentPodcast = widget.episodeItem['podcast'];
+              openAir.currentPodcast =
+                  PodcastModel.fromJson(widget.episodeItem);
+
               openAir.currentEpisode = widget.episodeItem;
 
               audioProviderNotifier.playNewQueueItem(

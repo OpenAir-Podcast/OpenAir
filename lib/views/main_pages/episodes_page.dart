@@ -237,9 +237,9 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
                             return EpisodeCardList(
                               title: snapshot['items'][index]['title'],
+                              author: podcastInfo['author'],
                               episodeItem: snapshot['items'][index],
                               podcast: widget.podcast,
-                              author: podcastInfo['author'],
                             );
                           },
                         ),
