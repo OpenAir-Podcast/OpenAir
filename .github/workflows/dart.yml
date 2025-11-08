@@ -24,7 +24,7 @@ jobs:
           version: 3.3.4
 
       - name: Install Dependencies
-        run: dart pub get
+        run: flutter pub get
 
       - name: Verify Formatting
         # Ensures all code adheres to Dart formatting standards
