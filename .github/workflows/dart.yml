@@ -1,0 +1,40 @@
+name: Dart CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # Adding workflow_dispatch allows manual triggering of the workflow
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Continuous Integration Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Dart SDK (3.3.4)
+        # Pinning to a specific Dart version for consistent builds
+        uses: dart-lang/setup-dart@v1
+        with:
+          version: 3.3.4
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Verify Formatting
+        # Ensures all code adheres to Dart formatting standards
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze Project Source (Strict)
+        # Passes '--fatal-infos' to enforce stricter code analysis and treat
+        # all info/warnings as errors, ensuring clean code.
+        run: dart analyze --fatal-infos
+
+      - name: Run Tests
+        # Runs all tests in the 'test/' directory
+        run: dart test
