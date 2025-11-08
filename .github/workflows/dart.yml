@@ -24,16 +24,17 @@ jobs:
           channel: 'stable'
 
       - name: Install Dependencies
-        run: flutter pub get # FIX: Use 'flutter pub get' for Flutter projects
+        run: flutter pub get # Use 'flutter pub get' for Flutter projects
 
       - name: Verify Formatting
-        # Ensures all code adheres to Dart formatting standards
-        run: flutter format --output=none --set-exit-if-changed . # FIX: Use 'flutter format'
+        # FIX: Switched from 'flutter format' to the reliable 'dart format'.
+        # This resolves the "Could not find a command named 'format'" error.
+        run: dart format --output=none --set-exit-if-changed . 
 
       - name: Analyze Project Source (Strict)
         # Passes '--fatal-infos' to enforce stricter code analysis
-        run: flutter analyze --fatal-infos # FIX: Use 'flutter analyze'
+        run: flutter analyze --fatal-infos # Use 'flutter analyze' for Flutter lint rules
 
       - name: Run Tests
         # Runs all tests in the 'test/' directory
-        run: flutter test # FIX: Use 'flutter test' for Flutter projects
+        run: flutter test # Use 'flutter test' for potential widget tests
