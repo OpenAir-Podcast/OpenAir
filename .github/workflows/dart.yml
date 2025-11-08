@@ -1,4 +1,4 @@
-name: Dart CI
+name: Flutter CI # Renamed the workflow to reflect use of Flutter
 
 on:
   push:
@@ -17,24 +17,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Dart SDK (3.3.4)
-        # Pinning to a specific Dart version for consistent builds
-        uses: dart-lang/setup-dart@v1
+      - name: Setup Flutter SDK # Use Flutter setup instead of Dart setup
+        # This action installs the Flutter SDK, which includes the Dart SDK.
+        uses: subosito/flutter-action@v2
         with:
-          version: 3.3.4
+          channel: 'stable'
 
       - name: Install Dependencies
-        run: flutter pub get
+        run: flutter pub get # FIX: Use 'flutter pub get' for Flutter projects
 
       - name: Verify Formatting
         # Ensures all code adheres to Dart formatting standards
-        run: dart format --output=none --set-exit-if-changed .
+        run: flutter format --output=none --set-exit-if-changed . # FIX: Use 'flutter format'
 
       - name: Analyze Project Source (Strict)
-        # Passes '--fatal-infos' to enforce stricter code analysis and treat
-        # all info/warnings as errors, ensuring clean code.
-        run: dart analyze --fatal-infos
+        # Passes '--fatal-infos' to enforce stricter code analysis
+        run: flutter analyze --fatal-infos # FIX: Use 'flutter analyze'
 
       - name: Run Tests
         # Runs all tests in the 'test/' directory
-        run: dart test
+        run: flutter test # FIX: Use 'flutter test' for Flutter projects
