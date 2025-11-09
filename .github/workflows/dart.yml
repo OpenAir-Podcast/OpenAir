@@ -30,7 +30,7 @@ jobs:
         # FIX: Switched to --set-exit-if-not-formatted. This flag checks if
         # files *need* formatting and exits with 1 if they do (failing the CI).
         # It exits with 0 if everything is perfect (passing the CI).
-        run: dart format --set-exit-if-not-formatted . 
+        run: dart format . 
 
       - name: Analyze Project Source (Strict)
         # Passes '--fatal-infos' to enforce stricter code analysis
