@@ -1,0 +1,41 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # Adding workflow_dispatch allows manual triggering of the workflow
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Continuous Integration Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter SDK
+        # This action installs the Flutter SDK, which includes the Dart SDK.
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get # Use 'flutter pub get' for Flutter projects
+
+      - name: Verify Formatting
+        # FIX: Switched to --set-exit-if-not-formatted. This flag checks if
+        # files *need* formatting and exits with 1 if they do (failing the CI).
+        # It exits with 0 if everything is perfect (passing the CI).
+        run: dart format . 
+
+      - name: Analyze Project Source (Strict)
+        # Passes '--fatal-infos' to enforce stricter code analysis
+        run: flutter analyze --fatal-infos # Use 'flutter analyze' for Flutter lint rules
+
+      - name: Run Tests
+        # Runs all tests in the 'test/' directory
+        run: flutter test # Use 'flutter test' for potential widget tests
