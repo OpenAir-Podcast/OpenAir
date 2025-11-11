@@ -128,7 +128,7 @@ class NotificationService extends ChangeNotifier {
       category: LinuxNotificationCategory.presence,
       urgency: LinuxNotificationUrgency.normal,
       location: LinuxNotificationLocation(1, 1),
-      icon: AssetsLinuxIcon('icons/icon.png'),
+      icon: AssetsLinuxIcon('icons/app_icon.png'),
     );
 
     final NotificationDetails platformChannelSpecifics = NotificationDetails(
