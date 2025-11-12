@@ -67,6 +67,7 @@ void main() async {
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_PROJECT_URL']!,
     anonKey: dotenv.env['SUPABASE_API_KEY']!,
+    debug: false,
   );
 
   await Hive.initFlutter('OpenAir/.hive_config');
