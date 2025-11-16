@@ -104,6 +104,8 @@ OpenAir is proudly developed and maintained by its contributors—who are enthus
 
 ## Screenshots
 
+### Mobile
+
 
 <img width="330" alt="Screenshot_20250913_155418" src="https://github.com/user-attachments/assets/c897d272-de0e-4014-8904-c4abda1922bc" />
 
@@ -116,3 +118,8 @@ OpenAir is proudly developed and maintained by its contributors—who are enthus
 <img width="330" alt="Screenshot_20250826_122518" src="https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168" />
 
 <img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />
+
+### Desktop
+<img width="1332" height="819" alt="Screenshot_20251110_192037" src="https://github.com/user-attachments/assets/d100e77d-d552-42f3-8def-23e1c4da8bd9" />
+<img width="1332" height="819" alt="Screenshot_20251110_192157" src="https://github.com/user-attachments/assets/4c582617-b14b-4c7b-80b6-42ec9bc51bca" />
+<img width="1332" height="819" alt="Screenshot_20251110_192221" src="https://github.com/user-attachments/assets/b32b655e-cc1b-4536-96bb-a352433b57c4" />
