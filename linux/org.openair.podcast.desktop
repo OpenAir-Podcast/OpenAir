@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=OpenAir
+Comment=A podcast manager for exploring and enjoying podcasts
+Exec=OpenAir
+Icon=org.openair.podcast
+Type=Application
+Categories=AudioVideo;Audio;Player;
+Terminal=false
+StartupWMClass=openair

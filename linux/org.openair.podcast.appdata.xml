@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.openair.podcast</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>MIT</project_license>
+    <name>OpenAir</name>
+    <summary>A podcast manager for exploring and enjoying podcasts</summary>
+    <developer_name>OpenAir Team and Contributors</developer_name>
+    <description>
+        <p>OpenAir is a free and open-source cross-platform podcast app that empowers you to explore
+            and enjoy the vast world of podcasts.</p>
+    </description>
+    <releases>
+        <release version="0.13.0" date="2025-11-15"/>
+        <release version="0.12.5" date="2025-11-13"/>
+    </releases>
+    <launchable type="desktop-id">org.openair.podcast.desktop</launchable>
+    <url type="homepage">https://github.com/OpenAir-Podcast/OpenAir</url>
+    <url type="bugtracker">https://github.com/OpenAir-Podcast/OpenAir/issues</url>
+    <content_rating type="oars-1.1" />
+</component>
