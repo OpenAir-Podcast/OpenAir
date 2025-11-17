@@ -1,0 +1,90 @@
+variables:
+  PODCAST_INDEX_API_KEY: ${PODCAST_INDEX_API_KEY}
+  
+  PODCAST_INDEX_API_SECRET: ${PODCAST_INDEX_API_SECRET}
+  PODCAST_USER_AGENT: "SomethingAwesome/1.0.1"
+
+  NEON_DATABASE_URL: ${NEON_DATABASE_URL}
+
+  GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+
+  OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+  OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+
+  FYYD_CLIENT_ID: ${FYYD_CLIENT_ID}
+  FYYD_CLIENT_SECRET: ${FYYD_CLIENT_SECRET}"
+
+  FYYD_ACCESS_TOKEN: ${FYYD_ACCESS_TOKEN}
+  FYYD_USER_ACCESS_TOKEN: ${FYYD_USER_ACCESS_TOKEN}
+
+  TADDY_API_KEY: ${TADDY_API_KEY}
+  TADDY_USER_ID: ${TADDY_USER_ID}
+
+  PAYPAL_URL: ${PAYPAL_URL}
+
+  BUY_ME_A_COFFEE_URL: ${BUY_ME_A_COFFEE_URL}
+
+  DONATE_WITH_KOFI_URL: ${DONATE_WITH_KOFI_URL}
+
+  DISCORD_URL: "https://discord.gg/cxy9AmMaYS"
+
+  GITHUB_ISSUES_URL: "https://github.com/OpenAir-Podcast/OpenAir/issues"
+
+  GITHUB_DISCUSSION_URL: "https://github.com/OpenAir-Podcast/OpenAir/discussions"
+
+  PRIVACY_POLICY: "https://github.com/OpenAir-Podcast/OpenAir/blob/main/privacy_policy.md"
+
+  GITHUB_URL: "https://github.com/OpenAir-Podcast/OpenAir"
+
+  TERMS_OF_SERVICE: "https://github.com/OpenAir-Podcast/OpenAir/blob/main/terms_of_service.md"
+
+  SUPABASE_PROJECT_URL: ${SUPABASE_PROJECT_URL}
+  SUPABASE_API_KEY: ${SUPABASE_API_KEY}
+  SUPABASE_DATABASE_PASSWORD: ${SUPABASE_DATABASE_PASSWORD}
+
+  SUPABASE_GOOGLE_CLIENT_ID: ${SUPABASE_GOOGLE_CLIENT_ID}
+  SUPABASE_GOOGLE_CLIENT_SECRET: ${SUPABASE_GOOGLE_CLIENT_SECRET}
+  SUPABASE_GOOGLE_CALLBACK: ${SUPABASE_GOOGLE_CALLBACK}
+
+  SUPABASE_GITHUB_CLIENT_ID: ${SUPABASE_GITHUB_CLIENT_ID}
+  SUPABASE_GITHUB_CLIENT_SECRET: ${SUPABASE_GITHUB_CLIENT_SECRET}
+  SUPABASE_GITHUB_CALLBACK: ${SUPABASE_GITHUB_CALLBACK}
+
+  CALLBACK_METHOD: "https://cicwndrzbcxciavwgjzr.supabase.co/auth/v1/callback"
+
+  APP_UNIQUE_ID: "org.openair.podcast"
+  APP_GUID: ${APP_GUID}
+
+output: dist/
+releases:
+  - name: dev
+    jobs:
+      # Build and publish APK to PGYER
+      - name: release-dev-android
+        package:
+          platform: android
+          target: apk
+          build_args:
+            target-platform: android-arm,android-arm64
+            dart-define:
+              APP_ENV: dev
+
+      - name: release-dev-windows
+        package:
+          platform: windows
+          target: msi
+          build_args:
+            dart-define:
+              APP_ENV: dev
+        publish_to: github_releases
+
+      - name: linux-dev
+        jobs:
+          - name: linux-dev
+            package:
+              platform: linux
+              target: rpm
+              build_args:
+                dart-define:
+                  APP_ENV: dev
+            publish_to: github_releases
