@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Super OpenAir
+Comment=A podcast manager for exploring and enjoying podcasts
+Exec=openair
+Icon=${SNAP}/meta/gui/openair.png
+Terminal=false
+Type=Application
+Categories=Education;AudioVideo;Audio;Player;Podcast;

@@ -1,0 +1,63 @@
+name: openair
+version: 0.13.0
+summary: A podcast manager for exploring and enjoying podcasts
+description:
+  OpenAir is a free and open-source cross-platform podcast app that empowers you to explore
+  and enjoy the vast world of podcasts.
+
+confinement: strict
+base: core22
+grade: stable
+
+slots:
+  dbus-openair:
+    interface: dbus
+    bus: session
+    name: org.openair.podcast
+
+apps:
+  openair:
+    command: openair
+    extensions: [gnome]
+    plugs:
+      - network
+      - desktop-legacy
+      - personal-files
+      - audio-playback
+    slots:
+      - dbus-openair
+      
+parts:
+  openair:
+    source: .
+    plugin: flutter
+    flutter-target: lib/main.dart
+    # These dependencies should now allow the build to complete successfully
+    build-packages:
+      - pkg-config
+      - libdbus-1-dev
+      - libgtk-3-dev
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      - libgstreamer-plugins-good1.0-dev
+    
+    # We removed 'override-build' to prevent internal conflicts.
+    # The Flutter plugin's default build logic will now execute automatically.
+
+    # We still need override-prime to correct the staging path for the 'openair' executable.
+    override-prime: |
+      # The Flutter executable and its assets are located inside a 'bundle' folder 
+      # within the part's install directory. We must copy its contents to the prime root.
+      echo "Staging Flutter application bundle into the snap prime directory..."
+      
+      # Use find to locate the 'bundle' directory reliably, regardless of the Flutter engine path.
+      FLUTTER_BUNDLE_DIR=$(find "$SNAPCRAFT_PART_INSTALL" -type d -name "bundle" -print -quit)
+      
+      if [ -d "$FLUTTER_BUNDLE_DIR" ]; then
+        # Copy the *contents* of the bundle (including the 'openair' executable) to the prime directory.
+        cp -R "$FLUTTER_BUNDLE_DIR"/* "$SNAPCRAFT_PRIME/"
+        echo "Staging complete. Executable 'openair' should now be at the snap root."
+      else
+        echo "Error: Flutter bundle directory not found. Cannot stage application."
+        exit 1
+      fi
