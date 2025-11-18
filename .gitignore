@@ -60,3 +60,5 @@ app.*.map.json
 
 # Flutter build cache
 .build-cache
+
+*.snap
