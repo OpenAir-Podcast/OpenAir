@@ -1,6 +1,6 @@
 name: openair
 title: OpenAir
-version: 0.13.2
+version: 0.13.15
 summary: A podcast manager for exploring and enjoying podcasts
 description:
   OpenAir is a free and open-source cross-platform podcast app that empowers you to explore
@@ -26,6 +26,14 @@ slots:
     bus: session
     name: org.openair.podcast
 
+layout:
+  /usr/lib/x86_64-linux-gnu/pulseaudio:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+  /usr/lib/x86_64-linux-gnu/gstreamer-1.0:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/gstreamer-1.0
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+
 apps:
   openair:
     command: OpenAir
@@ -33,9 +41,37 @@ apps:
     plugs:
       - network
       - desktop
+      - unity7
+      - network-manager
+      - audio-playback
+      - mpris
+      - media-hub
+      - home
+    slots:
+      - dbus-openair
 
 parts:
   openair:
     source: .
     plugin: flutter
     flutter-target: lib/main.dart
+    build-packages:
+      # Core GStreamer development libraries
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      # Comprehensive plugin development packages (Good, Bad, Ugly)
+      - libgstreamer-plugins-good1.0-dev
+      - libgstreamer-plugins-bad1.0-dev  # <-- Corrected package name
+      # Core audio libraries for development
+      - libpulse-dev
+      - libasound2-dev
+    stage-packages:
+      # Runtime packages needed for playback, ensuring we have all standard codecs
+      - gstreamer1.0-plugins-base
+      - gstreamer1.0-plugins-good
+      - gstreamer1.0-plugins-bad
+      - gstreamer1.0-plugins-ugly
+      - gstreamer1.0-libav # For MP3 and other non-free codecs
+      - gstreamer1.0-pulseaudio
+      - libpulse0
+      - libasound2
