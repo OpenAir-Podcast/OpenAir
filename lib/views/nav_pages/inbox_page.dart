@@ -95,9 +95,6 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                               return const SizedBox.shrink();
                             }
 
-
-                            
-
                             PodcastModel podcastModel = PodcastModel(
                               id: episodeData['id'] ?? -1,
                               title: episodeData['title'],

@@ -406,7 +406,7 @@ class AudioProvider extends ChangeNotifier {
         guid: guid,
         image: item['image'] ?? item['feedImage'],
         title: item['title'],
-        author: item['author'],
+        author: podcast.author!,
         datePublished: item['datePublished'],
         description: item['description'],
         feedUrl: item['feedUrl'],

@@ -20,7 +20,7 @@ class DownloadModelAdapter extends TypeAdapter<DownloadModel> {
       guid: fields[0] as String,
       image: fields[1] as String,
       title: fields[2] as String,
-      author: fields[3] as String?,
+      author: fields[3] as String,
       datePublished: (fields[4] as num).toInt(),
       description: fields[5] as String,
       feedUrl: fields[6] as String,
