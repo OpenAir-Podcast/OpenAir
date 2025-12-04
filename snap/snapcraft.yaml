@@ -1,6 +1,6 @@
 name: openair
 title: OpenAir
-version: 0.13.15
+version: 0.13.22
 summary: A podcast manager for exploring and enjoying podcasts
 description:
   OpenAir is a free and open-source cross-platform podcast app that empowers you to explore
@@ -20,6 +20,9 @@ base: core22
 grade: stable
 icon: snap/gui/icon.png
 
+architectures:
+  - build-on: amd64
+
 slots:
   dbus-openair:
     interface: dbus
@@ -27,12 +30,12 @@ slots:
     name: org.openair.podcast
 
 layout:
-  /usr/lib/x86_64-linux-gnu/pulseaudio:
-    bind: $SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
   /usr/lib/x86_64-linux-gnu/gstreamer-1.0:
     bind: $SNAP/usr/lib/x86_64-linux-gnu/gstreamer-1.0
   /usr/share/alsa:
     bind: $SNAP/usr/share/alsa
+  /etc/ssl/certs:
+    bind: $SNAP/etc/ssl/certs
 
 apps:
   openair:
@@ -40,13 +43,35 @@ apps:
     extensions: [gnome]
     plugs:
       - network
+      - network-bind
+      - browser-support
       - desktop
-      - unity7
-      - network-manager
+      - desktop-legacy
+      - wayland
+      - x11
+      - opengl
       - audio-playback
-      - mpris
-      - media-hub
+      - pulseaudio
       - home
+      - removable-media
+      - gsettings
+      - unity7
+
+    environment:
+      # GStreamer configuration
+      GST_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/gstreamer-1.0
+      GST_PLUGIN_SYSTEM_PATH: $SNAP/usr/lib/x86_64-linux-gnu/gstreamer-1.0
+
+      # SSL certificate paths
+      SSL_CERT_DIR: $SNAP/etc/ssl/certs
+      SSL_CERT_FILE: $SNAP/etc/ssl/certs/ca-certificates.crt
+
+      # GDK settings
+      GDK_BACKEND: x11
+
+      # Flutter audio backend
+      FLUTTER_TEST: "False"
+
     slots:
       - dbus-openair
 
@@ -55,23 +80,73 @@ parts:
     source: .
     plugin: flutter
     flutter-target: lib/main.dart
+    flutter-channel: stable
+
     build-packages:
-      # Core GStreamer development libraries
+      - build-essential
+      - cmake
+      - ninja-build
+      - pkg-config
+      - libgtk-3-dev
+      - liblzma-dev
+
+      # GStreamer development
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
-      # Comprehensive plugin development packages (Good, Bad, Ugly)
       - libgstreamer-plugins-good1.0-dev
-      - libgstreamer-plugins-bad1.0-dev  # <-- Corrected package name
-      # Core audio libraries for development
+      - libgstreamer-plugins-bad1.0-dev
+      - gstreamer1.0-plugins-good
+      - gstreamer1.0-plugins-bad
+      - gstreamer1.0-libav
+
+      # Audio development
       - libpulse-dev
       - libasound2-dev
+
+      # SSL/Networking
+      - libssl-dev
+      - libnss3-dev
+
     stage-packages:
-      # Runtime packages needed for playback, ensuring we have all standard codecs
+      # Core system libraries
+      - libc6
+      - libgcc-s1
+      - libstdc++6
+
+      # SSL and certificates - CRITICAL FOR HTTPS
+      - ca-certificates
+      - openssl
+      - libnss3
+      - libnspr4
+
+      # GStreamer core
       - gstreamer1.0-plugins-base
       - gstreamer1.0-plugins-good
       - gstreamer1.0-plugins-bad
       - gstreamer1.0-plugins-ugly
-      - gstreamer1.0-libav # For MP3 and other non-free codecs
+      - gstreamer1.0-libav
+
+      # GStreamer HTTPS support - CRITICAL
+      - gstreamer1.0-nice
+      - gstreamer1.0-plugins-good
+
+      # Audio support
       - gstreamer1.0-pulseaudio
+      - gstreamer1.0-alsa
       - libpulse0
       - libasound2
+      - pulseaudio-utils
+
+      # Additional codecs
+      - gstreamer1.0-gl
+      - gstreamer1.0-rtsp
+
+      # Network support
+      - gstreamer1.0-plugins-base-apps
+
+      # GTK and desktop integration
+      - libgtk-3-0
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-0
+
+    build-snaps: [flutter/latest/stable]
