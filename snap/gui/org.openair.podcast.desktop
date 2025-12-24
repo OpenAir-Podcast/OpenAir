@@ -1,8 +1,9 @@
 [Desktop Entry]
-Name=Super OpenAir
-Comment=A podcast manager for exploring and enjoying podcasts
+Name=OpenAir
+Comment=Free and open-source podcast player
 Exec=openair
-Icon=${SNAP}/meta/gui/icon.png
-Terminal=false
+Icon=${SNAP}/usr/share/icons/hicolor/512x512/apps/openair.png
 Type=Application
-Categories=Utility;Application;AudioVideo;Audio;Player;Podcast;
+Categories=AudioVideo;Audio;Player;
+Terminal=false
+StartupWMClass=openaircls
