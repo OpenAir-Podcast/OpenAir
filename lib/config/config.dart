@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-int wideScreenMinWidth = 800;
+int wideScreenMinWidth = 384;
 double circleSize = 70.0;
 
 double bannerAudioPlayerHeight = 85.0;
@@ -37,7 +37,7 @@ double wideMainAxisExtent = 833.0;
 double subscribedNarrowMainAxisExtent = 236.0;
 double subscribedWideMainAxisExtent = 250.0;
 
-int narrowItemCount = 4;
+int narrowItemCount = 3;
 int wideItemCount = 6;
 
 double featuredCardHeight = 230.0;

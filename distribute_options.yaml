@@ -59,14 +59,14 @@ output: dist/
 releases:
   - name: dev
     jobs:
-      # - name: release-dev-android
-      #   package:
-      #     platform: android
-      #     target: apk
-      #     build_args:
-      #       target-platform: android-arm,android-arm64
-      #       dart-define:
-      #         APP_ENV: dev
+      - name: release-dev-android
+        package:
+          platform: android
+          target: apk
+          build_args:
+            target-platform: android-arm,android-arm64
+            dart-define:
+              APP_ENV: dev
 
       # - name: release-dev-windows
       #   package:
@@ -75,7 +75,6 @@ releases:
       #     build_args:
       #       dart-define:
       #         APP_ENV: dev
-      #   publish_to: github
 
       - name: release-dev-linux-appimage
         package:
@@ -84,4 +83,3 @@ releases:
           build_args:
             dart-define:
               APP_ENV: dev
-        publish_to: github

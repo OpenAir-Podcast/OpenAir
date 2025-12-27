@@ -102,6 +102,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(MediaQuery.of(context).size.toString());
+    debugPrint(MediaQuery.of(context).orientation.toString());
+
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
