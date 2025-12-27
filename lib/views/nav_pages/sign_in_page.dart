@@ -59,285 +59,288 @@ class _SignInState extends ConsumerState<SignIn> {
 
     return Scaffold(
       appBar: Platform.isAndroid ? AppBar() : null,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            spacing: 16.0,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  Translations.of(context).text('signIn'),
-                  style: TextStyle(
-                    color: Brightness.dark == Theme.of(context).brightness
-                        ? Colors.white
-                        : Colors.black,
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              TextFormField(
-                style: TextStyle(
-                  color: Brightness.dark == Theme.of(context).brightness
-                      ? Colors.white
-                      : Colors.black,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return Translations.of(context).text('requiredField');
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return Translations.of(context).text('invalidEmail');
-                  }
-
-                  return null;
-                },
-                keyboardType: TextInputType.text,
-                controller: emailInputControl,
-                onChanged: (value) {
-                  if (emailInputControl.text.isNotEmpty) {
-                    setState(() {});
-                  }
-                },
-                decoration: InputDecoration(
-                  label: Text(Translations.of(context).text('email')),
-                  border: OutlineInputBorder(),
-                  hintText: Translations.of(context).text('typeYourEmail'),
-                  prefixIcon: Icon(Icons.person),
-                  suffixIcon: emailInputControl.text.isNotEmpty
-                      ? IconButton(
-                          onPressed: () {
-                            emailInputControl.clear();
-                            setState(() {});
-                          },
-                          icon: const Icon(Icons.clear),
-                        )
-                      : null,
-                ),
-              ),
-              TextFormField(
-                style: TextStyle(
-                  color: Brightness.dark == Theme.of(context).brightness
-                      ? Colors.white
-                      : Colors.black,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return Translations.of(context).text('requiredField');
-                  } else if (value.length < 6) {
-                    return Translations.of(context).text('invalidPassword');
-                  }
-
-                  return null;
-                },
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: !isPasswordVisible,
-                controller: passwordInputControl,
-                onChanged: (value) {
-                  if (passwordInputControl.text.isNotEmpty) {
-                    setState(() {});
-                  }
-                },
-                decoration: InputDecoration(
-                  label: Text(Translations.of(context).text('password')),
-                  border: OutlineInputBorder(),
-                  hintText: Translations.of(context).text('typeYourPassword'),
-                  prefixIcon: Icon(Icons.lock_rounded),
-                  suffixIcon: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isPasswordVisible = !isPasswordVisible;
-                          });
-                        },
-                        icon: Icon(isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                      ),
-                      passwordInputControl.text.isNotEmpty
-                          ? IconButton(
-                              onPressed: () {
-                                passwordInputControl.clear();
-                                setState(() {});
-                              },
-                              icon: const Icon(Icons.clear),
-                            )
-                          : Container(),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              spacing: 16.0,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
                   child: Text(
-                    Translations.of(context).text('forgotPassword'),
+                    Translations.of(context).text('signIn'),
                     style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16.0,
+                      color: Brightness.dark == Theme.of(context).brightness
+                          ? Colors.white
+                          : Colors.black,
+                      fontSize: 48.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 2.0),
-              Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: 380.0,
-                  height: 48.0,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all<Color>(
-                        Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    onPressed: () async {
-                      if (context.mounted) {
-                        if (_formKey.currentState!.validate()) {
-                          final username = emailInputControl.text.trim();
-                          final password = passwordInputControl.text.trim();
+                TextFormField(
+                  style: TextStyle(
+                    color: Brightness.dark == Theme.of(context).brightness
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return Translations.of(context).text('requiredField');
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
+                      return Translations.of(context).text('invalidEmail');
+                    }
 
-                          try {
-                            AuthResponse response = await supabaseService
-                                .signIn(username, password);
-
-                            if (response.user != null && context.mounted) {
-                              if (!Platform.isAndroid && !Platform.isIOS) {
-                                ref
-                                    .read(notificationServiceProvider)
-                                    .showNotification(
-                                      'OpenAir ${Translations.of(context).text('notification')}',
-                                      Translations.of(context)
-                                          .text('loginSuccess'),
-                                    );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      Translations.of(context)
-                                          .text('loginSuccess'),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              widget.returnFromSignin();
-                            } else {
-                              if (context.mounted) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        Translations.of(context)
-                                            .text('loginFailed'),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('loginFailed'),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            }
-                          } on AuthException catch (e) {
-                            if (context.mounted) {
-                              if (!Platform.isAndroid && !Platform.isIOS) {
-                                ref
-                                    .read(notificationServiceProvider)
-                                    .showNotification(
-                                      'OpenAir ${Translations.of(context).text('notification')}',
-                                      '${Translations.of(context).text('loginFailed')}: ${e.message}',
-                                    );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      '${Translations.of(context).text('loginFailed')}: ${e.message}',
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                          } catch (e) {
-                            debugPrint(e.toString());
-                          }
-                        }
-                      }
-                    },
-                    child: Text(
-                      Translations.of(context)
-                          .text(
-                            'signIn',
+                    return null;
+                  },
+                  keyboardType: TextInputType.text,
+                  controller: emailInputControl,
+                  onChanged: (value) {
+                    if (emailInputControl.text.isNotEmpty) {
+                      setState(() {});
+                    }
+                  },
+                  decoration: InputDecoration(
+                    label: Text(Translations.of(context).text('email')),
+                    border: OutlineInputBorder(),
+                    hintText: Translations.of(context).text('typeYourEmail'),
+                    prefixIcon: Icon(Icons.person),
+                    suffixIcon: emailInputControl.text.isNotEmpty
+                        ? IconButton(
+                            onPressed: () {
+                              emailInputControl.clear();
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.clear),
                           )
-                          .toUpperCase(),
+                        : null,
+                  ),
+                ),
+                TextFormField(
+                  style: TextStyle(
+                    color: Brightness.dark == Theme.of(context).brightness
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return Translations.of(context).text('requiredField');
+                    } else if (value.length < 6) {
+                      return Translations.of(context).text('invalidPassword');
+                    }
+
+                    return null;
+                  },
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: !isPasswordVisible,
+                  controller: passwordInputControl,
+                  onChanged: (value) {
+                    if (passwordInputControl.text.isNotEmpty) {
+                      setState(() {});
+                    }
+                  },
+                  decoration: InputDecoration(
+                    label: Text(Translations.of(context).text('password')),
+                    border: OutlineInputBorder(),
+                    hintText: Translations.of(context).text('typeYourPassword'),
+                    prefixIcon: Icon(Icons.lock_rounded),
+                    suffixIcon: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isPasswordVisible = !isPasswordVisible;
+                            });
+                          },
+                          icon: Icon(isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off),
+                        ),
+                        passwordInputControl.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  passwordInputControl.clear();
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.clear),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      Translations.of(context).text('forgotPassword'),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.blue,
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 2.0),
-              Align(
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          Translations.of(context).text('dontHaveAnAccount'),
-                          style: TextStyle(
-                            color:
-                                Brightness.dark == Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                SizedBox(height: 2.0),
+                Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 380.0,
+                    height: 48.0,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all<Color>(
+                          Theme.of(context).colorScheme.primary,
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignUp(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            Translations.of(context).text('signUp'),
+                      ),
+                      onPressed: () async {
+                        if (context.mounted) {
+                          if (_formKey.currentState!.validate()) {
+                            final username = emailInputControl.text.trim();
+                            final password = passwordInputControl.text.trim();
+
+                            try {
+                              AuthResponse response = await supabaseService
+                                  .signIn(username, password);
+
+                              if (response.user != null && context.mounted) {
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('loginSuccess'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('loginSuccess'),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                widget.returnFromSignin();
+                              } else {
+                                if (context.mounted) {
+                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .showNotification(
+                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                          Translations.of(context)
+                                              .text('loginFailed'),
+                                        );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          Translations.of(context)
+                                              .text('loginFailed'),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            } on AuthException catch (e) {
+                              if (context.mounted) {
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        '${Translations.of(context).text('loginFailed')}: ${e.message}',
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${Translations.of(context).text('loginFailed')}: ${e.message}',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          }
+                        }
+                      },
+                      child: Text(
+                        Translations.of(context)
+                            .text(
+                              'signIn',
+                            )
+                            .toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 2.0),
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            Translations.of(context).text('dontHaveAnAccount'),
                             style: TextStyle(
-                              color: Colors.blue,
+                              color: Brightness.dark ==
+                                      Theme.of(context).brightness
+                                  ? Colors.white
+                                  : Colors.black,
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignUp(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              Translations.of(context).text('signUp'),
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

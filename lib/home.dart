@@ -173,7 +173,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
       return Row(
         children: [
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Card(
               color: Theme.of(context).cardColor,
               elevation: 2.0,
@@ -188,7 +188,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
             ),
           ),
           Expanded(
-            flex: 4,
+            flex: 5,
             child: _content,
           ),
         ],

@@ -58,58 +58,56 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
     return Column(
       children: [
         Expanded(
-          flex: 2,
-          child: DrawerHeader(
-            child: Center(
-              child: Column(
-                spacing: 16.0,
-                children: [
-                  ClipOval(
-                    child: Image.asset(
-                      'assets/icons/icon.png',
-                      width: circleSize,
-                      height: circleSize,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  session.when(
-                    data: (data) {
-                      return ElevatedButton(
-                        onPressed: () {
-                          if (session.value == null) {
-                            widget.onPageSelected(SignIn(
-                              returnFromSignin: returnFromSignin,
-                            ));
-                          } else {
-                            supabaseService.signOut();
-                            ref.invalidate(getSessionProvider);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                        child: Text(
-                          session.value == null
-                              ? Translations.of(context).text('signIn')
-                              : Translations.of(context).text('logout'),
-                        ),
-                      );
-                    },
-                    error: (error, stackTrace) => Text(
-                      Translations.of(context).text('errorLoadingData'),
-                    ),
-                    loading: () => const CircularProgressIndicator(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Expanded(
           flex: 4,
           child: ListView(
             children: [
+              DrawerHeader(
+                child: Center(
+                  child: Column(
+                    spacing: 16.0,
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          'assets/icons/icon.png',
+                          width: circleSize,
+                          height: circleSize,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      session.when(
+                        data: (data) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              if (session.value == null) {
+                                widget.onPageSelected(SignIn(
+                                  returnFromSignin: returnFromSignin,
+                                ));
+                              } else {
+                                supabaseService.signOut();
+                                ref.invalidate(getSessionProvider);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            child: Text(
+                              session.value == null
+                                  ? Translations.of(context).text('signIn')
+                                  : Translations.of(context).text('logout'),
+                            ),
+                          );
+                        },
+                        error: (error, stackTrace) => Text(
+                          Translations.of(context).text('errorLoadingData'),
+                        ),
+                        loading: () => const CircularProgressIndicator(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               ListTile(
                 leading: const Icon(Icons.home_rounded),
                 title: Text(Translations.of(context).text('home')),
