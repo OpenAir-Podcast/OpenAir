@@ -31,7 +31,7 @@ double blurRadius = 10.0;
 
 double narrowMainAxisExtent = 500.0;
 
-int wideCrossAxisCount = 5;
+int wideCrossAxisCount = 4;
 double wideMainAxisExtent = 833.0;
 
 double subscribedNarrowMainAxisExtent = 236.0;

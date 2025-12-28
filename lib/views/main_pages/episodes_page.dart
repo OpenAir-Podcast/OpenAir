@@ -207,8 +207,8 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                             crossAxisCount: wideCrossAxisCount,
                             childAspectRatio: 1.2,
                             mainAxisExtent: 294,
-                            crossAxisSpacing: 4,
-                            mainAxisSpacing: 4,
+                            crossAxisSpacing: 2,
+                            mainAxisSpacing: 2,
                           ),
                           itemCount: snapshot['count'],
                           itemBuilder: (context, index) {
