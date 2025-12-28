@@ -401,7 +401,7 @@ class PodcastsCard extends ConsumerWidget {
                                 memCacheHeight: cardImageHeight.ceil(),
                                 memCacheWidth: cardImageWidth.ceil(),
                                 imageUrl: snapshot.feeds[index].artwork,
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 errorWidget: (context, url, error) => Icon(
                                   Icons.error,
                                   size: 120.0,
