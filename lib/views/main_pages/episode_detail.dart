@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -59,18 +60,23 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Container(
+                      width: 62.0,
+                      height: 62.0,
                       decoration: BoxDecoration(
+                        color: cardImageShadow,
                         borderRadius: BorderRadius.circular(10.0),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            widget.episodeItem!['feedImage'] ??
-                                widget.episodeItem!['image'],
-                          ),
-                          fit: BoxFit.cover,
+                      ),
+                      child: CachedNetworkImage(
+                        memCacheHeight: 62,
+                        memCacheWidth: 62,
+                        imageUrl: widget.episodeItem!['feedImage'] ??
+                            widget.episodeItem!['image'],
+                        fit: BoxFit.fill,
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.error,
+                          size: 56.0,
                         ),
                       ),
-                      width: 92.0,
-                      height: 92.0,
                     ),
                   ),
                   Padding(
