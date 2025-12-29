@@ -393,6 +393,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                       );
                     },
                   )
+              // FIXME: does not display the podcasts
                 : ListView.builder(
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
