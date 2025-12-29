@@ -93,7 +93,8 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                       child: CachedNetworkImage(
                         memCacheHeight: 62,
                         memCacheWidth: 62,
-                        imageUrl: widget.episodeItem['feedImage'] ??
+                        imageUrl: widget.episodeItem['image'] ??
+                            widget.episodeItem['feedImage'] ??
                             widget.podcast.imageUrl,
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(

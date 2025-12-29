@@ -82,7 +82,11 @@ class SubscriptionCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     memCacheHeight: cardImageHeight.ceil(),
                     memCacheWidth: cardImageWidth.ceil(),
-                    imageUrl: subs[index].imageUrl,
+                    imageUrl: subs[index].artwork,
+                    errorWidget: (context, url, error) => Icon(
+                      Icons.error,
+                      size: 56.0,
+                    ),
                   ),
                 ),
                 Positioned(
