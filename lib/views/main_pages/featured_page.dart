@@ -14,8 +14,6 @@ import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:theme_provider/theme_provider.dart';
 
-// Add a button to refresh data
-
 final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.watch(openAirProvider).hiveService.getTopFeaturedPodcast();
@@ -402,9 +400,26 @@ class PodcastsCard extends ConsumerWidget {
                                 memCacheWidth: cardImageWidth.ceil(),
                                 imageUrl: snapshot.feeds[index].artwork,
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.error,
-                                  size: 120.0,
+                                // Responsive error widget using LayoutBuilder
+                                errorWidget: (context, url, error) =>
+                                    LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return Container(
+                                      color: Theme.of(context)
+                                          .dividerColor
+                                          .withOpacity(0.1),
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Icons.error,
+                                        // Set size relative to the current container dimensions
+                                        size: (constraints.maxWidth <
+                                                    constraints.maxHeight
+                                                ? constraints.maxWidth
+                                                : constraints.maxHeight) *
+                                            0.5,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
