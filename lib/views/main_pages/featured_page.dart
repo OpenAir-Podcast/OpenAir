@@ -143,28 +143,28 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage> {
                 title: Translations.of(context).text('topPodcasts'),
                 podcastDataProvider: podcastDataByTopProvider,
               ),
-              SizedBox.fromSize(size: const Size(0, 10)),
+              SizedBox(width: 0, height: 10),
               // Education
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncEducationValue,
                 title: Translations.of(context).text('education'),
                 podcastDataProvider: podcastDataByEducationProvider,
               ),
-              SizedBox.fromSize(size: const Size(0, 10)),
+              SizedBox(width: 0, height: 10),
               // Health
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncHealthValue,
                 title: Translations.of(context).text('health'),
                 podcastDataProvider: podcastDataByHealthProvider,
               ),
-              SizedBox.fromSize(size: const Size(0, 10)),
+              SizedBox(width: 0, height: 10),
               // Technology
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncTechnologyValue,
                 title: Translations.of(context).text('technology'),
                 podcastDataProvider: podcastDataByTechnologyProvider,
               ),
-              SizedBox.fromSize(size: const Size(0, 10)),
+              SizedBox(width: 0, height: 10),
               // Sports
               PodcastsCard(
                 podcastDataAsyncValue: podcastDataAsyncSportsValue,
@@ -405,9 +405,7 @@ class PodcastsCard extends ConsumerWidget {
                                     LayoutBuilder(
                                   builder: (context, constraints) {
                                     return Container(
-                                      color: Theme.of(context)
-                                          .dividerColor
-                                          .withOpacity(0.1),
+                                      color: Colors.brown,
                                       alignment: Alignment.center,
                                       child: Icon(
                                         Icons.error,
