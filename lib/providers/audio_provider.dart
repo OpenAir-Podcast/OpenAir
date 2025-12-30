@@ -949,7 +949,6 @@ class AudioProvider extends ChangeNotifier {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-// NOTE: I am assuming your Translations class provides locale-aware strings
 // for 'hour', 'hours', 'minute', and 'minutes'.
   String convertSecondsToDuration(int totalSeconds, BuildContext context) {
     // Use a temporary list to hold the formatted parts (e.g., ["1 hr", "05 min"])

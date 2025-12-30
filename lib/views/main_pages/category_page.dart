@@ -393,25 +393,21 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                       );
                     },
                   )
-              // FIXME: does not display the podcasts
                 : ListView.builder(
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
-                      return FutureBuilder(
-                        future: ref
-                            .watch(podcastIndexProvider)
-                            .getPodcastDetailsByTitle(
-                                snapshot.feeds[index].title),
-                        builder: (context, podcastInfoSnapshot) {
-                          if (podcastInfoSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return PodcastCardPlaceholder();
-                          }
+                      final podcastDataInfoAsyncValue =
+                          ref.watch(getPodcastInfoByTitleProvider(
+                        snapshot.feeds[index].title,
+                      ));
 
+                      return podcastDataInfoAsyncValue.when(
+                        loading: () => PodcastCardPlaceholder(),
+                        error: (error, stackTrace) => PodcastCardPlaceholder(),
+                        data: (podcastInfoData) {
                           PodcastModel podcast = snapshot.feeds[index];
 
-                          podcast.author =
-                              podcastInfoSnapshot.data!['feeds'][0]['author'];
+                          podcast.author = podcastInfoData['author'];
 
                           return PodcastCardList(
                             podcastItem: podcast,

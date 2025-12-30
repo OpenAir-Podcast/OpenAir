@@ -83,7 +83,6 @@ class SubscriptionCard extends StatelessWidget {
                     memCacheHeight: cardImageHeight.ceil(),
                     memCacheWidth: cardImageWidth.ceil(),
                     imageUrl: subs[index].artwork,
-                    // FIXME: Does not scale witht the card properly
                     errorWidget: (context, url, error) => Icon(
                       Icons.error,
                       size: 56.0,
