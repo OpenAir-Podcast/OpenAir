@@ -46,7 +46,7 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
-      minimumSize: Size(800, 600),
+      minimumSize: Size(720, 600),
       title: 'OpenAir',
       titleBarStyle: TitleBarStyle.normal,
     );
@@ -102,8 +102,6 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(MediaQuery.sizeOf(context).toString());
-
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -280,11 +278,13 @@ class _MyAppState extends ConsumerState<MyApp> {
                       theme: themeData,
                       home: Home(),
                     );
-                  });
+                  },
+                );
                 },
               ),
             ),
           );
-        });
+        },
+      );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,9 +14,8 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/episode_card_list.dart';
 
-final podcastDataByUrlProvider =
-    FutureProvider.family<Map<String, dynamic>, String>(
-        (ref, podcastUrl) async {
+// Defined as a top-level provider
+final podcastDataByUrlProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, podcastUrl) async {
   final podcastIndexService = ref.watch(podcastIndexProvider);
   return await podcastIndexService.getEpisodesByFeedUrl(podcastUrl);
 });
@@ -37,14 +35,12 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Current podcast feed URL from audio provider
     final podcastUrl = ref.watch(audioProvider).currentPodcast!.feedUrl;
 
-    final podcastDataAsyncValue =
-        ref.watch(podcastDataByUrlProvider(podcastUrl));
-
-    final podcastDataInfoAsyncValue = ref.watch(getPodcastInfoByTitleProvider(
-      widget.podcast.title,
-    ));
+    // Async values for episode data and podcast info
+    final podcastDataAsyncValue = ref.watch(podcastDataByUrlProvider(podcastUrl));
+    final podcastDataInfoAsyncValue = ref.watch(getPodcastInfoByTitleProvider(widget.podcast.title));
 
     return podcastDataAsyncValue.when(
       loading: () => Scaffold(
@@ -58,29 +54,21 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 75.0,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.error_outline_rounded, size: 75.0, color: Colors.grey),
               const SizedBox(height: 20.0),
               Text(
                 Translations.of(context).text('oopsAnErrorOccurred'),
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
-                  color: Brightness.dark == Theme.of(context).brightness
-                      ? Colors.white
-                      : Colors.black,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               Text(
                 Translations.of(context).text('oopsTryAgainLater'),
                 style: TextStyle(
                   fontSize: 16.0,
-                  color: Brightness.dark == Theme.of(context).brightness
-                      ? Colors.white
-                      : Colors.black,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -89,20 +77,14 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                 height: 40.0,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                   ),
-                  onPressed: () async {
-                    ref.invalidate(podcastIndexProvider);
-                  },
+                  onPressed: () async => ref.invalidate(podcastIndexProvider),
                   child: Text(
                     Translations.of(context).text('retry'),
                     style: TextStyle(
                       fontSize: 16.0,
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
@@ -122,73 +104,49 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                     tooltip: Translations.of(context).text('podcastDetails'),
                     onPressed: () async {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PodcastInfoPage(
-                              podcastInfo: podcastInfo,
-                            ),
-                          ));
+                        context,
+                        MaterialPageRoute(builder: (context) => PodcastInfoPage(podcastInfo: podcastInfo)),
+                      );
                     },
-                    icon: Icon(
-                      Icons.info_outline_rounded,
-                      size: 30.0,
-                    ),
+                    icon: const Icon(Icons.info_outline_rounded, size: 30.0),
                   ),
-                  FutureBuilder(
-                    future: ref
-                        .watch(openAirProvider)
-                        .isSubscribed(widget.podcast.title),
-                    builder: (context, snapshot) {
+                  FutureBuilder<bool>(
+                    future: ref.watch(openAirProvider).isSubscribed(widget.podcast.title),
+                    builder: (context, subSnapshot) {
+                      final isSubscribed = subSnapshot.data ?? false;
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: IconButton(
-                          tooltip: snapshot.hasData
-                              ? snapshot.data!
-                                  ? Translations.of(context)
-                                      .text('unsubscribeToPodcast')
-                                  : Translations.of(context)
-                                      .text('subscribeToPodcast')
+                          tooltip: subSnapshot.hasData
+                              ? (isSubscribed
+                                  ? Translations.of(context).text('unsubscribeToPodcast')
+                                  : Translations.of(context).text('subscribeToPodcast'))
                               : '...',
                           onPressed: () async {
                             widget.podcast.author = podcastInfo['author'];
 
-                            snapshot.data! && snapshot.hasData
-                                ? ref
-                                    .read(audioProvider)
-                                    .unsubscribe(widget.podcast)
-                                : ref.read(audioProvider).subscribe(
-                                      widget.podcast,
-                                      context,
-                                    );
+                            if (isSubscribed) {
+                              ref.read(audioProvider).unsubscribe(widget.podcast);
+                            } else {
+                              ref.read(audioProvider).subscribe(widget.podcast, context);
+                            }
+
+                            final notificationMsg = isSubscribed
+                                ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
+                                : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}';
 
                             if (!Platform.isAndroid && !Platform.isIOS) {
-                              ref
-                                  .read(notificationServiceProvider)
-                                  .showNotification(
+                              ref.read(notificationServiceProvider).showNotification(
                                     'OpenAir ${Translations.of(context).text('notification')}',
-                                    snapshot.data!
-                                        ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
-                                        : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
+                                    notificationMsg,
                                   );
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    snapshot.data!
-                                        ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
-                                        : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}',
-                                  ),
-                                ),
-                              );
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(notificationMsg)));
                             }
 
                             ref.invalidate(podcastDataByUrlProvider);
                           },
-                          icon: snapshot.hasData
-                              ? snapshot.data!
-                                  ? const Icon(Icons.check)
-                                  : const Icon(Icons.add)
-                              : const Icon(Icons.add),
+                          icon: Icon(isSubscribed ? Icons.check : Icons.add),
                         ),
                       );
                     },
@@ -199,26 +157,32 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: RefreshIndicator(
-                        onRefresh: () async => ref
-                            .invalidate(podcastDataByUrlProvider(podcastUrl)),
-                        child: GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: wideCrossAxisCount,
-                            childAspectRatio: 1.2,
-                            mainAxisExtent: 294,
-                            crossAxisSpacing: 2,
-                            mainAxisSpacing: 2,
-                          ),
-                          itemCount: snapshot['count'],
-                          itemBuilder: (context, index) {
-                            widget.podcast.author = podcastInfo['author'];
+                        onRefresh: () async => ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            // Responsive column calculation
+                            const double targetCardWidth = 250.0;
+                            int dynamicCrossAxisCount = (constraints.maxWidth / targetCardWidth).floor();
+                            if (dynamicCrossAxisCount < 1) dynamicCrossAxisCount = 1;
 
-                            return EpisodeCardGrid(
-                              title: snapshot['items'][index]['title'],
-                              aurthor: podcastInfo['author'],
-                              episodeItem: snapshot['items'][index],
-                              podcast: widget.podcast,
+                            return GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: dynamicCrossAxisCount,
+                                childAspectRatio: 1.2,
+                                mainAxisExtent: 294,
+                                crossAxisSpacing: 2,
+                                mainAxisSpacing: 2,
+                              ),
+                              itemCount: snapshot['count'],
+                              itemBuilder: (context, index) {
+                                widget.podcast.author = podcastInfo['author'];
+                                return EpisodeCardGrid(
+                                  title: snapshot['items'][index]['title'],
+                                  aurthor: podcastInfo['author'],
+                                  episodeItem: snapshot['items'][index],
+                                  podcast: widget.podcast,
+                                );
+                              },
                             );
                           },
                         ),
@@ -227,14 +191,12 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                   : Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: RefreshIndicator(
-                        onRefresh: () async => ref
-                            .invalidate(podcastDataByUrlProvider(podcastUrl)),
+                        onRefresh: () async => ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
                         child: ListView.builder(
                           cacheExtent: cacheExtent,
                           itemCount: snapshot['count'],
                           itemBuilder: (context, index) {
                             widget.podcast.author = podcastInfo['author'];
-
                             return EpisodeCardList(
                               title: snapshot['items'][index]['title'],
                               author: podcastInfo['author'],
@@ -246,59 +208,43 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                       ),
                     ),
               bottomNavigationBar: SizedBox(
-                height: ref.watch(audioProvider).isPodcastSelected
-                    ? bannerAudioPlayerHeight
-                    : 0.0,
-                child: ref.watch(audioProvider).isPodcastSelected
-                    ? const BannerAudioPlayer()
-                    : const SizedBox(),
+                height: ref.watch(audioProvider).isPodcastSelected ? bannerAudioPlayerHeight : 0.0,
+                child: ref.watch(audioProvider).isPodcastSelected ? const BannerAudioPlayer() : const SizedBox(),
               ),
             );
           },
-          error: (error, stackTrace) {
-            return Scaffold(
-              body: SizedBox(
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline_rounded,
-                      size: 75.0,
-                      color: Colors.grey,
+          error: (error, stackTrace) => Scaffold(
+            body: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline_rounded, size: 75.0, color: Colors.grey),
+                  const SizedBox(height: 20.0),
+                  Text(
+                    Translations.of(context).text('oopsAnErrorOccurred'),
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     ),
-                    const SizedBox(height: 20.0),
-                    Text(
-                      Translations.of(context).text('oopsAnErrorOccurred'),
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
-                      ),
+                  ),
+                  Text(
+                    Translations.of(context).text('oopsTryAgainLater'),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     ),
-                    Text(
-                      Translations.of(context).text('oopsTryAgainLater'),
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-          loading: () {
-            return Scaffold(
-              appBar: AppBar(),
-              body: const Center(child: CircularProgressIndicator()),
-            );
-          },
+            ),
+          ),
+          loading: () => Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
         );
       },
     );

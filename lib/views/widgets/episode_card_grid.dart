@@ -472,7 +472,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                 ),
                                 onPressed: null),
                           ),
-
+                        // TODO: On PC, replace the share and like icons with more options icon because the btn bar overflow the card
                         IconButton(
                           tooltip: Translations.of(context).text('share'),
                           onPressed: () => ref.watch(openAirProvider).share(),

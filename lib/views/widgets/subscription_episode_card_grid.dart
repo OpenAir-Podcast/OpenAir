@@ -215,7 +215,7 @@ class _SubscriptionEpisodeCardGridState
                         ),
                       ),
                       Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Playlist button
                           queueListAsync.when(
