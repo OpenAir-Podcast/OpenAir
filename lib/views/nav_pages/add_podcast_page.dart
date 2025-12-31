@@ -300,9 +300,23 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                   memCacheWidth: cardImageWidth.ceil(),
                                   imageUrl: snapshot[index]['imgURL'],
                                   fit: BoxFit.fill,
-                                  errorWidget: (context, url, error) => Icon(
-                                    Icons.error,
-                                    size: 120.0,
+                                  errorWidget: (context, url, error) =>
+                                      LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return Container(
+                                        color: Colors.brown,
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.error,
+                                          // Set size relative to the current container dimensions
+                                          size: (constraints.maxWidth <
+                                                      constraints.maxHeight
+                                                  ? constraints.maxWidth
+                                                  : constraints.maxHeight) *
+                                              0.5,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),

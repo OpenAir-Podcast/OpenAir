@@ -93,7 +93,10 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
             child: IconButton(
               tooltip: Translations.of(context).text('search'),
               onPressed: () {
-                _handleNavigation(const AddPodcastPage());
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AddPodcastPage()),
+                );
+
               },
               icon: const Icon(Icons.search_rounded),
             ),
