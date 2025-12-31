@@ -67,3 +67,5 @@ app.*.map.json
 
 AppDir/
 appimage-build/
+
+*.log

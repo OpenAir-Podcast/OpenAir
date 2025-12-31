@@ -68,18 +68,23 @@ releases:
             dart-define:
               APP_ENV: dev
 
-      # - name: release-dev-windows
-      #   package:
-      #     platform: windows
-      #     target: msi
-      #     build_args:
-      #       dart-define:
-      #         APP_ENV: dev
+      - name: release-dev-windows
+        package:
+          platform: windows
+          target: exe
+          build_args:
+            dart-define:
+              APP_ENV: dev
 
       - name: release-dev-linux-appimage
         package:
           platform: linux
           target: appimage
+          make_args:
+            app_name: OpenAir
+            executable_name: OpenAir
+            icon: assets/icons/icon.png
+            desktop_entry: linux/org.openair.podcast.desktop
           build_args:
             dart-define:
               APP_ENV: dev

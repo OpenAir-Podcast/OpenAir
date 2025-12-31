@@ -1,5 +1,9 @@
 # AppImage configuration file for OpenAir.
 
+# The name used in the desktop entry (e.g., OpenAir Podcast)
+# This is likely the missing field causing the 'Null' cast error.
+display_name: OpenAir
+
 # The base name of the resulting AppImage file (e.g., OpenAir-x86_64.AppImage)
 executable_name: OpenAir
 

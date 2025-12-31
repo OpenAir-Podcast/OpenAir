@@ -16,26 +16,24 @@ import 'package:openair/views/widgets/podcast_card_placeholder.dart';
 // Create a FutureProvider to fetch the podcast data
 final podcastDataByCategoryProvider = FutureProvider.family
     .autoDispose<FetchDataModel, String>((ref, category) async {
-  final FetchDataModel? categoryPodcastData = await ref
-      .read(openAirProvider)
-      .hiveService
-      .getCategoryPodcast(category.replaceAll(' ', ''));
+      final FetchDataModel? categoryPodcastData = await ref
+          .read(openAirProvider)
+          .hiveService
+          .getCategoryPodcast(category.replaceAll(' ', ''));
 
-  if (categoryPodcastData != null) {
-    return categoryPodcastData;
-  }
+      if (categoryPodcastData != null) {
+        return categoryPodcastData;
+      }
 
-  final data =
-      await ref.watch(podcastIndexProvider).getPodcastsByCategory(category);
+      final data = await ref
+          .watch(podcastIndexProvider)
+          .getPodcastsByCategory(category);
 
-  return FetchDataModel.fromJson(data);
-});
+      return FetchDataModel.fromJson(data);
+    });
 
 class CategoryPage extends ConsumerStatefulWidget {
-  const CategoryPage({
-    super.key,
-    required this.category,
-  });
+  const CategoryPage({super.key, required this.category});
 
   final String category;
 
@@ -256,23 +254,32 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
     } else if (Translations.of(context).text('categorySelfImprovement') ==
         widget.category) {
       cat = 'Self Improvement';
-    } else if (Translations.of(context).text('categorySexuality') == widget.category) {
+    } else if (Translations.of(context).text('categorySexuality') ==
+        widget.category) {
       cat = 'Sexuality';
-    } else if (Translations.of(context).text('categorySocial') == widget.category) {
+    } else if (Translations.of(context).text('categorySocial') ==
+        widget.category) {
       cat = 'Social';
-    } else if (Translations.of(context).text('categorySpirituality') == widget.category) {
+    } else if (Translations.of(context).text('categorySpirituality') ==
+        widget.category) {
       cat = 'Spirituality';
-    } else if (Translations.of(context).text('categorySports') == widget.category) {
+    } else if (Translations.of(context).text('categorySports') ==
+        widget.category) {
       cat = 'Sports';
-    } else if (Translations.of(context).text('categoryStandUp') == widget.category) {
+    } else if (Translations.of(context).text('categoryStandUp') ==
+        widget.category) {
       cat = 'Stand-Up';
-    } else if (Translations.of(context).text('categoryStories') == widget.category) {
+    } else if (Translations.of(context).text('categoryStories') ==
+        widget.category) {
       cat = 'Stories';
-    } else if (Translations.of(context).text('categoryVideoGames') == widget.category) {
+    } else if (Translations.of(context).text('categoryVideoGames') ==
+        widget.category) {
       cat = 'Video Games';
-    } else if (Translations.of(context).text('categoryVisual') == widget.category) {
+    } else if (Translations.of(context).text('categoryVisual') ==
+        widget.category) {
       cat = 'Visual';
-    } else if (Translations.of(context).text('categoryTrueCrime') == widget.category) {
+    } else if (Translations.of(context).text('categoryTrueCrime') ==
+        widget.category) {
       cat = 'True Crime';
     } else if (Translations.of(context).text('categoryTV') == widget.category) {
       cat = 'TV';
@@ -283,32 +290,21 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
     return podcastDataAsyncValue.when(
       loading: () => Scaffold(
         appBar: AppBar(),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stackTrace) => Scaffold(
-        appBar: AppBar(
-          title: Text(widget.category),
-        ),
+        appBar: AppBar(title: Text(widget.category)),
         body: SizedBox(
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 75.0,
-                color: Colors.grey,
-              ),
+              Icon(Icons.error_outline_rounded, size: 75.0, color: Colors.grey),
               const SizedBox(height: 20.0),
               Text(
                 Translations.of(context).text('oopsAnErrorOccurred'),
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
               Text(
                 Translations.of(context).text('oopsTryAgainLater'),
@@ -349,7 +345,8 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                         .removeCategory(widget.category);
 
                     ref.invalidate(
-                        podcastDataByCategoryProvider(widget.category));
+                      podcastDataByCategoryProvider(widget.category),
+                    );
 
                     Future.delayed(const Duration(seconds: 1), () async {
                       setState(() {});
@@ -366,17 +363,18 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                 ? GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 200,
-                      childAspectRatio: 3 / 4,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                    ),
+                          maxCrossAxisExtent: 200,
+                          childAspectRatio: 3 / 4,
+                          crossAxisSpacing: 4,
+                          mainAxisSpacing: 4,
+                        ),
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
-                      final podcastDataInfoAsyncValue =
-                          ref.watch(getPodcastInfoByTitleProvider(
-                        snapshot.feeds[index].title,
-                      ));
+                      final podcastDataInfoAsyncValue = ref.watch(
+                        getPodcastInfoByTitleProvider(
+                          snapshot.feeds[index].title,
+                        ),
+                      );
 
                       return podcastDataInfoAsyncValue.when(
                         loading: () => PodcastCardPlaceholder(),
@@ -386,9 +384,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
 
                           podcast.author = podcastInfoData['author'];
 
-                          return PodcastCardGrid(
-                            podcastItem: podcast,
-                          );
+                          return PodcastCardGrid(podcastItem: podcast);
                         },
                       );
                     },
@@ -396,10 +392,11 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                 : ListView.builder(
                     itemCount: snapshot.count,
                     itemBuilder: (context, index) {
-                      final podcastDataInfoAsyncValue =
-                          ref.watch(getPodcastInfoByTitleProvider(
-                        snapshot.feeds[index].title,
-                      ));
+                      final podcastDataInfoAsyncValue = ref.watch(
+                        getPodcastInfoByTitleProvider(
+                          snapshot.feeds[index].title,
+                        ),
+                      );
 
                       return podcastDataInfoAsyncValue.when(
                         loading: () => PodcastCardPlaceholder(),
@@ -409,9 +406,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
 
                           podcast.author = podcastInfoData['author'];
 
-                          return PodcastCardList(
-                            podcastItem: podcast,
-                          );
+                          return PodcastCardList(podcastItem: podcast);
                         },
                       );
                     },

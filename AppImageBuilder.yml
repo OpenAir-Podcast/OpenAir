@@ -1,23 +1,22 @@
 # appimage-builder recipe see https://appimage-builder.readthedocs.io for details
 version: 1
 AppDir:
-  path: /home/jennings/Documents/GitHub/openair/AppDir
+  path: /home/jennings/Documents/GitHub/openair/build/linux/x64/release/bundle/
   app_info:
     id: org.openair.podcast
     name: OpenAir
     icon: openair
-    version: 0.13.32
+    version: 0.14.46
     exec: OpenAir
     exec_args: $@
   files:
-    include:
-    - lib64/ld-linux-x86-64.so.2
+    include: []
     exclude:
-    - usr/share/man
-    - usr/share/doc/*/README.*
-    - usr/share/doc/*/changelog.*
-    - usr/share/doc/*/NEWS.*
-    - usr/share/doc/*/TODO.*
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+      - usr/share/doc/*/TODO.*
   test:
     fedora-30:
       image: appimagecrafters/tests-env:fedora-30
@@ -36,5 +35,6 @@ AppDir:
       command: ./AppRun
 AppImage:
   arch: x86_64
-  update-information: Refactor DownloadModel author field to non-nullable and update
-    related code; remove unused web assets and update version in configuration files
+  update-information:
+    fix scaling issues for podcast card and narrow view in category
+    not loading podcasts
