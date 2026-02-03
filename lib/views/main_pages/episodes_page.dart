@@ -192,8 +192,9 @@ class _EpisodesPageState extends ConsumerState<EpisodesPage> {
                             int dynamicCrossAxisCount =
                                 (constraints.maxWidth / targetCardWidth)
                                     .floor();
-                            if (dynamicCrossAxisCount < 1)
+                            if (dynamicCrossAxisCount < 1) {
                               dynamicCrossAxisCount = 1;
+                            }
 
                             return GridView.builder(
                               gridDelegate:

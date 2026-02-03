@@ -70,6 +70,11 @@ add_executable(${BINARY_NAME}
 # that need different build settings.
 apply_standard_settings(${BINARY_NAME})
 
+# Add this to suppress the deprecated literal operator warning in dependencies
+if(LINUX)
+  add_definitions(-Wno-error=deprecated-literal-operator)
+endif()
+
 # Add dependency libraries. Add any application-specific dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
