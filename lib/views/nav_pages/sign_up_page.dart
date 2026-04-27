@@ -469,6 +469,15 @@ class _SignUpState extends ConsumerState<SignUp> {
                                     }
                                   }
                                 }
+
+                                if (context.mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AccountPage(),
+                                    ),
+                                  );
+                                }
                               } on AuthException catch (e) {
                                 if (context.mounted) {
                                   if (!Platform.isAndroid && !Platform.isIOS) {
