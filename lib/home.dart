@@ -45,15 +45,18 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   }
 
   void _onPageSelected(Widget page) {
-    int index = 0;
+    // Check if it's a tab page
     if (page is FeaturedPage) {
-      index = 0;
+      _tabController.animateTo(0);
     } else if (page is TrendingPage) {
-      index = 1;
+      _tabController.animateTo(1);
     } else if (page is CategoriesPage) {
-      index = 2;
+      _tabController.animateTo(2);
+    } else {
+      // Non-tab page - navigate normally
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
+      return;
     }
-    _tabController.animateTo(index);
     setState(() {});
   }
 
