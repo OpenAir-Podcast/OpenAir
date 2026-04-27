@@ -23,12 +23,10 @@ final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
     return episodes.toString();
   }
 
-  // Watch hiveServiceProvider as subscription counts depend on Hive data
   return await ref.read(openAirProvider).getAccumulatedSubscriptionCount();
 });
 
 final feedCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  // Watch hiveServiceProvider as feed counts depend on Hive data
   return await ref.read(openAirProvider).getFeedsCount();
 });
 
@@ -37,12 +35,10 @@ final inboxCountProvider = FutureProvider.autoDispose<int>((ref) async {
 });
 
 final queueCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  // Watch hiveServiceProvider as queue counts depend on Hive data
   return await ref.read(openAirProvider).getQueueCount();
 });
 
 final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
-  // Watch hiveServiceProvider as queue counts depend on Hive data
   return await ref.read(openAirProvider).getDownloadsCount();
 });
 
@@ -61,12 +57,11 @@ class ListDrawer extends ConsumerStatefulWidget {
 class _ListDrawerState extends ConsumerState<ListDrawer> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<String> getSubCountValue = ref.watch(subCountProvider);
-    final AsyncValue<String> getFeedsCountValue = ref.watch(feedCountProvider);
-    final AsyncValue<int> getInboxCountValue = ref.watch(inboxCountProvider);
-    final AsyncValue<String> getQueueCountValue = ref.watch(queueCountProvider);
-    final AsyncValue<int> getDownloadsCountValue =
-        ref.watch(downloadsCountProvider);
+    final getSubCountValue = ref.watch(subCountProvider);
+    final getFeedsCountValue = ref.watch(feedCountProvider);
+    final getInboxCountValue = ref.watch(inboxCountProvider);
+    final getQueueCountValue = ref.watch(queueCountProvider);
+    final getDownloadsCountValue = ref.watch(downloadsCountProvider);
 
     final supabaseService = ref.watch(supabaseServiceProvider);
     final session = supabaseService.client.auth.currentUser;
@@ -95,7 +90,6 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                     onPressed: () {
                       if (session == null) {
                         Navigator.pop(context);
-
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const LogIn(),
@@ -122,8 +116,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
           ),
           Expanded(
             child: ListView(
+              padding: EdgeInsets.zero,
               children: [
-                // Home button
                 ListTile(
                   leading: const Icon(Icons.home_rounded),
                   title: Text(Translations.of(context).text('home')),
@@ -133,256 +127,133 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   },
                 ),
                 const Divider(),
-                // Subscribed button
-                getSubCountValue.when(
-                  loading: () {
-                    return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
-                      title:
-                          Text(Translations.of(context).text('subscriptions')),
-                      trailing: const Text('...'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => SubscriptionsPage()),
-                        );
-                      },
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
-                      title:
-                          Text(Translations.of(context).text('subscriptions')),
-                      trailing: ElevatedButton(
-                        child: const Text('Retry'),
-                        onPressed: () => ref.invalidate(subCountProvider),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => SubscriptionsPage()),
-                        );
-                      },
-                    );
-                  },
-                  data: (String data) {
-                    return ListTile(
-                      leading: const Icon(Icons.subscriptions_rounded),
-                      title:
-                          Text(Translations.of(context).text('subscriptions')),
-                      trailing: Text(data),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => SubscriptionsPage()),
-                        );
-                      },
-                    );
-                  },
+                _buildCountTile(
+                  context,
+                  Icons.subscriptions_rounded,
+                  Translations.of(context).text('subscriptions'),
+                  getSubCountValue,
+                  () => _navigateTo(const SubscriptionsPage()),
                 ),
                 const Divider(),
-                // Feeds button
-                getFeedsCountValue.when(
-                  loading: () {
-                    return ListTile(
-                      leading: const Icon(Icons.feed_rounded),
-                      title: Text(Translations.of(context).text('feeds')),
-                      trailing: const Text('...'),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return ListTile(
-                      leading: const Icon(Icons.feed_rounded),
-                      title: Text(Translations.of(context).text('feeds')),
-                      trailing: ElevatedButton(
-                        child: const Text('Retry'),
-                        onPressed: () => ref.invalidate(feedCountProvider),
-                      ),
-                    );
-                  },
-                  data: (String data) {
-                    return ListTile(
-                      leading: const Icon(Icons.feed_rounded),
-                      title: Text(Translations.of(context).text('feeds')),
-                      trailing: Text(data),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => FeedsPage()),
-                        );
-                      },
-                    );
-                  },
+                _buildCountTile(
+                  context,
+                  Icons.feed_rounded,
+                  Translations.of(context).text('feeds'),
+                  getFeedsCountValue,
+                  () => _navigateTo(const FeedsPage()),
                 ),
                 const Divider(),
-                // Inbox
-                getInboxCountValue.when(
-                  loading: () {
-                    return ListTile(
-                      leading: const Icon(Icons.inbox_rounded),
-                      title: Text(Translations.of(context).text('inbox')),
-                      trailing: const Text('...'),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return ListTile(
-                      leading: const Icon(Icons.inbox_rounded),
-                      title: Text(Translations.of(context).text('inbox')),
-                      trailing: ElevatedButton(
-                        child: const Text('Retry'),
-                        onPressed: () => ref.invalidate(inboxCountProvider),
-                      ),
-                    );
-                  },
-                  data: (int data) {
-                    return ListTile(
-                      leading: const Icon(Icons.inbox_rounded),
-                      title: Text(Translations.of(context).text('inbox')),
-                      trailing: Text('$data'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => InboxPage()),
-                        );
-                      },
-                    );
-                  },
+                _buildCountTile(
+                  context,
+                  Icons.inbox_rounded,
+                  Translations.of(context).text('inbox'),
+                  getInboxCountValue,
+                  () => _navigateTo(const InboxPage()),
                 ),
                 const Divider(),
-                // Favourite
+                _buildCountTile(
+                  context,
+                  Icons.queue_rounded,
+                  Translations.of(context).text('queue'),
+                  getQueueCountValue,
+                  () => _navigateTo(const QueuePage()),
+                ),
+                const Divider(),
+                _buildCountTile(
+                  context,
+                  Icons.download_rounded,
+                  Translations.of(context).text('downloads'),
+                  getDownloadsCountValue,
+                  () => _navigateTo(const DownloadsPage()),
+                ),
+                const Divider(),
                 ListTile(
                   leading: const Icon(Icons.favorite_rounded),
                   title: Text(Translations.of(context).text('favorites')),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => FavoritesPage()),
-                    );
-                  },
-                ),
-
-                const Divider(),
-                // Queue button
-                getQueueCountValue.when(
-                  loading: () {
-                    return ListTile(
-                      leading: const Icon(Icons.queue_music_rounded),
-                      title: Text(Translations.of(context).text('queue')),
-                      trailing: const Text('...'),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return ListTile(
-                      leading: const Icon(Icons.queue_music_rounded),
-                      title: Text(Translations.of(context).text('queue')),
-                      trailing: ElevatedButton(
-                        child: const Text('Retry'),
-                        onPressed: () => ref.invalidate(queueCountProvider),
-                      ),
-                    );
-                  },
-                  data: (String data) {
-                    return ListTile(
-                      leading: const Icon(Icons.queue_music_rounded),
-                      title: Text(Translations.of(context).text('queue')),
-                      trailing: Text(data),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => QueuePage()),
-                        );
-                      },
-                    );
-                  },
+                  onTap: () => _navigateTo(const FavoritesPage()),
                 ),
                 const Divider(),
-                // Downloads button
-                getDownloadsCountValue.when(
-                  loading: () {
-                    return ListTile(
-                      leading: const Icon(Icons.download_rounded),
-                      title: Text(Translations.of(context).text('downloads')),
-                      trailing: const Text('...'),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return ListTile(
-                      leading: const Icon(Icons.download_rounded),
-                      title: Text(Translations.of(context).text('downloads')),
-                      trailing: ElevatedButton(
-                        child: const Text('Retry'),
-                        onPressed: () => ref.invalidate(queueCountProvider),
-                      ),
-                    );
-                  },
-                  data: (int data) {
-                    return ListTile(
-                      leading: const Icon(Icons.download_rounded),
-                      title: Text(Translations.of(context).text('downloads')),
-                      trailing: Text(data.toString()),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => DownloadsPage()),
-                        );
-                      },
-                    );
-                  },
-                ),
-                const Divider(),
-                // History button
                 ListTile(
                   leading: const Icon(Icons.history_rounded),
                   title: Text(Translations.of(context).text('history')),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => HistoryPage()),
-                    );
-                  },
+                  onTap: () => _navigateTo(const HistoryPage()),
                 ),
                 const Divider(),
-                // Settings button
                 ListTile(
                   leading: const Icon(Icons.add_rounded),
                   title: Text(Translations.of(context).text('addPodcast')),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => AddPodcastPage()),
-                    );
-                  },
+                  onTap: () => _navigateTo(const AddPodcastPage()),
                 ),
+                const Divider(),
+                const ListDrawerSettings(),
               ],
             ),
           ),
-          const Divider(),
-          // Settings button
-          ListTile(
-            leading: const Icon(Icons.settings_rounded),
-            title: Text(Translations.of(context).text('settings')),
-            onTap: () {
-              // Navigator.pop(context);
-              Navigator.of(context)
-                  .push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      Settings(functionBuild: widget.languageChanged),
-                ),
-              )
-                  .then((_) {
-                if (context.mounted) Navigator.pop(context);
-                widget.languageChanged();
-              });
-            },
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCountTile(
+    BuildContext context,
+    IconData icon,
+    String title,
+    AsyncValue<dynamic> countValue,
+    VoidCallback onTap,
+  ) {
+    return countValue.when(
+      loading: () => ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      error: (error, _) => ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: const Icon(Icons.error_outline, color: Colors.red),
+        onTap: onTap,
+      ),
+      data: (data) => ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: Text(
+          data.toString(),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  void _navigateTo(Widget page) {
+    Navigator.pop(context);
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
+  }
+}
+
+class ListDrawerSettings extends ConsumerWidget {
+  const ListDrawerSettings({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      leading: const Icon(Icons.settings_rounded),
+      title: Text(Translations.of(context).text('settings')),
+      onTap: () => _navigateToSettings(context),
+    );
+  }
+
+  void _navigateToSettings(BuildContext context) {
+    Navigator.pop(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => Settings(functionBuild: () {})),
     );
   }
 }
