@@ -14,6 +14,14 @@ import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:theme_provider/theme_provider.dart';
 
+const _featuredApiKeys = {
+  'Top Podcasts': 'top',
+  'Education': 'education',
+  'Health': 'health',
+  'Technology': 'technology',
+  'Sports': 'sports',
+};
+
 final podcastDataByTopProvider = FutureProvider<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.watch(openAirProvider).hiveService.getTopFeaturedPodcast();
@@ -331,11 +339,14 @@ class PodcastsCard extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {
-                        if (title ==
-                            Translations.of(context).text('topPodcasts')) {
-                          return TopPodcastsPage();
+                        final apiKey = _featuredApiKeys[title];
+                        if (apiKey == 'top') {
+                          return const TopPodcastsPage();
                         } else {
-                          return CategoryPage(category: title);
+                          return CategoryPage(
+                            category: title,
+                            apiKey: apiKey ?? title.toLowerCase(),
+                          );
                         }
                       },
                     ),
