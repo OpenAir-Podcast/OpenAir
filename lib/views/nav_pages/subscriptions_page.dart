@@ -16,8 +16,8 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
-  // Watch hiveServiceProvider as subscription data comes from Hive
+final subscriptionsProvider =
+    FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
   ref.watch(openAirProvider).hiveService;
   return await ref.read(openAirProvider).getSubscriptions();
 });
