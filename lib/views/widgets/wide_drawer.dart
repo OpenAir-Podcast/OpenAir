@@ -14,6 +14,7 @@ import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
 import 'package:openair/views/nav_pages/sign_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
+import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
 final getSessionProvider = FutureProvider.autoDispose((ref) async {
@@ -112,7 +113,7 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                 leading: const Icon(Icons.home_rounded),
                 title: Text(Translations.of(context).text('home')),
                 onTap: () {
-                  widget.onPageSelected(Text('home'));
+                  widget.onPageSelected(const FeaturedPage());
                 },
               ),
               const Divider(),

@@ -25,11 +25,47 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   late TabController _tabController;
+  String _pageTitle = 'openAir';
+
+  static const _titles = ['openAir', 'trending', 'categories'];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) {
+      setState(() {
+        _pageTitle = _titles[_tabController.index];
+      });
+    }
+  }
+
+  void _onPageSelected(Widget page) {
+    int index = 0;
+    if (page is FeaturedPage) {
+      index = 0;
+    } else if (page is TrendingPage) {
+      index = 1;
+    } else if (page is CategoriesPage) {
+      index = 2;
+    }
+    _tabController.animateTo(index);
+    setState(() {});
+  }
+
+  void _rebuildDrawer() {
+    setState(() {});
+  }
+
+  String _getTitle() {
+    if (_pageTitle == 'openAir') {
+      return Translations.of(context).text('openAir');
+    }
+    return Translations.of(context).text(_pageTitle);
   }
 
   @override
@@ -72,14 +108,49 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
             shape:
                 const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             child: WideDrawer(
-              onPageSelected: (_) {},
-              rebuildDrawer: () {},
+              onPageSelected: _onPageSelected,
+              rebuildDrawer: _rebuildDrawer,
             ),
           ),
         ),
         Expanded(
           flex: 5,
-          child: _buildMainContent(null),
+          child: Scaffold(
+            appBar: AppBar(
+              elevation: 4.0,
+              shadowColor: Colors.grey,
+              title: Text(_getTitle()),
+              actions: [
+                IconButton(
+                  tooltip: Translations.of(context).text('search'),
+                  onPressed: () => _navigateToSearch(),
+                  icon: const Icon(Icons.search_rounded),
+                ),
+                IconButton(
+                  tooltip: Translations.of(context).text('refresh'),
+                  onPressed: () => _onRefresh(),
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
+              ],
+              bottom: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(icon: Icon(Icons.home_rounded)),
+                  Tab(icon: Icon(Icons.trending_up_rounded)),
+                  Tab(icon: Icon(Icons.category_rounded)),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: const [
+                FeaturedPage(),
+                TrendingPage(),
+                CategoriesPage(),
+              ],
+            ),
+            drawer: null,
+          ),
         ),
       ],
     );
@@ -100,7 +171,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
       appBar: AppBar(
         elevation: 4.0,
         shadowColor: Colors.grey,
-        title: Text(Translations.of(context).text('openAir')),
+        title: Text(_getTitle()),
         actions: [
           IconButton(
             tooltip: Translations.of(context).text('search'),
