@@ -71,6 +71,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         return EpisodeCardGrid(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
+                          imageUrl: podcastData.imageUrl,
                           podcast: PodcastModel(
                             id: podcastData.id,
                             title: podcastData.title,

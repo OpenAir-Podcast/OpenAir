@@ -133,6 +133,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
                         return EpisodeCardGrid(
                           title: data[index].title,
                           aurthor: data[index].author,
+                          imageUrl: data[index].image,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
                         );
