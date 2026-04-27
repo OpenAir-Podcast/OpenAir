@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,74 +59,30 @@ class EpisodesPage extends ConsumerWidget {
     Map episodesData,
     Map? podcastInfo,
   ) {
-    final imageUrl = podcast.imageUrl.isNotEmpty
-        ? podcast.imageUrl
-        : podcastInfo?['image'] ?? '';
-
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                podcast.title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
-                ),
-              ),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (imageUrl.isNotEmpty)
-                    CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => Container(
-                        color: Theme.of(context).primaryColor,
-                        child: const Icon(Icons.podcasts, size: 64),
-                      ),
-                    )
-                  else
-                    Container(
-                      color: Theme.of(context).primaryColor,
-                      child: const Icon(Icons.podcasts, size: 64),
-                    ),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black54],
-                      ),
-                    ),
+      appBar: AppBar(
+        title: Text(podcast.title),
+        actions: [
+          IconButton(
+            tooltip: Translations.of(context).text('podcastDetails'),
+            onPressed: () {
+              if (podcastInfo != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PodcastInfoPage(podcastInfo: podcastInfo),
                   ),
-                ],
-              ),
-            ),
-            actions: [
-              IconButton(
-                tooltip: Translations.of(context).text('podcastDetails'),
-                onPressed: () {
-                  if (podcastInfo != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            PodcastInfoPage(podcastInfo: podcastInfo),
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.info_outline_rounded),
-              ),
-              _SubscribeButton(podcast: podcast),
-            ],
+                );
+              }
+            },
+            icon: const Icon(Icons.info_outline_rounded),
           ),
-          _buildEpisodeList(context, ref, episodesData, podcastInfo),
+          _SubscribeButton(podcast: podcast),
         ],
+      ),
+      body: CustomScrollView(
+        slivers: [_buildEpisodeList(context, ref, episodesData, podcastInfo)],
       ),
       bottomNavigationBar: _buildBottomNav(context, ref),
     );
