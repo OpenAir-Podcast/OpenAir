@@ -96,7 +96,6 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => AddPodcastPage()),
                 );
-
               },
               icon: const Icon(Icons.search_rounded),
             ),
@@ -121,7 +120,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
                     await ref
                         .watch(hiveServiceProvider)
                         .removeAllTrendingPodcast();
-                    ref.invalidate(podcastDataByTrendingProvider);
+                    ref.invalidate(trendingDataProvider);
                     break;
                 }
 
