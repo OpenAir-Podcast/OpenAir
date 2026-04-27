@@ -38,7 +38,8 @@ class WideDrawer extends ConsumerStatefulWidget {
 
 class __WideDrawerState extends ConsumerState<WideDrawer> {
   void returnFromSignin() {
-    widget.onPageSelected(const Text('home'));
+    Navigator.of(context).pop();
+    widget.onPageSelected(const FeaturedPage());
     ref.invalidate(getSessionProvider);
     widget.rebuildDrawer();
   }
