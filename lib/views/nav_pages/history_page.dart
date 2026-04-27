@@ -151,6 +151,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                         return EpisodeCardGrid(
                           title: data[index].title,
                           aurthor: data[index].author!,
+                          imageUrl: data[index].image,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
                         );

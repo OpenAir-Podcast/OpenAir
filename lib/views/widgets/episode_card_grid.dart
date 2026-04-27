@@ -23,6 +23,7 @@ class EpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
   final String aurthor;
+  final String imageUrl;
   final PodcastModel podcast;
 
   const EpisodeCardGrid({
@@ -30,6 +31,7 @@ class EpisodeCardGrid extends ConsumerStatefulWidget {
     required this.episodeItem,
     required this.title,
     required this.aurthor,
+    required this.imageUrl,
     required this.podcast,
   });
 
@@ -93,9 +95,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                       child: CachedNetworkImage(
                         memCacheHeight: 62,
                         memCacheWidth: 62,
-                        imageUrl: widget.episodeItem['image'] ??
-                            widget.episodeItem['feedImage'] ??
-                            widget.podcast.imageUrl,
+                        imageUrl: widget.imageUrl,
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(
                           Icons.error,
@@ -472,12 +472,6 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                 ),
                                 onPressed: null),
                           ),
-                        // TODO: On PC, replace the share and like icons with more options icon because the btn bar overflow the card
-                        IconButton(
-                          tooltip: Translations.of(context).text('share'),
-                          onPressed: () => ref.watch(openAirProvider).share(),
-                          icon: const Icon(Icons.share_rounded),
-                        ),
                         favoriteListAsync.when(
                           data: (data) {
                             isFavorite =
