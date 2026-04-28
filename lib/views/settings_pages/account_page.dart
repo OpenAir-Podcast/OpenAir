@@ -306,7 +306,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             ),
                     ),
                     const SizedBox(height: 24),
-                    Row(
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
