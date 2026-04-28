@@ -53,7 +53,7 @@ class SupabaseService {
     return client.auth.signOut(scope: SignOutScope.global);
   }
 
-  logInUsingGoogle() async {
+  Future<void> logInUsingGoogle() async {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
@@ -71,7 +71,7 @@ class SupabaseService {
     }
   }
 
-  logInUsingGithub() async {
+  Future<void> logInUsingGithub() async {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.github,
