@@ -90,9 +90,11 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
 
   bool _isWideScreen(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
+    
     if (Platform.isAndroid || Platform.isIOS) {
       return width >= wideScreenMinWidth;
     }
+    
     return width > 630.0 ||
         Platform.isLinux ||
         Platform.isMacOS ||
