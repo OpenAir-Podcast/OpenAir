@@ -62,15 +62,6 @@ class _TrendingView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(Translations.of(context).text('trending')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(trendingDataProvider),
-          ),
-        ],
-      ),
       body: data.count == 0
           ? Center(
               child: Column(
