@@ -20,24 +20,22 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Translations.support(
-    [
-      Localization.ar_AE, // Arabic (UAE)
-      Localization.de_DE, // Germany
-      Localization.es_ES, // Spain
-      Localization.en_US, // United States
-      Localization.fr_FR, // France
-      Localization.he_IL, // Israel
-      Localization.it_IT, // Italy
-      Localization.ja_JP, // Japan
-      Localization.ko_KR, // South Korea
-      Localization.nl_NL, // Netherlands
-      Localization.pt_PT, // Portugal
-      Localization.ru_RU, // Russia
-      Localization.sv_SE, // Sweden
-      Localization.zh_CN, // China
-    ],
-  );
+  Translations.support([
+    Localization.ar_AE,
+    Localization.de_DE,
+    Localization.es_ES,
+    Localization.en_US,
+    Localization.fr_FR,
+    Localization.he_IL,
+    Localization.it_IT,
+    Localization.ja_JP,
+    Localization.ko_KR,
+    Localization.nl_NL,
+    Localization.pt_PT,
+    Localization.ru_RU,
+    Localization.sv_SE,
+    Localization.zh_CN,
+  ]);
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
@@ -58,7 +56,6 @@ void main() async {
   }
 
   try {
-    // Load the .env file
     await dotenv.load(fileName: '.env');
   } on FileNotFoundError catch (_, e) {
     debugPrint('Error loading .env file: $e');
@@ -88,13 +85,10 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // We only want to run initialization once.
     _initialization ??= _initApp();
   }
 
-  /// Initializes all necessary app services.
   Future<void> _initApp() async {
-    // Now initialize the main provider which needs context.
     if (mounted) await ref.read(openAirProvider).initial(context);
     if (mounted) await ref.read(audioProvider).initAudio(context);
     if (mounted) await ref.read(notificationProvider).init(context);
@@ -102,189 +96,276 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    return ThemeProvider(
+      defaultThemeId: 'blue_accent_light_extra_large',
+      saveThemesOnChange: true,
+      loadThemeOnInit: true,
+      themes: [
+        AppTheme(
+          id: "blue_accent_light_small",
+          description: "Light theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+            primaryColor: primaryColorLight,
+            appBarTheme: appBarThemeLight,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorLight,
+            colorScheme: colorSchemeLight,
+            textTheme: scaleTextTheme(baseTextTheme, 0.8),
+            snackBarTheme: snackBarThemeLight,
+            listTileTheme: listTileThemeLight,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_light_medium",
+          description: "Light theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+            primaryColor: primaryColorLight,
+            appBarTheme: appBarThemeLight,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorLight,
+            colorScheme: colorSchemeLight,
+            textTheme: scaleTextTheme(baseTextTheme, 1.0),
+            snackBarTheme: snackBarThemeLight,
+            listTileTheme: listTileThemeLight,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_light_large",
+          description: "Light theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+            primaryColor: primaryColorLight,
+            appBarTheme: appBarThemeLight,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorLight,
+            colorScheme: colorSchemeLight,
+            textTheme: scaleTextTheme(baseTextTheme, 1.2),
+            snackBarTheme: snackBarThemeLight,
+            listTileTheme: listTileThemeLight,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_light_extra_large",
+          description: "Light theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: scaffoldBackgroundColorLight,
+            primaryColor: primaryColorLight,
+            appBarTheme: appBarThemeLight,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorLight,
+            colorScheme: colorSchemeLight,
+            textTheme: scaleTextTheme(baseTextTheme, 1.4),
+            snackBarTheme: snackBarThemeLight,
+            listTileTheme: listTileThemeLight,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_dark_small",
+          description: "Dark theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+            primaryColor: primaryColorDark,
+            appBarTheme: appBarThemeDark,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorDark,
+            colorScheme: colorSchemeDark,
+            textTheme: scaleTextTheme(baseTextTheme, 0.8),
+            snackBarTheme: snackBarThemeDark,
+            listTileTheme: listTileThemeDark,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_dark_medium",
+          description: "Dark theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+            primaryColor: primaryColorDark,
+            appBarTheme: appBarThemeDark,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorDark,
+            colorScheme: colorSchemeDark,
+            textTheme: scaleTextTheme(baseTextTheme, 1.0),
+            snackBarTheme: snackBarThemeDark,
+            listTileTheme: listTileThemeDark,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_dark_large",
+          description: "Dark theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+            primaryColor: primaryColorDark,
+            appBarTheme: appBarThemeDark,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorDark,
+            colorScheme: colorSchemeDark,
+            textTheme: scaleTextTheme(baseTextTheme, 1.2),
+            snackBarTheme: snackBarThemeDark,
+            listTileTheme: listTileThemeDark,
+          ),
+        ),
+        AppTheme(
+          id: "blue_accent_dark_extra_large",
+          description: "Dark theme with blue accent",
+          data: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: scaffoldBackgroundColorDark,
+            primaryColor: primaryColorDark,
+            appBarTheme: appBarThemeDark,
+            floatingActionButtonTheme: floatingActionButtonTheme,
+            cardColor: cardColorDark,
+            colorScheme: colorSchemeDark,
+            textTheme: scaleTextTheme(baseTextTheme, 1.4),
+            snackBarTheme: snackBarThemeDark,
+            listTileTheme: listTileThemeDark,
+          ),
+        ),
+      ],
+      child: ThemeConsumer(
+        child: Builder(
+          builder: (themeContext) {
+            final themeData = ThemeProvider.themeOf(themeContext).data;
+
+            return _AppHome(
+              initialization: _initialization,
+              themeData: themeData,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _AppHome extends ConsumerStatefulWidget {
+  final Future<void>? initialization;
+  final ThemeData themeData;
+
+  const _AppHome({
+    this.initialization,
+    required this.themeData,
+  });
+
+  @override
+  ConsumerState<_AppHome> createState() => _AppHomeState();
+}
+
+class _AppHomeState extends ConsumerState<_AppHome>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  bool _minDelayPassed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+    
+    _controller.forward();
+
+    // Minimum 2 second delay
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() => _minDelayPassed = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _initialization,
-        builder: (context, snapshot) {
-          return ThemeProvider(
-            defaultThemeId: 'blue_accent_light_extra_large',
-            saveThemesOnChange: true,
-            loadThemeOnInit: true,
-            themes: [
-              // Light Theme
-              AppTheme(
-                id: "blue_accent_light_small",
-                description: "Light theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.light,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
-                  primaryColor: primaryColorLight,
-                  appBarTheme: appBarThemeLight,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorLight,
-                  colorScheme: colorSchemeLight,
-                  textTheme: scaleTextTheme(baseTextTheme, 0.8),
-                  snackBarTheme: snackBarThemeLight,
-                  listTileTheme: listTileThemeLight,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_light_medium",
-                description: "Light theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.light,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
-                  primaryColor: primaryColorLight,
-                  appBarTheme: appBarThemeLight,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorLight,
-                  colorScheme: colorSchemeLight,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.0),
-                  snackBarTheme: snackBarThemeLight,
-                  listTileTheme: listTileThemeLight,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_light_large",
-                description: "Light theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.light,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
-                  primaryColor: primaryColorLight,
-                  appBarTheme: appBarThemeLight,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorLight,
-                  colorScheme: colorSchemeLight,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.2),
-                  snackBarTheme: snackBarThemeLight,
-                  listTileTheme: listTileThemeLight,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_light_extra_large",
-                description: "Light theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.light,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorLight,
-                  primaryColor: primaryColorLight,
-                  appBarTheme: appBarThemeLight,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorLight,
-                  colorScheme: colorSchemeLight,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.4),
-                  snackBarTheme: snackBarThemeLight,
-                  listTileTheme: listTileThemeLight,
-                ),
-              ),
-              // Dark Theme
-              AppTheme(
-                id: "blue_accent_dark_small",
-                description: "Dark theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
-                  primaryColor: primaryColorDark,
-                  appBarTheme: appBarThemeDark,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorDark,
-                  colorScheme: colorSchemeDark,
-                  textTheme: scaleTextTheme(baseTextTheme, 0.8),
-                  snackBarTheme: snackBarThemeDark,
-                  listTileTheme: listTileThemeDark,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_dark_medium",
-                description: "Dark theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
-                  primaryColor: primaryColorDark,
-                  appBarTheme: appBarThemeDark,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorDark,
-                  colorScheme: colorSchemeDark,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.0),
-                  snackBarTheme: snackBarThemeDark,
-                  listTileTheme: listTileThemeDark,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_dark_large",
-                description: "Dark theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
-                  primaryColor: primaryColorDark,
-                  appBarTheme: appBarThemeDark,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorDark,
-                  colorScheme: colorSchemeDark,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.2),
-                  snackBarTheme: snackBarThemeDark,
-                  listTileTheme: listTileThemeDark,
-                ),
-              ),
-              AppTheme(
-                id: "blue_accent_dark_extra_large",
-                description: "Dark theme with blue accent",
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  scaffoldBackgroundColor: scaffoldBackgroundColorDark,
-                  primaryColor: primaryColorDark,
-                  appBarTheme: appBarThemeDark,
-                  floatingActionButtonTheme: floatingActionButtonTheme,
-                  cardColor: cardColorDark,
-                  colorScheme: colorSchemeDark,
-                  textTheme: scaleTextTheme(baseTextTheme, 1.4),
-                  snackBarTheme: snackBarThemeDark,
-                  listTileTheme: listTileThemeDark,
-                ),
-              ),
-            ],
-            child: ThemeConsumer(
-              child: Builder(
-                builder: (themeContext) {
-                  final themeData = ThemeProvider.themeOf(themeContext).data;
+      future: widget.initialization,
+      builder: (context, snapshot) {
+        final initDone = snapshot.connectionState == ConnectionState.done;
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return MaterialApp(
-                      locale: const Locale('en', 'US'),
-                      supportedLocales: Translations.supportedLocales,
-                      localizationsDelegates: const [
-                        LocalizationsPlusDelegate(),
-                        FallbackCupertinoLocalizationsDelegate()
-                      ],
-                      debugShowCheckedModeBanner: false,
-                      title: 'OpenAir',
-                      theme: themeData,
-                      home: const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      ),
-                    );
-                  }
+        // Show splash while: init not done OR min delay not passed
+        if (!initDone || !_minDelayPassed) {
+          return _buildSplash();
+        }
 
-                  return Consumer(builder: (context, ref, _) {
-                    final locale = ref.watch(localeProvider);
+        // Show Home
+        final locale = ref.watch(localeProvider);
+        return MaterialApp(
+          locale: locale,
+          supportedLocales: Translations.supportedLocales,
+          localizationsDelegates: const [
+            LocalizationsPlusDelegate(),
+            FallbackCupertinoLocalizationsDelegate()
+          ],
+          debugShowCheckedModeBanner: false,
+          title: 'OpenAir',
+          theme: widget.themeData,
+          home: Home(),
+        );
+      },
+    );
+  }
 
-                    return MaterialApp(
-                      locale: locale,
-                      supportedLocales: Translations.supportedLocales,
-                      localizationsDelegates: const [
-                        LocalizationsPlusDelegate(),
-                        FallbackCupertinoLocalizationsDelegate()
-                      ],
-                      debugShowCheckedModeBanner: false,
-                      title: 'OpenAir',
-                      theme: themeData,
-                      home: Home(),
-                    );
-                  },
-                );
-                },
-              ),
+  Widget _buildSplash() {
+    return MaterialApp(
+      locale: const Locale('en', 'US'),
+      supportedLocales: Translations.supportedLocales,
+      localizationsDelegates: const [
+        LocalizationsPlusDelegate(),
+        FallbackCupertinoLocalizationsDelegate()
+      ],
+      debugShowCheckedModeBanner: false,
+      title: 'OpenAir',
+      theme: widget.themeData,
+      home: Scaffold(
+        backgroundColor: widget.themeData.colorScheme.primary,
+        body: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.radio,
+                  size: 100,
+                  color: widget.themeData.colorScheme.onPrimary,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'OpenAir',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: widget.themeData.colorScheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    widget.themeData.colorScheme.onPrimary,
+                  ),
+                ),
+              ],
             ),
-          );
-        },
-      );
+          ),
+        ),
+      ),
+    );
   }
 }
