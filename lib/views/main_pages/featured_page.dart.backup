@@ -131,17 +131,9 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage> {
         final podcastDataAsyncSportsValue =
             ref.watch(podcastDataBySportsProvider);
 
-        // Show loading while any podcast data is loading
-        if (podcastDataAsyncTopValue.isLoading ||
-            podcastDataAsyncEducationValue.isLoading ||
-            podcastDataAsyncHealthValue.isLoading ||
-            podcastDataAsyncTechnologyValue.isLoading ||
-            podcastDataAsyncSportsValue.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
           child: ListView(
             cacheExtent: 1000.0,
             children: [
@@ -187,6 +179,80 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage> {
       error: (error, stackTrace) => NoConnection(),
       loading: () => const Center(
         child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
+
+          final podcastDataAsyncTopValue = ref.watch(podcastDataByTopProvider);
+
+          final podcastDataAsyncEducationValue =
+              ref.watch(podcastDataByEducationProvider);
+
+          final podcastDataAsyncHealthValue =
+              ref.watch(podcastDataByHealthProvider);
+
+          final podcastDataAsyncTechnologyValue =
+              ref.watch(podcastDataByTechnologyProvider);
+
+          final podcastDataAsyncSportsValue =
+              ref.watch(podcastDataBySportsProvider);
+
+          if (podcastDataAsyncTopValue.hasError) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
+            child: ListView(
+              cacheExtent: 1000.0,
+              children: [
+                // Top Podcasts
+                PodcastsCard(
+                  podcastDataAsyncValue: podcastDataAsyncTopValue,
+                  title: Translations.of(context).text('topPodcasts'),
+                  podcastDataProvider: podcastDataByTopProvider,
+                ),
+                SizedBox(width: 0, height: 10),
+                // Education
+                PodcastsCard(
+                  podcastDataAsyncValue: podcastDataAsyncEducationValue,
+                  title: Translations.of(context).text('education'),
+                  podcastDataProvider: podcastDataByEducationProvider,
+                ),
+                SizedBox(width: 0, height: 10),
+                // Health
+                PodcastsCard(
+                  podcastDataAsyncValue: podcastDataAsyncHealthValue,
+                  title: Translations.of(context).text('health'),
+                  podcastDataProvider: podcastDataByHealthProvider,
+                ),
+                SizedBox(width: 0, height: 10),
+                // Technology
+                PodcastsCard(
+                  podcastDataAsyncValue: podcastDataAsyncTechnologyValue,
+                  title: Translations.of(context).text('technology'),
+                  podcastDataProvider: podcastDataByTechnologyProvider,
+                ),
+                SizedBox(width: 0, height: 10),
+                // Sports
+                PodcastsCard(
+                  podcastDataAsyncValue: podcastDataAsyncSportsValue,
+                  title: Translations.of(context).text('sports'),
+                  podcastDataProvider: podcastDataBySportsProvider,
+                ),
+                SizedBox.fromSize(size: const Size(0, 10)),
+              ],
+            ),
+          );
+        },
+        error: (error, stackTrace) => NoConnection(),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }
