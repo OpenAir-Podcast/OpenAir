@@ -103,7 +103,11 @@ class _LogInState extends ConsumerState<LogIn> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(centerTitle: true),
+      appBar: AppBar(
+        title: Text(
+          Translations.of(context).text('openAir'),
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),

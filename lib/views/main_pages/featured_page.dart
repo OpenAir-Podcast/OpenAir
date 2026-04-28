@@ -141,7 +141,7 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage> {
         }
 
         return Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 12.0),
           child: ListView(
             cacheExtent: 1000.0,
             children: [

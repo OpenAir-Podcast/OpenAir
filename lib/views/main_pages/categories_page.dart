@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/category.dart';
@@ -178,9 +177,6 @@ class CategoriesPage extends ConsumerWidget {
     final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(Translations.of(context).text('categories')),
-      ),
       body: isWide
           ? GridView.builder(
               padding: const EdgeInsets.all(8),
