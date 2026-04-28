@@ -10,9 +10,9 @@ import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/history_page.dart';
 import 'package:openair/views/nav_pages/inbox_page.dart';
+import 'package:openair/views/nav_pages/log_in_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
-import 'package:openair/views/nav_pages/sign_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
@@ -83,9 +83,7 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                           return ElevatedButton(
                             onPressed: () {
                               if (session.value == null) {
-                                widget.onPageSelected(SignIn(
-                                  returnFromSignin: returnFromSignin,
-                                ));
+                                widget.onPageSelected(LogIn());
                               } else {
                                 supabaseService.signOut();
                                 ref.invalidate(getSessionProvider);
