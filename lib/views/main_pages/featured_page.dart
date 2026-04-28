@@ -204,184 +204,166 @@ class PodcastsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      color: Theme.of(context).cardColor,
-      elevation: cardElevation ?? 0.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(cardBottomCornersRatio),
-      ),
-      child: podcastDataAsyncValue.when(
-        loading: () => Column(
-          children: [
-            ListTile(
-              leading: Text(title),
-              trailing: Text(Translations.of(context).text('seeAll')),
-            ),
-            SizedBox(
-              height: featuredCardHeight,
-              width: double.infinity,
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                    ? wideItemCount
-                    : narrowItemCount,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.sizeOf(context).width >
-                          wideScreenMinWidth
-                      ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
-                          .clamp(1, wideItemCount)
-                      : narrowItemCount,
-                  mainAxisExtent:
-                      wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                          ? wideMainAxisExtent
-                          : narrowMainAxisExtent,
-                ),
-                itemBuilder: (context, index) {
-                  return Shimmer.fromColors(
-                    baseColor: Theme.of(context).cardColor,
-                    highlightColor: highlightColor!,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        cardSidePadding,
-                        cardTopPadding,
-                        cardSidePadding,
-                        cardTopPadding,
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            color: highlightColor2,
-                            height: cardImageHeight - 14.0,
-                            width: cardImageWidth,
-                          ),
-                          Container(
-                            color: highlightColor,
-                            height: cardLabelHeight - 14.0,
-                            width: cardLabelWidth,
-                          ),
-                          Container(
-                            color: highlightColor,
-                            height: cardLabelHeight - 14.0,
-                            width: cardLabelWidth,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+    return SizedBox(
+      height: featuredCardHeight + cardLabelHeight + 34.0,
+      child: Card(
+        color: Theme.of(context).cardColor,
+        elevation: cardElevation ?? 0.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(cardBottomCornersRatio),
         ),
-        error: (error, stackTrace) => Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 75.0,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              Translations.of(context).text('oopsAnErrorOccurred'),
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              Translations.of(context).text('oopsTryAgainLater'),
-              style: TextStyle(fontSize: 16.0),
-            ),
-            const SizedBox(height: 20.0),
-            SizedBox(
-              width: 180.0,
-              height: 40.0,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onPressed: () async {
-                  ref.invalidate(podcastDataProvider);
-                },
-                child: Text(Translations.of(context).text('retry')),
-              ),
-            ),
-          ],
-        ),
-        data: (snapshot) {
-          return Column(
+        child: podcastDataAsyncValue.when(
+          loading: () => Column(
             children: [
               ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(cardTopCornersRatio),
-                    topRight: Radius.circular(cardTopCornersRatio),
-                  ),
-                ),
-                tileColor: ThemeProvider.themeOf(context).data.primaryColor,
-                leading: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                trailing: Text(
-                  Translations.of(context).text('seeAll'),
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        final apiKey = _featuredApiKeys[title];
-                        if (apiKey == 'top') {
-                          return const TopPodcastsPage();
-                        } else {
-                          return CategoryPage(
-                            category: title,
-                            apiKey: apiKey ?? title.toLowerCase(),
-                          );
-                        }
-                      },
-                    ),
-                  );
-                },
+                leading: Text(title),
+                trailing: Text(Translations.of(context).text('seeAll')),
               ),
               SizedBox(
                 height: featuredCardHeight,
-                width: double.infinity,
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount:
-                      wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                          ? wideItemCount
-                          : narrowItemCount,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: MediaQuery.sizeOf(context).width >
-                            wideScreenMinWidth
-                        ? (MediaQuery.of(context).size.width ~/ cardImageWidth)
-                            .clamp(1, wideItemCount)
-                        : narrowItemCount,
-                    mainAxisExtent:
-                        wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                            ? wideMainAxisExtent
-                            : narrowMainAxisExtent,
-                  ),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  itemCount: 5,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 12),
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        cardSidePadding,
-                        cardTopPadding,
-                        cardSidePadding,
-                        cardTopPadding,
+                    return Shimmer.fromColors(
+                      baseColor: Theme.of(context).cardColor,
+                      highlightColor: highlightColor!,
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: cardImageShadow,
+                                  blurRadius: blurRadius,
+                                )
+                              ],
+                            ),
+                            height: cardImageHeight,
+                            width: cardImageWidth,
+                            color: highlightColor2,
+                          ),
+                          Container(
+                            height: cardLabelHeight,
+                            width: cardLabelWidth,
+                            color: highlightColor,
+                          ),
+                        ],
                       ),
-                      child: GestureDetector(
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          error: (error, stackTrace) => Column(
+            children: [
+              ListTile(
+                leading: Text(title),
+                trailing: Text(Translations.of(context).text('seeAll')),
+              ),
+              SizedBox(
+                height: featuredCardHeight,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 48.0,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 12.0),
+                      Text(
+                        Translations.of(context).text('oopsAnErrorOccurred'),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      SizedBox(
+                        width: 120.0,
+                        height: 36.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onPressed: () async {
+                            ref.invalidate(podcastDataProvider);
+                          },
+                          child: Text(
+                            Translations.of(context).text('retry'),
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          data: (snapshot) {
+            final itemCount =
+                snapshot.feeds.length > 5 ? 5 : snapshot.feeds.length;
+
+            return Column(
+              children: [
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(cardTopCornersRatio),
+                      topRight: Radius.circular(cardTopCornersRatio),
+                    ),
+                  ),
+                  tileColor: ThemeProvider.themeOf(context).data.primaryColor,
+                  leading: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  trailing: Text(
+                    Translations.of(context).text('seeAll'),
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          final apiKey = _featuredApiKeys[title];
+                          if (apiKey == 'top') {
+                            return const TopPodcastsPage();
+                          } else {
+                            return CategoryPage(
+                              category: title,
+                              apiKey: apiKey ?? title.toLowerCase(),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 10.0),
+                SizedBox(
+                  height: featuredCardHeight,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    itemCount: itemCount,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
                         onTap: () {
                           ref.read(audioProvider).currentPodcast =
                               snapshot.feeds[index];
@@ -411,7 +393,6 @@ class PodcastsCard extends ConsumerWidget {
                                 memCacheWidth: cardImageWidth.ceil(),
                                 imageUrl: snapshot.feeds[index].artwork,
                                 fit: BoxFit.cover,
-                                // Responsive error widget using LayoutBuilder
                                 errorWidget: (context, url, error) =>
                                     LayoutBuilder(
                                   builder: (context, constraints) {
@@ -420,7 +401,6 @@ class PodcastsCard extends ConsumerWidget {
                                       alignment: Alignment.center,
                                       child: Icon(
                                         Icons.error,
-                                        // Set size relative to the current container dimensions
                                         size: (constraints.maxWidth <
                                                     constraints.maxHeight
                                                 ? constraints.maxWidth
@@ -460,14 +440,14 @@ class PodcastsCard extends ConsumerWidget {
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
