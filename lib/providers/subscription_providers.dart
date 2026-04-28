@@ -33,3 +33,17 @@ final subscriptionsWithCountsProvider =
 
   return result;
 });
+
+// Provider to check if a podcast is subscribed
+final isSubscribedProvider =
+    FutureProvider.family<bool, String>((ref, title) async {
+  final openAir = ref.watch(openAirProvider);
+  return await openAir.isSubscribed(title);
+});
+
+// Provider to fetch episodes by podcast URL
+final podcastDataByUrlProvider =
+    FutureProvider.family<Map<String, dynamic>, String>((ref, podcastUrl) async {
+  final podcastIndexService = ref.watch(podcastIndexProvider);
+  return await podcastIndexService.getEpisodesByFeedUrl(podcastUrl);
+});
