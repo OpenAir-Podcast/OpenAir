@@ -1219,7 +1219,7 @@ class HiveService {
     return await box.getAllValues();
   }
 
-  updateEpisodePosition(String guid, Duration position) async {
+  Future<void> updateEpisodePosition(String guid, Duration position) async {
     final box = await episodeBox;
     final episode = await box.get(guid);
 
@@ -1229,7 +1229,7 @@ class HiveService {
     }
   }
 
-  markEpisodeAsCompleted(String guid) async {
+  Future<void> markEpisodeAsCompleted(String guid) async {
     final box = await episodeBox;
     final episode = await box.get(guid);
 
