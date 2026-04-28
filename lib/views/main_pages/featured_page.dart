@@ -235,6 +235,7 @@ class PodcastsCard extends ConsumerWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
+                              color: highlightColor2,
                               boxShadow: [
                                 BoxShadow(
                                   color: cardImageShadow,
@@ -244,7 +245,6 @@ class PodcastsCard extends ConsumerWidget {
                             ),
                             height: cardImageHeight,
                             width: cardImageWidth,
-                            color: highlightColor2,
                           ),
                           Container(
                             height: cardLabelHeight,

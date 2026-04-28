@@ -40,7 +40,7 @@ double subscribedWideMainAxisExtent = 250.0;
 int narrowItemCount = 3;
 int wideItemCount = 6;
 
-double featuredCardHeight = 215.0;
+double featuredCardHeight = 200.0;
 
 double cardTopCornersRatio = 12.0;
 double cardBottomCornersRatio = 12.0;
