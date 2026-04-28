@@ -38,10 +38,12 @@ class WideDrawer extends ConsumerStatefulWidget {
 
 class __WideDrawerState extends ConsumerState<WideDrawer> {
   void returnFromSignin() {
-    Navigator.of(context).pop();
-    widget.onPageSelected(const FeaturedPage());
-    ref.invalidate(getSessionProvider);
-    widget.rebuildDrawer();
+    // todo continue from here... need to return the user to the main page after logging in.
+    debugPrint('Returned from SignIn');
+    // Navigator.of(context).pop();
+    // widget.onPageSelected(const FeaturedPage());
+    // ref.invalidate(getSessionProvider);
+    // widget.rebuildDrawer();
   }
 
   @override
