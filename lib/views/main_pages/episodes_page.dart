@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -107,11 +107,13 @@ class EpisodesPage extends ConsumerWidget {
           ),
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              final author =
-                  podcastInfo?['author'] ?? podcast.author ?? 'Unknown';
+              final author = (podcastInfo?['author']?.isNotEmpty == true ||
+                      podcast.author?.isNotEmpty == true)
+                  ? (podcastInfo?['author'] ?? podcast.author!)
+                  : Translations.of(context).text('unknown');
               return EpisodeCardGrid(
                 title: episodesData['items'][index]['title'],
-                aurthor: author,
+                author: author,
                 imageUrl: podcast.imageUrl.isNotEmpty
                     ? podcast.imageUrl
                     : podcastInfo?['image'] ?? '',
@@ -130,8 +132,10 @@ class EpisodesPage extends ConsumerWidget {
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final author =
-                podcastInfo?['author'] ?? podcast.author ?? 'Unknown';
+            final author = (podcastInfo?['author']?.isNotEmpty == true ||
+                    podcast.author?.isNotEmpty == true)
+                ? (podcastInfo?['author'] ?? podcast.author!)
+                : Translations.of(context).text('unknown');
             return EpisodeCardList(
               title: episodesData['items'][index]['title'],
               author: author,

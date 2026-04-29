@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
@@ -90,8 +91,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       );
                     },
                     child: Text(
-                      ref.watch(audioProvider).currentEpisode!['author'] ??
-                          'Unknown',
+                      (ref.watch(audioProvider).currentEpisode!['author']
+                                      as String?)
+                                  ?.isNotEmpty ==
+                              true
+                          ? ref.watch(audioProvider).currentEpisode!['author']
+                          : Translations.of(context).text('unknown'),
                       style: const TextStyle(
                         fontSize: 14.0,
                         color: Colors.grey,

@@ -1,12 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/model/hive_models/fetch_data_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
+import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
-import 'package:openair/views/widgets/podcast_card_list.dart';
 
 final categoryDataProvider = FutureProvider.family
     .autoDispose<FetchDataModel, String>((ref, apiKey) async {
@@ -75,12 +78,12 @@ class CategoryPage extends ConsumerWidget {
 
     if (isWide) {
       return GridView.builder(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 3 / 4,
-          crossAxisSpacing: 4,
-          mainAxisSpacing: 4,
+          maxCrossAxisExtent: 180,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
         cacheExtent: cacheExtent,
         itemCount: data.count,
@@ -90,12 +93,118 @@ class CategoryPage extends ConsumerWidget {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
       cacheExtent: cacheExtent,
       itemCount: data.count,
-      itemBuilder: (context, index) => PodcastCardList(
-        podcastItem: data.feeds[index],
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemBuilder: (context, index) => _PodcastListTile(
+        podcast: data.feeds[index],
+        apiKey: apiKey,
+      ),
+    );
+  }
+}
+
+class _PodcastListTile extends ConsumerWidget {
+  final PodcastModel podcast;
+  final String apiKey;
+
+  const _PodcastListTile({required this.podcast, required this.apiKey});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          ref.read(audioProvider).currentPodcast = podcast;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EpisodesPage(podcast: podcast),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: CachedNetworkImage(
+                  imageUrl: podcast.imageUrl,
+                  height: 64,
+                  width: 64,
+                  memCacheHeight: 128,
+                  memCacheWidth: 128,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => Container(
+                    height: 64,
+                    width: 64,
+                    color: theme.cardColor,
+                    child: const Icon(Icons.podcasts, size: 32),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      podcast.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      podcast.author ??
+                          Translations.of(context).text('unknown'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              FutureBuilder<bool>(
+                future: ref.watch(openAirProvider).isSubscribed(podcast.title),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return const SizedBox.shrink();
+
+                  return IconButton(
+                    icon: Icon(
+                      snapshot.data!
+                          ? Icons.check_circle
+                          : Icons.add_circle_outline,
+                      color: snapshot.data! ? theme.primaryColor : null,
+                    ),
+                    onPressed: () async {
+                      if (snapshot.data!) {
+                        ref.read(audioProvider).unsubscribe(podcast);
+                      } else {
+                        ref.read(audioProvider).subscribe(podcast, context);
+                      }
+                      ref.invalidate(categoryDataProvider(apiKey));
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
