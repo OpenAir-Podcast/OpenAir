@@ -88,7 +88,7 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                 ),
               ),
             ),
-            FutureBuilder(
+            FutureBuilder<bool>(
               future: ref
                   .watch(openAirProvider)
                   .isSubscribed(widget.podcastItem.title),

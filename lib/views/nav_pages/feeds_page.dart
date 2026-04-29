@@ -12,7 +12,7 @@ import 'package:openair/views/widgets/feeds_episode_card_list.dart';
 import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-final getSubscribedEpisodesProvider = FutureProvider.autoDispose((ref) async {
+final getSubscribedEpisodesProvider = FutureProvider.autoDispose<List<Map>>((ref) async {
   return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 

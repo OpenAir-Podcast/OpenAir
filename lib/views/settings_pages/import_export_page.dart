@@ -29,7 +29,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
   late bool automaticExportDatabase;
 
   void importDatabase() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       dialogTitle: Translations.of(context).text('importDatabase'),
       type: FileType.custom,
       allowedExtensions: ['db'],
@@ -66,7 +66,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
 
     if (context.mounted) {
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
           dialogTitle: Translations.of(context).text('exportDatabase'),
           fileName: fileName,
           type: FileType.custom,
@@ -80,7 +80,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
   }
 
   void importOpml() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       dialogTitle: Translations.of(context).text('importOpml'),
       type: FileType.custom,
       allowedExtensions: ['opml', 'xml'],
@@ -101,7 +101,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
 
     if (context.mounted) {
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
         dialogTitle: Translations.of(context).text('exportOpml'),
         fileName: fileName,
         type: FileType.custom,

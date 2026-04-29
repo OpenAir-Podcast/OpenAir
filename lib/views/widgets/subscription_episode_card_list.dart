@@ -307,7 +307,7 @@ class _SubscriptionEpisodeCardListState
                                 loading: () {
                                   // Handle loading by showing previous state's icon, disabled
                                   final previousList =
-                                      queueListAsync.valueOrNull;
+                                      queueListAsync.value;
 
                                   final isQueuedPreviously =
                                       previousList?.containsKey(

@@ -109,7 +109,7 @@ class _FyydSearchCardGridState extends ConsumerState<FyydSearchCardGrid> {
                 ],
               ),
             ),
-            FutureBuilder(
+            FutureBuilder<bool>(
               future: ref.watch(openAirProvider).isSubscribed(podcastMod.title),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

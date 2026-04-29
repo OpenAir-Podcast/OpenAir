@@ -86,7 +86,7 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                 ],
               ),
             ),
-            FutureBuilder(
+            FutureBuilder<bool>(
               future: ref
                   .watch(openAirProvider)
                   .isSubscribed(widget.podcastItem.title),

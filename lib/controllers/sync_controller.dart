@@ -14,7 +14,7 @@ import 'package:openair/providers/supabase_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:convert';
 
-final syncControllerProvider = ChangeNotifierProvider<SyncController>(
+final syncControllerProvider = Provider<SyncController>(
   (ref) => SyncController(ref),
 );
 

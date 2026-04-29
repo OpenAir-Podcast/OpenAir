@@ -4,7 +4,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
-final settingsControllerProvider = ChangeNotifierProvider<SettingsController>(
+final settingsControllerProvider = Provider<SettingsController>(
   (ref) => SettingsController(ref),
 );
 

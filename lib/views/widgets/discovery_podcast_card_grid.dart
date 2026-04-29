@@ -98,7 +98,7 @@ class _DiscoveryPodcastCardGridState
                 ],
               ),
             ),
-            FutureBuilder(
+            FutureBuilder<bool>(
               future: ref.watch(openAirProvider).isSubscribed(podcast.title),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
