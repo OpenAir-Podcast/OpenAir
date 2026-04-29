@@ -12,7 +12,6 @@ import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/main_pages/top_podcasts_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:theme_provider/theme_provider.dart';
 
 const _featuredApiKeys = {
   'Top Podcasts': 'top',
@@ -204,252 +203,242 @@ class PodcastsCard extends ConsumerWidget {
   final String title;
   final FutureProvider<FetchDataModel> podcastDataProvider;
 
+  Widget _buildSectionHeader(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    final apiKey = _featuredApiKeys[title];
+                    if (apiKey == 'top') {
+                      return const TopPodcastsPage();
+                    } else {
+                      return CategoryPage(
+                        category: title,
+                        apiKey: apiKey ?? title.toLowerCase(),
+                      );
+                    }
+                  },
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text(
+                Translations.of(context).text('seeAll'),
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      height: featuredCardHeight + cardLabelHeight + 34.0,
-      child: Card(
-        color: Theme.of(context).cardColor,
-        elevation: cardElevation ?? 0.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cardBottomCornersRatio),
-        ),
-        child: podcastDataAsyncValue.when(
-          loading: () => Column(
-            children: [
-              ListTile(
-                leading: Text(title),
-                trailing: Text(Translations.of(context).text('seeAll')),
-              ),
-              SizedBox(
-                height: featuredCardHeight,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  itemCount: 5,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    return Shimmer.fromColors(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0),
+      child: podcastDataAsyncValue.when(
+        loading: () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(context, ref),
+            SizedBox(
+              height: cardImageHeight + 50.0, // Image + spacing + text
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: 5,
+                separatorBuilder: (context, index) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  return SizedBox(
+                    width: cardImageWidth,
+                    child: Shimmer.fromColors(
                       baseColor: Theme.of(context).cardColor,
-                      highlightColor: highlightColor!,
+                      highlightColor: highlightColor ?? Colors.grey[200]!,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            decoration: BoxDecoration(
-                              color: highlightColor2,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cardImageShadow,
-                                  blurRadius: blurRadius,
-                                )
-                              ],
-                            ),
                             height: cardImageHeight,
                             width: cardImageWidth,
+                            decoration: BoxDecoration(
+                              color: highlightColor2 ?? Colors.grey[400]!,
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
                           ),
+                          const SizedBox(height: 8.0),
                           Container(
-                            height: cardLabelHeight,
-                            width: cardLabelWidth,
-                            color: highlightColor,
+                            height: 14.0,
+                            width: cardImageWidth * 0.8,
+                            decoration: BoxDecoration(
+                              color: highlightColor ?? Colors.grey[200]!,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Container(
+                            height: 14.0,
+                            width: cardImageWidth * 0.5,
+                            decoration: BoxDecoration(
+                              color: highlightColor ?? Colors.grey[200]!,
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        error: (error, stackTrace) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(context, ref),
+            SizedBox(
+              height: cardImageHeight + 50.0,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 40.0,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 12.0),
+                    Text(
+                      Translations.of(context).text('oopsAnErrorOccurred'),
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    SizedBox(
+                      height: 36.0,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        onPressed: () async {
+                          ref.invalidate(podcastDataProvider);
+                        },
+                        child: Text(
+                          Translations.of(context).text('retry'),
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          error: (error, stackTrace) => Column(
+            ),
+          ],
+        ),
+        data: (snapshot) {
+          final itemCount = snapshot.feeds.length > 5 ? 5 : snapshot.feeds.length;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListTile(
-                leading: Text(title),
-                trailing: Text(Translations.of(context).text('seeAll')),
-              ),
+              _buildSectionHeader(context, ref),
               SizedBox(
-                height: featuredCardHeight,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        size: 48.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 12.0),
-                      Text(
-                        Translations.of(context).text('oopsAnErrorOccurred'),
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      SizedBox(
-                        width: 120.0,
-                        height: 36.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
+                height: cardImageHeight + 65.0, // Image + title + small padding
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: itemCount,
+                  separatorBuilder: (context, index) => const SizedBox(width: 16),
+                  itemBuilder: (context, index) {
+                    final feed = snapshot.feeds[index];
+                    return GestureDetector(
+                      onTap: () {
+                        ref.read(audioProvider).currentPodcast = feed;
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => EpisodesPage(podcast: feed),
                           ),
-                          onPressed: () async {
-                            ref.invalidate(podcastDataProvider);
-                          },
-                          child: Text(
-                            Translations.of(context).text('retry'),
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          data: (snapshot) {
-            final itemCount =
-                snapshot.feeds.length > 5 ? 5 : snapshot.feeds.length;
-
-            return Column(
-              children: [
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(cardTopCornersRatio),
-                      topRight: Radius.circular(cardTopCornersRatio),
-                    ),
-                  ),
-                  tileColor: ThemeProvider.themeOf(context).data.primaryColor,
-                  leading: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  trailing: Text(
-                    Translations.of(context).text('seeAll'),
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          final apiKey = _featuredApiKeys[title];
-                          if (apiKey == 'top') {
-                            return const TopPodcastsPage();
-                          } else {
-                            return CategoryPage(
-                              category: title,
-                              apiKey: apiKey ?? title.toLowerCase(),
-                            );
-                          }
-                        },
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: 10.0),
-                SizedBox(
-                  height: featuredCardHeight,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    itemCount: itemCount,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          ref.read(audioProvider).currentPodcast =
-                              snapshot.feeds[index];
-
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EpisodesPage(podcast: snapshot.feeds[index]),
-                            ),
-                          );
-                        },
+                        );
+                      },
+                      child: SizedBox(
+                        width: cardImageWidth,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: cardImageShadow,
-                                    blurRadius: blurRadius,
-                                  )
-                                ],
-                              ),
-                              height: cardImageHeight,
-                              width: cardImageWidth,
-                              child: CachedNetworkImage(
-                                memCacheHeight: cardImageHeight.ceil(),
-                                memCacheWidth: cardImageWidth.ceil(),
-                                imageUrl: snapshot.feeds[index].artwork,
-                                fit: BoxFit.cover,
-                                errorWidget: (context, url, error) =>
-                                    LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    return Container(
-                                      color: Colors.brown,
-                                      alignment: Alignment.center,
-                                      child: Icon(
-                                        Icons.error,
-                                        size: (constraints.maxWidth <
-                                                    constraints.maxHeight
-                                                ? constraints.maxWidth
-                                                : constraints.maxHeight) *
-                                            0.5,
-                                      ),
-                                    );
-                                  },
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: SizedBox(
+                                height: cardImageHeight,
+                                width: cardImageWidth,
+                                child: CachedNetworkImage(
+                                  memCacheHeight: cardImageHeight.ceil(),
+                                  memCacheWidth: cardImageWidth.ceil(),
+                                  imageUrl: feed.artwork,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) => LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return Container(
+                                        color: Colors.brown,
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.error,
+                                          size: (constraints.maxWidth < constraints.maxHeight
+                                                  ? constraints.maxWidth
+                                                  : constraints.maxHeight) *
+                                              0.5,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
-                            Container(
-                              height: cardLabelHeight,
-                              width: cardLabelWidth,
-                              decoration: BoxDecoration(
-                                color: cardLabelBackground,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: cardLabelShadow,
-                                    blurRadius: blurRadius,
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(cardLabelPadding),
-                                child: Text(
-                                  snapshot.feeds[index].title,
-                                  maxLines: cardLabelMaxLines,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: cardLabelTextColor,
-                                    fontSize: cardLabelFontSize,
-                                    fontWeight: cardLabelFontWeight,
-                                  ),
-                                ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              feed.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
