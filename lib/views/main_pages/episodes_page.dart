@@ -27,7 +27,9 @@ class EpisodesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final podcastUrl = ref.watch(audioProvider).currentPodcast!.feedUrl;
+
     final podcastDataAsync = ref.watch(podcastDataByUrlProvider(podcastUrl));
+
     final podcastInfoAsync =
         ref.watch(getPodcastInfoByTitleProvider(podcast.title));
 
