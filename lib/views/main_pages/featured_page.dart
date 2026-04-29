@@ -238,10 +238,6 @@ class PodcastsCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.primaryColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
-        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),

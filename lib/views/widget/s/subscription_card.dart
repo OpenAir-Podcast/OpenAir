@@ -27,8 +27,8 @@ class SubscriptionCard extends ConsumerWidget {
     return subscriptionsWithCounts.when(
       data: (data) {
         final title = subs[index].title;
-        final countData = data[title] ?? {};
-        final newEpisodes = countData['newEpisodes'] as int? ?? 0;
+        final countData = data['counts'] ?? {};
+        final newEpisodes = countData[title] as int? ?? 0;
 
         return GestureDetector(
           onTap: () {
@@ -47,11 +47,10 @@ class SubscriptionCard extends ConsumerWidget {
           child: Column(
             children: [
               // Podcast artwork
-              Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Container(
+              Expanded(
+                child: Stack(
+                  children: [
+                    Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
@@ -64,62 +63,63 @@ class SubscriptionCard extends ConsumerWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          memCacheHeight: 200,
-                          memCacheWidth: 200,
-                          imageUrl: subs[index].artwork,
-                          fit: BoxFit.cover,
-                          errorWidget: (context, url, error) => Container(
-                            color: theme.cardColor,
-                            child: Icon(
-                              Icons.podcasts,
-                              size: 48,
-                              color: Colors.grey[400],
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: CachedNetworkImage(
+                            memCacheHeight: 200,
+                            memCacheWidth: 200,
+                            imageUrl: subs[index].artwork,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Container(
+                              color: theme.cardColor,
+                              child: Icon(
+                                Icons.podcasts,
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  // New episode badge
-                  if (newEpisodes > 0)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          newEpisodes > 99 ? '99+' : '$newEpisodes',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                    // New episode badge
+                    if (newEpisodes > 0)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            newEpisodes > 99 ? '99+' : '$newEpisodes',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               // Podcast title
-              Expanded(
-                child: Text(
-                  subs[index].title,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+              Text(
+                subs[index].title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -136,13 +136,10 @@ class SubscriptionCard extends ConsumerWidget {
       },
       loading: () => Column(
         children: [
-          AspectRatio(
-            aspectRatio: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(12),
-              ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
           const SizedBox(height: 8),
