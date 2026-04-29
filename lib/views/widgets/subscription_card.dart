@@ -107,17 +107,17 @@ class SubscriptionCard extends ConsumerWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               // Podcast title
-              Flexible(
-                fit: FlexFit.loose,
+              Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
                     subs[index].title,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
-                      height: 1.2,
+                      fontSize: 10,
+                      height: 1.1,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
