@@ -12,7 +12,8 @@ import 'package:openair/views/widgets/feeds_episode_card_list.dart';
 import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-final getSubscribedEpisodesProvider = FutureProvider.autoDispose<List<Map>>((ref) async {
+final getSubscribedEpisodesProvider =
+    FutureProvider.autoDispose<List<Map>>((ref) async {
   return await ref.read(openAirProvider).getSubscribedEpisodes();
 });
 
@@ -24,12 +25,6 @@ class FeedsPage extends ConsumerStatefulWidget {
 }
 
 class _FeedsPageState extends ConsumerState<FeedsPage> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    ref.invalidate(getSubscribedEpisodesProvider);
-  }
-
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<Map>> getEpisodesValue =
