@@ -220,7 +220,7 @@ class PodcastsCard extends ConsumerWidget {
         _buildSectionHeader(context, ref),
         const SizedBox(height: 16),
         SizedBox(
-          height: featuredCardHeight + 64.0,
+          height: featuredCardHeight + 10.0,
           child: podcastDataAsyncValue.when(
             loading: () => _buildLoadingShimmer(context),
             error: (error, stackTrace) => _buildErrorView(context, ref),
