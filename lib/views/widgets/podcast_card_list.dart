@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
@@ -75,8 +75,9 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                   ),
                   const SizedBox(height: 4.0),
                   Text(
-                    widget.podcastItem.author ??
-                        Translations.of(context).text('unknown'),
+                    (widget.podcastItem.author?.isNotEmpty == true)
+                        ? widget.podcastItem.author!
+                        : Translations.of(context).text('unknown'),
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 14.0,

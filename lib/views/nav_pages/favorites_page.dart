@@ -3,7 +3,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/empty_favorites.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
@@ -81,7 +81,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                             artwork: podcastData.artwork,
                             imageUrl: podcastData.imageUrl,
                           ),
-                          aurthor: podcastData.author ?? 'Unknown',
+                          author: podcastData.author?.isNotEmpty == true
+                              ? podcastData.author!
+                              : Translations.of(context).text('unknown'),
                         );
                       },
                     )
@@ -95,7 +97,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         return EpisodeCardList(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
-                          author: podcastData.author ?? 'Unknown',
+                          author: (podcastData.author?.isNotEmpty == true)
+                              ? podcastData.author!
+                              : Translations.of(context).text('unknown'),
                           podcast: PodcastModel(
                             id: podcastData.id,
                             title: podcastData.title,

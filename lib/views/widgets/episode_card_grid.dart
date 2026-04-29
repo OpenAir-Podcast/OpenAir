@@ -7,8 +7,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
@@ -22,7 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 class EpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
-  final String aurthor;
+  final String author;
   final String imageUrl;
   final PodcastModel podcast;
 
@@ -30,7 +30,7 @@ class EpisodeCardGrid extends ConsumerStatefulWidget {
     super.key,
     required this.episodeItem,
     required this.title,
-    required this.aurthor,
+    required this.author,
     required this.imageUrl,
     required this.podcast,
   });
@@ -132,7 +132,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                             width: MediaQuery.of(context).size.width - 130.0,
                             // Podcast title
                             child: Text(
-                              widget.aurthor,
+                              widget.author,
                               style: const TextStyle(
                                 fontSize: 14.0,
                                 overflow: TextOverflow.ellipsis,
@@ -202,7 +202,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                               );
 
                           ref.watch(audioProvider).currentEpisode!['author'] =
-                              widget.aurthor;
+                              widget.author;
                         }
                       },
                       child: PlayButtonWidget(

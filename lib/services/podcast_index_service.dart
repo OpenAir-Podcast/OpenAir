@@ -135,7 +135,10 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
 
+    debugPrint(url);
+
     final response = await _retry(() => _dio.get(url));
+
     ref
         .watch(openAirProvider)
         .hiveService

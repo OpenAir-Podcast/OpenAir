@@ -3,8 +3,8 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_downloaded_episodes.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
@@ -133,7 +133,9 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
 
                         return EpisodeCardGrid(
                           title: data[index].title,
-                          aurthor: data[index].author,
+                          author: data[index].author.isNotEmpty
+                              ? data[index].author
+                              : Translations.of(context).text('unknown'),
                           imageUrl: data[index].image,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
