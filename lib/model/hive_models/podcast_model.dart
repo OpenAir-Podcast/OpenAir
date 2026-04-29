@@ -42,13 +42,7 @@ class PodcastModel extends HiveObject {
         title: json['title'],
         author: (json['author'] as String?)?.isNotEmpty == true
             ? json['author']
-            : (json['itunesAuthor'] as String?)?.isNotEmpty == true
-                ? json['itunesAuthor']
-                : (json['ownerName'] as String?)?.isNotEmpty == true
-                    ? json['ownerName']
-                    : (json['publisher'] as String?)?.isNotEmpty == true
-                        ? json['publisher']
-                        : json['subtitle'],
+            : 'Unknown',
         imageUrl: json['image'] ?? json['imgURL'],
         artwork: json['artwork'] ?? json['image'] ?? json['imgURL'],
         description: json['description'],
