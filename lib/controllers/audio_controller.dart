@@ -16,7 +16,6 @@ import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';

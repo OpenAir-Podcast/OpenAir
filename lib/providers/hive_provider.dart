@@ -55,6 +55,11 @@ final sortedDownloadsProvider = FutureProvider.autoDispose<List<DownloadModel>>(
   },
 );
 
+final getFavoriteProvider = FutureProvider.autoDispose((ref) async {
+  final hiveService = ref.watch(hiveServiceProvider);
+  return await hiveService.getFavoriteEpisodes();
+});
+
 // Create a FutureProvider to fetch the podcast data
 final getPodcastInfoByTitleProvider =
     FutureProvider.family.autoDispose<Map, String>((ref, title) async {
