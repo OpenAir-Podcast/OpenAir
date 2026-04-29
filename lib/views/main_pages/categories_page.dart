@@ -179,12 +179,12 @@ class CategoriesPage extends ConsumerWidget {
     return Scaffold(
       body: isWide
           ? GridView.builder(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
-                childAspectRatio: 3 / 2,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
+                childAspectRatio: 3 / 2.5,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
               itemCount: categories.length,
               itemBuilder: (context, index) {
@@ -196,8 +196,8 @@ class CategoriesPage extends ConsumerWidget {
               },
             )
           : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              separatorBuilder: (_, __) => const Divider(),
+              padding: const EdgeInsets.all(12),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
@@ -232,15 +232,42 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Card(
+      borderRadius: BorderRadius.circular(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(category.icon, size: 48),
-            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                category.icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 32.0,
+              ),
+            ),
+            const SizedBox(height: 12.0),
             Text(
               category.name,
               textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -257,10 +284,46 @@ class _CategoryListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(category.name),
-      leading: Icon(category.icon),
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Icon(
+                category.icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24.0,
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Text(
+                category.name,
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey[400],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
