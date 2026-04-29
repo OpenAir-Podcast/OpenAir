@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,9 +9,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/inbox_page.dart';
-
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
@@ -33,240 +29,222 @@ class SubscriptionsPage extends ConsumerStatefulWidget {
 class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map<String, SubscriptionModel>> getSubscriptionsValue =
-        ref.watch(subscriptionsProvider);
+    final subscriptionsAsync = ref.watch(subscriptionsWithCountsProvider);
 
-    return getSubscriptionsValue.when(
-      data: (Map<String, SubscriptionModel> data) {
-        if (data.isEmpty) {
-          return NoSubscriptions(title: 'Subscriptions');
-        }
+    return subscriptionsAsync.when(
+      data: (Map<String, dynamic> countsMap) {
+        final subscriptionsAsync2 = ref.watch(subscriptionsProvider);
 
-        final List<SubscriptionModel> subs = data.values.toList();
+        return subscriptionsAsync2.when(
+          data: (Map<String, SubscriptionModel> subsMap) {
+            if (subsMap.isEmpty) {
+              return const NoSubscriptions(title: 'Subscriptions');
+            }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(Translations.of(context).text('subscriptions')),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: () {
-                    showMenu(
-                      context: context,
-                      position: RelativeRect.fromLTRB(
-                        MediaQuery.of(context).size.width - 100,
-                        58,
-                        0,
-                        0,
+            final List<SubscriptionModel> subs = subsMap.values.toList();
+            final totalNew = countsMap.values
+                .map((m) => (m as Map)['newEpisodes'] as int? ?? 0)
+                .fold(0, (a, b) => a + b);
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Row(
+                  children: [
+                    Text(
+                      Translations.of(context).text('subscriptions'),
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      items: [
-                        PopupMenuItem(
-                          value: 'refresh_all',
-                          child: Text(
-                            Translations.of(context).text('refreshAllPodcasts'),
-                          ),
-                          onTap: () async {
-                            await ref
-                                .read(openAirProvider)
-                                .hiveService
-                                .updateSubscriptions();
-
-                            ref.invalidate(subscriptionsWithCountsProvider);
-                            ref.invalidate(subscriptionsProvider);
-                          },
+                    ),
+                    if (totalNew > 0) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        PopupMenuItem(
-                          value: 'clear_all',
-                          child: Text(
-                            Translations.of(context).text('clearAllPodcasts'),
+                        child: Text(
+                          '$totalNew',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext dialogContext) =>
-                                  AlertDialog(
-                                title: Text(
-                                  Translations.of(context).text(
-                                    'clearAllPodcasts',
-                                  ),
-                                  style: TextStyle(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                content: Text(
-                                  Translations.of(context).text(
-                                    'areYouSureClearAllPodcasts',
-                                  ),
-                                  style: TextStyle(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(Translations.of(context)
-                                        .text('cancel')),
-                                    onPressed: () {
-                                      Navigator.of(dialogContext).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text(
-                                      Translations.of(context).text('clear'),
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      Navigator.of(dialogContext).pop();
-
-                                      await ref
-                                          .read(openAirProvider)
-                                          .hiveService
-                                          .deleteSubscriptions();
-
-                                      ref.invalidate(subscriptionsProvider);
-                                      ref.invalidate(subCountProvider);
-
-                                      ref.invalidate(
-                                          getSubscribedEpisodesProvider);
-                                      ref.invalidate(feedCountProvider);
-
-                                      ref.invalidate(getInboxProvider);
-                                      ref.invalidate(inboxCountProvider);
-
-                                      if (context.mounted) {
-                                        if (!Platform.isAndroid &&
-                                            !Platform.isIOS) {
-                                          ref
-                                              .read(notificationServiceProvider)
-                                              .showNotification(
-                                                'OpenAir ${Translations.of(context).text('notification')}',
-                                                Translations.of(context)
-                                                    .text('allPodcastsCleared'),
-                                              );
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                Translations.of(context)
-                                                    .text('allPodcastsCleared'),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
                         ),
-                      ],
-                    );
-                  },
-                  icon: const Icon(Icons.more_vert_rounded),
+                      ),
+                    ],
+                  ],
                 ),
+                actions: [
+                  IconButton(
+                    tooltip:
+                        Translations.of(context).text('refreshAllPodcasts'),
+                    icon: const Icon(Icons.refresh_rounded),
+                    onPressed: () async {
+                      await ref
+                          .read(openAirProvider)
+                          .hiveService
+                          .updateSubscriptions();
+                      ref.invalidate(subscriptionsWithCountsProvider);
+                      ref.invalidate(subscriptionsProvider);
+                    },
+                  ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert_rounded),
+                    onSelected: (value) async {
+                      if (value == 'clear_all') {
+                        _showClearAllDialog(context);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'clear_all',
+                        child: Text(
+                            Translations.of(context).text('clearAllPodcasts')),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 4.0,
-            ),
-            child: GridView.builder(
-              itemCount: subs.length,
-              cacheExtent: cacheExtent,
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200.0,
-                mainAxisExtent: subscribedWideMainAxisExtent,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
+              body: GridView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: subs.length,
+                cacheExtent: cacheExtent,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 160,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemBuilder: (context, index) {
+                  return SubscriptionCard(
+                    subs: subs,
+                    ref: ref,
+                    index: index,
+                  );
+                },
               ),
-              itemBuilder: (context, index) {
-                return SubscriptionCard(
-                  subs: subs,
-                  ref: ref,
-                  index: index,
-                );
-              },
-            ),
-          ),
-          bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? bannerAudioPlayerHeight
-                : 0.0,
-            child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? const BannerAudioPlayer()
-                : const SizedBox.shrink(),
+              bottomNavigationBar: _buildBottomBar(context, ref),
+            );
+          },
+          error: (error, stackTrace) {
+            debugPrint('Error loading subscriptions: $error\n$stackTrace');
+            return Scaffold(
+              appBar: AppBar(
+                  title: Text(Translations.of(context).text('subscriptions'))),
+              body: _ErrorView(error: error.toString()),
+            );
+          },
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           ),
         );
       },
       error: (error, stackTrace) {
         debugPrint('Error loading subscriptions: $error\n$stackTrace');
         return Scaffold(
-          body: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 75.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 20.0),
-                Text(
-                  Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$error',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  width: 180.0,
-                  height: 40.0,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      ref.invalidate(subscriptionsProvider);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          appBar: AppBar(
+              title: Text(Translations.of(context).text('subscriptions'))),
+          body: _ErrorView(error: error.toString()),
         );
       },
-      loading: () => Container(
-        color: Brightness.dark == Theme.of(context).brightness
-            ? Colors.black
-            : Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+
+  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
+    final isPodcastSelected = ref.watch(
+      audioProvider.select((p) => p.isPodcastSelected),
+    );
+
+    if (!isPodcastSelected) return null;
+
+    return SizedBox(
+      height: bannerAudioPlayerHeight,
+      child: const BannerAudioPlayer(),
+    );
+  }
+
+  void _showClearAllDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(Translations.of(context).text('clearAllPodcasts')),
+        content:
+            Text(Translations.of(context).text('areYouSureClearAllPodcasts')),
+        actions: [
+          TextButton(
+            child: Text(Translations.of(context).text('cancel')),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(Translations.of(context).text('clear')),
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              await ref.read(openAirProvider).hiveService.deleteSubscriptions();
+
+              ref.invalidate(subscriptionsProvider);
+              ref.invalidate(subCountProvider);
+              ref.invalidate(getSubscribedEpisodesProvider);
+              ref.invalidate(feedCountProvider);
+              ref.invalidate(getInboxProvider);
+              ref.invalidate(inboxCountProvider);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final String error;
+
+  const _ErrorView({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 75, color: Colors.grey),
+          const SizedBox(height: 20),
+          Text(
+            Translations.of(context).text('oopsTryAgainLater'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 180,
+            height: 40,
+            child: Consumer(
+              builder: (context, ref, _) => ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  ref.invalidate(subscriptionsWithCountsProvider);
+                  ref.invalidate(subscriptionsProvider);
+                },
+                child: const Text('Retry'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

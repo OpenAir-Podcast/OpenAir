@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +7,6 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/subscription_episode_card_list.dart';
 import 'package:openair/views/widgets/subscription_episode_card_grid.dart';
 import 'package:openair/views/native/podcast_info.dart';
@@ -47,31 +44,10 @@ class _SubscriptionsEpisodesPageState
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stackTrace) => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline_rounded,
-                  size: 75, color: Colors.grey),
-              const SizedBox(height: 20),
-              Text(
-                Translations.of(context).text('oopsTryAgainLater'),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              Text('$error', style: const TextStyle(fontSize: 16)),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 180,
-                height: 40,
-                child: ElevatedButton(
-                  onPressed: () =>
-                      ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-                  child: const Text('Retry'),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(title: Text(widget.podcast.title)),
+        body: _ErrorView(
+          error: error.toString(),
+          podcastFeedUrl: widget.podcast.feedUrl,
         ),
       ),
       data: (snapshot) {
@@ -97,103 +73,14 @@ class _SubscriptionsEpisodesPageState
                         },
                         icon: const Icon(Icons.info_outline_rounded, size: 30),
                       ),
-                      IconButton(
-                        tooltip: isSubscribed ? 'Unsubscribe' : 'Subscribe',
-                        onPressed: () async {
-                          if (isSubscribed) {
-                            ref.read(audioProvider).unsubscribe(widget.podcast);
-                          } else {
-                            ref
-                                .read(audioProvider)
-                                .subscribe(widget.podcast, context);
-                          }
-
-                          final msg = isSubscribed
-                              ? 'Unsubscribed from ${widget.podcast.title}'
-                              : 'Subscribed to ${widget.podcast.title}';
-
-                          if (!Platform.isAndroid && !Platform.isIOS) {
-                            ref
-                                .read(notificationServiceProvider)
-                                .showNotification(
-                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                  msg,
-                                );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(msg)),
-                            );
-                          }
-
-                          ref.invalidate(podcastDataByUrlProvider(podcastUrl));
-                          ref.invalidate(
-                              isSubscribedProvider(widget.podcast.title));
-                        },
-                        icon: Icon(isSubscribed ? Icons.check : Icons.add),
+                      _SubscribeButton(
+                        podcast: widget.podcast,
+                        isSubscribed: isSubscribed,
                       ),
                     ],
                   ),
-                  body: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RefreshIndicator(
-                      onRefresh: () async =>
-                          ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isWide =
-                              wideScreenMinWidth < constraints.maxWidth;
-
-                          if (isWide) {
-                            const targetCardWidth = 250.0;
-                            final crossAxisCount =
-                                (constraints.maxWidth / targetCardWidth)
-                                    .floor()
-                                    .clamp(1, 10);
-
-                            return GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                childAspectRatio: 1.2,
-                                mainAxisExtent: 294,
-                                crossAxisSpacing: 4,
-                                mainAxisSpacing: 4,
-                              ),
-                              cacheExtent: cacheExtent,
-                              itemCount: snapshot['count'] ?? 0,
-                              itemBuilder: (context, index) =>
-                                  SubscriptionEpisodeCardGrid(
-                                title: snapshot['items'][index]['title'],
-                                episodeItem: snapshot['items'][index],
-                                podcast: widget.podcast,
-                              ),
-                            );
-                          }
-
-                          return ListView.builder(
-                            itemCount: snapshot['count'] ?? 0,
-                            itemBuilder: (context, index) {
-                              return SubscriptionEpisodeCardList(
-                                title: snapshot['items'][index]['title'],
-                                episodeItem: snapshot['items'][index],
-                                podcast: widget.podcast,
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  bottomNavigationBar: SizedBox(
-                    height: ref.watch(
-                            audioProvider.select((p) => p.isPodcastSelected))
-                        ? bannerAudioPlayerHeight
-                        : 0.0,
-                    child: ref.watch(
-                            audioProvider.select((p) => p.isPodcastSelected))
-                        ? const BannerAudioPlayer()
-                        : const SizedBox(),
-                  ),
+                  body: _buildEpisodeList(context, ref, snapshot),
+                  bottomNavigationBar: _buildBottomBar(context, ref),
                 );
               },
               loading: () => const Scaffold(
@@ -204,11 +91,167 @@ class _SubscriptionsEpisodesPageState
               ),
             );
           },
-          loading: () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
-          error: (_, __) => const Scaffold(body: Center(child: Text('Error'))),
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          error: (_, __) => Scaffold(
+            appBar: AppBar(title: Text(widget.podcast.title)),
+            body: _ErrorView(
+              error: 'Error loading subscription status',
+              podcastFeedUrl: widget.podcast.feedUrl,
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildEpisodeList(
+    BuildContext context,
+    WidgetRef ref,
+    Map snapshot,
+  ) {
+    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+    final episodeCount = snapshot['count'] ?? 0;
+
+    if (episodeCount == 0) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.podcasts, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              Translations.of(context).text('noResults'),
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isWide) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(12),
+        cacheExtent: cacheExtent,
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 250,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: episodeCount,
+        itemBuilder: (context, index) => SubscriptionEpisodeCardGrid(
+          title: snapshot['items'][index]['title'],
+          episodeItem: snapshot['items'][index],
+          podcast: widget.podcast,
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      cacheExtent: cacheExtent,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemCount: episodeCount,
+      itemBuilder: (context, index) => SubscriptionEpisodeCardList(
+        title: snapshot['items'][index]['title'],
+        episodeItem: snapshot['items'][index],
+        podcast: widget.podcast,
+      ),
+    );
+  }
+
+  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
+    final isPodcastSelected = ref.watch(
+      audioProvider.select((p) => p.isPodcastSelected),
+    );
+
+    if (!isPodcastSelected) return null;
+
+    return SizedBox(
+      height: bannerAudioPlayerHeight,
+      child: const BannerAudioPlayer(),
+    );
+  }
+}
+
+class _SubscribeButton extends ConsumerWidget {
+  const _SubscribeButton({
+    required this.podcast,
+    required this.isSubscribed,
+  });
+
+  final PodcastModel podcast;
+  final bool isSubscribed;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      tooltip: isSubscribed
+          ? Translations.of(context).text('unsubscribeToPodcast')
+          : Translations.of(context).text('subscribeToPodcast'),
+      onPressed: () => _toggleSubscription(context, ref),
+      icon: Icon(isSubscribed ? Icons.check : Icons.add),
+    );
+  }
+
+  void _toggleSubscription(BuildContext context, WidgetRef ref) async {
+    final audioController = ref.read(audioProvider);
+
+    if (isSubscribed) {
+      audioController.unsubscribe(podcast);
+    } else {
+      audioController.subscribe(podcast, context);
+    }
+
+    final msg = isSubscribed
+        ? '${Translations.of(context).text('unsubscribedFrom')} ${podcast.title}'
+        : '${Translations.of(context).text('subscribedTo')} ${podcast.title}';
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+}
+
+class _ErrorView extends ConsumerWidget {
+  final String error;
+  final String podcastFeedUrl;
+
+  const _ErrorView({required this.error, required this.podcastFeedUrl});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            Translations.of(context).text('oopsTryAgainLater'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              error,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Consumer(
+            builder: (context, ref, _) => ElevatedButton(
+              onPressed: () =>
+                  ref.invalidate(podcastDataByUrlProvider(podcastFeedUrl)),
+              child: Text(Translations.of(context).text('retry')),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
