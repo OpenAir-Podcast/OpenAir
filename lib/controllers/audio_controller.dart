@@ -740,22 +740,18 @@ class AudioController extends ChangeNotifier {
   void audioSpeedButtonClicked() => cyclePlaybackSpeed();
 
   String convertSecondsToDuration(int totalSeconds, BuildContext context) {
-    final List<String> parts = [];
+    if (totalSeconds <= 0) return '';
+
     final duration = Duration(seconds: totalSeconds);
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
 
     if (hours > 0) {
-      final hourUnit = hours == 1 ? 'hr' : 'hrs';
-      parts.add('$hours $hourUnit');
+      return '${hours}h ${minutes.toString().padLeft(2, '0')}m';
     }
 
-    if (minutes > 0 || hours == 0) {
-      final minuteUnit = minutes == 1 ? 'min' : 'mins';
-      parts.add('${minutes.toString().padLeft(2, '0')} $minuteUnit');
-    }
-
-    return parts.join(' ');
+    return '${minutes}m ${seconds.toString().padLeft(2, '0')}s';
   }
 
   Future<Map> getFavoriteEpisodes() async {
