@@ -209,12 +209,25 @@ class PodcastsCard extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 4.0,
+                height: 20.0,
+                margin: const EdgeInsets.only(right: 8.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(2.0),
+                ),
+              ),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
           InkWell(
             borderRadius: BorderRadius.circular(20),
