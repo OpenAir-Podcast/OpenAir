@@ -276,7 +276,7 @@ class _EpisodeCardListState extends ConsumerState<EpisodeCardList> {
                       },
                       loading: () {
                         // Handle loading by showing previous state's icon, disabled
-                        final previousList = queueListAsync.valueOrNull;
+                        final previousList = queueListAsync.value;
 
                         final isQueuedPreviously = previousList
                                 ?.containsKey(widget.episodeItem['guid']) ??

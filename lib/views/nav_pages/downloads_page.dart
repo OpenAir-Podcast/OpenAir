@@ -11,7 +11,8 @@ import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/episode_card_list.dart';
 
-final getDownloadsProvider = FutureProvider.autoDispose((ref) async {
+final getDownloadsProvider =
+    FutureProvider.autoDispose<List<DownloadModel>>((ref) async {
   return await ref.read(openAirProvider).getSortedDownloadedEpisodes();
 });
 

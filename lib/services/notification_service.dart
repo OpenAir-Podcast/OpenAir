@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final notificationProvider = ChangeNotifierProvider<NotificationService>(
+final notificationProvider = Provider<NotificationService>(
   (ref) {
     return NotificationService(ref);
   },
@@ -48,7 +48,7 @@ class NotificationService extends ChangeNotifier {
     );
 
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
       onDidReceiveBackgroundNotificationResponse:
           onDidReceiveBackgroundNotificationResponse,
@@ -140,10 +140,10 @@ class NotificationService extends ChangeNotifier {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
+      id: 0,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
       // payload: payload,
     );
   }

@@ -89,7 +89,7 @@ class _PodcastIndexSearchCardGridState
                 ],
               ),
             ),
-            FutureBuilder(
+            FutureBuilder<bool>(
               future: ref
                   .watch(openAirProvider)
                   .isSubscribed(widget.podcastItem.title),

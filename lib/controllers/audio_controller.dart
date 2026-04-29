@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/hive_models/download_model.dart';
 import 'package:openair/hive_models/history_model.dart';
@@ -654,7 +655,7 @@ class AudioController extends ChangeNotifier {
     }
 
     if (context.mounted) {
-      result = await FilePicker.platform.pickFiles(
+      result = await FilePicker.pickFiles(
         dialogTitle: 'Import OPML',
         type: FileType.custom,
         allowedExtensions: ['opml'],

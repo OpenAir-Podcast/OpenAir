@@ -9,8 +9,8 @@ import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
 import 'package:openair/views/widgets/podcast_card_list.dart';
 
-final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
-    FutureProvider.autoDispose((ref) async {
+final podcastDataByTrendingProvider =
+    FutureProvider.autoDispose<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.watch(openAirProvider).hiveService.getTopFeaturedPodcast();
 

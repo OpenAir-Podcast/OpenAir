@@ -14,7 +14,8 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/episode_card_list.dart';
 
-final getHistoryProvider = FutureProvider.autoDispose((ref) async {
+final getHistoryProvider =
+    FutureProvider.autoDispose<List<HistoryModel>>((ref) async {
   return await ref.read(openAirProvider).getSortedHistory();
 });
 
