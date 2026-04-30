@@ -134,7 +134,7 @@ class SubscriptionCard extends ConsumerWidget {
           children: [
             Icon(Icons.error_outline, color: Colors.grey),
             const SizedBox(height: 4),
-            Text('Error', style: TextStyle(fontSize: 12)),
+            Text('Error', style: Theme.of(context).textTheme.bodySmall),
           ],
         );
       },

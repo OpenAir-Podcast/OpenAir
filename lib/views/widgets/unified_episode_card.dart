@@ -153,16 +153,14 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                                     const SizedBox(width: 2),
                                     Text(
                                       duration,
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(fontSize: 11),
+                                      style: theme.textTheme.bodySmall,
                                     ),
                                   ],
                                 ),
                               ],
                               Text(
                                 podcastDate,
-                                style: theme.textTheme.bodySmall
-                                    ?.copyWith(fontSize: 11),
+                                style: theme.textTheme.bodySmall,
                               ),
                             ],
                           ),
@@ -199,7 +197,6 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: theme.textTheme.bodySmall?.copyWith(
-        fontSize: 11,
         height: 1.2,
       ),
     );

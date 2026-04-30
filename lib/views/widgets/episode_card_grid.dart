@@ -115,37 +115,35 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                             // Podcast title
                             child: Text(
                               widget.title,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis,
-                                color: Brightness.dark ==
-                                        Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                               maxLines: 2,
                             ),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width - 130.0,
-                            // Podcast title
+                            // Podcast author
                             child: Text(
                               widget.author,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                overflow: TextOverflow.ellipsis,
-                                color: Colors.grey,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                              maxLines: 1,
                             ),
                           ),
                           Text(
                             podcastDate,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
                           ),
                         ],
                       ),
@@ -166,10 +164,11 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                         maxLines: 4,
                         textOverflow: TextOverflow.ellipsis,
                         margin: Margins.zero,
-                        fontSize: FontSize(14.0),
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
+                        fontSize: FontSize(
+                          Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                              14.0,
+                        ),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     },
                   ),

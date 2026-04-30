@@ -22,23 +22,14 @@ class NoConnection extends ConsumerWidget {
         Text(
           Translations.of(context).text('oopsAnErrorOccurred'),
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Brightness.dark == Theme.of(context).brightness
-                ? Colors.white
-                : Colors.black,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
         Text(
           Translations.of(context).text('pleaseConnectToNetwork'),
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Brightness.dark == Theme.of(context).brightness
-                ? Colors.white
-                : Colors.black,
-          ),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 20.0),
         SizedBox(

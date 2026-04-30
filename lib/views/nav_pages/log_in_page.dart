@@ -269,10 +269,12 @@ class _LogInState extends ConsumerState<LogIn> {
                                 Translations.of(context)
                                     .text('login')
                                     .toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                       ),
                       const SizedBox(height: 24),

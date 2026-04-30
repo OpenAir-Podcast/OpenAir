@@ -246,8 +246,7 @@ class PodcastsCard extends ConsumerWidget {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 18.0,
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: onPrimary,
               ),
@@ -276,8 +275,7 @@ class PodcastsCard extends ConsumerWidget {
                     const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                 child: Text(
                   Translations.of(context).text('seeAll'),
-                  style: TextStyle(
-                    fontSize: 14.0,
+                  style: theme.textTheme.labelLarge?.copyWith(
                     color: onPrimary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -352,10 +350,9 @@ class PodcastsCard extends ConsumerWidget {
           const SizedBox(height: 12.0),
           Text(
             Translations.of(context).text('oopsAnErrorOccurred'),
-            style: const TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 8.0),
           SizedBox(
@@ -371,7 +368,7 @@ class PodcastsCard extends ConsumerWidget {
               },
               child: Text(
                 Translations.of(context).text('retry'),
-                style: const TextStyle(fontSize: 14),
+                style: Theme.of(context).textTheme.labelLarge,
               ),
             ),
           ),
@@ -450,12 +447,10 @@ class PodcastsCard extends ConsumerWidget {
                     feed.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                    ),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                        ),
                   ),
                 ),
               ],

@@ -54,7 +54,8 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16.0)),
                 child: CachedNetworkImage(
                   memCacheHeight: 300,
                   imageUrl: widget.podcastItem.imageUrl,
@@ -80,11 +81,10 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                       children: [
                         Text(
                           widget.podcastItem.title,
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -94,10 +94,10 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                               ? widget.podcastItem.author!
                               : Translations.of(context).text('unknown'),
                           maxLines: 1,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12.0,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -110,15 +110,19 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                         .isSubscribed(widget.podcastItem.title),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return const SizedBox(width: 48, height: 48); // Placeholder size for icon button
+                        return const SizedBox(
+                            width: 48,
+                            height: 48); // Placeholder size for icon button
                       } else if (snapshot.hasError) {
                         return const SizedBox(width: 48, height: 48);
                       }
 
                       return IconButton(
                         tooltip: snapshot.data!
-                            ? Translations.of(context).text('unsubscribeToPodcast')
-                            : Translations.of(context).text('subscribeToPodcast'),
+                            ? Translations.of(context)
+                                .text('unsubscribeToPodcast')
+                            : Translations.of(context)
+                                .text('subscribeToPodcast'),
                         onPressed: () async {
                           snapshot.data!
                               ? ref
@@ -131,7 +135,9 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
 
                           if (context.mounted) {
                             if (!Platform.isAndroid && !Platform.isIOS) {
-                              ref.read(notificationServiceProvider).showNotification(
+                              ref
+                                  .read(notificationServiceProvider)
+                                  .showNotification(
                                     'OpenAir ${Translations.of(context).text('notification')}',
                                     snapshot.data!
                                         ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
@@ -150,8 +156,8 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                             }
                           }
 
-                          ref.invalidate(
-                              podcastDataByUrlProvider(widget.podcastItem.feedUrl));
+                          ref.invalidate(podcastDataByUrlProvider(
+                              widget.podcastItem.feedUrl));
 
                           Future.delayed(
                             Duration(seconds: 1),

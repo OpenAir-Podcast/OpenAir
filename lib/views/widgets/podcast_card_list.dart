@@ -66,11 +66,9 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                 children: [
                   Text(
                     widget.podcastItem.title,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -79,10 +77,9 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                     (widget.podcastItem.author?.isNotEmpty == true)
                         ? widget.podcastItem.author!
                         : Translations.of(context).text('unknown'),
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14.0,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

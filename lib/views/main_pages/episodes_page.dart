@@ -113,7 +113,7 @@ class EpisodesPage extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               Translations.of(context).text('noResults'),
-              style: const TextStyle(fontSize: 16),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
@@ -209,14 +209,18 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             Translations.of(context).text('oopsTryAgainLater'),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               error,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

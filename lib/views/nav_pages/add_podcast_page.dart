@@ -61,13 +61,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 maxLength: 256,
                 controller: textInputControl,
                 keyboardType: TextInputType.webSearch,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Brightness.light == Theme.of(context).brightness
-                      ? Colors.black
-                      : Colors.white,
-                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.search_rounded,
@@ -196,23 +192,14 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                         const SizedBox(height: 20.0),
                         Text(
                           Translations.of(context).text('oopsAnErrorOccurred'),
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                Brightness.light == Theme.of(context).brightness
-                                    ? Colors.black
-                                    : Colors.white,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         Text(
                           Translations.of(context).text('oopsTryAgainLater'),
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Brightness.light ==
-                                      Theme.of(context).brightness
-                                  ? Colors.black
-                                  : Colors.white),
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(height: 20.0),
                         SizedBox(
@@ -332,13 +319,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 children: [
                   Text(
                     Translations.of(context).text('discoveryPoweredByFyyd'),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
-                      color: Brightness.light == Theme.of(context).brightness
-                          ? Colors.black
-                          : Colors.white,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const Spacer(),
                   TextButton(
@@ -350,11 +333,11 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                       children: [
                         Text(
                           Translations.of(context).text('discoverMore'),
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         Icon(
                           Icons.double_arrow_rounded,
@@ -381,9 +364,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
                 title: Text(
                   Translations.of(context).text('addPodcastByRssUrl'),
-                  style: TextStyle(
-                    fontSize: 18.0,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 onTap: () => showDialog(
                   context: context,
@@ -394,12 +375,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     return AlertDialog(
                       title: Text(
                         Translations.of(context).text('addPodcastByRssUrl'),
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -441,11 +419,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               Translations.of(context).text('cancel'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
@@ -508,11 +488,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             },
                             child: Text(
                               Translations.of(context).text('add'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
@@ -529,12 +511,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
                 title: Text(
                   Translations.of(context).text('searchPodcastIndex'),
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Brightness.light == Theme.of(context).brightness
-                        ? Colors.black
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 onTap: () => showDialog(
                   context: context,
@@ -545,12 +522,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     return AlertDialog(
                       title: Text(
                         Translations.of(context).text('searchPodcastIndex'),
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -627,11 +601,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               Translations.of(context).text('cancel'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
@@ -676,11 +652,13 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             },
                             child: Text(
                               Translations.of(context).text('search'),
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
@@ -697,9 +675,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
                 title: Text(
                   Translations.of(context).text('importPodcastListOpml'),
-                  style: TextStyle(
-                    fontSize: 18.0,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 onTap: () async {
                   bool i = await ref

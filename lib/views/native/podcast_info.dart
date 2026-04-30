@@ -52,26 +52,26 @@ class PodcastInfoPage extends ConsumerWidget {
                       children: [
                         Text(
                           podcastInfo['title'],
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           podcastInfo['author'],
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${podcastInfo['episodeCount']} episodes',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                       ],
                     ),
@@ -81,7 +81,7 @@ class PodcastInfoPage extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 podcastInfo['description'],
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 16),
               Row(
@@ -96,11 +96,10 @@ class PodcastInfoPage extends ConsumerWidget {
                     },
                     child: Text(
                       podcastInfo['link'] ?? podcastInfo['url'],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
                     ),
                   ),
                 ],
@@ -108,22 +107,22 @@ class PodcastInfoPage extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'Language: ${podcastInfo['language']}',
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 16),
               Text(
                 'Medium: ${podcastInfo['medium']}',
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 16),
               Text(
                 'Categories: ${podcastInfo['categories'].values.join(', ')}',
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 16),
               Text(
                 'Last Update: ${DateTime.fromMillisecondsSinceEpoch(podcastInfo['lastUpdateTime'] * 1000)}',
-                style: const TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ],
           ),

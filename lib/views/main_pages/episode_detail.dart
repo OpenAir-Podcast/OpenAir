@@ -92,14 +92,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
                             widget.podcast!.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Brightness.dark ==
-                                      Theme.of(context).brightness
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
@@ -109,11 +107,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           child: Text(
                             widget.podcast!.author ??
                                 Translations.of(context).text('unknown'),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Colors.grey,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
@@ -124,11 +124,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               .watch(audioProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!['datePublished']),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.0,
-                            color: Colors.grey,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                  ),
                         ),
                       ],
                     ),
@@ -475,10 +475,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       maxLines: 4,
                       textOverflow: TextOverflow.ellipsis,
                       margin: Margins.zero,
-                      fontSize: FontSize(14.0),
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
+                      fontSize: FontSize(
+                        Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                            14.0,
+                      ),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   },
                 ),

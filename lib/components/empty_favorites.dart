@@ -23,23 +23,14 @@ class EmptyFavorites extends StatelessWidget {
             Text(
               Translations.of(context).text('emptyFavorites'),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Brightness.dark == Theme.of(context).brightness
-                    ? Colors.white
-                    : Colors.black,
-              ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             Text(
               Translations.of(context).text('emptyFavoritesSubtitle'),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16.0,
-                color: Brightness.dark == Theme.of(context).brightness
-                    ? Colors.white
-                    : Colors.black,
-              ),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
