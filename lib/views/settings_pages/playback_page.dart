@@ -184,11 +184,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: rewindSkipTime,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -256,11 +255,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: fastForwardSkipTime,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -327,11 +325,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: playbackSpeed,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -399,11 +396,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: enqueuePosition,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -527,11 +523,10 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: smartMarkAsCompleted,
                     onChanged: (String? newValue) {
                       setState(() {

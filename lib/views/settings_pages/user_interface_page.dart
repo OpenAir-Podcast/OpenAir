@@ -358,11 +358,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: fontSizeVal,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -479,11 +478,10 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: language,
                     onChanged: (String? newValue) {
                       String saveValue;

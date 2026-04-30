@@ -127,11 +127,10 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: refreshPodcasts,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -329,11 +328,10 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                   width: 200.0,
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color:
+                              ThemeProvider.themeOf(context).data.primaryColor,
+                        ),
                     value: downloadEpisodeLimit,
                     onChanged: (String? newValue) {
                       setState(() {

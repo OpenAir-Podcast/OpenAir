@@ -30,13 +30,9 @@ class DonatePageState extends ConsumerState<DonatePage> {
             child: Text(
               Translations.of(context).text('donateDescription'),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15.0,
-                fontWeight: FontWeight.bold,
-                color: Brightness.dark == Theme.of(context).brightness
-                    ? Colors.white
-                    : Colors.black,
-              ),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
           ListTile(
