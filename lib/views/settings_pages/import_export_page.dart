@@ -281,11 +281,13 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                         title: Text(
                           Translations.of(context).text('addPodcastByRssUrl'),
                           textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         content: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.85,
@@ -294,10 +296,13 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                             autofocus: true,
                             controller: textInputControl,
                             keyboardType: TextInputType.url,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                             decoration: InputDecoration(
                               icon: Icon(
                                 Icons.link_rounded,
@@ -325,11 +330,13 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                               onPressed: () => Navigator.pop(context),
                               child: Text(
                                 Translations.of(context).text('cancel'),
-                                style: TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ),
                           ),
@@ -401,11 +408,13 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                               },
                               child: Text(
                                 Translations.of(context).text('add'),
-                                style: TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ),
                           ),
@@ -437,11 +446,14 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       builder: (BuildContext dialogContext) => AlertDialog(
                         title: Text(
                           Translations.of(context).text('deleteAllEpisode'),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         content: Text(
                           Translations.of(context).text(

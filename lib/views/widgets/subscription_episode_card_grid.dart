@@ -124,15 +124,17 @@ class _SubscriptionEpisodeCardGridState
                                 // Podcast title
                                 child: Text(
                                   widget.title,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    overflow: TextOverflow.ellipsis,
-                                    color: Brightness.dark ==
-                                            Theme.of(context).brightness
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        overflow: TextOverflow.ellipsis,
+                                        color: Brightness.dark ==
+                                                Theme.of(context).brightness
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
                                   maxLines: 2,
                                 ),
                               ),
@@ -143,20 +145,26 @@ class _SubscriptionEpisodeCardGridState
                                 child: Text(
                                   widget.podcast.author ??
                                       Translations.of(context).text('unknown'),
-                                  style: const TextStyle(
-                                    fontSize: 14.0,
-                                    overflow: TextOverflow.ellipsis,
-                                    color: Colors.grey,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        overflow: TextOverflow.ellipsis,
+                                        color: Colors.grey,
+                                      ),
                                 ),
                               ),
                               Text(
                                 podcastDate,
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  overflow: TextOverflow.ellipsis,
-                                  color: Colors.grey,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      overflow: TextOverflow.ellipsis,
+                                      color: Colors.grey,
+                                    ),
                               ),
                             ],
                           ),

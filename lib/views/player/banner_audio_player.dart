@@ -59,23 +59,24 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               children: [
                 Text(
                   ref.watch(audioProvider).currentEpisode!['title'],
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   maxLines: 2,
                 ),
                 Text(
-                  (ref.watch(audioProvider).currentEpisode!['author'] as String?)
+                  (ref.watch(audioProvider).currentEpisode!['author']
+                                  as String?)
                               ?.isNotEmpty ==
                           true
                       ? ref.watch(audioProvider).currentEpisode!['author']
                       : Translations.of(context).text('unknown'),
-                  style: const TextStyle(
-                    fontSize: 14.0,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   maxLines: 2,
                 ),
               ],
