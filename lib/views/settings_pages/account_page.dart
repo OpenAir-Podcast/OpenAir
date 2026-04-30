@@ -299,10 +299,12 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                               Translations.of(context)
                                   .text('signIn')
                                   .toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                     ),
                     const SizedBox(height: 24),
@@ -372,11 +374,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               Text(
                 user.email ?? 'No email',
                 textAlign: TextAlign.center,
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 24,
-                  color: colorScheme.onSurface,
-                ),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               if (provider != null) ...[
                 const SizedBox(height: 4),
@@ -387,10 +387,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ),
                   label: Text(provider.toUpperCase()),
                   backgroundColor: colorScheme.secondaryContainer,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSecondaryContainer,
-                  ),
+                  labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSecondaryContainer,
+                      ),
                 ),
               ],
               const SizedBox(height: 32),
@@ -494,19 +493,17 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ],
             ),

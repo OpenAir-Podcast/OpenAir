@@ -51,13 +51,9 @@ class AboutPageState extends ConsumerState<AboutPage> {
                   child: Text(
                     Translations.of(context).text('aboutDescription'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.bold,
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ),
                 ListTile(
@@ -115,9 +111,7 @@ class AboutPageState extends ConsumerState<AboutPage> {
             return Center(
                 child: Text(
               Translations.of(context).text('oopsAnErrorOccurred'),
-              style: TextStyle(
-                fontSize: 18.0,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
             ));
           },
           loading: () {

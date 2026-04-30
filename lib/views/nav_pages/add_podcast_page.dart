@@ -386,14 +386,10 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                           autofocus: true,
                           controller: textInputControl,
                           keyboardType: TextInputType.url,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                Brightness.light == Theme.of(context).brightness
-                                    ? Colors.black
-                                    : Colors.white,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                           decoration: InputDecoration(
                             icon: Icon(
                               Icons.link_rounded,
@@ -533,14 +529,10 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                           autofocus: true,
                           controller: textInputControl,
                           keyboardType: TextInputType.url,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                Brightness.light == Theme.of(context).brightness
-                                    ? Colors.black
-                                    : Colors.white,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                           decoration: InputDecoration(
                             icon: Icon(
                               Icons.title_rounded,
