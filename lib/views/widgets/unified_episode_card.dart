@@ -10,25 +10,27 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 
-class EpisodeCardList extends ConsumerStatefulWidget {
+class UnifiedEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final PodcastModel podcast;
   final String title;
-  final String author;
+  final String? author;
+  final bool showAuthor;
 
-  const EpisodeCardList({
+  const UnifiedEpisodeCard({
     super.key,
     required this.episodeItem,
-    required this.title,
     required this.podcast,
-    required this.author,
+    required this.title,
+    this.author,
+    this.showAuthor = true,
   });
 
   @override
-  ConsumerState<EpisodeCardList> createState() => _EpisodeCardListState();
+  ConsumerState<UnifiedEpisodeCard> createState() => _UnifiedEpisodeCardState();
 }
 
-class _EpisodeCardListState extends ConsumerState<EpisodeCardList> {
+class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   late bool isQueued;
   late bool isFavorite;
 
@@ -61,6 +63,9 @@ class _EpisodeCardListState extends ConsumerState<EpisodeCardList> {
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final duration = _formatDuration(widget.episodeItem['duration']);
+    final author = widget.author ??
+        widget.podcast.author ??
+        Translations.of(context).text('unknown');
 
     return GestureDetector(
       onTap: () {
@@ -123,53 +128,58 @@ class _EpisodeCardListState extends ConsumerState<EpisodeCardList> {
                     ),
                     const SizedBox(height: 4),
                     // Author and date row
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.author,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
+                    if (widget.showAuthor) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              author,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        if (duration.isNotEmpty) ...[
+                          if (duration.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.access_time,
+                              size: 12,
+                              color: Colors.grey[500],
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              duration,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[500],
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                           const SizedBox(width: 8),
-                          Icon(
-                            Icons.access_time,
-                            size: 12,
-                            color: Colors.grey[500],
-                          ),
-                          const SizedBox(width: 2),
                           Text(
-                            duration,
+                            podcastDate,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: Colors.grey[500],
                               fontSize: 11,
                             ),
                           ),
                         ],
-                        const SizedBox(width: 8),
-                        Text(
-                          podcastDate,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[500],
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Description preview (lightweight, no Html widget)
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    // Description preview
                     if (widget.episodeItem['description'] != null)
                       _buildDescriptionPreview(
                         widget.episodeItem['description'],
                         theme,
                       ),
                     const SizedBox(height: 8),
-                    // Action buttons
+                    // Play button on its own line
+                    _buildPlayButton(context, ref),
+                    const SizedBox(height: 4),
+                    // Other action buttons
                     _buildActionButtons(context, ref),
                   ],
                 ),
@@ -196,37 +206,39 @@ class _EpisodeCardListState extends ConsumerState<EpisodeCardList> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
-    return Row(
-      children: [
-        // Play button
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            onPressed: () {
-              if (ref.read(audioProvider).currentEpisode !=
-                  widget.episodeItem) {
-                ref
-                    .read(audioProvider.notifier)
-                    .playerPlayButtonClicked(widget.episodeItem, context);
-                ref.read(audioProvider).currentEpisode!['author'] =
-                    widget.author;
-              }
-            },
-            child: PlayButtonWidget(
-              episodeItem: widget.episodeItem,
-            ),
+  Widget _buildPlayButton(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          minimumSize: const Size.fromHeight(36),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
-        const SizedBox(width: 4),
+        onPressed: () {
+          if (ref.read(audioProvider).currentEpisode != widget.episodeItem) {
+            ref
+                .read(audioProvider.notifier)
+                .playerPlayButtonClicked(widget.episodeItem, context);
+            ref.read(audioProvider).currentEpisode!['author'] =
+                widget.author ?? widget.podcast.author ?? '';
+          }
+        },
+        child: PlayButtonWidget(
+          episodeItem: widget.episodeItem,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
         // Queue button
         _buildQueueButton(context, ref),
         const SizedBox(width: 4),

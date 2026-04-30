@@ -11,8 +11,8 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
-import 'package:openair/views/widgets/episode_card_list.dart';
 
 final getHistoryProvider =
     FutureProvider.autoDispose<List<HistoryModel>>((ref) async {
@@ -172,11 +172,11 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                           artwork: data[index].image,
                         );
 
-                        return EpisodeCardList(
-                          title: data[index].title,
-                          author: data[index].author!,
+                        return UnifiedEpisodeCard(
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
+                          title: data[index].title,
+                          author: data[index].author!,
                         );
                       },
                     ),
