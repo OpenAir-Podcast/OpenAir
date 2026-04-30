@@ -169,8 +169,8 @@ class _SubscribeButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       tooltip: isSubscribed
-          ? Translations.of(context).text('unsubscribeToPodCast')
-          : Translations.of(context).text('subscribeToPodCast'),
+          ? Translations.of(context).text('unsubscribeToPodcast')
+          : Translations.of(context).text('subscribeToPodcast'),
       onPressed: () => _toggleSubscription(context, ref),
       icon: Icon(isSubscribed ? Icons.check : Icons.add),
     );

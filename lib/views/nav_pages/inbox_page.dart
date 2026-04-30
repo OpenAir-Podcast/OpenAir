@@ -7,26 +7,18 @@ import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-
+import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/feeds_episode_card_list.dart';
-import 'package:openair/views/widgets/feeds_episode_card_grid.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getInboxProvider = FutureProvider.autoDispose((ref) async {
   final Map<String, FeedModel> inboxEpisodes =
-      await ref.watch(hiveServiceProvider).getFeed();
-
-  if (inboxEpisodes.isNotEmpty) {
-    return inboxEpisodes;
-  }
-
-  await ref.read(hiveServiceProvider).updateSubscriptions();
-  return await ref.watch(hiveServiceProvider).getFeed();
+      await ref.read(hiveServiceProvider).getFeed();
+  return inboxEpisodes;
 });
 
-final episodeProvider =
-    FutureProvider.autoDispose.family<Map?, String>((ref, guid) async {
-  return await ref.watch(hiveServiceProvider).getEpisode(guid);
+final episodeProvider = FutureProvider.family<Map?, String>((ref, guid) async {
+  return await ref.read(hiveServiceProvider).getEpisode(guid);
 });
 
 class InboxPage extends ConsumerStatefulWidget {
@@ -39,13 +31,12 @@ class InboxPage extends ConsumerStatefulWidget {
 class _InboxPageState extends ConsumerState<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<Map<String, FeedModel>> getEpisodesValue =
-        ref.watch(getInboxProvider);
+    final episodesValue = ref.watch(getInboxProvider);
 
-    return getEpisodesValue.when(
+    return episodesValue.when(
       data: (Map<String, FeedModel> data) {
         if (data.isEmpty) {
-          return EmptyInbox();
+          return const EmptyInbox();
         }
 
         final feedItems = data.values.toList();
@@ -67,162 +58,117 @@ class _InboxPageState extends ConsumerState<InboxPage> {
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RefreshIndicator(
-              onRefresh: () async {
-                await ref.read(hiveServiceProvider).updateSubscriptions();
-                ref.invalidate(getInboxProvider);
-              },
-              child: MediaQuery.sizeOf(context).width > 1060
-                  ? GridView.builder(
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300.0,
-                        mainAxisExtent: 312.0,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                      ),
-                      cacheExtent: cacheExtent,
-                      itemCount: feedItems.length,
-                      itemBuilder: (context, index) {
-                        final feedItem = feedItems[index];
-                        final episodeFuture =
-                            ref.watch(episodeProvider(feedItem.guid));
+          body: ListView.separated(
+            padding: const EdgeInsets.all(12),
+            cacheExtent: cacheExtent,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemCount: feedItems.length,
+            itemBuilder: (context, index) {
+              final feedItem = feedItems[index];
+              final episodeFuture = ref.watch(episodeProvider(feedItem.guid));
 
-                        return episodeFuture.when(
-                          data: (episodeData) {
-                            if (episodeData == null) {
-                              return const SizedBox.shrink();
-                            }
+              return episodeFuture.when(
+                data: (episodeData) {
+                  if (episodeData == null) {
+                    return const SizedBox.shrink();
+                  }
 
-                            PodcastModel podcastModel = PodcastModel(
-                              id: episodeData['id'] ?? -1,
-                              title: episodeData['title'],
-                              author: episodeData['author'],
-                              feedUrl: episodeData['feedUrl'],
-                              imageUrl: episodeData['image'],
-                              description: episodeData['description'],
-                              artwork: episodeData['image'],
-                            );
+                  final podcast = PodcastModel(
+                    id: episodeData['id'] ?? -1,
+                    title: episodeData['title'] ?? '',
+                    author: episodeData['author'] ?? '',
+                    feedUrl: episodeData['feedUrl'] ?? '',
+                    imageUrl: episodeData['image'] ?? '',
+                    description: episodeData['description'] ?? '',
+                    artwork: episodeData['image'] ?? '',
+                  );
 
-                            return FeedsEpisodeCardGrid(
-                              title: episodeData['title'],
-                              // FIXME need to get the podcast info
-                              author: episodeData['author'] ??
-                                  Translations.of(context).text('unknown'),
-                              episodeItem: episodeData.cast<String, dynamic>(),
-                              podcast: podcastModel,
-                            );
-                          },
-                          loading: () =>
-                              const Center(child: CircularProgressIndicator()),
-                          error: (error, stackTrace) => const SizedBox.shrink(),
-                        );
-                      },
-                    )
-                  : ListView.builder(
-                      cacheExtent: cacheExtent,
-                      itemCount: feedItems.length,
-                      itemBuilder: (context, index) {
-                        final feedItem = feedItems[index];
-                        final episodeFuture =
-                            ref.watch(episodeProvider(feedItem.guid));
-
-                        return episodeFuture.when(
-                          data: (episodeData) {
-                            if (episodeData == null) {
-                              return const SizedBox.shrink();
-                            }
-
-                            PodcastModel podcastModel = PodcastModel(
-                              id: episodeData['id'],
-                              title: episodeData['title'],
-                              author: episodeData['author'],
-                              feedUrl: episodeData['feedUrl'],
-                              imageUrl: episodeData['image'],
-                              description: episodeData['description'],
-                              artwork: episodeData['image'],
-                            );
-
-                            return FeedsEpisodeCardList(
-                              title: episodeData['title'],
-                              episodeItem: episodeData.cast<String, dynamic>(),
-                              podcast: podcastModel,
-                            );
-                          },
-                          loading: () =>
-                              const Center(child: CircularProgressIndicator()),
-                          error: (error, stackTrace) => const SizedBox.shrink(),
-                        );
-                      },
-                    ),
-            ),
-          ),
-          bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? bannerAudioPlayerHeight
-                : 0.0,
-            child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? const BannerAudioPlayer()
-                : const SizedBox.shrink(),
-          ),
-        );
-      },
-      error: (error, stackTrace) {
-        debugPrint('Error loading episodes: $error');
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 75.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 20.0),
-                Text(
-                  Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$error',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  width: 180.0,
-                  height: 40.0,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      ref.invalidate(getInboxProvider);
+                  return GestureDetector(
+                    onTap: () {
+                      ref.read(audioProvider.notifier).currentPodcast = podcast;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EpisodesPage(
+                            podcast: podcast,
+                          ),
+                        ),
+                      );
                     },
-                    child: const Text('Retry'),
-                  ),
-                ),
-              ],
-            ),
+                    child: UnifiedEpisodeCard(
+                      episodeItem: episodeData.cast<String, dynamic>(),
+                      podcast: podcast,
+                      title: episodeData['title'] ?? '',
+                      author: episodeData['author'] ??
+                          Translations.of(context).text('unknown'),
+                      showAuthor: true,
+                    ),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const SizedBox.shrink(),
+              );
+            },
           ),
+          bottomNavigationBar: _buildBottomBar(),
         );
       },
-      loading: () => Container(
-        color: Brightness.dark == Theme.of(context).brightness
-            ? Colors.black
-            : Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        appBar: AppBar(title: Text(Translations.of(context).text('inbox'))),
+        body: _ErrorView(error: error.toString()),
+      ),
+    );
+  }
+
+  Widget? _buildBottomBar() {
+    final isPodcastSelected = ref.watch(
+      audioProvider.select((p) => p.isPodcastSelected),
+    );
+
+    if (!isPodcastSelected) return null;
+
+    return SizedBox(
+      height: bannerAudioPlayerHeight,
+      child: const BannerAudioPlayer(),
+    );
+  }
+}
+
+class _ErrorView extends ConsumerWidget {
+  final String error;
+
+  const _ErrorView({required this.error});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            Translations.of(context).text('oopsTryAgainLater'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              error,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => ref.invalidate(getInboxProvider),
+            child: Text(Translations.of(context).text('retry')),
+          ),
+        ],
       ),
     );
   }
