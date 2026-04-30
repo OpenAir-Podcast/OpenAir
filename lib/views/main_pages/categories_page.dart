@@ -316,10 +316,9 @@ class _CategoryListTile extends StatelessWidget {
             Expanded(
               child: Text(
                 category.name,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
             ),
             Icon(

@@ -434,10 +434,12 @@ class _SignUpState extends ConsumerState<SignUp> {
                                 Translations.of(context)
                                     .text('signUp')
                                     .toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                       ),
                     ],
