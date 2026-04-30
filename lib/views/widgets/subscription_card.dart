@@ -97,11 +97,11 @@ class SubscriptionCard extends ConsumerWidget {
                         ),
                         child: Text(
                           newEpisodes > 99 ? '99+' : '$newEpisodes',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ),
                     ),
@@ -116,7 +116,6 @@ class SubscriptionCard extends ConsumerWidget {
                     subs[index].title,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
-                      fontSize: 10,
                       height: 1.1,
                     ),
                     maxLines: 2,
