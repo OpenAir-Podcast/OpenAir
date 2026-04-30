@@ -442,14 +442,14 @@ class PodcastsCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8.0),
                 SizedBox(
-                  height: 40,
+                  height: 40.0,
                   child: Text(
                     feed.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
-                          height: 1.2,
+                          height: 1.0,
                         ),
                   ),
                 ),
