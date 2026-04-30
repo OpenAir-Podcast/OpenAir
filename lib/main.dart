@@ -112,7 +112,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             floatingActionButtonTheme: floatingActionButtonTheme,
             cardColor: cardColorLight,
             colorScheme: colorSchemeLight,
-            textTheme: scaleTextTheme(baseTextTheme, 0.8),
+            textTheme: scaleTextTheme(baseTextTheme, 0.875),
             snackBarTheme: snackBarThemeLight,
             listTileTheme: listTileThemeLight,
           ),
@@ -176,7 +176,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             floatingActionButtonTheme: floatingActionButtonTheme,
             cardColor: cardColorDark,
             colorScheme: colorSchemeDark,
-            textTheme: scaleTextTheme(baseTextTheme, 0.8),
+            textTheme: scaleTextTheme(baseTextTheme, 0.875),
             snackBarTheme: snackBarThemeDark,
             listTileTheme: listTileThemeDark,
           ),
@@ -275,7 +275,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
-    
+
     _controller.forward();
 
     // Minimum 2 second delay
@@ -349,8 +349,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
                 const SizedBox(height: 20),
                 Text(
                   'OpenAir',
-                  style: TextStyle(
-                    fontSize: 32,
+                  style: widget.themeData.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: widget.themeData.colorScheme.onPrimary,
                   ),

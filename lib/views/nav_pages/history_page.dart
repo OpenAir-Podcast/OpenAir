@@ -207,23 +207,14 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                 const SizedBox(height: 20.0),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Brightness.light == Theme.of(context).brightness
-                        ? Colors.black
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Brightness.light == Theme.of(context).brightness
-                        ? Colors.black
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(

@@ -115,7 +115,9 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             Translations.of(context).text('oopsTryAgainLater'),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -123,7 +125,9 @@ class _ErrorView extends StatelessWidget {
             child: Text(
               error,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

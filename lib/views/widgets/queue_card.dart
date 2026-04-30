@@ -106,7 +106,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                   ref.read(audioProvider).getPodcastPublishedDateFromEpoch(
                         widget.episodeItem['datePublished'],
                       ),
-                  style: const TextStyle(fontSize: 12),
+                  style: Theme.of(context).textTheme.bodySmall,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                   textAlign: TextAlign.left,
@@ -114,7 +114,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                 const Text(' | '),
                 Text(
                   widget.episodeItem['downloadSize'],
-                  style: const TextStyle(fontSize: 12),
+                  style: Theme.of(context).textTheme.bodySmall,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),

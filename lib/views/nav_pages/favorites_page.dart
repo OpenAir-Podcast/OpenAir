@@ -139,17 +139,14 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                 const SizedBox(height: 20.0),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Text(
                   '$error',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(

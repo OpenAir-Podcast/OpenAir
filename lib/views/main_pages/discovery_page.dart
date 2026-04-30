@@ -59,14 +59,14 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                         const SizedBox(height: 20.0),
                         Text(
                           Translations.of(context).text('oopsAnErrorOccurred'),
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         Text(
                           Translations.of(context).text('oopsTryAgainLater'),
-                          style: TextStyle(fontSize: 16.0),
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(height: 20.0),
                         SizedBox(
@@ -137,17 +137,16 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                 const SizedBox(height: 20.0),
                 Text(
                   Translations.of(context).text('oopsAnErrorOccurred'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
                       Translations.of(context).text('oopsTryAgainLater'),
-                      style: TextStyle(fontSize: 16.0),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                 ),

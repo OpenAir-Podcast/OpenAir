@@ -52,10 +52,9 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                   children: [
                     Text(
                       Translations.of(context).text('subscriptions'),
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     if (totalNew > 0) ...[
                       const SizedBox(width: 8),
@@ -68,11 +67,11 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                         ),
                         child: Text(
                           '$totalNew',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ),
                     ],
@@ -218,12 +217,14 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             Translations.of(context).text('oopsTryAgainLater'),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           Text(
             error,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 20),
           SizedBox(

@@ -383,10 +383,12 @@ class _SignUpState extends ConsumerState<SignUp> {
                               child: Text(
                                 Translations.of(context)
                                     .text('termsAndPrivacyPolicy'),
-                                style: TextStyle(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontSize: 14,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                               ),
                             ),
                           ),
