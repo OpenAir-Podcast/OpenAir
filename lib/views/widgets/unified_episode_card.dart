@@ -58,8 +58,8 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final podcastDate = ref
-        .read(audioProvider)
+    final audioState = ref.watch(audioProvider);
+    final podcastDate = audioState
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final duration = _formatDuration(widget.episodeItem['duration']);
@@ -85,105 +85,104 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Added padding for better spacing
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize
+                .min, // Prevents Column from trying to take infinite height
             children: [
-              // Episode thumbnail
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  color: theme.cardColor,
-                  child: CachedNetworkImage(
-                    memCacheHeight: 144,
-                    memCacheWidth: 144,
-                    imageUrl: widget.episodeItem['feedImage'] ??
-                        widget.podcast.imageUrl,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Icon(
-                      Icons.podcasts,
-                      size: 32,
-                      color: Colors.grey[400],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start, // Align to top
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      color: theme.cardColor,
+                      child: CachedNetworkImage(
+                        memCacheHeight: 144,
+                        memCacheWidth: 144,
+                        imageUrl: widget.episodeItem['feedImage'] ??
+                            widget.podcast.imageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.podcasts,
+                          size: 32,
+                          color: Colors.grey[400],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      widget.title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    // Author and date row
-                    if (widget.showAuthor) ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              author,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.title,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
                           ),
-                          if (duration.isNotEmpty) ...[
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.access_time,
-                              size: 12,
-                              color: Colors.grey[500],
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              duration,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[500],
-                                fontSize: 11,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        if (widget.showAuthor) ...[
+                          Wrap(
+                            // Using Wrap instead of Row prevents overflow on small screens
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                author,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                          const SizedBox(width: 8),
-                          Text(
-                            podcastDate,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[500],
-                              fontSize: 11,
-                            ),
+                              if (duration.isNotEmpty) ...[
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.access_time,
+                                        size: 12, color: Colors.grey[500]),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      duration,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              Text(
+                                podcastDate,
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(fontSize: 11),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    // Description preview
-                    if (widget.episodeItem['description'] != null)
-                      _buildDescriptionPreview(
-                        widget.episodeItem['description'],
-                        theme,
-                      ),
-                    const SizedBox(height: 8),
-                    // Play button on its own line
-                    _buildPlayButton(context, ref),
-                    const SizedBox(height: 4),
-                    // Other action buttons
-                    _buildActionButtons(context, ref),
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
+              if (widget.episodeItem['description'] != null) ...[
+                const SizedBox(height: 8),
+                _buildDescriptionPreview(
+                  widget.episodeItem['description'],
+                  theme,
+                ),
+              ],
+              const SizedBox(height: 12),
+              _buildPlayButton(context, ref),
+              const SizedBox(height: 8),
+              _buildActionButtons(context, ref),
             ],
           ),
         ),
@@ -211,7 +210,12 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          elevation: 0,
+          elevation: 1,
+          backgroundColor:
+              ref.watch(audioProvider).currentEpisode == widget.episodeItem
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.secondary,
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           minimumSize: const Size.fromHeight(36),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -237,7 +241,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Queue button
         _buildQueueButton(context, ref),
