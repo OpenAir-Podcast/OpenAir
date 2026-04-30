@@ -111,6 +111,7 @@ class PodcastInfoPage extends ConsumerWidget {
                               children: [
                                 Text(
                                   podcastInfo['title'],
+                                  textAlign: TextAlign.center,
                                   style:
                                       theme.textTheme.headlineSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
