@@ -278,12 +278,51 @@ class _AppHomeState extends ConsumerState<_AppHome>
 
     _controller.forward();
 
+    // Load saved theme
+    _loadSavedTheme();
+
     // Minimum 2 second delay
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() => _minDelayPassed = true);
       }
     });
+  }
+
+  void _loadSavedTheme() async {
+    try {
+      final box = await Hive.openBox('openAirBox');
+      final settings = box.get('userInterface');
+
+      if (settings != null) {
+        final fontSizeFactor = settings['fontSizeFactor'] ?? 'Medium';
+        final themeMode = settings['themeMode'] ?? 'Light';
+
+        String sizeSuffix;
+        switch (fontSizeFactor) {
+          case 'Small':
+            sizeSuffix = 'small';
+            break;
+          case 'Large':
+            sizeSuffix = 'large';
+            break;
+          case 'Extra Large':
+            sizeSuffix = 'extra_large';
+            break;
+          default:
+            sizeSuffix = 'medium';
+        }
+
+        String themeSuffix = themeMode == 'Dark' ? 'dark' : 'light';
+        final themeId = 'blue_accent_${themeSuffix}_$sizeSuffix';
+
+        if (mounted) {
+          ThemeProvider.controllerOf(context).setTheme(themeId);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading saved theme: $e');
+    }
   }
 
   @override
