@@ -6,14 +6,14 @@ import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/episode_card_grid.dart';
-import 'package:openair/views/widgets/episode_card_list.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getDownloadsProvider =
     FutureProvider.autoDispose<List<DownloadModel>>((ref) async {
-  return await ref.read(openAirProvider).getSortedDownloadedEpisodes();
+  final hiveService = ref.watch(hiveServiceProvider);
+  return hiveService.getSortedDownloads();
 });
 
 class DownloadsPage extends ConsumerStatefulWidget {
@@ -26,13 +26,13 @@ class DownloadsPage extends ConsumerStatefulWidget {
 class _DownloadsState extends ConsumerState<DownloadsPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<DownloadModel>> getEpisodesValue =
+    final AsyncValue<List<DownloadModel>> episodesValue =
         ref.watch(getDownloadsProvider);
 
-    return getEpisodesValue.when(
+    return episodesValue.when(
       data: (List<DownloadModel> data) {
         if (data.isEmpty) {
-          return NoDownloadedEpisodes();
+          return const NoDownloadedEpisodes();
         }
 
         return Scaffold(
@@ -42,189 +42,88 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  tooltip: Translations.of(context).text('clearDownloads'),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext dialogContext) => AlertDialog(
-                        title: Text(
-                          Translations.of(context).text('clearDownloads'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                          ),
-                        ),
-                        content: Text(
-                          Translations.of(context)
-                              .text('areYouSureClearDownloads'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child:
-                                Text(Translations.of(context).text('cancel')),
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              Translations.of(context).text('clear'),
-                              style: TextStyle(
-                                color: Colors.red,
-                              ),
-                            ),
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-
-                              await ref
-                                  .read(audioProvider)
-                                  .removeAllDownloadedPodcasts(context);
-
-                              ref.invalidate(getDownloadsProvider);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                  onPressed: () => ref.invalidate(getDownloadsProvider),
+                  icon: const Icon(Icons.refresh_rounded),
                 ),
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RefreshIndicator(
-              onRefresh: () async => ref.invalidate(getDownloadsProvider),
-              child: MediaQuery.sizeOf(context).width > 1060
-                  ? GridView.builder(
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300.0,
-                        mainAxisExtent: 300.0,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                      ),
-                      cacheExtent: cacheExtent,
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        PodcastModel podcastModel = PodcastModel(
-                          id: data[index].podcastId,
-                          title: data[index].title,
-                          author: data[index].author,
-                          feedUrl: data[index].feedUrl,
-                          imageUrl: data[index].image,
-                          description: data[index].description,
-                          artwork: data[index].image,
-                        );
+          body: ListView.separated(
+            padding: const EdgeInsets.all(12),
+            cacheExtent: cacheExtent,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final author = data[index].author.isNotEmpty == true
+                  ? data[index].author
+                  : Translations.of(context).text('unknown');
 
-                        return EpisodeCardGrid(
-                          title: data[index].title,
-                          author: data[index].author.isNotEmpty
-                              ? data[index].author
-                              : Translations.of(context).text('unknown'),
-                          imageUrl: data[index].image,
-                          episodeItem: data[index].toJson(),
-                          podcast: podcastModel,
-                        );
-                      },
-                    )
-                  : ListView.builder(
-                      cacheExtent: cacheExtent,
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        PodcastModel podcastModel = PodcastModel(
-                          id: data[index].podcastId,
-                          title: data[index].title,
-                          author: data[index].author,
-                          feedUrl: data[index].feedUrl,
-                          imageUrl: data[index].image,
-                          description: data[index].description,
-                          artwork: data[index].image,
-                        );
-
-                        return EpisodeCardList(
-                          title: data[index].title,
-                          author: data[index].author,
-                          episodeItem: data[index].toJson(),
-                          podcast: podcastModel,
-                        );
-                      },
-                    ),
-            ),
+              return UnifiedEpisodeCard(
+                episodeItem: data[index].toJson(),
+                podcast: PodcastModel.fromJson(data[index].toJson()),
+                title: data[index].title,
+                author: author,
+                showAuthor: true,
+              );
+            },
           ),
-          bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? bannerAudioPlayerHeight
-                : 0.0,
-            child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
-                ? const BannerAudioPlayer()
-                : const SizedBox.shrink(),
-          ),
+          bottomNavigationBar: _buildBottomBar(context, ref),
         );
       },
-      error: (error, stackTrace) {
-        debugPrint('Error loading episodes: $error');
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 75.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 20.0),
-                Text(
-                  Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$error',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  width: 180.0,
-                  height: 40.0,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      ref.invalidate(getDownloadsProvider);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ),
-              ],
-            ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        appBar: AppBar(title: Text(Translations.of(context).text('downloads'))),
+        body: _ErrorView(error: error.toString()),
+      ),
+    );
+  }
+
+  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
+    final isPodcastSelected = ref.watch(
+      audioProvider.select((p) => p.isPodcastSelected),
+    );
+
+    if (!isPodcastSelected) return null;
+
+    return SizedBox(
+      height: bannerAudioPlayerHeight,
+      child: const BannerAudioPlayer(),
+    );
+  }
+}
+
+class _ErrorView extends ConsumerWidget {
+  final String error;
+
+  const _ErrorView({required this.error});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            Translations.of(context).text('oopsTryAgainLater'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-        );
-      },
-      loading: () => Container(
-        color: Brightness.dark == Theme.of(context).brightness
-            ? Colors.black
-            : Colors.white,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => ref.invalidate(getDownloadsProvider),
+            child: Text(Translations.of(context).text('retry')),
+          ),
+        ],
       ),
     );
   }

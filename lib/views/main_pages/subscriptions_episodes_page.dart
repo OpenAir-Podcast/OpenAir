@@ -6,10 +6,17 @@ import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/widgets/subscription_episode_card_list.dart';
-import 'package:openair/views/widgets/subscription_episode_card_grid.dart';
+import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/native/podcast_info.dart';
+import 'package:openair/views/player/banner_audio_player.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
+
+final podCastDataByUrlProvider =
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, podCastUrl) async {
+  final podCastIndexService = ref.watch(podcastIndexProvider);
+  return await podCastIndexService.getEpisodesByFeedUrl(podCastUrl);
+});
 
 class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
   const SubscriptionsEpisodesPage({
@@ -30,15 +37,14 @@ class _SubscriptionsEpisodesPageState
     extends ConsumerState<SubscriptionsEpisodesPage> {
   @override
   Widget build(BuildContext context) {
-    final podcastUrl = widget.podcast.feedUrl;
-    final podcastDataAsyncValue =
-        ref.watch(podcastDataByUrlProvider(podcastUrl));
-    final podcastDataInfoAsyncValue =
+    final podCastUrl = widget.podcast.feedUrl;
+    final podCastDataAsync = ref.watch(podCastDataByUrlProvider(podCastUrl));
+    final podCastDataInfoAsync =
         ref.watch(getPodcastInfoByTitleProvider(widget.podcast.title));
-    final isSubscribedAsyncValue =
+    final isSubscribedAsync =
         ref.watch(isSubscribedProvider(widget.podcast.title));
 
-    return podcastDataAsyncValue.when(
+    return podCastDataAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
@@ -47,13 +53,13 @@ class _SubscriptionsEpisodesPageState
         appBar: AppBar(title: Text(widget.podcast.title)),
         body: _ErrorView(
           error: error.toString(),
-          podcastFeedUrl: widget.podcast.feedUrl,
+          podCastFeedUrl: podCastUrl,
         ),
       ),
       data: (snapshot) {
-        return podcastDataInfoAsyncValue.when(
+        return podCastDataInfoAsync.when(
           data: (data) {
-            return isSubscribedAsyncValue.when(
+            return isSubscribedAsync.when(
               data: (isSubscribed) {
                 return Scaffold(
                   appBar: AppBar(
@@ -61,7 +67,7 @@ class _SubscriptionsEpisodesPageState
                     actions: [
                       IconButton(
                         tooltip:
-                            Translations.of(context).text('podcastDetails'),
+                            Translations.of(context).text('podCastDetails'),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -79,7 +85,7 @@ class _SubscriptionsEpisodesPageState
                       ),
                     ],
                   ),
-                  body: _buildEpisodeList(context, ref, snapshot),
+                  body: _buildEpisodeList(context, ref, snapshot, data),
                   bottomNavigationBar: _buildBottomBar(context, ref),
                 );
               },
@@ -96,10 +102,7 @@ class _SubscriptionsEpisodesPageState
           ),
           error: (_, __) => Scaffold(
             appBar: AppBar(title: Text(widget.podcast.title)),
-            body: _ErrorView(
-              error: 'Error loading subscription status',
-              podcastFeedUrl: widget.podcast.feedUrl,
-            ),
+            body: _buildEpisodeList(context, ref, snapshot, null),
           ),
         );
       },
@@ -110,8 +113,8 @@ class _SubscriptionsEpisodesPageState
     BuildContext context,
     WidgetRef ref,
     Map snapshot,
+    Map? podcastInfo,
   ) {
-    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
     final episodeCount = snapshot['count'] ?? 0;
 
     if (episodeCount == 0) {
@@ -130,35 +133,25 @@ class _SubscriptionsEpisodesPageState
       );
     }
 
-    if (isWide) {
-      return GridView.builder(
-        padding: const EdgeInsets.all(12),
-        cacheExtent: cacheExtent,
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 250,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: episodeCount,
-        itemBuilder: (context, index) => SubscriptionEpisodeCardGrid(
-          title: snapshot['items'][index]['title'],
-          episodeItem: snapshot['items'][index],
-          podcast: widget.podcast,
-        ),
-      );
-    }
-
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       cacheExtent: cacheExtent,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodeCount,
-      itemBuilder: (context, index) => SubscriptionEpisodeCardList(
-        title: snapshot['items'][index]['title'],
-        episodeItem: snapshot['items'][index],
-        podcast: widget.podcast,
-      ),
+      itemBuilder: (context, index) {
+        final author = (podcastInfo?['author']?.isNotEmpty == true ||
+                widget.podcast.author?.isNotEmpty == true)
+            ? (podcastInfo?['author'] ?? widget.podcast.author!)
+            : Translations.of(context).text('unknown');
+
+        return UnifiedEpisodeCard(
+          episodeItem: snapshot['items'][index],
+          podcast: widget.podcast,
+          title: snapshot['items'][index]['title'],
+          author: author,
+          showAuthor: true,
+        );
+      },
     );
   }
 
@@ -189,8 +182,8 @@ class _SubscribeButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       tooltip: isSubscribed
-          ? Translations.of(context).text('unsubscribeToPodcast')
-          : Translations.of(context).text('subscribeToPodcast'),
+          ? Translations.of(context).text('unsubscribeToPodCast')
+          : Translations.of(context).text('subscribeToPodCast'),
       onPressed: () => _toggleSubscription(context, ref),
       icon: Icon(isSubscribed ? Icons.check : Icons.add),
     );
@@ -215,9 +208,10 @@ class _SubscribeButton extends ConsumerWidget {
 
 class _ErrorView extends ConsumerWidget {
   final String error;
-  final String podcastFeedUrl;
 
-  const _ErrorView({required this.error, required this.podcastFeedUrl});
+  const _ErrorView({required this.error, required this.podCastFeedUrl});
+
+  final String podCastFeedUrl;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -226,29 +220,23 @@ class _ErrorView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             Translations.of(context).text('oopsTryAgainLater'),
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(
-              error,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 24),
-          Consumer(
-            builder: (context, ref, _) => ElevatedButton(
-              onPressed: () =>
-                  ref.invalidate(podcastDataByUrlProvider(podcastFeedUrl)),
-              child: Text(Translations.of(context).text('retry')),
-            ),
+          ElevatedButton(
+            onPressed: () =>
+                ref.invalidate(podCastDataByUrlProvider(podCastFeedUrl)),
+            child: Text(Translations.of(context).text('retry')),
           ),
         ],
       ),

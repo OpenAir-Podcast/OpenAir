@@ -9,7 +9,7 @@ import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
-import 'package:openair/views/widgets/episode_card_list.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getFavoriteProvider = StreamProvider.autoDispose((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
@@ -94,7 +94,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         final episodeData = data.values.elementAt(index);
                         PodcastModel podcastData = episodeData['podcast'];
 
-                        return EpisodeCardList(
+                        return UnifiedEpisodeCard(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
                           author: (podcastData.author?.isNotEmpty == true)
