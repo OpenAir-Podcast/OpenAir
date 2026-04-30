@@ -69,10 +69,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     },
                     child: Text(
                       ref.watch(audioProvider).currentEpisode!['title'],
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       textAlign: TextAlign.center,
@@ -97,10 +96,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                               true
                           ? ref.watch(audioProvider).currentEpisode!['author']
                           : Translations.of(context).text('unknown'),
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.grey,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -195,14 +193,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             right: 0.0,
                             child: Text(
                               '-${rewindIntervalConfig}s',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.0,
-                                color: Brightness.dark ==
-                                        Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ],
@@ -240,14 +236,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             right: 0.0,
                             child: Text(
                               '+${fastForwardIntervalConfig}s',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.0,
-                                color: Brightness.dark ==
-                                        Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ],
