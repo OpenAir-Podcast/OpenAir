@@ -55,8 +55,18 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
             itemCount: episodesDataSet.length,
             itemBuilder: (context, index) {
               final episodeItem = episodesDataSet[index];
-              final podcast = PodcastModel.fromJson(
-                  (episodeItem['podcast'] as Map).cast<String, dynamic>());
+              final podcastMap = (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
+              final podcast = podcastMap != null
+                  ? PodcastModel.fromJson(podcastMap)
+                  : PodcastModel(
+                      id: -1,
+                      feedUrl: episodeItem['feedUrl'] ?? '',
+                      title: episodeItem['feedTitle'] ?? 'Unknown Podcast',
+                      author: episodeItem['author'] ?? 'Unknown Author',
+                      imageUrl: episodeItem['feedImage'] ?? '',
+                      artwork: episodeItem['feedImage'] ?? '',
+                      description: '',
+                    );
 
               return GestureDetector(
                 onTap: () {

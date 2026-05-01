@@ -474,6 +474,16 @@ class HiveService {
               final guid = episode['guid'];
 
               if (await episodeBox.get(guid) == null) {
+                episode['podcast'] = {
+                  'id': subscription.id,
+                  'title': subscription.title,
+                  'author': subscription.author,
+                  'url': subscription.feedUrl,
+                  'image': subscription.imageUrl,
+                  'artwork': subscription.artwork,
+                  'description': subscription.description,
+                };
+                
                 await episodeBox.put(guid, episode);
 
                 if (downloadNewEpisodesConfig) {
@@ -524,6 +534,15 @@ class HiveService {
           for (final episode in newEpisodes) {
             final guid = episode['guid'];
             if (await episodeBox.get(guid) == null) {
+              episode['podcast'] = {
+                'id': subscription.id,
+                'title': subscription.title,
+                'author': subscription.author,
+                'url': subscription.feedUrl,
+                'image': subscription.imageUrl,
+                'artwork': subscription.artwork,
+                'description': subscription.description,
+              };
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
 
