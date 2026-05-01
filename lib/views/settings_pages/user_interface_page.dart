@@ -103,49 +103,49 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
           switch (userInterface['language']) {
             case 'English':
-              language = Translations.of(context).text('english');
+              language = "English";
               break;
             case 'Spanish':
-              language = Translations.of(context).text('spanish');
+              language = "Español";
               break;
             case 'French':
-              language = Translations.of(context).text('french');
+              language = "Français";
               break;
             case 'German':
-              language = Translations.of(context).text('german');
+              language = "Deutsch";
               break;
             case 'Italian':
-              language = Translations.of(context).text('italian');
+              language = "Italiano";
               break;
             case 'Portuguese':
-              language = Translations.of(context).text('portuguese');
+              language = "Português";
               break;
             case 'Russian':
-              language = Translations.of(context).text('russian');
+              language = "Русский";
               break;
             case 'Chinese':
-              language = Translations.of(context).text('chinese');
+              language = "中文";
               break;
             case 'Japanese':
-              language = Translations.of(context).text('japanese');
+              language = "日本語";
               break;
             case 'Korean':
-              language = Translations.of(context).text('korean');
+              language = "한국어";
               break;
             case 'Arabic':
-              language = Translations.of(context).text('arabic');
+              language = "العربية";
               break;
             case 'Hebrew':
-              language = Translations.of(context).text('hebrew');
+              language = "עברית";
               break;
             case 'Dutch':
-              language = Translations.of(context).text('dutch');
+              language = "Nederlands";
               break;
             case 'Swedish':
-              language = Translations.of(context).text('swedish');
+              language = "Svenska";
               break;
             default:
-              language = Translations.of(context).text('english');
+              language = "English";
           }
 
           switch (userInterface['voice']) {
@@ -566,20 +566,20 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       });
                     },
                     items: <String>[
-                      Translations.of(context).text('english'),
-                      Translations.of(context).text('spanish'),
-                      Translations.of(context).text('french'),
-                      Translations.of(context).text('german'),
-                      Translations.of(context).text('italian'),
-                      Translations.of(context).text('portuguese'),
-                      Translations.of(context).text('russian'),
-                      Translations.of(context).text('chinese'),
-                      Translations.of(context).text('japanese'),
-                      Translations.of(context).text('korean'),
-                      Translations.of(context).text('arabic'),
-                      Translations.of(context).text('hebrew'),
-                      Translations.of(context).text('dutch'),
-                      Translations.of(context).text('swedish'),
+                      "English",
+                      "Español",
+                      "Français",
+                      "Deutsch",
+                      "Italiano",
+                      "Português",
+                      "Русский",
+                      "中文",
+                      "日本語",
+                      "한국어",
+                      "العربية",
+                      "עברית",
+                      "Nederlands",
+                      "Svenska",
                     ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
