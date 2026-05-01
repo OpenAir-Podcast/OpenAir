@@ -366,7 +366,7 @@ class AudioController extends ChangeNotifier {
       historyPodcastImage = podcast.imageUrl;
       historyPodcastAuthor = podcast.author ?? 'Unknown';
     } else {
-      historyPodcastId = episode['podcastId']?.toString() ?? 'unknown';
+      historyPodcastId = episode['podcastId']?.toString() ?? '-1';
       historyPodcastImage = episode['image'] ?? '';
       historyPodcastAuthor = episode['author'] ?? 'Unknown';
     }

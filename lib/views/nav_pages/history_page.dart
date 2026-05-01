@@ -140,7 +140,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
-                          id: int.parse(data[index].podcastId),
+                          id: int.tryParse(data[index].podcastId) ?? -1,
                           feedUrl: data[index].feedUrl,
                           title: data[index].title,
                           author: data[index].author,
@@ -163,7 +163,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
-                          id: int.parse(data[index].podcastId),
+                          id: int.tryParse(data[index].podcastId) ?? -1,
                           feedUrl: data[index].feedUrl,
                           title: data[index].title,
                           author: data[index].author,
