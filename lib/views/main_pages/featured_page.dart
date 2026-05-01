@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/main_pages/category_page.dart';
@@ -107,6 +108,7 @@ class FeaturedPage extends ConsumerStatefulWidget {
 class _FeaturedPageState extends ConsumerState<FeaturedPage> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider); // Ensure rebuild on language change
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return getConnectionStatusValue.when(

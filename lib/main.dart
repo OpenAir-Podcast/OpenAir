@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/config/config.dart';
@@ -442,6 +443,9 @@ class _AppHomeState extends ConsumerState<_AppHome>
           supportedLocales: Translations.supportedLocales,
           localizationsDelegates: const [
             LocalizationsPlusDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
             FallbackCupertinoLocalizationsDelegate()
           ],
           debugShowCheckedModeBanner: false,
@@ -459,6 +463,9 @@ class _AppHomeState extends ConsumerState<_AppHome>
       supportedLocales: Translations.supportedLocales,
       localizationsDelegates: const [
         LocalizationsPlusDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
         FallbackCupertinoLocalizationsDelegate()
       ],
       debugShowCheckedModeBanner: false,

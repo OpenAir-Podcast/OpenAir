@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/model/category.dart';
 import 'package:openair/views/main_pages/category_page.dart';
 import 'package:openair/components/no_connection.dart';
@@ -319,6 +320,7 @@ class CategoriesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider); // Ensure rebuild on language change
     final connectionAsync = ref.watch(connectionCheckProvider);
 
     return connectionAsync.when(

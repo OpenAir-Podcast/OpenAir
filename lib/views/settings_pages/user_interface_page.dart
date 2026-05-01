@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -485,65 +486,84 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                     value: language,
                     onChanged: (String? newValue) {
                       String saveValue;
-                      String locale;
+                      String localeStr;
+                      late Locale locale;
 
                       if (newValue == "English") {
                         saveValue = 'English';
-                        locale = Localization.en_US;
+                        localeStr = Localization.en_US;
+                        locale = const Locale('en', 'US');
                       } else if (newValue == "Español") {
                         saveValue = 'Spanish';
-                        locale = Localization.es_ES;
+                        localeStr = Localization.es_ES;
+                        locale = const Locale('es', 'ES');
                       } else if (newValue == "Français") {
                         saveValue = 'French';
-                        locale = Localization.fr_FR;
+                        localeStr = Localization.fr_FR;
+                        locale = const Locale('fr', 'FR');
                       } else if (newValue == "Deutsch") {
                         saveValue = 'German';
-                        locale = Localization.de_DE;
+                        localeStr = Localization.de_DE;
+                        locale = const Locale('de', 'DE');
                       } else if (newValue == "Italiano") {
                         saveValue = 'Italian';
-                        locale = Localization.it_IT;
+                        localeStr = Localization.it_IT;
+                        locale = const Locale('it', 'IT');
                       } else if (newValue == "Português") {
                         saveValue = 'Portuguese';
-                        locale = Localization.pt_PT;
+                        localeStr = Localization.pt_PT;
+                        locale = const Locale('pt', 'PT');
                       } else if (newValue == "Русский") {
                         saveValue = 'Russian';
-                        locale = Localization.ru_RU;
+                        localeStr = Localization.ru_RU;
+                        locale = const Locale('ru', 'RU');
                       } else if (newValue == "中文") {
                         saveValue = 'Chinese';
-                        locale = Localization.zh_CN;
+                        localeStr = Localization.zh_CN;
+                        locale = const Locale('zh', 'CN');
                       } else if (newValue == "日本語") {
                         saveValue = 'Japanese';
-                        locale = Localization.ja_JP;
+                        localeStr = Localization.ja_JP;
+                        locale = const Locale('ja', 'JP');
                       } else if (newValue == "한국어") {
                         saveValue = 'Korean';
-                        locale = Localization.ko_KR;
+                        localeStr = Localization.ko_KR;
+                        locale = const Locale('ko', 'KR');
                       } else if (newValue == "العربية") {
                         saveValue = 'Arabic';
-                        locale = Localization.ar_AE;
+                        localeStr = Localization.ar_AE;
+                        locale = const Locale('ar', 'AE');
                       } else if (newValue == "עברית") {
                         saveValue = 'Hebrew';
-                        locale = Localization.he_IL;
+                        localeStr = Localization.he_IL;
+                        locale = const Locale('he', 'IL');
                       } else if (newValue == "Nederlands") {
                         saveValue = 'Dutch';
-                        locale = Localization.nl_NL;
+                        localeStr = Localization.nl_NL;
+                        locale = const Locale('nl', 'NL');
                       } else if (newValue == "Svenska") {
                         saveValue = 'Swedish';
-                        locale = Localization.sv_SE;
+                        localeStr = Localization.sv_SE;
+                        locale = const Locale('sv', 'SE');
                       } else {
                         saveValue = 'English';
-                        locale = Localization.en_US;
+                        localeStr = Localization.en_US;
+                        locale = const Locale('en', 'US');
                       }
 
                       setState(() {
                         userInterface['language'] = saveValue;
-                        userInterface['locale'] = locale;
-                        languageConfig = userInterface['language'];
-                        localeConfig = userInterface['locale'];
+                        userInterface['locale'] = localeStr;
+                        languageConfig = saveValue;
+                        localeConfig = localeStr;
 
-                        localeSettings = locale;
+                        localeSettings = localeStr;
                         onChanged = false;
 
-                        Translations.changeLanguage(locale);
+                        Translations.changeLanguage(localeStr);
+
+                        // Update the locale provider to trigger UI refresh
+                        ref.read(localeProvider.notifier).setLocale(locale);
 
                         ref
                             .watch(openAirProvider)

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
 
 import 'package:openair/views/main_pages/categories_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
@@ -82,6 +83,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     final isWideScreen = _isWideScreen(context);
     final isPodcastPlaying =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+    ref.watch(localeProvider); // Ensure rebuild on language change
 
     return isWideScreen
         ? _buildWideLayout()
@@ -162,7 +164,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
 
   Widget _buildNormalLayout(bool isPodcastPlaying) {
     return _buildMainContent(
-      ListDrawer(languageChanged: () {}),
+      const ListDrawer(),
     );
   }
 
