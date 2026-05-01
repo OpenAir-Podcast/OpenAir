@@ -487,60 +487,46 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                       String saveValue;
                       String locale;
 
-                      if (newValue ==
-                          Translations.of(context).text('english')) {
+                      if (newValue == "English") {
                         saveValue = 'English';
                         locale = Localization.en_US;
-                      } else if (newValue ==
-                          Translations.of(context).text('spanish')) {
+                      } else if (newValue == "Español") {
                         saveValue = 'Spanish';
                         locale = Localization.es_ES;
-                      } else if (newValue ==
-                          Translations.of(context).text('french')) {
+                      } else if (newValue == "Français") {
                         saveValue = 'French';
                         locale = Localization.fr_FR;
-                      } else if (newValue ==
-                          Translations.of(context).text('german')) {
+                      } else if (newValue == "Deutsch") {
                         saveValue = 'German';
                         locale = Localization.de_DE;
-                      } else if (newValue ==
-                          Translations.of(context).text('italian')) {
+                      } else if (newValue == "Italiano") {
                         saveValue = 'Italian';
                         locale = Localization.it_IT;
-                      } else if (newValue ==
-                          Translations.of(context).text('portuguese')) {
+                      } else if (newValue == "Português") {
                         saveValue = 'Portuguese';
                         locale = Localization.pt_PT;
-                      } else if (newValue ==
-                          Translations.of(context).text('russian')) {
+                      } else if (newValue == "Русский") {
                         saveValue = 'Russian';
                         locale = Localization.ru_RU;
-                      } else if (newValue ==
-                          Translations.of(context).text('chinese')) {
+                      } else if (newValue == "中文") {
                         saveValue = 'Chinese';
                         locale = Localization.zh_CN;
-                      } else if (newValue ==
-                          Translations.of(context).text('japanese')) {
+                      } else if (newValue == "日本語") {
                         saveValue = 'Japanese';
                         locale = Localization.ja_JP;
-                      } else if (newValue ==
-                          Translations.of(context).text('korean')) {
+                      } else if (newValue == "한국어") {
                         saveValue = 'Korean';
                         locale = Localization.ko_KR;
-                      } else if (newValue ==
-                          Translations.of(context).text('arabic')) {
+                      } else if (newValue == "العربية") {
                         saveValue = 'Arabic';
                         locale = Localization.ar_AE;
-                      } else if (newValue ==
-                          Translations.of(context).text('hebrew')) {
+                      } else if (newValue == "עברית") {
                         saveValue = 'Hebrew';
                         locale = Localization.he_IL;
-                      } else if (newValue ==
-                          Translations.of(context).text('dutch')) {
+                      } else if (newValue == "Nederlands") {
                         saveValue = 'Dutch';
                         locale = Localization.nl_NL;
-                      } else if (newValue ==
-                          Translations.of(context).text('swedish')) {
+                      } else if (newValue == "Svenska") {
                         saveValue = 'Swedish';
                         locale = Localization.sv_SE;
                       } else {
