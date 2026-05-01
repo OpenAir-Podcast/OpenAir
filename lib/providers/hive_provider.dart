@@ -198,39 +198,54 @@ class HiveService {
     localeConfig = await getUserInterfaceSettings()
         .then((value) => value['locale'] ?? 'en_US');
 
-    switch (languageConfig) {
-      case 'English':
-        Translations.changeLanguage(Localization.en_US);
-        break;
-      case 'Spanish':
-        Translations.changeLanguage(Localization.es_ES);
-        break;
-      case 'French':
-        Translations.changeLanguage(Localization.fr_FR);
-        break;
-      case 'German':
-        Translations.changeLanguage(Localization.de_DE);
-        break;
-      case 'Italian':
-        Translations.changeLanguage(Localization.it_IT);
-        break;
-      case 'Portuguese':
-        Translations.changeLanguage(Localization.pt_PT);
-        break;
-      case 'Russian':
-        Translations.changeLanguage(Localization.ru_RU);
-        break;
-      case 'Chinese':
-        Translations.changeLanguage(Localization.zh_CN);
-        break;
-      case 'Japanese':
-        Translations.changeLanguage(Localization.ja_JP);
-        break;
-      case 'Korean':
-        Translations.changeLanguage(Localization.ko_KR);
-        break;
-      default:
-        Translations.changeLanguage(Localization.en_US);
+    // Set the language from saved config
+    if (languageConfig.isNotEmpty) {
+      switch (languageConfig) {
+        case 'English':
+          Translations.changeLanguage(Localization.en_US);
+          break;
+        case 'Spanish':
+          Translations.changeLanguage(Localization.es_ES);
+          break;
+        case 'French':
+          Translations.changeLanguage(Localization.fr_FR);
+          break;
+        case 'German':
+          Translations.changeLanguage(Localization.de_DE);
+          break;
+        case 'Italian':
+          Translations.changeLanguage(Localization.it_IT);
+          break;
+        case 'Portuguese':
+          Translations.changeLanguage(Localization.pt_PT);
+          break;
+        case 'Russian':
+          Translations.changeLanguage(Localization.ru_RU);
+          break;
+        case 'Chinese':
+          Translations.changeLanguage(Localization.zh_CN);
+          break;
+        case 'Japanese':
+          Translations.changeLanguage(Localization.ja_JP);
+          break;
+        case 'Korean':
+          Translations.changeLanguage(Localization.ko_KR);
+          break;
+        case 'Arabic':
+          Translations.changeLanguage(Localization.ar_AE);
+          break;
+        case 'Hebrew':
+          Translations.changeLanguage(Localization.he_IL);
+          break;
+        case 'Dutch':
+          Translations.changeLanguage(Localization.nl_NL);
+          break;
+        case 'Swedish':
+          Translations.changeLanguage(Localization.sv_SE);
+          break;
+        default:
+          Translations.changeLanguage(Localization.en_US);
+      }
     }
 
     rewindIntervalConfig =
