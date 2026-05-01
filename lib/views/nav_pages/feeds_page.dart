@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/components/no_connection.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/views/main_pages/discovery_page.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
@@ -25,76 +27,109 @@ class FeedsPage extends ConsumerStatefulWidget {
 class _FeedsPageState extends ConsumerState<FeedsPage> {
   @override
   Widget build(BuildContext context) {
-    final episodesAsync = ref.watch(getSubscribedEpisodesProvider);
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
-    return episodesAsync.when(
-      data: (List<Map<dynamic, dynamic>> episodesDataSet) {
-        if (episodesDataSet.isEmpty) {
-          return const NoSubscriptions(title: 'Feeds');
+    return getConnectionStatusValue.when(
+      data: (data) {
+        if (data == false) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                Translations.of(context).text('feeds'),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            body: const Center(child: NoConnection()),
+          );
         }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(Translations.of(context).text('feeds')),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: IconButton(
-                  onPressed: () {
-                    ref.invalidate(getSubscribedEpisodesProvider);
-                  },
-                  icon: const Icon(Icons.refresh_rounded),
-                ),
-              ),
-            ],
-          ),
-          body: ListView.separated(
-            padding: const EdgeInsets.all(12),
-            cacheExtent: cacheExtent,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemCount: episodesDataSet.length,
-            itemBuilder: (context, index) {
-              final episodeItem = episodesDataSet[index];
-              final podcastMap = (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
-              final podcast = podcastMap != null
-                  ? PodcastModel.fromJson(podcastMap)
-                  : PodcastModel(
-                      id: -1,
-                      feedUrl: episodeItem['feedUrl'] ?? '',
-                      title: episodeItem['feedTitle'] ?? 'Unknown Podcast',
-                      author: episodeItem['author'] ?? 'Unknown Author',
-                      imageUrl: episodeItem['feedImage'] ?? '',
-                      artwork: episodeItem['feedImage'] ?? '',
-                      description: '',
-                    );
+        final episodesAsync = ref.watch(getSubscribedEpisodesProvider);
 
-              return GestureDetector(
-                onTap: () {
-                  ref.read(audioProvider.notifier).currentPodcast = podcast;
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => EpisodesPage(
-                        podcast: podcast,
-                      ),
+        return episodesAsync.when(
+          data: (List<Map<dynamic, dynamic>> episodesDataSet) {
+            if (episodesDataSet.isEmpty) {
+              return const NoSubscriptions(title: 'feeds');
+            }
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(Translations.of(context).text('feeds')),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: IconButton(
+                      onPressed: () {
+                        ref.invalidate(getSubscribedEpisodesProvider);
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                    ),
+                  ),
+                ],
+              ),
+              body: ListView.separated(
+                padding: const EdgeInsets.all(12),
+                cacheExtent: cacheExtent,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemCount: episodesDataSet.length,
+                itemBuilder: (context, index) {
+                  final episodeItem = episodesDataSet[index];
+                  final podcastMap =
+                      (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
+                  final podcast = podcastMap != null
+                      ? PodcastModel.fromJson(podcastMap)
+                      : PodcastModel(
+                          id: -1,
+                          feedUrl: episodeItem['feedUrl'] ?? '',
+                          title: episodeItem['feedTitle'] ?? 'Unknown Podcast',
+                          author: episodeItem['author'] ?? 'Unknown Author',
+                          imageUrl: episodeItem['feedImage'] ?? '',
+                          artwork: episodeItem['feedImage'] ?? '',
+                          description: '',
+                        );
+
+                  return GestureDetector(
+                    onTap: () {
+                      ref.read(audioProvider.notifier).currentPodcast = podcast;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EpisodesPage(
+                            podcast: podcast,
+                          ),
+                        ),
+                      );
+                    },
+                    child: UnifiedEpisodeCard(
+                      episodeItem: episodeItem.cast<String, dynamic>(),
+                      podcast: podcast,
+                      title: episodeItem['title'] ?? '',
+                      author: podcast.author ??
+                          Translations.of(context).text('unknown'),
+                      showAuthor: true,
                     ),
                   );
                 },
-                child: UnifiedEpisodeCard(
-                  episodeItem: episodeItem.cast<String, dynamic>(),
-                  podcast: podcast,
-                  title: episodeItem['title'] ?? '',
-                  author: podcast.author ??
-                      Translations.of(context).text('unknown'),
-                  showAuthor: true,
-                ),
-              );
-            },
+              ),
+            );
+          },
+          loading: () => Scaffold(
+            appBar: AppBar(title: Text(Translations.of(context).text('feeds'))),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stackTrace) => Scaffold(
+            appBar: AppBar(title: Text(Translations.of(context).text('feeds'))),
+            body: _ErrorView(
+              error: error.toString(),
+              onRetry: () {
+                ref.invalidate(getSubscribedEpisodesProvider);
+              },
+            ),
           ),
         );
       },
-      loading: () => Scaffold(
-        appBar: AppBar(title: Text(Translations.of(context).text('feeds'))),
-        body: const Center(child: CircularProgressIndicator()),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
       ),
       error: (error, stackTrace) => Scaffold(
         appBar: AppBar(title: Text(Translations.of(context).text('feeds'))),

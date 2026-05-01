@@ -11,6 +11,7 @@ class NoQueue extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             Icons.queue_music_rounded,
@@ -20,12 +21,15 @@ class NoQueue extends StatelessWidget {
           const SizedBox(height: 20.0),
           Text(
             Translations.of(context).text('oopsNoQueue'),
+            textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
+          const SizedBox(height: 10.0),
           Text(
             Translations.of(context).text('pleaseAddEpisodeToQueue'),
+            textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/components/no_connection.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
@@ -12,6 +13,8 @@ import 'package:openair/views/nav_pages/inbox_page.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+
+import '../main_pages/featured_page.dart';
 
 final subscriptionsProvider =
     FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
@@ -29,104 +32,140 @@ class SubscriptionsPage extends ConsumerStatefulWidget {
 class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   @override
   Widget build(BuildContext context) {
-    final subscriptionsAsync = ref.watch(subscriptionsWithCountsProvider);
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
-    return subscriptionsAsync.when(
-      data: (Map<String, dynamic> countsMap) {
-        final subscriptionsAsync2 = ref.watch(subscriptionsProvider);
-
-        return subscriptionsAsync2.when(
-          data: (Map<String, SubscriptionModel> subsMap) {
-            if (subsMap.isEmpty) {
-              return const NoSubscriptions(title: 'Subscriptions');
-            }
-
-            final List<SubscriptionModel> subs = subsMap.values.toList();
-            final totalNew = countsMap.values
-                .map((m) => (m as Map)['newEpisodes'] as int? ?? 0)
-                .fold(0, (a, b) => a + b);
-
-            return Scaffold(
-              appBar: AppBar(
-                title: Row(
-                  children: [
-                    Text(
-                      Translations.of(context).text('subscriptions'),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+    return getConnectionStatusValue.when(
+      data: (data) {
+        if (data == false) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                Translations.of(context).text('subscriptions'),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    if (totalNew > 0) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '$totalNew',
+              ),
+            ),
+            body: const Center(child: NoConnection()),
+          );
+        }
+
+        final subscriptionsAsync = ref.watch(subscriptionsWithCountsProvider);
+
+        return subscriptionsAsync.when(
+          data: (Map<String, dynamic> countsMap) {
+            final subscriptionsAsync2 = ref.watch(subscriptionsProvider);
+
+            return subscriptionsAsync2.when(
+              data: (Map<String, SubscriptionModel> subsMap) {
+                if (subsMap.isEmpty) {
+                  return const NoSubscriptions(title: 'Subscriptions');
+                }
+
+                final List<SubscriptionModel> subs = subsMap.values.toList();
+                final totalNew = countsMap.values
+                    .map((m) => (m as Map)['newEpisodes'] as int? ?? 0)
+                    .fold(0, (a, b) => a + b);
+
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Row(
+                      children: [
+                        Text(
+                          Translations.of(context).text('subscriptions'),
                           style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: Colors.white,
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
+                        if (totalNew > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '$totalNew',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    actions: [
+                      IconButton(
+                        tooltip:
+                            Translations.of(context).text('refreshAllPodcasts'),
+                        icon: const Icon(Icons.refresh_rounded),
+                        onPressed: () async {
+                          await ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .updateSubscriptions();
+                          ref.invalidate(subscriptionsWithCountsProvider);
+                          ref.invalidate(subscriptionsProvider);
+                        },
+                      ),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert_rounded),
+                        onSelected: (value) async {
+                          if (value == 'clear_all') {
+                            _showClearAllDialog(context);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'clear_all',
+                            child: Text(Translations.of(context)
+                                .text('clearAllPodcasts')),
+                          ),
+                        ],
                       ),
                     ],
-                  ],
-                ),
-                actions: [
-                  IconButton(
-                    tooltip:
-                        Translations.of(context).text('refreshAllPodcasts'),
-                    icon: const Icon(Icons.refresh_rounded),
-                    onPressed: () async {
-                      await ref
-                          .read(openAirProvider)
-                          .hiveService
-                          .updateSubscriptions();
-                      ref.invalidate(subscriptionsWithCountsProvider);
-                      ref.invalidate(subscriptionsProvider);
+                  ),
+                  body: GridView.builder(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: subs.length,
+                    cacheExtent: cacheExtent,
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 160,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemBuilder: (context, index) {
+                      return SubscriptionCard(
+                        subs: subs,
+                        ref: ref,
+                        index: index,
+                      );
                     },
                   ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert_rounded),
-                    onSelected: (value) async {
-                      if (value == 'clear_all') {
-                        _showClearAllDialog(context);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'clear_all',
-                        child: Text(
-                            Translations.of(context).text('clearAllPodcasts')),
-                      ),
-                    ],
-                  ),
-                ],
+                  bottomNavigationBar: _buildBottomBar(context, ref),
+                );
+              },
+              error: (error, stackTrace) {
+                debugPrint('Error loading subscriptions: $error\n$stackTrace');
+                return Scaffold(
+                  appBar: AppBar(
+                      title:
+                          Text(Translations.of(context).text('subscriptions'))),
+                  body: _ErrorView(error: error.toString()),
+                );
+              },
+              loading: () => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
               ),
-              body: GridView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: subs.length,
-                cacheExtent: cacheExtent,
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 160,
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemBuilder: (context, index) {
-                  return SubscriptionCard(
-                    subs: subs,
-                    ref: ref,
-                    index: index,
-                  );
-                },
-              ),
-              bottomNavigationBar: _buildBottomBar(context, ref),
             );
           },
           error: (error, stackTrace) {
@@ -142,14 +181,9 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
           ),
         );
       },
-      error: (error, stackTrace) {
-        debugPrint('Error loading subscriptions: $error\n$stackTrace');
-        return Scaffold(
-          appBar: AppBar(
-              title: Text(Translations.of(context).text('subscriptions'))),
-          body: _ErrorView(error: error.toString()),
-        );
-      },
+      error: (error, stackTrace) => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       ),
