@@ -255,7 +255,7 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_large');
                                 break;
-                              case 'extraLarge':
+                              case 'Extra Large':
                                 ThemeProvider.controllerOf(context)
                                     .setTheme('blue_accent_light_extra_large');
                                 break;

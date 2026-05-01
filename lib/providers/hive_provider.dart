@@ -190,7 +190,7 @@ class HiveService {
         .then((value) => value['themeMode'] ?? 'System');
 
     fontSizeConfig = await getUserInterfaceSettings()
-        .then((value) => value['fontSizeFactor'].toString());
+        .then((value) => value['fontSizeFactor'] ?? 'Medium');
 
     languageConfig = await getUserInterfaceSettings()
         .then((value) => value['language'] ?? 'English');
@@ -843,7 +843,7 @@ class HiveService {
 
     if (userInterfaceSettings == null) {
       userInterfaceSettings = {
-        'fontSizeFactor': 'medium',
+        'fontSizeFactor': 'Medium',
         'language': 'English',
         'locale': 'en_US',
       };

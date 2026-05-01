@@ -97,9 +97,10 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ThemeProvider(
-      defaultThemeId: 'blue_accent_light_extra_large',
+      // Default theme - will be overridden by _loadSavedTheme() if needed
+      defaultThemeId: 'blue_accent_light_medium',
       saveThemesOnChange: true,
-      loadThemeOnInit: true,
+      loadThemeOnInit: false, // We'll load manually to handle Auto mode
       themes: [
         AppTheme(
           id: "blue_accent_light_small",
@@ -260,7 +261,7 @@ class _AppHome extends ConsumerStatefulWidget {
 }
 
 class _AppHomeState extends ConsumerState<_AppHome>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   bool _minDelayPassed = false;
@@ -281,6 +282,9 @@ class _AppHomeState extends ConsumerState<_AppHome>
     // Load saved theme
     _loadSavedTheme();
 
+    // Listen for system theme changes
+    WidgetsBinding.instance.addObserver(this);
+
     // Minimum 2 second delay
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
@@ -289,36 +293,63 @@ class _AppHomeState extends ConsumerState<_AppHome>
     });
   }
 
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    if (mounted) {
+      _applySystemTheme();
+    }
+  }
+
+  void _applySystemTheme() {
+    if (!mounted || themeModeConfig != 'System') return;
+
+    final brightness = View.of(context).platformDispatcher.platformBrightness;
+    final sizeSuffix = _getSizeSuffix(fontSizeConfig);
+    final themeSuffix = brightness == Brightness.dark ? 'dark' : 'light';
+    final themeId = 'blue_accent_${themeSuffix}_$sizeSuffix';
+
+    ThemeProvider.controllerOf(context).setTheme(themeId);
+  }
+
+  String _getSizeSuffix(String fontSizeFactor) {
+    switch (fontSizeFactor) {
+      case 'Small':
+        return 'small';
+      case 'Large':
+        return 'large';
+      case 'Extra Large':
+        return 'extra_large';
+      default:
+        return 'medium';
+    }
+  }
+
   void _loadSavedTheme() async {
     try {
       final box = await Hive.openBox('openAirBox');
       final settings = box.get('userInterface');
 
-      if (settings != null) {
+      if (settings != null && mounted) {
         final fontSizeFactor = settings['fontSizeFactor'] ?? 'Medium';
         final themeMode = settings['themeMode'] ?? 'Light';
 
-        String sizeSuffix;
-        switch (fontSizeFactor) {
-          case 'Small':
-            sizeSuffix = 'small';
-            break;
-          case 'Large':
-            sizeSuffix = 'large';
-            break;
-          case 'Extra Large':
-            sizeSuffix = 'extra_large';
-            break;
-          default:
-            sizeSuffix = 'medium';
+        fontSizeConfig = fontSizeFactor;
+        themeModeConfig = themeMode;
+
+        String sizeSuffix = _getSizeSuffix(fontSizeFactor);
+        String themeSuffix;
+
+        if (themeMode == 'System') {
+          final brightness =
+              View.of(context).platformDispatcher.platformBrightness;
+          themeSuffix = brightness == Brightness.dark ? 'dark' : 'light';
+        } else {
+          themeSuffix = themeMode == 'Dark' ? 'dark' : 'light';
         }
 
-        String themeSuffix = themeMode == 'Dark' ? 'dark' : 'light';
         final themeId = 'blue_accent_${themeSuffix}_$sizeSuffix';
-
-        if (mounted) {
-          ThemeProvider.controllerOf(context).setTheme(themeId);
-        }
+        ThemeProvider.controllerOf(context).setTheme(themeId);
       }
     } catch (e) {
       debugPrint('Error loading saved theme: $e');
@@ -327,6 +358,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
