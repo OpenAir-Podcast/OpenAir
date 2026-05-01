@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/components/no_connection.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
@@ -45,6 +46,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
   @override
   Widget build(BuildContext context) {
     final podcastDataAsyncValue = ref.watch(podcastDataFeaturedProvider);
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -152,81 +154,28 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 },
               ),
               SizedBox(height: 15),
-              podcastDataAsyncValue.when(
-                loading: () {
-                  return SizedBox(
-                    height: 336,
-                    child: GridView.builder(
-                      itemCount: 12,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisExtent: 100.0,
-                        crossAxisSpacing: 12.0,
-                        mainAxisSpacing: 12.0,
-                      ),
-                      itemBuilder: (context, index) {
-                        return Shimmer.fromColors(
-                          baseColor: Theme.of(context).cardColor,
-                          highlightColor: highlightColor!,
-                          child: Container(
-                            color: highlightColor,
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
+              getConnectionStatusValue.when(
                 error: (error, stackTrace) {
-                  debugPrint('$error');
-
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline_rounded,
-                          size: 75.0,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 20.0),
-                        Text(
-                          Translations.of(context).text('oopsAnErrorOccurred'),
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                        Text(
-                          Translations.of(context).text('oopsTryAgainLater'),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        const SizedBox(height: 20.0),
-                        SizedBox(
-                          width: 180.0,
-                          height: 40.0,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            onPressed: () async {
-                              ref.invalidate(podcastDataFeaturedProvider);
-                            },
-                            child: Text(
-                              Translations.of(context).text('retry'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  debugPrint('Error fetching connection status: $error');
+                  return const SizedBox.shrink();
+                },
+                loading: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
                 },
-                data: (snapshot) {
-                  return Column(
-                    children: [
-                      SizedBox(
+                data: (data) {
+                  if (data == false) {
+                    return const NoConnection();
+                  }
+
+                  return podcastDataAsyncValue.when(
+                    error: (error, stackTrace) {
+                      debugPrint('Error fetching podcast data: $error');
+                      return const SizedBox.shrink();
+                    },
+                    loading: () {
+                      return SizedBox(
                         height: 336,
                         child: GridView.builder(
                           itemCount: 12,
@@ -238,88 +187,119 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                             mainAxisSpacing: 12.0,
                           ),
                           itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () async {
-                                final xmlString = await ref
-                                    .watch(fyydProvider)
-                                    .getPodcastXml(snapshot[index]['xmlURL']);
-
-                                var rssFeed = RssFeed.parse(xmlString);
-
-                                SubscriptionModel podcast = SubscriptionModel(
-                                  id: snapshot[index]['id'],
-                                  feedUrl: snapshot[index]['xmlURL'],
-                                  title: rssFeed.title!,
-                                  description: rssFeed.description!,
-                                  author: rssFeed.author ?? 'unknown',
-                                  imageUrl: snapshot[index]['imgURL'],
-                                  episodeCount: rssFeed.items!.length,
-                                  artwork: snapshot[index]['imgURL'],
-                                  updatedAt: DateTime.now(),
-                                );
-
-                                ref.read(audioProvider).currentPodcast =
-                                    PodcastModel.fromJson(podcast.toJson());
-
-                                if (context.mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => EpisodesPage(
-                                          podcast: PodcastModel.fromJson(
-                                              podcast.toJson())),
-                                    ),
-                                  );
-                                }
-                              },
+                            return Shimmer.fromColors(
+                              baseColor: Theme.of(context).cardColor,
+                              highlightColor: highlightColor!,
                               child: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: cardImageShadow,
-                                      blurRadius: blurRadius,
-                                    )
-                                  ],
-                                ),
-                                height: cardImageHeight,
-                                width: cardImageWidth,
-                                child: CachedNetworkImage(
-                                  memCacheHeight: cardImageHeight.ceil(),
-                                  memCacheWidth: cardImageWidth.ceil(),
-                                  imageUrl: snapshot[index]['imgURL'],
-                                  fit: BoxFit.fill,
-                                  errorWidget: (context, url, error) =>
-                                      LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      return Container(
-                                        color: Colors.brown,
-                                        alignment: Alignment.center,
-                                        child: Icon(
-                                          Icons.error,
-                                          // Set size relative to the current container dimensions
-                                          size: (constraints.maxWidth <
-                                                      constraints.maxHeight
-                                                  ? constraints.maxWidth
-                                                  : constraints.maxHeight) *
-                                              0.5,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                color: highlightColor,
                               ),
                             );
                           },
                         ),
-                      ),
-                    ],
+                      );
+                    },
+                    data: (snapshot) {
+                      return Column(
+                        children: [
+                          SizedBox(
+                            height: 336,
+                            child: GridView.builder(
+                              itemCount: 12,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                mainAxisExtent: 100.0,
+                                crossAxisSpacing: 12.0,
+                                mainAxisSpacing: 12.0,
+                              ),
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    final xmlString = await ref
+                                        .watch(fyydProvider)
+                                        .getPodcastXml(
+                                            snapshot[index]['xmlURL']);
+
+                                    var rssFeed = RssFeed.parse(xmlString);
+
+                                    SubscriptionModel podcast =
+                                        SubscriptionModel(
+                                      id: snapshot[index]['id'],
+                                      feedUrl: snapshot[index]['xmlURL'],
+                                      title: rssFeed.title!,
+                                      description: rssFeed.description!,
+                                      author: rssFeed.author ?? 'unknown',
+                                      imageUrl: snapshot[index]['imgURL'],
+                                      episodeCount: rssFeed.items!.length,
+                                      artwork: snapshot[index]['imgURL'],
+                                      updatedAt: DateTime.now(),
+                                    );
+
+                                    ref.read(audioProvider).currentPodcast =
+                                        PodcastModel.fromJson(podcast.toJson());
+
+                                    if (context.mounted) {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => EpisodesPage(
+                                              podcast: PodcastModel.fromJson(
+                                                  podcast.toJson())),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: cardImageShadow,
+                                          blurRadius: blurRadius,
+                                        )
+                                      ],
+                                    ),
+                                    height: cardImageHeight,
+                                    width: cardImageWidth,
+                                    child: CachedNetworkImage(
+                                      memCacheHeight: cardImageHeight.ceil(),
+                                      memCacheWidth: cardImageWidth.ceil(),
+                                      imageUrl: snapshot[index]['imgURL'],
+                                      fit: BoxFit.fill,
+                                      errorWidget: (context, url, error) =>
+                                          LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return Container(
+                                            color: Colors.brown,
+                                            alignment: Alignment.center,
+                                            child: Icon(
+                                              Icons.error,
+                                              // Set size relative to the current container dimensions
+                                              size: (constraints.maxWidth <
+                                                          constraints.maxHeight
+                                                      ? constraints.maxWidth
+                                                      : constraints.maxHeight) *
+                                                  0.5,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Text(
                     Translations.of(context).text('discoveryPoweredByFyyd'),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
@@ -334,7 +314,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                         Text(
                           Translations.of(context).text('discoverMore'),
                           style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.bold,
                                   ),
