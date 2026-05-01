@@ -20,6 +20,12 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load saved language BEFORE setting up Translations
+  await Hive.initFlutter('OpenAir/.hive_config');
+  final box = await Hive.openBox('openAirBox');
+  final settings = box.get('userInterface');
+  final language = settings?['language'] ?? 'English';
+
   Translations.support([
     Localization.ar_AE,
     Localization.de_DE,
@@ -36,6 +42,9 @@ void main() async {
     Localization.sv_SE,
     Localization.zh_CN,
   ]);
+
+  // Set the language BEFORE runApp
+  _setLanguage(language);
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
@@ -67,9 +76,59 @@ void main() async {
     debug: false,
   );
 
-  await Hive.initFlutter('OpenAir/.hive_config');
-
   runApp(ProviderScope(child: const MyApp()));
+}
+
+void _setLanguage(String language) {
+  // Update the config
+  languageConfig = language;
+
+  switch (language) {
+    case 'English':
+      Translations.changeLanguage(Localization.en_US);
+      break;
+    case 'Spanish':
+      Translations.changeLanguage(Localization.es_ES);
+      break;
+    case 'French':
+      Translations.changeLanguage(Localization.fr_FR);
+      break;
+    case 'German':
+      Translations.changeLanguage(Localization.de_DE);
+      break;
+    case 'Italian':
+      Translations.changeLanguage(Localization.it_IT);
+      break;
+    case 'Portuguese':
+      Translations.changeLanguage(Localization.pt_PT);
+      break;
+    case 'Russian':
+      Translations.changeLanguage(Localization.ru_RU);
+      break;
+    case 'Chinese':
+      Translations.changeLanguage(Localization.zh_CN);
+      break;
+    case 'Japanese':
+      Translations.changeLanguage(Localization.ja_JP);
+      break;
+    case 'Korean':
+      Translations.changeLanguage(Localization.ko_KR);
+      break;
+    case 'Arabic':
+      Translations.changeLanguage(Localization.ar_AE);
+      break;
+    case 'Hebrew':
+      Translations.changeLanguage(Localization.he_IL);
+      break;
+    case 'Dutch':
+      Translations.changeLanguage(Localization.nl_NL);
+      break;
+    case 'Swedish':
+      Translations.changeLanguage(Localization.sv_SE);
+      break;
+    default:
+      Translations.changeLanguage(Localization.en_US);
+  }
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -377,6 +436,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
 
         // Show Home
         final locale = ref.watch(localeProvider);
+
         return MaterialApp(
           locale: locale,
           supportedLocales: Translations.supportedLocales,
