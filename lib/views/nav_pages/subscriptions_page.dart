@@ -14,8 +14,6 @@ import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-import '../main_pages/featured_page.dart';
-
 final subscriptionsProvider =
     FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
   ref.watch(openAirProvider).hiveService;

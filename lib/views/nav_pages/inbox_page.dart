@@ -8,8 +8,8 @@ import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
-import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 

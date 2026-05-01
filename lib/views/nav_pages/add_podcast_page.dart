@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';

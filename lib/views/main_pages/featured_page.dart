@@ -93,10 +93,6 @@ final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
   return FetchDataModel.fromJson(data);
 });
 
-final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-  final podcastIndexService = ref.read(openAirProvider);
-  return await podcastIndexService.getConnectionStatus();
-});
 
 class FeaturedPage extends ConsumerStatefulWidget {
   const FeaturedPage({super.key});
