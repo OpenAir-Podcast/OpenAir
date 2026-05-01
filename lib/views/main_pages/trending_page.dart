@@ -37,22 +37,36 @@ class TrendingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(localeProvider); // Ensure rebuild on language change
-    final trendingAsync = ref.watch(trendingDataProvider);
+    final connectionAsync = ref.watch(connectionCheckProvider);
 
-    return trendingAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, stackTrace) => Scaffold(
-        appBar: AppBar(title: Text(Translations.of(context).text('trending'))),
-        body: _ErrorView(
-          error: error.toString(),
-          onRetry: () => ref.invalidate(trendingDataProvider),
-        ),
-      ),
-      data: (data) => _TrendingView(data: data),
-    );
+    return connectionAsync.when(
+        loading: () => const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+        error: (_, __) => const TrendingPage(),
+        data: (isConnected) {
+          if (isConnected == false) {
+            return const NoConnection();
+          }
+
+          ref.watch(localeProvider); // Ensure rebuild on language change
+          final trendingAsync = ref.watch(trendingDataProvider);
+
+          return trendingAsync.when(
+            loading: () => const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+            error: (error, stackTrace) => Scaffold(
+              appBar: AppBar(
+                  title: Text(Translations.of(context).text('trending'))),
+              body: _ErrorView(
+                error: error.toString(),
+                onRetry: () => ref.invalidate(trendingDataProvider),
+              ),
+            ),
+            data: (data) => _TrendingView(data: data),
+          );
+        });
   }
 }
 
@@ -159,21 +173,3 @@ final connectionCheckProvider = FutureProvider.autoDispose<bool>((ref) async {
   final openAir = ref.read(openAirProvider);
   return await openAir.getConnectionStatus();
 });
-
-class TrendingPageWithConnection extends ConsumerWidget {
-  const TrendingPageWithConnection({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final connectionAsync = ref.watch(connectionCheckProvider);
-
-    return connectionAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => const TrendingPage(),
-      data: (isConnected) =>
-          isConnected ? const TrendingPage() : const NoConnection(),
-    );
-  }
-}
