@@ -40,10 +40,12 @@ class FetchDataModel extends HiveObject {
     if (json['feeds'] != null) {
       feeds =
           (json['feeds'] as List).map((i) => PodcastModel.fromJson(i)).toList();
-    } else {
-      debugPrint('Feeds is null');
+    } else if (json['data'] != null) {
+      debugPrint('Feeds is null, using data');
       feeds =
           (json['data'] as List).map((e) => PodcastModel.fromJson(e)).toList();
+    } else {
+      debugPrint('Both feeds and data are null');
     }
 
     final int maxTmp = json['max'].runtimeType == int
@@ -55,12 +57,12 @@ class FetchDataModel extends HiveObject {
     final int sinceTmp = json['since'] ?? -1;
 
     return FetchDataModel(
-      count: json['count'] ?? json['data'].length,
+      count: json['count'] ?? json['data']?.length ?? feeds.length,
       feeds: feeds,
-      status: json['status'],
+      status: json['status'] ?? 'unknown',
       max: maxTmp,
       since: sinceTmp,
-      description: json['description'],
+      description: json['description'] ?? '',
     );
   }
 
