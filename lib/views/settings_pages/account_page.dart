@@ -8,6 +8,7 @@ import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/services/supabase_service.dart';
 import 'package:openair/views/nav_pages/sign_up_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:openair/components/no_connection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -106,37 +107,92 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     final supabaseService = ref.watch(supabaseServiceProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(Translations.of(context).text('account')),
         centerTitle: true,
       ),
-      body: StreamBuilder<AuthState>(
-        stream: supabaseService.client.auth.onAuthStateChange,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+      body: getConnectionStatusValue.when(
+        data: (connectionData) {
+          if (connectionData == false) {
+            return const NoConnection();
           }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+          return StreamBuilder<AuthState>(
+            stream: supabaseService.client.auth.onAuthStateChange,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (!snapshot.hasData) {
-            return const Center(
-                child: Text('No authentication data available.'));
-          }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          size: 75.0,
+                          color: colorScheme.error,
+                        ),
+                        const SizedBox(height: 20.0),
+                        Text(
+                          Translations.of(context).text('oopsAnErrorOccurred'),
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          snapshot.error.toString(),
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 20.0),
+                        SizedBox(
+                          width: 180.0,
+                          height: 40.0,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              ref.invalidate(getConnectionStatusProvider);
+                              setState(() {});
+                            },
+                            child: Text(Translations.of(context).text('retry')),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
 
-          final user = snapshot.data!.session?.user;
+              if (!snapshot.hasData) {
+                return const Center(
+                    child: Text('No authentication data available.'));
+              }
 
-          if (user == null) {
-            return _buildSignInForm(colorScheme, textTheme);
-          }
+              final user = snapshot.data!.session?.user;
 
-          return _buildAccountDetails(
-              user, supabaseService, colorScheme, textTheme);
+              if (user == null) {
+                return _buildSignInForm(colorScheme, textTheme);
+              }
+
+              return _buildAccountDetails(
+                  user, supabaseService, colorScheme, textTheme);
+            },
+          );
         },
+        error: (error, stackTrace) => Center(child: Text('Error: $error')),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }

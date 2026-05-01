@@ -181,3 +181,9 @@ class OpenAirProvider extends ChangeNotifier {
     await syncController.synchronize(context);
   }
 }
+
+final getConnectionStatusProvider =
+    FutureProvider.autoDispose<bool>((ref) async {
+  final podcastIndexService = ref.read(openAirProvider);
+  return await podcastIndexService.getConnectionStatus();
+});

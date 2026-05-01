@@ -8,11 +8,6 @@ import 'package:openair/views/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/widgets/discovery_podcast_card_list.dart';
 import 'package:openair/views/widgets/discovery_podcast_card_grid.dart';
 
-final getConnectionStatusProvider =
-    FutureProvider.autoDispose<bool>((ref) async {
-  final podcastIndexService = ref.read(openAirProvider);
-  return await podcastIndexService.getConnectionStatus();
-});
 
 class DiscoveryPage extends ConsumerStatefulWidget {
   final AsyncValue<List<dynamic>> podcastDataAsyncValue;
