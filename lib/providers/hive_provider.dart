@@ -17,6 +17,7 @@ import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
+import 'package:openair/model/hive_models/search_cache_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
@@ -97,6 +98,7 @@ class HiveService {
   late final Future<CollectionBox<Map>> podcastInfoBox;
 
   late final Future<CollectionBox<Map>> favoritesBox;
+  late final Future<CollectionBox<SearchCacheModel>> searchCacheBox;
 
   late final Directory openAirDir;
 
@@ -121,6 +123,7 @@ class HiveService {
     Hive.registerAdapter(SubscriptionModelAdapter());
 
     Hive.registerAdapter(FetchDataModelAdapter());
+    Hive.registerAdapter(SearchCacheModelAdapter());
 
     // Get the application documents directory
     if (!kIsWeb) {
@@ -153,6 +156,7 @@ class HiveService {
         'category',
         'favorites',
         'podcast_info',
+        'search_cache',
       },
       path: kIsWeb ? null : openAirDir.path,
     );
@@ -183,6 +187,7 @@ class HiveService {
     podcastInfoBox = collection.openBox<Map>('podcast_info');
 
     favoritesBox = collection.openBox<Map>('favorites');
+    searchCacheBox = collection.openBox<SearchCacheModel>('search_cache');
 
     Map<String, dynamic> playbackSettings = await getPlaybackSettings();
 
@@ -1278,5 +1283,22 @@ class HiveService {
       final completedEpisode = CompletedEpisodeModel(guid: guid);
       await addToCompletedEpisode(completedEpisode);
     }
+  }
+
+  Future<SearchCacheModel?> getSearchCache(String query) async {
+    final box = await searchCacheBox;
+    return await box.get(query);
+  }
+
+  Future<void> putSearchCache(String query, Map<String, dynamic> results) async {
+    final box = await searchCacheBox;
+    await box.put(
+      query,
+      SearchCacheModel(
+        query: query,
+        results: results,
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 }

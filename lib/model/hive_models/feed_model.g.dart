@@ -8,7 +8,7 @@ part of 'feed_model.dart';
 
 class FeedModelAdapter extends TypeAdapter<FeedModel> {
   @override
-  final typeId = feedTypeId;
+  final typeId = 2;
 
   @override
   FeedModel read(BinaryReader reader) {

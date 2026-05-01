@@ -8,7 +8,7 @@ part of 'fetch_data_model.dart';
 
 class FetchDataModelAdapter extends TypeAdapter<FetchDataModel> {
   @override
-  final typeId = fetchDataTypeId;
+  final typeId = 9;
 
   @override
   FetchDataModel read(BinaryReader reader) {
