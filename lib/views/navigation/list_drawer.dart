@@ -2,6 +2,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
@@ -43,11 +44,8 @@ final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
 });
 
 class ListDrawer extends ConsumerStatefulWidget {
-  final Function() languageChanged;
-
   const ListDrawer({
     super.key,
-    required this.languageChanged,
   });
 
   @override
@@ -57,6 +55,7 @@ class ListDrawer extends ConsumerStatefulWidget {
 class _ListDrawerState extends ConsumerState<ListDrawer> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider); // Ensure rebuild on language change
     final getSubCountValue = ref.watch(subCountProvider);
     final getFeedsCountValue = ref.watch(feedCountProvider);
     final getInboxCountValue = ref.watch(inboxCountProvider);
