@@ -26,10 +26,12 @@ class NoConnection extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
         ),
-        Text(
-          Translations.of(context).text('pleaseConnectToNetwork'),
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyLarge,
+        Center(
+          child: Text(
+            Translations.of(context).text('pleaseConnectToNetwork'),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
         const SizedBox(height: 20.0),
         SizedBox(
