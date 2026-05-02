@@ -74,6 +74,7 @@ flutter:
     - .env
     - locales/
     - assets/icons/icon.png
+    - assets/icons/icon_512.png
     - assets/icons/org.openair.podcast.svg
     - assets/images/github-white-logo.png
     - assets/images/github-black-logo.png
