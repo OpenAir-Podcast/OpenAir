@@ -23,11 +23,91 @@ class NotificationsPage extends ConsumerStatefulWidget {
 }
 
 class NotificationsPageState extends ConsumerState<NotificationsPage> {
-  late Map notificationsData;
+  Widget _buildCard(Widget child, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
 
-  late bool receiveNotificationsForNewEpisodes;
-  late bool receiveNotificationsWhenPlaying;
-  late bool receiveNotificationsWhenDownloading;
+  Widget _buildToggleTile({
+    required String label,
+    required String subtitle,
+    required IconData icon,
+    required bool value,
+    required Function(bool) onChanged,
+    required BuildContext context,
+    Color? iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: (iconColor ?? Theme.of(context).colorScheme.primary)
+                  .withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: iconColor ?? Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _saveNotificationsSettings(Map data, BuildContext context) {
+    ref.watch(openAirProvider).hiveService.saveNotificationsSettings(data);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,173 +115,99 @@ class NotificationsPageState extends ConsumerState<NotificationsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('notifications')),
+        title: Text(
+          Translations.of(context).text('notifications'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: notifications.when(
         data: (data) {
-          notificationsData = data!;
+          final notificationsData = data!;
 
-          receiveNotificationsForNewEpisodes =
-              notificationsData['receiveNotificationsForNewEpisodes'] ??= true;
-          receiveNotificationsWhenPlaying =
-              notificationsData['receiveNotificationsWhenPlaying'] ??= true;
-          receiveNotificationsWhenDownloading =
-              notificationsData['receiveNotificationsWhenDownloading'] ??= true;
+          final receiveNotificationsForNewEpisodes =
+              notificationsData['receiveNotificationsForNewEpisodes'] ?? true;
+          final receiveNotificationsWhenPlaying =
+              notificationsData['receiveNotificationsWhenPlaying'] ?? true;
+          final receiveNotificationsWhenDownloading =
+              notificationsData['receiveNotificationsWhenDownloading'] ?? true;
 
-          return Column(
-            spacing: settingsSpacer,
+          return ListView(
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('alerts'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context)
-                    .text('receiveNotificationsForNewEpisodes')),
-                subtitle: Text(
-                  Translations.of(context)
-                      .text('receiveNotificationsForNewEpisodes'),
-                ),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [
-                    receiveNotificationsForNewEpisodes,
-                    !receiveNotificationsForNewEpisodes
-                  ],
-                  onPressed: (int index) {
-                    setState(() {
-                      receiveNotificationsForNewEpisodes =
-                          !receiveNotificationsForNewEpisodes;
-                      notificationsData['receiveNotificationsForNewEpisodes'] =
-                          receiveNotificationsForNewEpisodes;
-
-                      receiveNotificationsForNewEpisodesConfig =
-                          receiveNotificationsForNewEpisodes;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveNotificationsSettings(notificationsData);
-                    });
-                  },
+              SizedBox(height: 16),
+              _buildCard(
+                Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
+                    _buildToggleTile(
+                      icon: Icons.auto_awesome_rounded,
+                      label: Translations.of(context)
+                          .text('receiveNotificationsForNewEpisodes'),
+                      subtitle: Translations.of(context)
+                          .text('receiveNotificationsForNewEpisodesSubtitle'),
+                      value: receiveNotificationsForNewEpisodes,
+                      onChanged: (value) {
+                        notificationsData[
+                            'receiveNotificationsForNewEpisodes'] = value;
+                        receiveNotificationsForNewEpisodesConfig = value;
+                        _saveNotificationsSettings(notificationsData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      icon: Icons.play_circle_outline_rounded,
+                      label: Translations.of(context)
+                          .text('receiveNotificationsWhenPlaying'),
+                      subtitle: Translations.of(context)
+                          .text('receiveNotificationsWhenPlayingSubtitle'),
+                      value: receiveNotificationsWhenPlaying,
+                      onChanged: (value) {
+                        notificationsData['receiveNotificationsWhenPlaying'] =
+                            value;
+                        receiveNotificationsWhenPlayConfig = value;
+                        _saveNotificationsSettings(notificationsData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      icon: Icons.download_rounded,
+                      label: Translations.of(context)
+                          .text('receiveNotificationsWhenDownloading'),
+                      subtitle: Translations.of(context)
+                          .text('receiveNotificationsWhenDownloadingSubtitle'),
+                      value: receiveNotificationsWhenDownloading,
+                      onChanged: (value) {
+                        notificationsData[
+                            'receiveNotificationsWhenDownloading'] = value;
+                        receiveNotificationsWhenDownloadConfig = value;
+                        _saveNotificationsSettings(notificationsData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
                   ],
-                )),
-              ),
-              ListTile(
-                title: Text(Translations.of(context)
-                    .text('receiveNotificationsWhenPlaying')),
-                subtitle: Text(
-                  Translations.of(context)
-                      .text('receiveNotificationsWhenPlayingSubtitle'),
                 ),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [
-                    receiveNotificationsWhenPlaying,
-                    !receiveNotificationsWhenPlaying
-                  ],
-                  onPressed: (int index) {
-                    setState(() {
-                      receiveNotificationsWhenPlaying =
-                          !receiveNotificationsWhenPlaying;
-                      notificationsData['receiveNotificationsWhenPlaying'] =
-                          receiveNotificationsWhenPlaying;
-
-                      receiveNotificationsWhenPlayConfig =
-                          receiveNotificationsWhenPlaying;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveNotificationsSettings(notificationsData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(
-                  Translations.of(context)
-                      .text('receiveNotificationsWhenDownloading'),
-                ),
-                subtitle: Text(
-                  Translations.of(context)
-                      .text('receiveNotificationsWhenDownloadingSubtitle'),
-                ),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [
-                    receiveNotificationsWhenDownloading,
-                    !receiveNotificationsWhenDownloading
-                  ],
-                  onPressed: (int index) {
-                    setState(() {
-                      receiveNotificationsWhenDownloading =
-                          !receiveNotificationsWhenDownloading;
-                      notificationsData['receiveNotificationsWhenDownloading'] =
-                          receiveNotificationsWhenDownloading;
-
-                      receiveNotificationsWhenDownloadConfig =
-                          receiveNotificationsWhenDownloading;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveNotificationsSettings(notificationsData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
+                context,
               ),
             ],
           );
         },
         error: (error, stackTrace) {
-          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
+          return Center(
+            child: Text(Translations.of(context).text('oopsAnErrorOccurred')),
+          );
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());
