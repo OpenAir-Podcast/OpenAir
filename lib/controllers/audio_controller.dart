@@ -463,6 +463,7 @@ class AudioController extends ChangeNotifier {
     for (int i = 0; i < episodes['count']; i++) {
       final episode = {
         'podcastId': podcast.id.toString(),
+        'podcastTitle': podcast.title,
         'guid': episodes['items'][i]['guid'],
         'title': episodes['items'][i]['title'],
         'author': podcast.author,
