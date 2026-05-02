@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/player/main_player.dart';
 
@@ -18,89 +17,134 @@ class BannerAudioPlayer extends ConsumerStatefulWidget {
 class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Theme.of(context).bottomAppBarTheme.color
-          : Theme.of(context).colorScheme.primaryContainer,
-      child: Column(
-        children: [
-          ListTile(
-            minTileHeight: 70.0,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MainPlayer(),
-                ),
-              );
-            },
-            leading: Container(
-              width: 62.0,
-              height: 62.0,
-              decoration: BoxDecoration(
-                color: cardImageShadow,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: CachedNetworkImage(
-                memCacheHeight: 62,
-                memCacheWidth: 62,
-                imageUrl:
-                    ref.watch(audioProvider).currentEpisode!['feedImage'] ??
-                        ref.watch(audioProvider).currentEpisode!['image'],
-                fit: BoxFit.fill,
-                errorWidget: (context, url, error) => Icon(
-                  Icons.error,
-                  size: 48.0,
-                ),
-              ),
+    final audioState = ref.watch(audioProvider);
+    final currentEpisode = audioState.currentEpisode;
+
+    if (currentEpisode == null || currentEpisode.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MainPlayer(),
             ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  ref.watch(audioProvider).currentEpisode!['title'],
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                  child: Row(
+                    children: [
+                      // Thumbnail
+                      Hero(
+                        tag: 'player_art',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            width: 48,
+                            height: 48,
+                            imageUrl: currentEpisode['feedImage'] ??
+                                currentEpisode['image'] ??
+                                '',
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Container(
+                              color: theme.colorScheme.onSurface,
+                              child: const Icon(Icons.podcasts, size: 24),
+                            ),
+                          ),
+                        ),
                       ),
-                  maxLines: 2,
+                      const SizedBox(width: 12),
+                      // Text info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              currentEpisode['title'] ?? '',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              currentEpisode['author']?.toString() ??
+                                  Translations.of(context).text('unknown'),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                fontSize: 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Play/Pause Button
+                      IconButton(
+                        onPressed: () {
+                          audioState.audioState == 'Play'
+                              ? audioState.playerPauseButtonClicked()
+                              : audioState.playerResumeButtonClicked();
+                        },
+                        icon: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: Icon(
+                            audioState.audioState == 'Play'
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            key: ValueKey(audioState.audioState),
+                            size: 28,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  (ref.watch(audioProvider).currentEpisode!['author']
-                                  as String?)
-                              ?.isNotEmpty ==
-                          true
-                      ? ref.watch(audioProvider).currentEpisode!['author']
-                      : Translations.of(context).text('unknown'),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  maxLines: 2,
+                // Slim Progress Bar at the bottom
+                SizedBox(
+                  height: 3,
+                  child: LinearProgressIndicator(
+                    value: audioState.podcastCurrentPositionInMilliseconds,
+                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.colorScheme.primary,
+                    ),
+                  ),
                 ),
               ],
             ),
-            trailing: IconButton(
-              onPressed: () {
-                ref.read(audioProvider).audioState == 'Play'
-                    ? ref.read(audioProvider).playerPauseButtonClicked()
-                    : ref.read(audioProvider).playerResumeButtonClicked();
-              },
-              icon: ref.watch(audioProvider).audioState == 'Play'
-                  ? const Icon(Icons.pause_rounded)
-                  : const Icon(Icons.play_arrow_rounded),
-            ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: LinearProgressIndicator(
-              value: ref.watch(audioProvider
-                  .select((p) => p.podcastCurrentPositionInMilliseconds)),
-              backgroundColor: Colors.purple.shade100,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
