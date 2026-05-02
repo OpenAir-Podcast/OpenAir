@@ -154,9 +154,9 @@ class AboutPageState extends ConsumerState<AboutPage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
                   child: Image.asset(
-                    'assets/icons/icon.png',
-                    width: 100,
-                    height: 100,
+                    'assets/icons/icon_512.png',
+                    width: 192,
+                    height: 192,
                   ),
                 ),
               ),
