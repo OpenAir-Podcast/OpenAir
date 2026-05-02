@@ -70,27 +70,6 @@ class AudioController extends ChangeNotifier {
 
   List downloadingPodcasts = [];
 
-  Future<void> initializeAudio(BuildContext context) async {
-    podcastTitle = '';
-    podcastSubtitle = '';
-
-    playerPosition = Duration.zero;
-    playerTotalDuration = Duration.zero;
-
-    podcastCurrentPositionInMilliseconds = 0;
-    currentPlaybackPositionString = '00:00:00';
-    currentPlaybackRemainingTimeString = '00:00:00';
-    currentPlaybackDurationString = '00:00:00';
-
-    currentEpisode = {};
-    nextEpisode = {};
-
-    audioState = 'Pause';
-    loadState = 'Detail';
-
-    currentPodcastTimeRemaining = '00:00:00';
-  }
-
   Icon getDownloadIcon(DownloadStatus downloadStatus) {
     Icon icon;
     switch (downloadStatus) {
@@ -618,6 +597,60 @@ class AudioController extends ChangeNotifier {
   Future<bool> isAudioFileDownloaded(String guid) => isAudioDownloaded(guid);
 
   Future<void> initAudio(BuildContext context) => initializeAudio(context);
+
+  Future<void> initializeAudio(BuildContext context) async {
+    // Set up position listener
+    _player.onPositionChanged.listen((Duration position) {
+      playerPosition = position;
+      podcastCurrentPositionInMilliseconds =
+          playerTotalDuration.inMilliseconds > 0
+              ? (position.inMilliseconds / playerTotalDuration.inMilliseconds)
+                  .clamp(0.0, 1.0)
+              : 0.0;
+      currentPlaybackPositionString = formatPlaybackPosition(position);
+      notifyListeners();
+    });
+
+    // Set up duration listener
+    _player.onDurationChanged.listen((Duration duration) {
+      playerTotalDuration = duration;
+      currentPlaybackDurationString = formatPlaybackPosition(duration);
+      notifyListeners();
+    });
+
+    // Set up player state listener
+    _player.onPlayerStateChanged.listen((PlayerState state) {
+      switch (state) {
+        case PlayerState.playing:
+          isPlaying = PlayingStatus.playing;
+          audioState = 'Play';
+          loadState = 'Play';
+          break;
+        case PlayerState.paused:
+          isPlaying = PlayingStatus.paused;
+          audioState = 'Pause';
+          loadState = 'Detail';
+          break;
+        case PlayerState.stopped:
+          isPlaying = PlayingStatus.stop;
+          audioState = 'Stop';
+          loadState = 'Detail';
+          break;
+        case PlayerState.completed:
+          isPlaying = PlayingStatus.stop;
+          audioState = 'Stop';
+          loadState = 'Detail';
+          isCompleted = true;
+          break;
+        case PlayerState.disposed:
+          isPlaying = PlayingStatus.stop;
+          audioState = 'Stop';
+          loadState = 'Detail';
+          break;
+      }
+      notifyListeners();
+    });
+  }
 
   Future<void> playerPlayButtonClicked(
     Map<String, dynamic> episodeItem,
