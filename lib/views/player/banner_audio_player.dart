@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/main_player.dart';
 
 class BannerAudioPlayer extends ConsumerStatefulWidget {
@@ -19,9 +20,29 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
   Widget build(BuildContext context) {
     final audioState = ref.watch(audioProvider);
     final currentEpisode = audioState.currentEpisode;
+    final subsAsync = ref.watch(subscriptionsProvider);
 
     if (currentEpisode == null || currentEpisode.isEmpty) {
       return const SizedBox.shrink();
+    }
+
+    String podcastTitle = currentEpisode['podcastTitle']?.toString() ?? '';
+    if (podcastTitle.isEmpty) {
+      subsAsync.whenData((subs) {
+        final podcastId = currentEpisode['podcastId'];
+        if (podcastId != null) {
+          for (final entry in subs.entries) {
+            if (entry.value.id.toString() == podcastId.toString()) {
+              podcastTitle = entry.value.title;
+              break;
+            }
+          }
+        }
+      });
+    }
+    if (podcastTitle.isEmpty) {
+      podcastTitle = currentEpisode['author']?.toString() ??
+          Translations.of(context).text('unknown');
     }
 
     final theme = Theme.of(context);
@@ -96,9 +117,7 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              currentEpisode['podcastTitle']?.toString() ??
-                                  currentEpisode['author']?.toString() ??
-                                  Translations.of(context).text('unknown'),
+                              podcastTitle,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: isDark
                                     ? Colors.grey[400]

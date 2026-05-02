@@ -114,6 +114,9 @@ class AudioController extends ChangeNotifier {
     BuildContext context,
   ) async {
     currentEpisode = episodeItem;
+    if (currentPodcast != null && currentEpisode!['podcastTitle'] == null) {
+      currentEpisode!['podcastTitle'] = currentPodcast!.title;
+    }
     final bool isDownloaded = await isAudioDownloaded(currentEpisode!['guid']);
 
     isPodcastSelected = true;

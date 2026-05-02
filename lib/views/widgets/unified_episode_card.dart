@@ -136,13 +136,19 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                             runSpacing: 4,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Text(
-                                author,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.person,
+                                      size: 12, color: Colors.grey[500]),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    author,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                               if (duration.isNotEmpty) ...[
                                 Row(
@@ -158,9 +164,17 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                                   ],
                                 ),
                               ],
-                              Text(
-                                podcastDate,
-                                style: theme.textTheme.bodySmall,
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.calendar_month,
+                                      size: 12, color: Colors.grey[500]),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    podcastDate,
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
