@@ -130,7 +130,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           }
                         },
                         child: Text(
-                          currentEpisode['author']?.toString() ??
+                          currentEpisode['podcastTitle']?.toString() ??
+                              currentEpisode['author']?.toString() ??
                               Translations.of(context).text('unknown'),
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.colorScheme.primary,
@@ -154,8 +155,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                 overlayRadius: 14,
                               ),
                               activeTrackColor: theme.colorScheme.primary,
-                              inactiveTrackColor:
-                                  theme.colorScheme.primary.withValues(alpha: 0.3),
+                              inactiveTrackColor: theme.colorScheme.primary
+                                  .withValues(alpha: 0.3),
                               thumbColor: theme.colorScheme.primary,
                             ),
                             child: Slider(

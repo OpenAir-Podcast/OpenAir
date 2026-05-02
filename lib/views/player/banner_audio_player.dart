@@ -96,7 +96,8 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              currentEpisode['author']?.toString() ??
+                              currentEpisode['podcastTitle']?.toString() ??
+                                  currentEpisode['author']?.toString() ??
                                   Translations.of(context).text('unknown'),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: isDark
