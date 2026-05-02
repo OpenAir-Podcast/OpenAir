@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:openair/views/settings_pages/licenses_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final appInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -131,30 +132,6 @@ class AboutPageState extends ConsumerState<AboutPage> {
     }
   }
 
-  void _showDarkLicensePage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Theme(
-          data: ThemeData.dark(useMaterial3: true).copyWith(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.blue,
-            ),
-            listTileTheme: const ListTileThemeData(
-              iconColor: Colors.white,
-              textColor: Colors.white,
-            ),
-          ),
-          child: const LicensePage(
-            applicationName: 'OpenAir',
-            applicationVersion: '1.0.0',
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final appInfoAsync = ref.watch(appInfoProvider);
@@ -247,11 +224,11 @@ class AboutPageState extends ConsumerState<AboutPage> {
                       icon: Icons.gavel_rounded,
                       title: Translations.of(context).text('licenses'),
                       onTap: () {
-                        if (Brightness.dark == Theme.of(context).brightness) {
-                          _showDarkLicensePage();
-                        } else {
-                          showLicensePage(context: context);
-                        }
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LicensesPage(),
+                          ),
+                        );
                       },
                       context: context,
                     ),
