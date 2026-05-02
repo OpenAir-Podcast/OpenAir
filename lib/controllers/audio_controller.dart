@@ -71,8 +71,8 @@ class AudioController extends ChangeNotifier {
   List downloadingPodcasts = [];
 
   Future<void> initializeAudio(BuildContext context) async {
-    podcastSubtitle = 'podcastImage';
-    podcastSubtitle = 'name';
+    podcastTitle = '';
+    podcastSubtitle = '';
 
     playerPosition = Duration.zero;
     playerTotalDuration = Duration.zero;
@@ -87,6 +87,8 @@ class AudioController extends ChangeNotifier {
 
     audioState = 'Pause';
     loadState = 'Detail';
+
+    currentPodcastTimeRemaining = '00:00:00';
   }
 
   Icon getDownloadIcon(DownloadStatus downloadStatus) {
