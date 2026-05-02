@@ -1,4 +1,4 @@
-package com.example.openair
+package com.liquidhive.openair
 
 import io.flutter.embedding.android.FlutterActivity
 
