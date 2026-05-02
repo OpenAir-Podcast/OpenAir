@@ -54,8 +54,8 @@ class AudioController extends ChangeNotifier {
   late String audioState;
   late String loadState;
 
-  late Duration playerPosition;
-  late Duration playerTotalDuration;
+  Duration playerPosition = Duration.zero;
+  Duration playerTotalDuration = Duration.zero;
 
   late double podcastCurrentPositionInMilliseconds;
   late String currentPlaybackPositionString;
@@ -64,7 +64,7 @@ class AudioController extends ChangeNotifier {
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
-  late String? currentPodcastTimeRemaining;
+  String? currentPodcastTimeRemaining;
 
   List<String> audioSpeedOptions = ['0.5x', '1.0x', '1.25x', '1.5x', '2.0x'];
 
@@ -606,12 +606,16 @@ class AudioController extends ChangeNotifier {
     // Set up position listener
     _player.onPositionChanged.listen((Duration position) {
       playerPosition = position;
-      podcastCurrentPositionInMilliseconds =
-          playerTotalDuration.inMilliseconds > 0
-              ? (position.inMilliseconds / playerTotalDuration.inMilliseconds)
-                  .clamp(0.0, 1.0)
-              : 0.0;
       currentPlaybackPositionString = formatPlaybackPosition(position);
+      if (playerTotalDuration.inMilliseconds > 0) {
+        podcastCurrentPositionInMilliseconds =
+            (position.inMilliseconds / playerTotalDuration.inMilliseconds)
+                .clamp(0.0, 1.0);
+        final remaining = playerTotalDuration - position;
+        currentPodcastTimeRemaining = formatPlaybackPosition(remaining);
+      } else {
+        podcastCurrentPositionInMilliseconds = 0.0;
+      }
       notifyListeners();
     });
 

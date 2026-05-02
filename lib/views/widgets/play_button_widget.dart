@@ -25,7 +25,9 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
     final currentEpisode = ref.watch(audioProvider).currentEpisode;
     final isPlaying = ref.watch(audioProvider).isPlaying;
 
-    if (currentEpisode == null || currentEpisode.isEmpty || widget.episodeItem['guid'] != currentEpisode['guid']) {
+    if (currentEpisode == null ||
+        currentEpisode.isEmpty ||
+        widget.episodeItem['guid'] != currentEpisode['guid']) {
       if (isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }
@@ -56,6 +58,7 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
         ],
       );
     } else if (playStatus case PlayingStatus.paused) {
+      final audio = ref.watch(audioProvider);
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -63,10 +66,11 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
             padding: EdgeInsets.symmetric(
               horizontal: paddingSpace,
             ),
-            child: Icon(Icons.timelapse_rounded),
+            child: Icon(Icons.pause_rounded),
           ),
           Text(
-            ref.watch(audioProvider).currentPodcastTimeRemaining!,
+            audio.currentPodcastTimeRemaining ??
+                audio.currentPlaybackPositionString,
             overflow: TextOverflow.ellipsis,
           ),
         ],
