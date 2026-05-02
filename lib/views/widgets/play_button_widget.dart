@@ -22,20 +22,21 @@ class PlayButtonWidgetState extends ConsumerState<PlayButtonWidget> {
   Widget build(BuildContext context) {
     const double paddingSpace = 8.0;
 
-    if (widget.episodeItem['guid'] !=
-        ref.watch(audioProvider).currentEpisode!['guid']) {
-      if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
+    final currentEpisode = ref.watch(audioProvider).currentEpisode;
+    final isPlaying = ref.watch(audioProvider).isPlaying;
+
+    if (currentEpisode == null || currentEpisode.isEmpty || widget.episodeItem['guid'] != currentEpisode['guid']) {
+      if (isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.detail;
       }
     } else {
-      if (ref.watch(audioProvider).isPlaying == PlayingStatus.playing) {
+      if (isPlaying == PlayingStatus.playing) {
         playStatus = PlayingStatus.playing;
-      } else if (ref.watch(audioProvider).isPlaying == PlayingStatus.paused) {
+      } else if (isPlaying == PlayingStatus.paused) {
         playStatus = PlayingStatus.paused;
-      } else if (ref.watch(audioProvider).isPlaying == PlayingStatus.stop) {
+      } else if (isPlaying == PlayingStatus.stop) {
         playStatus = PlayingStatus.detail;
-      } else if (ref.watch(audioProvider).isPlaying ==
-          PlayingStatus.buffering) {
+      } else if (isPlaying == PlayingStatus.buffering) {
         playStatus = PlayingStatus.buffering;
       }
     }
