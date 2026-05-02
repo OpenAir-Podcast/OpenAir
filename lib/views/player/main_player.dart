@@ -33,21 +33,41 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(35.0),
-                      ),
-                      width: imageSize,
-                      height: imageSize,
-                      child: CachedNetworkImage(
-                        memCacheHeight: imageSize.ceil(),
-                        memCacheWidth: imageSize.ceil(),
-                        imageUrl: ref
-                                .watch(audioProvider)
-                                .currentEpisode!['feedImage'] ??
-                            ref.watch(audioProvider).currentEpisode!['image'],
-                        fit: BoxFit.fill,
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Hero(
+                      tag: 'player_art',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        width: imageSize,
+                        height: imageSize,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24.0),
+                          child: CachedNetworkImage(
+                            memCacheHeight: (imageSize * 2).ceil(),
+                            memCacheWidth: (imageSize * 2).ceil(),
+                            imageUrl: ref
+                                    .watch(audioProvider)
+                                    .currentEpisode?['feedImage'] ??
+                                ref
+                                    .watch(audioProvider)
+                                    .currentEpisode?['image'] ??
+                                '',
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Container(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              child: const Icon(Icons.podcasts, size: 80),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
