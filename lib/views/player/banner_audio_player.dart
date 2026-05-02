@@ -56,8 +56,8 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 6.0),
                   child: Row(
                     children: [
                       // Thumbnail
@@ -99,7 +99,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                               currentEpisode['author']?.toString() ??
                                   Translations.of(context).text('unknown'),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
                                 fontSize: 11,
                               ),
                               maxLines: 1,
@@ -134,8 +136,9 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                 SizedBox(
                   height: 3,
                   child: LinearProgressIndicator(
+                    backgroundColor:
+                        theme.colorScheme.primary.withValues(alpha: 0.1),
                     value: audioState.podcastCurrentPositionInMilliseconds,
-                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       theme.colorScheme.primary,
                     ),
