@@ -291,6 +291,7 @@
     "syncHistory": "履歴を同期",
     "syncSettings": "設定を同期",
     "syncPlaybackPosition": "再生位置を同期",
+    "syncItems": "同期する項目",
     "synchronizeNow": "今すぐ同期",
     "database": "データベース",
     "exportDatabase": "データベースをエクスポート",

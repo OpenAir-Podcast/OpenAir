@@ -19,13 +19,77 @@ class SynchronizationPage extends ConsumerStatefulWidget {
 }
 
 class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
-  late Map synchronizationData;
+  Widget _buildCard(Widget child, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
 
-  late bool syncFavourites;
-  late bool syncQueue;
-  late bool syncHistory;
-  late bool syncPlaybackPosition;
-  late bool syncSettings;
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: 0.5,
+              ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggleTile({
+    required String label,
+    required bool value,
+    required Function(bool) onChanged,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _saveSynchronizationSettings(Map syncData, BuildContext context) {
+    ref
+        .watch(openAirProvider)
+        .hiveService
+        .saveSynchronizationSettings(syncData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,229 +97,141 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('synchronization')),
+        title: Text(
+          Translations.of(context).text('synchronization'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: synchronization.when(
         data: (data) {
-          synchronizationData = data!;
+          final syncData = data!;
 
-          syncFavourites = synchronizationData['syncFavourites'] ?? true;
-          syncQueue = synchronizationData['syncQueue'] ?? true;
-          syncHistory = synchronizationData['syncHistory'] ?? true;
-          syncPlaybackPosition =
-              synchronizationData['syncPlaybackPosition'] ?? true;
-          syncSettings = synchronizationData['syncSettings'] ?? true;
+          final syncFavourites = syncData['syncFavourites'] ?? true;
+          final syncQueue = syncData['syncQueue'] ?? true;
+          final syncHistory = syncData['syncHistory'] ?? true;
+          final syncPlaybackPosition = syncData['syncPlaybackPosition'] ?? true;
+          final syncSettings = syncData['syncSettings'] ?? true;
 
           return Column(
-            spacing: settingsSpacer,
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('synchronization'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('syncFavourites')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [syncFavourites, !syncFavourites],
-                  onPressed: (int index) {
-                    setState(() {
-                      syncFavourites = !syncFavourites;
-                      synchronizationData['syncFavourites'] = syncFavourites;
-
-                      syncFavouritesConfig = syncFavourites;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveSynchronizationSettings(synchronizationData);
-                    });
-                  },
+              _buildSectionHeader(
+                  Translations.of(context).text('synchronization'), context),
+              _buildCard(
+                Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
+                    _buildToggleTile(
+                      label: Translations.of(context).text('syncFavourites'),
+                      value: syncFavourites,
+                      onChanged: (value) {
+                        syncData['syncFavourites'] = value;
+                        syncFavouritesConfig = value;
+                        _saveSynchronizationSettings(syncData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context).text('syncQueue'),
+                      value: syncQueue,
+                      onChanged: (value) {
+                        syncData['syncQueue'] = value;
+                        syncQueueConfig = value;
+                        _saveSynchronizationSettings(syncData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context).text('syncHistory'),
+                      value: syncHistory,
+                      onChanged: (value) {
+                        syncData['syncHistory'] = value;
+                        syncHistoryConfig = value;
+                        _saveSynchronizationSettings(syncData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label:
+                          Translations.of(context).text('syncPlaybackPosition'),
+                      value: syncPlaybackPosition,
+                      onChanged: (value) {
+                        syncData['syncPlaybackPosition'] = value;
+                        syncPlaybackPositionConfig = value;
+                        _saveSynchronizationSettings(syncData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context).text('syncSettings'),
+                      value: syncSettings,
+                      onChanged: (value) {
+                        syncData['syncSettings'] = value;
+                        syncSettingsConfig = value;
+                        _saveSynchronizationSettings(syncData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
                   ],
-                )),
+                ),
+                context,
               ),
-              ListTile(
-                title: Text(Translations.of(context).text('syncQueue')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [syncQueue, !syncQueue],
-                  onPressed: (int index) {
-                    setState(() {
-                      syncQueue = !syncQueue;
-                      synchronizationData['syncQueue'] = syncQueue;
-
-                      syncQueueConfig = syncQueue;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveSynchronizationSettings(synchronizationData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('syncHistory')),
-                trailing: SizedBox(
-                  child: ToggleButtons(
-                    isSelected: [syncHistory, !syncHistory],
-                    onPressed: (int index) {
-                      setState(() {
-                        syncHistory = !syncHistory;
-                        synchronizationData['syncHistory'] = syncHistory;
-
-                        syncHistoryConfig = syncHistory;
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveSynchronizationSettings(synchronizationData);
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('on'),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('off'),
-                        ),
-                      ),
-                    ],
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () => ref.read(openAirProvider).synchronize(context),
+                icon: const Icon(Icons.sync_rounded),
+                label: Text(
+                  Translations.of(context).text('synchronizeNow'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('syncPlaybackPosition')),
-                trailing: SizedBox(
-                  child: ToggleButtons(
-                    isSelected: [syncPlaybackPosition, !syncPlaybackPosition],
-                    onPressed: (int index) {
-                      setState(() {
-                        syncPlaybackPosition = !syncPlaybackPosition;
-                        synchronizationData['syncPlaybackPosition'] =
-                            syncPlaybackPosition;
-
-                        syncPlaybackPositionConfig = syncPlaybackPosition;
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveSynchronizationSettings(synchronizationData);
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('on'),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('off'),
-                        ),
-                      ),
-                    ],
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
                   ),
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('syncSettings')),
-                trailing: SizedBox(
-                  child: ToggleButtons(
-                    isSelected: [syncSettings, !syncSettings],
-                    onPressed: (int index) {
-                      setState(() {
-                        syncSettings = !syncSettings;
-                        synchronizationData['syncSettings'] = syncSettings;
-
-                        syncSettingsConfig = syncSettings;
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveSynchronizationSettings(synchronizationData);
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('on'),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          Translations.of(context).text('off'),
-                        ),
-                      ),
-                    ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 60.0,
-                  width: 200.0,
-                  child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                            Theme.of(context).primaryColor),
-                        foregroundColor: WidgetStateProperty.all(
-                            Theme.of(context).colorScheme.onPrimary),
-                      ),
-                      onPressed: () =>
-                          ref.read(openAirProvider).synchronize(context),
-                      child: Text(
-                          Translations.of(context).text('synchronizeNow'))),
-                ),
-              )
+              const SizedBox(height: 24),
             ],
           );
         },
         error: (error, stackTrace) {
-          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
+          return Center(
+            child: Text(Translations.of(context).text('oopsAnErrorOccurred')),
+          );
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());

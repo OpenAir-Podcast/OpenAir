@@ -291,6 +291,7 @@
     "syncHistory": "同步历史记录",
     "syncSettings": "同步设置",
     "syncPlaybackPosition": "同步播放位置",
+    "syncItems": "要同步的项目",
     "synchronizeNow": "立即同步",
     "database": "数据库",
     "exportDatabase": "导出数据库",

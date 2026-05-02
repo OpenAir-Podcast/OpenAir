@@ -291,6 +291,7 @@
     "syncHistory": "Synchroniser l'historique",
     "syncSettings": "Synchroniser les paramètres",
     "syncPlaybackPosition": "Synchroniser la position de lecture",
+    "syncItems": "Éléments à synchroniser",
     "synchronizeNow": "Synchroniser maintenant",
     "database": "Base de données",
     "exportDatabase": "Exporter la base de données",
