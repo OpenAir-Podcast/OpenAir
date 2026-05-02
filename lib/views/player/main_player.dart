@@ -4,6 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'dart:ui';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
@@ -22,10 +23,36 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
   Widget build(BuildContext context) {
     final audioState = ref.watch(audioProvider);
     final currentEpisode = audioState.currentEpisode;
+    final subsAsync = ref.watch(subscriptionsProvider);
 
     if (currentEpisode == null || currentEpisode.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    String getPodcastTitle(
+        Map<String, dynamic> episode, AsyncValue<Map<String, dynamic>> subs) {
+      if (episode['podcastTitle'] != null) return episode['podcastTitle'];
+      return subs.when(
+        data: (subsMap) {
+          final podcastId = episode['podcastId'];
+          if (podcastId != null) {
+            for (final entry in subsMap.entries) {
+              if (entry.value.id.toString() == podcastId.toString()) {
+                return entry.value.title;
+              }
+            }
+          }
+          return episode['author']?.toString() ??
+              Translations.of(context).text('unknown');
+        },
+        loading: () => episode['author']?.toString() ?? '',
+        error: (_, __) =>
+            episode['author']?.toString() ??
+            Translations.of(context).text('unknown'),
+      );
+    }
+
+    final podcastTitle = getPodcastTitle(currentEpisode, subsAsync);
 
     final theme = Theme.of(context);
 
@@ -130,9 +157,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           }
                         },
                         child: Text(
-                          currentEpisode['podcastTitle']?.toString() ??
-                              currentEpisode['author']?.toString() ??
-                              Translations.of(context).text('unknown'),
+                          podcastTitle,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w500,
