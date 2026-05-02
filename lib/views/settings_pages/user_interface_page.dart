@@ -15,12 +15,6 @@ final FutureProvider<Map?> userInterfaceSettingsDataProvider =
   return await hiveService.getUserInterfaceSettings();
 });
 
-enum ThemeMode {
-  system,
-  light,
-  dark,
-}
-
 class UserInterface extends ConsumerStatefulWidget {
   const UserInterface({super.key});
 
@@ -29,583 +23,475 @@ class UserInterface extends ConsumerStatefulWidget {
 }
 
 class _UserInterfaceState extends ConsumerState<UserInterface> {
-  late Map userInterface;
+  Widget _buildCard(Widget child, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
 
-  late String fontSizeVal;
-  late String themeMode;
-  late String language;
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: 0.5,
+              ),
+        ),
+      ),
+    );
+  }
 
-  late String voice;
-  late String speechRate;
-  late String pitch;
+  void _applyTheme(Map userInterface, BuildContext context, String themeMode,
+      String fontSizeFactor) {
+    final platformBrightness =
+        View.of(context).platformDispatcher.platformBrightness;
+    final effectiveTheme = themeMode == 'System'
+        ? (platformBrightness == Brightness.dark ? 'Dark' : 'Light')
+        : themeMode;
+    final brightness = effectiveTheme == 'Dark' ? 'dark' : 'light';
 
-  late bool systemTheme;
-  late bool lightTheme;
-  late bool darkTheme;
+    switch (fontSizeFactor) {
+      case 'Small':
+        ThemeProvider.controllerOf(context)
+            .setTheme('blue_accent_${brightness}_small');
+        break;
+      case 'Medium':
+        ThemeProvider.controllerOf(context)
+            .setTheme('blue_accent_${brightness}_medium');
+        break;
+      case 'Large':
+        ThemeProvider.controllerOf(context)
+            .setTheme('blue_accent_${brightness}_large');
+        break;
+      case 'Extra Large':
+        ThemeProvider.controllerOf(context)
+            .setTheme('blue_accent_${brightness}_extra_large');
+        break;
+      default:
+        ThemeProvider.controllerOf(context)
+            .setTheme('blue_accent_${brightness}_medium');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(userInterfaceSettingsDataProvider);
 
-    Brightness platformBrightness =
-        View.of(context).platformDispatcher.platformBrightness;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('userInterface')),
+        title: Text(
+          Translations.of(context).text('userInterface'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: settings.when(
         data: (data) {
-          userInterface = data!;
+          final userInterface = data!;
 
-          switch (userInterface['fontSizeFactor']) {
-            case 'Small':
-              fontSizeVal = Translations.of(context).text('small');
-              break;
-            case 'Medium':
-              fontSizeVal = Translations.of(context).text('medium');
-              break;
-            case 'Large':
-              fontSizeVal = Translations.of(context).text('large');
-              break;
-            case 'Extra Large':
-              fontSizeVal = Translations.of(context).text('extraLarge');
-              break;
-            default:
-              fontSizeVal = Translations.of(context).text('medium');
-              break;
-          }
+          final fontSizeFactor = userInterface['fontSizeFactor'] ?? 'Medium';
+          final themeMode = userInterface['themeMode'] ?? 'System';
+          final storedLanguage = userInterface['language'] ?? 'English';
 
-          switch (userInterface['themeMode']) {
-            case 'System':
-              themeMode = Translations.of(context).text('system');
-              systemTheme = true;
-              lightTheme = false;
-              darkTheme = false;
-              break;
-            case 'Light':
-              themeMode = Translations.of(context).text('light');
-              systemTheme = false;
-              lightTheme = true;
-              darkTheme = false;
-              break;
-            case 'Dark':
-              themeMode = Translations.of(context).text('dark');
-              systemTheme = false;
-              lightTheme = false;
-              darkTheme = true;
-              break;
-            default:
-              themeMode = Translations.of(context).text('system');
-              systemTheme = true;
-              lightTheme = false;
-              darkTheme = false;
-          }
+          final fontSizeLabels = {
+            'Small': Translations.of(context).text('small'),
+            'Medium': Translations.of(context).text('medium'),
+            'Large': Translations.of(context).text('large'),
+            'Extra Large': Translations.of(context).text('extraLarge'),
+          };
 
-          switch (userInterface['language']) {
-            case 'English':
-              language = "English";
-              break;
-            case 'Spanish':
-              language = "Español";
-              break;
-            case 'French':
-              language = "Français";
-              break;
-            case 'German':
-              language = "Deutsch";
-              break;
-            case 'Italian':
-              language = "Italiano";
-              break;
-            case 'Portuguese':
-              language = "Português";
-              break;
-            case 'Russian':
-              language = "Русский";
-              break;
-            case 'Chinese':
-              language = "中文";
-              break;
-            case 'Japanese':
-              language = "日本語";
-              break;
-            case 'Korean':
-              language = "한국어";
-              break;
-            case 'Arabic':
-              language = "العربية";
-              break;
-            case 'Hebrew':
-              language = "עברית";
-              break;
-            case 'Dutch':
-              language = "Nederlands";
-              break;
-            case 'Swedish':
-              language = "Svenska";
-              break;
-            default:
-              language = "English";
-          }
+          final languageOptions = {
+            "English": const Locale('en', 'US'),
+            "Español": const Locale('es', 'ES'),
+            "Français": const Locale('fr', 'FR'),
+            "Deutsch": const Locale('de', 'DE'),
+            "Italiano": const Locale('it', 'IT'),
+            "Português": const Locale('pt', 'PT'),
+            "Русский": const Locale('ru', 'RU'),
+            "中文": const Locale('zh', 'CN'),
+            "日本語": const Locale('ja', 'JP'),
+            "한국어": const Locale('ko', 'KR'),
+            "العربية": const Locale('ar', 'AE'),
+            "עברית": const Locale('he', 'IL'),
+            "Nederlands": const Locale('nl', 'NL'),
+            "Svenska": const Locale('sv', 'SE'),
+          };
 
-          switch (userInterface['voice']) {
-            case 'System':
-              voice = Translations.of(context).text('system');
-              break;
-            case 'Male':
-              voice = Translations.of(context).text('male');
-              break;
-            case 'Female':
-              voice = Translations.of(context).text('female');
-              break;
-            default:
-              voice = Translations.of(context).text('system');
-          }
+          final languageSaveValues = {
+            "English": 'English',
+            "Español": 'Spanish',
+            "Français": 'French',
+            "Deutsch": 'German',
+            "Italiano": 'Italian',
+            "Português": 'Portuguese',
+            "Русский": 'Russian',
+            "中文": 'Chinese',
+            "日本語": 'Japanese',
+            "한국어": 'Korean',
+            "العربية": 'Arabic',
+            "עברית": 'Hebrew',
+            "Nederlands": 'Dutch',
+            "Svenska": 'Swedish',
+          };
 
-          switch (userInterface['speechRate']) {
-            case 'Slow':
-              speechRate = Translations.of(context).text('slow');
-              break;
-            case 'Medium':
-              speechRate = Translations.of(context).text('medium');
-              break;
-            case 'Fast':
-              speechRate = Translations.of(context).text('fast');
-              break;
-            case 'Extra Fast':
-              speechRate = Translations.of(context).text('extraFast');
-              break;
-            default:
-              speechRate = Translations.of(context).text('medium');
-          }
+          final reverseLanguageSaveValues = {
+            for (var entry in languageSaveValues.entries)
+              entry.value: entry.key,
+          };
 
-          switch (userInterface['pitch']) {
-            case 'Low':
-              pitch = Translations.of(context).text('low');
-              break;
-            case 'Medium':
-              pitch = Translations.of(context).text('medium');
-              break;
-            case 'High':
-              pitch = Translations.of(context).text('high');
-              break;
-            case 'Extra High':
-              pitch = Translations.of(context).text('extraHigh');
-              break;
-            default:
-              pitch = Translations.of(context).text('medium');
-          }
+          final displayLanguage =
+              reverseLanguageSaveValues[storedLanguage] ?? storedLanguage;
+
+          final localeStrings = {
+            "English": Localization.en_US,
+            "Español": Localization.es_ES,
+            "Français": Localization.fr_FR,
+            "Deutsch": Localization.de_DE,
+            "Italiano": Localization.it_IT,
+            "Português": Localization.pt_PT,
+            "Русский": Localization.ru_RU,
+            "中文": Localization.zh_CN,
+            "日本語": Localization.ja_JP,
+            "한국어": Localization.ko_KR,
+            "العربية": Localization.ar_AE,
+            "עברית": Localization.he_IL,
+            "Nederlands": Localization.nl_NL,
+            "Svenska": Localization.sv_SE,
+          };
+
+          final themeIcons = {
+            'System': Icons.brightness_auto_rounded,
+            'Light': Icons.light_mode_rounded,
+            'Dark': Icons.dark_mode_rounded,
+          };
 
           return Column(
-            spacing: settingsSpacer,
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('display'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('themeMode')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [systemTheme, lightTheme, darkTheme],
-                  onPressed: (int index) {
-                    setState(() {
-                      switch (index) {
-                        case 0:
-                          userInterface['themeMode'] = 'System';
-
-                          if (platformBrightness == Brightness.dark) {
-                            switch (data['fontSizeFactor']) {
-                              case 'Small':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_small');
-                                break;
-                              case 'Medium':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                                break;
-                              case 'Large':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_large');
-                                break;
-                              case 'Extra Large':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_dark_medium');
-                            }
-                          } else if (platformBrightness == Brightness.light) {
-                            switch (data['fontSizeFactor']) {
-                              case 'Small':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_small');
-                                break;
-                              case 'Medium':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                                break;
-                              case 'Large':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_large');
-                                break;
-                              case 'Extra Large':
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_extra_large');
-                                break;
-                              default:
-                                ThemeProvider.controllerOf(context)
-                                    .setTheme('blue_accent_light_medium');
-                            }
-                          }
-
-                          break;
-                        case 1:
-                          userInterface['themeMode'] = 'Light';
-
-                          switch (userInterface['fontSizeFactor']) {
-                            case 'Small':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_small');
-                              break;
-                            case 'Medium':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_medium');
-                              break;
-                            case 'Large':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_large');
-                              break;
-                            case 'Extra Large':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_extra_large');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_medium');
-                          }
-
-                          break;
-                        case 2:
-                          userInterface['themeMode'] = 'Dark';
-
-                          switch (userInterface['fontSizeFactor']) {
-                            case 'Small':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_small');
-                              break;
-                            case 'Medium':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_medium');
-                              break;
-                            case 'Large':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_large');
-                              break;
-                            case 'Extra Large':
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_extra_large');
-                              break;
-                            default:
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_medium');
-                          }
-
-                          break;
-                      }
-
-                      themeModeConfig = userInterface['themeMode'];
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveUserInterfaceSettings(userInterface);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('system'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('light'),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('dark'),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('fontSize')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color:
-                              ThemeProvider.themeOf(context).data.primaryColor,
-                        ),
-                    value: fontSizeVal,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        fontSizeVal = newValue!;
-                        String scaleFactor;
-
-                        if (newValue ==
-                            Translations.of(context).text('small')) {
-                          scaleFactor = 'Small';
-                        } else if (newValue ==
-                            Translations.of(context).text('medium')) {
-                          scaleFactor = 'Medium';
-                        } else if (newValue ==
-                            Translations.of(context).text('large')) {
-                          scaleFactor = 'Large';
-                        } else if (newValue ==
-                            Translations.of(context).text('extraLarge')) {
-                          scaleFactor = 'Extra Large';
-                        } else {
-                          scaleFactor = 'Medium';
-                        }
-
-                        userInterface['fontSizeFactor'] = scaleFactor;
-                        fontSizeConfig = userInterface['fontSizeFactor'];
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveUserInterfaceSettings(userInterface);
-
-                        // Apply the theme change immediately
-                        if (themeModeConfig == 'Dark') {
-                          if (scaleFactor == 'Small') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark_small');
-                          } else if (scaleFactor == 'Medium') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark_medium');
-                          } else if (scaleFactor == 'Large') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark_large');
-                          } else if (scaleFactor == 'Extra Large') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_dark_extra_large');
-                          }
-                        } else if (themeModeConfig == 'Light') {
-                          if (scaleFactor == 'Small') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light_small');
-                          } else if (scaleFactor == 'Medium') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light_medium');
-                          } else if (scaleFactor == 'Large') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light_large');
-                          } else if (scaleFactor == 'Extra Large') {
-                            ThemeProvider.controllerOf(context)
-                                .setTheme('blue_accent_light_extra_large');
-                          }
-                        }
-                        // System Theme
-                        else {
-                          if (platformBrightness == Brightness.dark) {
-                            if (scaleFactor == 'Small') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_small');
-                            } else if (scaleFactor == 'Medium') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_medium');
-                            } else if (scaleFactor == 'Large') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_large');
-                            } else if (scaleFactor == 'Extra Large') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_dark_extra_large');
-                            }
-                          } else if (platformBrightness == Brightness.light) {
-                            if (scaleFactor == 'Small') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_small');
-                            } else if (scaleFactor == 'Medium') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_medium');
-                            } else if (scaleFactor == 'Large') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_large');
-                            } else if (scaleFactor == 'Extra Large') {
-                              ThemeProvider.controllerOf(context)
-                                  .setTheme('blue_accent_light_extra_large');
-                            }
-                          }
-                        }
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('small'),
-                      Translations.of(context).text('medium'),
-                      Translations.of(context).text('large'),
-                      Translations.of(context).text('extraLarge'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
+              _buildSectionHeader('appearance', context),
+              _buildCard(
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
                         child: Text(
-                          value,
+                          Translations.of(context).text('themeMode'),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: ['System', 'Light', 'Dark'].map((mode) {
+                          final isSelected = themeMode == mode;
+                          return Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: _ThemeOption(
+                                icon: themeIcons[mode]!,
+                                label: Translations.of(context)
+                                    .text(mode.toLowerCase()),
+                                isSelected: isSelected,
+                                onTap: () {
+                                  setState(() {
+                                    userInterface['themeMode'] = mode;
+                                    themeModeConfig = mode;
+                                    _applyTheme(userInterface, context, mode,
+                                        fontSizeFactor);
+                                    ref
+                                        .watch(openAirProvider)
+                                        .hiveService
+                                        .saveUserInterfaceSettings(
+                                            userInterface);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ),
+                context,
               ),
-              ListTile(
-                title: Text(Translations.of(context).text('language')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color:
-                              ThemeProvider.themeOf(context).data.primaryColor,
-                        ),
-                    value: language,
-                    onChanged: (String? newValue) {
-                      String saveValue;
-                      String localeStr;
-                      late Locale locale;
-
-                      if (newValue == "English") {
-                        saveValue = 'English';
-                        localeStr = Localization.en_US;
-                        locale = const Locale('en', 'US');
-                      } else if (newValue == "Español") {
-                        saveValue = 'Spanish';
-                        localeStr = Localization.es_ES;
-                        locale = const Locale('es', 'ES');
-                      } else if (newValue == "Français") {
-                        saveValue = 'French';
-                        localeStr = Localization.fr_FR;
-                        locale = const Locale('fr', 'FR');
-                      } else if (newValue == "Deutsch") {
-                        saveValue = 'German';
-                        localeStr = Localization.de_DE;
-                        locale = const Locale('de', 'DE');
-                      } else if (newValue == "Italiano") {
-                        saveValue = 'Italian';
-                        localeStr = Localization.it_IT;
-                        locale = const Locale('it', 'IT');
-                      } else if (newValue == "Português") {
-                        saveValue = 'Portuguese';
-                        localeStr = Localization.pt_PT;
-                        locale = const Locale('pt', 'PT');
-                      } else if (newValue == "Русский") {
-                        saveValue = 'Russian';
-                        localeStr = Localization.ru_RU;
-                        locale = const Locale('ru', 'RU');
-                      } else if (newValue == "中文") {
-                        saveValue = 'Chinese';
-                        localeStr = Localization.zh_CN;
-                        locale = const Locale('zh', 'CN');
-                      } else if (newValue == "日本語") {
-                        saveValue = 'Japanese';
-                        localeStr = Localization.ja_JP;
-                        locale = const Locale('ja', 'JP');
-                      } else if (newValue == "한국어") {
-                        saveValue = 'Korean';
-                        localeStr = Localization.ko_KR;
-                        locale = const Locale('ko', 'KR');
-                      } else if (newValue == "العربية") {
-                        saveValue = 'Arabic';
-                        localeStr = Localization.ar_AE;
-                        locale = const Locale('ar', 'AE');
-                      } else if (newValue == "עברית") {
-                        saveValue = 'Hebrew';
-                        localeStr = Localization.he_IL;
-                        locale = const Locale('he', 'IL');
-                      } else if (newValue == "Nederlands") {
-                        saveValue = 'Dutch';
-                        localeStr = Localization.nl_NL;
-                        locale = const Locale('nl', 'NL');
-                      } else if (newValue == "Svenska") {
-                        saveValue = 'Swedish';
-                        localeStr = Localization.sv_SE;
-                        locale = const Locale('sv', 'SE');
-                      } else {
-                        saveValue = 'English';
-                        localeStr = Localization.en_US;
-                        locale = const Locale('en', 'US');
-                      }
-
-                      setState(() {
-                        userInterface['language'] = saveValue;
-                        userInterface['locale'] = localeStr;
-                        languageConfig = saveValue;
-                        localeConfig = localeStr;
-
-                        localeSettings = localeStr;
-                        onChanged = false;
-
-                        Translations.changeLanguage(localeStr);
-
-                        // Update the locale provider to trigger UI refresh
-                        ref.read(localeProvider.notifier).setLocale(locale);
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveUserInterfaceSettings(userInterface);
-                      });
-                    },
-                    items: <String>[
-                      "English",
-                      "Español",
-                      "Français",
-                      "Deutsch",
-                      "Italiano",
-                      "Português",
-                      "Русский",
-                      "中文",
-                      "日本語",
-                      "한국어",
-                      "العربية",
-                      "עברית",
-                      "Nederlands",
-                      "Svenska",
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
+              const SizedBox(height: 16),
+              _buildCard(
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
                         child: Text(
-                          value,
+                          Translations.of(context).text('fontSize'),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: ['Small', 'Medium', 'Large', 'Extra Large']
+                            .map((size) {
+                          final isSelected = fontSizeFactor == size;
+                          return Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 3),
+                              child: _SizeOption(
+                                label: fontSizeLabels[size]!,
+                                isSelected: isSelected,
+                                onTap: () {
+                                  setState(() {
+                                    userInterface['fontSizeFactor'] = size;
+                                    fontSizeConfig = size;
+                                    _applyTheme(userInterface, context,
+                                        themeMode, size);
+                                    ref
+                                        .watch(openAirProvider)
+                                        .hiveService
+                                        .saveUserInterfaceSettings(
+                                            userInterface);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ),
+                context,
               ),
+              _buildSectionHeader('language', context),
+              _buildCard(
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          Translations.of(context).text('language'),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest
+                                .withValues(alpha: 0.5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                          ),
+                          isExpanded: true,
+                          initialValue: displayLanguage,
+                          onChanged: (newValue) {
+                            if (newValue == null) return;
+                            final saveValue = languageSaveValues[newValue]!;
+                            final localeStr = localeStrings[newValue]!;
+                            final locale = languageOptions[newValue]!;
+
+                            setState(() {
+                              userInterface['language'] = saveValue;
+                              userInterface['locale'] = localeStr;
+                              languageConfig = saveValue;
+                              localeConfig = localeStr;
+                              localeSettings = localeStr;
+                              onChanged = false;
+
+                              Translations.changeLanguage(localeStr);
+                              ref
+                                  .read(localeProvider.notifier)
+                                  .setLocale(locale);
+
+                              ref
+                                  .watch(openAirProvider)
+                                  .hiveService
+                                  .saveUserInterfaceSettings(userInterface);
+                            });
+                          },
+                          items: languageOptions.keys
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                context,
+              ),
+              const SizedBox(height: 24),
             ],
           );
         },
         error: (error, stackTrace) {
-          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
+          return Center(
+            child: Text(Translations.of(context).text('oopsAnErrorOccurred')),
+          );
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());
         },
+      ),
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeOption({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(
+                  color: theme.colorScheme.primary,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 24,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SizeOption extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SizeOption({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(
+                  color: theme.colorScheme.primary,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
