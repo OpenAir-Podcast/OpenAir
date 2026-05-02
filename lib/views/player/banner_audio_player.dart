@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/main_player.dart';
@@ -26,24 +27,30 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
       return const SizedBox.shrink();
     }
 
-    String podcastTitle = currentEpisode['podcastTitle']?.toString() ?? '';
-    if (podcastTitle.isEmpty) {
-      subsAsync.whenData((subs) {
-        final podcastId = currentEpisode['podcastId'];
-        if (podcastId != null) {
-          for (final entry in subs.entries) {
-            if (entry.value.id.toString() == podcastId.toString()) {
-              podcastTitle = entry.value.title;
-              break;
+    String getPodcastTitle(Map<String, dynamic> episode,
+        AsyncValue<Map<String, SubscriptionModel>> subs) {
+      if (episode['podcastTitle'] != null) return episode['podcastTitle'];
+      return subs.when(
+        data: (subsMap) {
+          final podcastId = episode['podcastId'];
+          if (podcastId != null) {
+            for (final entry in subsMap.entries) {
+              if (entry.value.id.toString() == podcastId.toString()) {
+                return entry.value.title;
+              }
             }
           }
-        }
-      });
+          return episode['author']?.toString() ??
+              Translations.of(context).text('unknown');
+        },
+        loading: () => episode['author']?.toString() ?? '',
+        error: (_, __) =>
+            episode['author']?.toString() ??
+            Translations.of(context).text('unknown'),
+      );
     }
-    if (podcastTitle.isEmpty) {
-      podcastTitle = currentEpisode['author']?.toString() ??
-          Translations.of(context).text('unknown');
-    }
+
+    final podcastTitle = getPodcastTitle(currentEpisode, subsAsync);
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
