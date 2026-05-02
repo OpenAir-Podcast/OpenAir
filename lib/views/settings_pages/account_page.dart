@@ -112,7 +112,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Translations.of(context).text('account')),
-        centerTitle: true,
       ),
       body: getConnectionStatusValue.when(
         data: (connectionData) {
