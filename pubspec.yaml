@@ -67,6 +67,12 @@ dev_dependencies:
 dependency_overrides:
   intl: ^0.20.2
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icons/icon.png"
+
 flutter:
   uses-material-design: true
 
