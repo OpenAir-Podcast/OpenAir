@@ -162,148 +162,145 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     );
   }
 
-  void _showSuccessMessage(String message) {
-    if (mounted) {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        ref.read(notificationServiceProvider).showNotification(
-              'OpenAir ${Translations.of(context).text('notification')}',
-              message,
-            );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
-      }
+  void _showNotification(String message, {bool isError = false}) {
+    if (!mounted) return;
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      ref.read(notificationServiceProvider).showNotification(
+            'OpenAir ${Translations.of(context).text('notification')}',
+            message,
+          );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor:
+              isError ? Colors.red : Theme.of(context).colorScheme.primary,
+        ),
+      );
     }
   }
 
-  void _showErrorMessage(String message) {
-    if (mounted) {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        ref.read(notificationServiceProvider).showNotification(
-              'OpenAir ${Translations.of(context).text('notification')}',
-              message,
-            );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
-      }
-    }
-  }
+  Future<void> _importDatabase() async {
+    if (!mounted) return;
+    final dialogTitle = Translations.of(context).text('importDatabase');
+    final successMsg =
+        Translations.of(context).text('databaseImportedRestartApp');
 
-  void importDatabase() async {
     FilePickerResult? result = await FilePicker.pickFiles(
-      dialogTitle: Translations.of(context).text('importDatabase'),
+      dialogTitle: dialogTitle,
       type: FileType.custom,
       allowedExtensions: ['db'],
     );
 
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      await ref.read(openAirProvider).importFromDb(file);
+    if (result == null || !mounted) return;
 
-      if (mounted) {
-        _showSuccessMessage(
-            Translations.of(context).text('databaseImportedRestartApp'));
-      }
+    File file = File(result.files.single.path!);
+    await ref.read(openAirProvider).importFromDb(file);
+
+    if (mounted) {
+      _showNotification(successMsg);
     }
   }
 
-  void exportDatabase(BuildContext context) async {
+  Future<void> _exportDatabase() async {
+    if (!mounted) return;
+    final dialogTitle = Translations.of(context).text('exportDatabase');
+    final exportSuccessMsg = Translations.of(context).text('databaseExported');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.db';
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
 
-    if (context.mounted) {
-      String? outputFile = await FilePicker.saveFile(
-          dialogTitle: Translations.of(context).text('exportDatabase'),
-          fileName: fileName,
-          type: FileType.custom,
-          allowedExtensions: ['db'],
-          initialDirectory: getOpenAirPath);
+    String? outputFile = await FilePicker.saveFile(
+        dialogTitle: dialogTitle,
+        fileName: fileName,
+        type: FileType.custom,
+        allowedExtensions: ['db'],
+        initialDirectory: getOpenAirPath);
 
-      if (outputFile != null) {
-        ref.read(openAirProvider).exportToDb(outputFile);
-        _showSuccessMessage(Translations.of(context).text('databaseExported'));
-      }
-    }
+    if (outputFile == null || !mounted) return;
+
+    ref.read(openAirProvider).exportToDb(outputFile);
+    _showNotification(exportSuccessMsg);
   }
 
-  void importOpml() async {
+  Future<void> _importOpml() async {
     FilePickerResult? result = await FilePicker.pickFiles(
       dialogTitle: Translations.of(context).text('importOpml'),
       type: FileType.custom,
       allowedExtensions: ['opml', 'xml'],
     );
 
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      final hiveService = ref.read(openAirProvider).hiveService;
-      await hiveService.importOpml(file);
-      _showSuccessMessage(
+    if (result == null || !mounted) return;
+
+    File file = File(result.files.single.path!);
+    final hiveService = ref.read(openAirProvider).hiveService;
+    await hiveService.importOpml(file);
+
+    if (mounted) {
+      _showNotification(
           Translations.of(context).text('opmlImportedRestartApp'));
     }
   }
 
-  void exportOpml(BuildContext context) async {
+  Future<void> _exportOpml() async {
+    if (!mounted) return;
+    final dialogTitle = Translations.of(context).text('exportOpml');
+    final exportSuccessMsg = Translations.of(context).text('opmlExported');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.opml';
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
 
-    if (context.mounted) {
-      String? outputFile = await FilePicker.saveFile(
-        dialogTitle: Translations.of(context).text('exportOpml'),
-        fileName: fileName,
-        type: FileType.custom,
-        allowedExtensions: ['opml', 'xml'],
-        initialDirectory: getOpenAirPath,
-      );
+    String? outputFile = await FilePicker.saveFile(
+      dialogTitle: dialogTitle,
+      fileName: fileName,
+      type: FileType.custom,
+      allowedExtensions: ['opml', 'xml'],
+      initialDirectory: getOpenAirPath,
+    );
 
-      if (outputFile != null) {
-        final hiveService = ref.read(openAirProvider).hiveService;
-        await hiveService.exportOpml(outputFile);
-        _showSuccessMessage(Translations.of(context).text('opmlExported'));
-      }
-    }
+    if (outputFile == null || !mounted) return;
+
+    final hiveService = ref.read(openAirProvider).hiveService;
+    await hiveService.exportOpml(outputFile);
+    _showNotification(exportSuccessMsg);
   }
 
   void _showRssUrlDialog() {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         TextEditingController textInputControl = TextEditingController();
 
         return AlertDialog(
           title: Text(
-            Translations.of(context).text('addPodcastByRssUrl'),
+            Translations.of(dialogContext).text('addPodcastByRssUrl'),
             textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(dialogContext).colorScheme.primary,
                 ),
           ),
           content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.85,
+            width: MediaQuery.of(dialogContext).size.width * 0.85,
             child: TextField(
               maxLength: 256,
               autofocus: true,
               controller: textInputControl,
               keyboardType: TextInputType.url,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(dialogContext).colorScheme.primary,
                   ),
               decoration: InputDecoration(
                 icon: Icon(
                   Icons.link_rounded,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(dialogContext).colorScheme.primary,
                 ),
-                labelText: Translations.of(context).text('rssUrl'),
+                labelText: Translations.of(dialogContext).text('rssUrl'),
                 suffix: IconButton(
                   onPressed: () {
                     textInputControl.text = '';
@@ -318,10 +315,10 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
-                  Translations.of(context).text('cancel'),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  Translations.of(dialogContext).text('cancel'),
+                  style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
                         color: Colors.blueAccent,
                         fontWeight: FontWeight.bold,
                       ),
@@ -332,29 +329,27 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextButton(
                 onPressed: () async {
-                  Navigator.pop(context);
+                  final url = textInputControl.text;
+                  Navigator.pop(dialogContext);
 
-                  if (textInputControl.text.isEmpty) {
-                    return;
-                  }
+                  if (url.isEmpty || !mounted) return;
 
                   bool success = await ref
                       .watch(audioProvider)
-                      .addPodcastByRssUrl(textInputControl.text, context);
+                      .addPodcastByRssUrl(url, dialogContext);
 
-                  if (context.mounted) {
-                    if (success) {
-                      _showSuccessMessage(
-                          Translations.of(context).text('subscribed'));
-                    } else {
-                      _showErrorMessage(
-                          Translations.of(context).text('errorAddingPodcast'));
-                    }
+                  if (mounted) {
+                    _showNotification(
+                      success
+                          ? Translations.of(context).text('subscribed')
+                          : Translations.of(context).text('errorAddingPodcast'),
+                      isError: !success,
+                    );
                   }
                 },
                 child: Text(
-                  Translations.of(context).text('add'),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  Translations.of(dialogContext).text('add'),
+                  style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
                         color: Colors.blueAccent,
                         fontWeight: FontWeight.bold,
                       ),
@@ -372,17 +367,17 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
         title: Text(
-          Translations.of(context).text('deleteAllEpisode'),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          Translations.of(dialogContext).text('deleteAllEpisode'),
+          style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 overflow: TextOverflow.ellipsis,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(dialogContext).colorScheme.primary,
               ),
         ),
         content: Text(
-          Translations.of(context).text('deleteAllEpisodeConfirmation'),
+          Translations.of(dialogContext).text('deleteAllEpisodeConfirmation'),
           style: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark
+            color: Theme.of(dialogContext).brightness == Brightness.dark
                 ? Colors.white70
                 : Colors.black87,
             fontSize: 16,
@@ -390,14 +385,14 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
         ),
         actions: <Widget>[
           TextButton(
-            child: Text(Translations.of(context).text('cancel')),
+            child: Text(Translations.of(dialogContext).text('cancel')),
             onPressed: () {
               Navigator.of(dialogContext).pop(false);
             },
           ),
           TextButton(
             child: Text(
-              Translations.of(context).text('delete'),
+              Translations.of(dialogContext).text('delete'),
               style: const TextStyle(color: Colors.red),
             ),
             onPressed: () {
@@ -408,11 +403,10 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
       ),
     );
 
-    if (shouldDelete == true) {
+    if (shouldDelete == true && mounted) {
       await ref.read(openAirProvider).hiveService.deleteEpisodes();
-      if (context.mounted) {
-        _showSuccessMessage(
-            Translations.of(context).text('allPodcastsCleared'));
+      if (mounted) {
+        _showNotification(Translations.of(context).text('allPodcastsCleared'));
       }
     }
   }
@@ -447,7 +441,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       title: Translations.of(context).text('importDatabase'),
                       subtitle: Translations.of(context)
                           .text('importDatabaseSubtitle'),
-                      onTap: importDatabase,
+                      onTap: _importDatabase,
                       context: context,
                     ),
                     Divider(
@@ -460,7 +454,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       title: Translations.of(context).text('exportDatabase'),
                       subtitle: Translations.of(context)
                           .text('exportDatabaseSubtitle'),
-                      onTap: () => exportDatabase(context),
+                      onTap: _exportDatabase,
                       context: context,
                     ),
                     Divider(
@@ -496,7 +490,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       title: Translations.of(context).text('importOpml'),
                       subtitle:
                           Translations.of(context).text('importOpmlSubtitle'),
-                      onTap: importOpml,
+                      onTap: _importOpml,
                       context: context,
                     ),
                     Divider(
@@ -509,7 +503,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                       title: Translations.of(context).text('exportOpml'),
                       subtitle:
                           Translations.of(context).text('exportOpmlSubtitle'),
-                      onTap: () => exportOpml(context),
+                      onTap: _exportOpml,
                       context: context,
                     ),
                   ],
