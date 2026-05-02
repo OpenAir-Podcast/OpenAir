@@ -71,16 +71,13 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                       children: [
                         Text(
                           Translations.of(context).text('subscriptions'),
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         if (totalNew > 0) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                                horizontal: 4, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(12),
