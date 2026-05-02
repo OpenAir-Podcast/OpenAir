@@ -142,22 +142,23 @@ class DonatePageState extends ConsumerState<DonatePage> {
                   context: context,
                   iconColor: const Color(0xFF003087),
                 ),
-                Divider(
-                    height: 1,
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: 0.15)),
-                _buildDonateTile(
-                  icon: Icons.coffee_rounded,
-                  title: Translations.of(context).text('buyMeACoffee'),
-                  onTap: () async {
-                    final url = dotenv.env['BUY_ME_A_COFFEE_URL'];
-                    if (url != null && context.mounted) {
-                      await _launchUrl(url, context);
-                    }
-                  },
-                  context: context,
-                  iconColor: Colors.orange,
-                ),
+                // todo: replace with open source donation link
+                // Divider(
+                //     height: 1,
+                //     color:
+                //         Theme.of(context).dividerColor.withValues(alpha: 0.15)),
+                // _buildDonateTile(
+                //   icon: Icons.coffee_rounded,
+                //   title: Translations.of(context).text('buyMeACoffee'),
+                //   onTap: () async {
+                //     final url = dotenv.env['BUY_ME_A_COFFEE_URL'];
+                //     if (url != null && context.mounted) {
+                //       await _launchUrl(url, context);
+                //     }
+                //   },
+                //   context: context,
+                //   iconColor: Colors.orange,
+                // ),
                 Divider(
                     height: 1,
                     color:
