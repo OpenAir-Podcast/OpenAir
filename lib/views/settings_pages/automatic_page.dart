@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:theme_provider/theme_provider.dart';
 
 final FutureProvider<Map?> downloadSettingsDataProvider =
     FutureProvider((ref) async {
@@ -19,15 +18,151 @@ class AutomaticPage extends ConsumerStatefulWidget {
 }
 
 class AutomaticPageState extends ConsumerState<AutomaticPage> {
-  late Map downloadsData;
+  Widget _buildCard(Widget child, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
 
-  late String refreshPodcasts;
-  late bool downloadNewEpisodes;
-  late bool downloadQueuedEpisodes;
-  late String downloadEpisodeLimit;
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: 0.5,
+              ),
+        ),
+      ),
+    );
+  }
 
-  late bool deletePlayedEpisodes;
-  late bool keepFavouriteEpisodes;
+  Widget _buildDropdownTile({
+    required String label,
+    required String currentValue,
+    required List<String> options,
+    required Map<String, String> valueMap,
+    required Function(String) onSave,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 140,
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                isDense: true,
+              ),
+              isExpanded: true,
+              initialValue: currentValue,
+              onChanged: (newValue) {
+                if (newValue == null) return;
+                final internalValue = valueMap[newValue];
+                if (internalValue != null) onSave(internalValue);
+              },
+              items: options.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value, textAlign: TextAlign.center),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleTile({
+    required String label,
+    String? subtitle,
+    required bool value,
+    required Function(bool)? onChanged,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                        ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged ?? (_) {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _saveAutomaticSettings(Map downloadsData, BuildContext context) {
+    ref.watch(openAirProvider).hiveService.saveAutomaticSettings(downloadsData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,435 +170,237 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('automatic')),
+        title: Text(
+          Translations.of(context).text('automatic'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: playback.when(
         data: (data) {
-          downloadsData = data!;
+          final downloadsData = data!;
 
-          downloadNewEpisodes = downloadsData['downloadNewEpisodes'] ?? true;
-          downloadQueuedEpisodes =
+          final refreshOptions = [
+            'Never',
+            'Every hour',
+            'Every 2 hours',
+            'Every 4 hours',
+            'Every 8 hours',
+            'Every 12 hours',
+            'Every day',
+            'Every 3 days',
+          ];
+
+          final refreshScheduleMap = {
+            'Never': Duration.zero,
+            'Every hour': const Duration(hours: 1),
+            'Every 2 hours': const Duration(hours: 2),
+            'Every 4 hours': const Duration(hours: 4),
+            'Every 8 hours': const Duration(hours: 8),
+            'Every 12 hours': const Duration(hours: 12),
+            'Every day': const Duration(days: 1),
+            'Every 3 days': const Duration(days: 3),
+          };
+
+          final refreshLabels = {
+            'Never': Translations.of(context).text('never'),
+            'Every hour': Translations.of(context).text('everyHour'),
+            'Every 2 hours': Translations.of(context).text('every2Hours'),
+            'Every 4 hours': Translations.of(context).text('every4Hours'),
+            'Every 8 hours': Translations.of(context).text('every8Hours'),
+            'Every 12 hours': Translations.of(context).text('every12Hours'),
+            'Every day': Translations.of(context).text('everyDay'),
+            'Every 3 days': Translations.of(context).text('everyDay3'),
+          };
+
+          final limitOptions = [
+            '5',
+            '10',
+            '25',
+            '50',
+            '75',
+            '100',
+            '500',
+            'Unlimited',
+          ];
+
+          final limitLabels = {
+            for (var l in limitOptions)
+              l: l == 'Unlimited'
+                  ? Translations.of(context).text('unlimited')
+                  : l,
+          };
+
+          final storedRefresh = downloadsData['refreshPodcasts'] ?? 'Never';
+          final storedLimit = downloadsData['downloadEpisodeLimit'] ?? '25';
+
+          final downloadNewEpisodes =
+              downloadsData['downloadNewEpisodes'] ?? true;
+          final downloadQueuedEpisodes =
               downloadsData['downloadQueuedEpisodes'] ?? false;
-
-          deletePlayedEpisodes = downloadsData['deletePlayedEpisodes'] ?? false;
-          keepFavouriteEpisodes =
+          final deletePlayedEpisodes =
+              downloadsData['deletePlayedEpisodes'] ?? false;
+          final keepFavouriteEpisodes =
               downloadsData['keepFavouriteEpisodes'] ?? false;
 
-          switch (downloadsData['refreshPodcasts']) {
-            case 'Never':
-              refreshPodcasts = Translations.of(context).text('never');
-              break;
-            case 'Every hour':
-              refreshPodcasts = Translations.of(context).text('everyHour');
-              break;
-            case 'Every 2 hours':
-              refreshPodcasts = Translations.of(context).text('every2Hours');
-              break;
-            case 'Every 4 hours':
-              refreshPodcasts = Translations.of(context).text('every4Hours');
-              break;
-            case 'Every 8 hours':
-              refreshPodcasts = Translations.of(context).text('every8Hours');
-              break;
-            case 'Every 12 hours':
-              refreshPodcasts = Translations.of(context).text('every12Hours');
-              break;
-            case 'Every day':
-              refreshPodcasts = Translations.of(context).text('everyDay');
-              break;
-            case 'Every 3 days':
-              refreshPodcasts = Translations.of(context).text('everyDay3');
-              break;
-            default:
-              refreshPodcasts = Translations.of(context).text('never');
-          }
-
-          switch (downloadsData['downloadEpisodeLimit']) {
-            case '5':
-              downloadEpisodeLimit = '5';
-              break;
-
-            case '10':
-              downloadEpisodeLimit = '10';
-              break;
-
-            case '25':
-              downloadEpisodeLimit = '25';
-              break;
-            case '50':
-              downloadEpisodeLimit = '50';
-              break;
-            case '75':
-              downloadEpisodeLimit = '75';
-              break;
-            case '100':
-              downloadEpisodeLimit = '100';
-              break;
-            case '500':
-              downloadEpisodeLimit = '500';
-              break;
-            case 'Unlimited':
-              downloadEpisodeLimit = Translations.of(context).text('unlimited');
-              break;
-            default:
-              downloadEpisodeLimit = '25';
-          }
-
-          return Column(
-            spacing: settingsSpacer,
+          return ListView(
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('automatic'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('refreshPodcasts')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color:
-                              ThemeProvider.themeOf(context).data.primaryColor,
-                        ),
-                    value: refreshPodcasts,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        refreshPodcasts = newValue!;
+              _buildSectionHeader('refresh', context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildDropdownTile(
+                      label: Translations.of(context).text('refreshPodcasts'),
+                      currentValue: refreshLabels[storedRefresh]!,
+                      options:
+                          refreshOptions.map((e) => refreshLabels[e]!).toList(),
+                      valueMap: {
+                        for (var option in refreshOptions)
+                          refreshLabels[option]!: option,
+                      },
+                      onSave: (value) {
+                        downloadsData['refreshPodcasts'] = value;
+                        refreshPodcastsConfig = value;
 
-                        if (Translations.of(context).text('never') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Never';
-
+                        if (value == 'Never') {
                           ref
                               .read(openAirProvider)
                               .hiveService
                               .refreshTimer
                               .clearSchedule();
-                        } else if (Translations.of(context).text('everyHour') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every hour';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(hours: 1)));
-                        } else if (Translations.of(context)
-                                .text('every2Hours') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every 2 hours';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(hours: 2)));
-                        } else if (Translations.of(context)
-                                .text('every4Hours') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every 4 hours';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(hours: 4)));
-                        } else if (Translations.of(context)
-                                .text('every8Hours') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every 8 hours';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(hours: 8)));
-                        } else if (Translations.of(context)
-                                .text('every12Hours') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every 12 hours';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(DateTime.now()
-                                  .add(const Duration(hours: 12)));
-                        } else if (Translations.of(context).text('everyDay') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every day';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(days: 1)));
-                        } else if (Translations.of(context).text('everyDay3') ==
-                            newValue) {
-                          downloadsData['refreshPodcasts'] = 'Every 3 days';
-
-                          ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .refreshTimer
-                              .schedule(
-                                  DateTime.now().add(const Duration(days: 3)));
-                        }
-
-                        refreshPodcastsConfig = refreshPodcasts;
-
-                        ref
-                            .read(openAirProvider)
-                            .hiveService
-                            .saveAutomaticSettings(downloadsData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('never'),
-                      Translations.of(context).text('everyHour'),
-                      Translations.of(context).text('every2Hours'),
-                      Translations.of(context).text('every4Hours'),
-                      Translations.of(context).text('every8Hours'),
-                      Translations.of(context).text('every12Hours'),
-                      Translations.of(context).text('everyDay'),
-                      Translations.of(context).text('everyDay3'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('downloadNewEpisodes')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [downloadNewEpisodes, !downloadNewEpisodes],
-                  onPressed: (int index) {
-                    setState(() {
-                      downloadNewEpisodes = !downloadNewEpisodes;
-                      downloadsData['downloadNewEpisodes'] =
-                          downloadNewEpisodes;
-
-                      downloadNewEpisodesConfig = downloadNewEpisodes;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveAutomaticSettings(downloadsData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(
-                    Translations.of(context).text('downloadQueuedEpisodes')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [downloadQueuedEpisodes, !downloadQueuedEpisodes],
-                  onPressed: (int index) {
-                    setState(() {
-                      downloadQueuedEpisodes = !downloadQueuedEpisodes;
-                      downloadsData['downloadQueuedEpisodes'] =
-                          downloadQueuedEpisodes;
-
-                      downloadQueuedEpisodesConfig = downloadQueuedEpisodes;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveAutomaticSettings(downloadsData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('downloadEpisodeLimit')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color:
-                              ThemeProvider.themeOf(context).data.primaryColor,
-                        ),
-                    value: downloadEpisodeLimit,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        downloadEpisodeLimit = newValue!;
-
-                        if ('5' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '5';
-                        } else if ('10' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '10';
-                        } else if ('25' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '25';
-                        } else if ('50' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '50';
-                        } else if ('75' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '75';
-                        } else if ('100' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '100';
-                        } else if ('500' == newValue) {
-                          downloadsData['downloadEpisodeLimit'] = '500';
-                        } else if (Translations.of(context).text('unlimited') ==
-                            newValue) {
-                          downloadsData['downloadEpisodeLimit'] = 'Unlimited';
-                        }
-
-                        downloadEpisodeLimitConfig = downloadEpisodeLimit;
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .saveAutomaticSettings(downloadsData);
-                      });
-                    },
-                    items: <String>[
-                      '5',
-                      '10',
-                      '25',
-                      '50',
-                      '75',
-                      '100',
-                      '500',
-                      Translations.of(context).text('unlimited'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              Divider(),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('deletePlayedEpisodes')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [deletePlayedEpisodes, !deletePlayedEpisodes],
-                  onPressed: (int index) {
-                    setState(() {
-                      deletePlayedEpisodes = !deletePlayedEpisodes;
-                      downloadsData['deletePlayedEpisodes'] =
-                          deletePlayedEpisodes;
-
-                      deletePlayedEpisodesConfig = deletePlayedEpisodes;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .saveAutomaticSettings(downloadsData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(
-                    Translations.of(context).text('keepFavouriteEpisodes')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [keepFavouriteEpisodes, !keepFavouriteEpisodes],
-                  onPressed: deletePlayedEpisodes
-                      ? (int index) {
-                          setState(() {
-                            keepFavouriteEpisodes = !keepFavouriteEpisodes;
-                            downloadsData['keepFavouriteEpisodes'] =
-                                keepFavouriteEpisodes;
-
-                            keepFavouriteEpisodesConfig = keepFavouriteEpisodes;
-
+                        } else {
+                          final duration = refreshScheduleMap[value];
+                          if (duration != null) {
                             ref
-                                .watch(openAirProvider)
+                                .read(openAirProvider)
                                 .hiveService
-                                .saveAutomaticSettings(downloadsData);
-                          });
+                                .refreshTimer
+                                .schedule(DateTime.now().add(duration));
+                          }
                         }
-                      : null,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
+
+                        _saveAutomaticSettings(downloadsData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
                   ],
-                )),
+                ),
+                context,
               ),
+              _buildSectionHeader('downloads', context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildToggleTile(
+                      label:
+                          Translations.of(context).text('downloadNewEpisodes'),
+                      value: downloadNewEpisodes,
+                      onChanged: (value) {
+                        downloadsData['downloadNewEpisodes'] = value;
+                        downloadNewEpisodesConfig = value;
+                        _saveAutomaticSettings(downloadsData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context)
+                          .text('downloadQueuedEpisodes'),
+                      value: downloadQueuedEpisodes,
+                      onChanged: (value) {
+                        downloadsData['downloadQueuedEpisodes'] = value;
+                        downloadQueuedEpisodesConfig = value;
+                        _saveAutomaticSettings(downloadsData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildDropdownTile(
+                      label:
+                          Translations.of(context).text('downloadEpisodeLimit'),
+                      currentValue: limitLabels[storedLimit]!,
+                      options:
+                          limitOptions.map((e) => limitLabels[e]!).toList(),
+                      valueMap: {
+                        for (var option in limitOptions)
+                          limitLabels[option]!: option,
+                      },
+                      onSave: (value) {
+                        downloadsData['downloadEpisodeLimit'] = value;
+                        downloadEpisodeLimitConfig = value;
+                        _saveAutomaticSettings(downloadsData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                  ],
+                ),
+                context,
+              ),
+              _buildSectionHeader('cleanup', context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildToggleTile(
+                      label:
+                          Translations.of(context).text('deletePlayedEpisodes'),
+                      value: deletePlayedEpisodes,
+                      onChanged: (value) {
+                        downloadsData['deletePlayedEpisodes'] = value;
+                        deletePlayedEpisodesConfig = value;
+                        _saveAutomaticSettings(downloadsData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context)
+                          .text('keepFavouriteEpisodes'),
+                      subtitle: deletePlayedEpisodes
+                          ? null
+                          : Translations.of(context)
+                              .text('enableDeletePlayedFirst'),
+                      value:
+                          deletePlayedEpisodes ? keepFavouriteEpisodes : false,
+                      onChanged: deletePlayedEpisodes
+                          ? (value) {
+                              downloadsData['keepFavouriteEpisodes'] = value;
+                              keepFavouriteEpisodesConfig = value;
+                              _saveAutomaticSettings(downloadsData, context);
+                              setState(() {});
+                            }
+                          : null,
+                      context: context,
+                    ),
+                  ],
+                ),
+                context,
+              ),
+              const SizedBox(height: 24),
             ],
           );
         },
         error: (error, stackTrace) {
-          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
+          return Center(
+            child: Text(Translations.of(context).text('oopsAnErrorOccurred')),
+          );
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());
