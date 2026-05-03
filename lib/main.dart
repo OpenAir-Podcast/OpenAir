@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
@@ -20,6 +21,13 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Enable edge-to-edge with transparent system bars
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+  ));
 
   // Load saved language BEFORE setting up Translations
   await Hive.initFlutter('OpenAir/.hive_config');
@@ -439,6 +447,16 @@ class _AppHomeState extends ConsumerState<_AppHome>
         final locale = ref.watch(localeProvider);
 
         return MaterialApp(
+          builder: (context, child) {
+            // Apply safe area to all routes, but only at the bottom
+            // so the status bar remains edge-to-edge
+            return SafeArea(
+              top: false,
+              bottom: true,
+              maintainBottomViewPadding: true,
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
           locale: locale,
           supportedLocales: Translations.supportedLocales,
           localizationsDelegates: const [
