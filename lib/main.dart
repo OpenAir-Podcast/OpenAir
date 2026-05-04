@@ -14,7 +14,9 @@ import 'package:openair/home.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/services/audio_handler.dart';
 import 'package:openair/services/notification_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
@@ -25,7 +27,7 @@ void main() async {
 
   // Initialize audio service for background playback
   await AudioService.init(
-    builder: () => OpenAirAudioHandler(),
+    builder: () => getAudioHandler(),
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.liquidhive.openair',
       androidNotificationChannelName: 'OpenAir Audio',
@@ -40,6 +42,14 @@ void main() async {
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: Colors.transparent,
   ));
+
+  // Request notification permission for Android 13+
+  if (Platform.isAndroid) {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
 
   // Load saved language BEFORE setting up Translations
   await Hive.initFlutter('OpenAir/.hive_config');

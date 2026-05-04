@@ -38,7 +38,7 @@ class AudioController extends ChangeNotifier {
 
   final Ref ref;
 
-  final OpenAirAudioHandler _audioHandler = OpenAirAudioHandler();
+  final OpenAirAudioHandler _audioHandler = getAudioHandler();
   OpenAirAudioHandler get audioHandler => _audioHandler;
   AudioPlayer get player => _audioHandler.player;
 
