@@ -2,6 +2,13 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
+OpenAirAudioHandler? _audioHandlerInstance;
+
+OpenAirAudioHandler getAudioHandler() {
+  _audioHandlerInstance ??= OpenAirAudioHandler();
+  return _audioHandlerInstance!;
+}
+
 class OpenAirAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   final AudioPlayer player = AudioPlayer();
