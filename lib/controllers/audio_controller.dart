@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/services/audio_handler.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
@@ -37,8 +38,9 @@ class AudioController extends ChangeNotifier {
 
   final Ref ref;
 
-  final AudioPlayer _player = AudioPlayer();
-  AudioPlayer get player => _player;
+  final OpenAirAudioHandler _audioHandler = OpenAirAudioHandler();
+  OpenAirAudioHandler get audioHandler => _audioHandler;
+  AudioPlayer get player => _audioHandler.player;
 
   PodcastModel? currentPodcast;
   Map<String, dynamic>? currentEpisode;
@@ -124,22 +126,34 @@ class AudioController extends ChangeNotifier {
     isCompleted = false;
 
     try {
+      final imageUrl =
+          currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '';
+      final title = currentEpisode!['title'] ?? 'Unknown';
+      final artist = currentEpisode!['author'] ??
+          currentEpisode!['podcastTitle'] ??
+          'Unknown';
+
+      await _audioHandler.setMediaItem(
+        id: currentEpisode!['guid'],
+        title: title,
+        artist: artist,
+        album: currentEpisode!['podcastTitle'] ?? '',
+        artUri: imageUrl,
+      );
+
       if (isDownloaded) {
         final downloadsDir = await getDownloadsDirectory();
         final filePath = join(downloadsDir, '${episodeItem['guid']}.mp3');
-        await _player
-            .play(DeviceFileSource(filePath))
-            .timeout(const Duration(seconds: 30));
+        await _audioHandler.playFromFile(filePath);
       } else {
-        await _player
-            .play(UrlSource(currentEpisode!['enclosureUrl']))
-            .timeout(const Duration(seconds: 30));
+        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl']);
       }
 
       Future.delayed(Duration(seconds: 3), () {
-        _player.getDuration().then((Duration? value) {
-          currentPlaybackDurationString = formatPlaybackPosition(value!);
-        });
+        final duration = _audioHandler.duration;
+        if (duration != null) {
+          currentPlaybackDurationString = formatPlaybackPosition(duration);
+        }
       });
 
       isPlaying = PlayingStatus.playing;
@@ -164,28 +178,24 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> resumePlayback() async {
-    if (_player.state == PlayerState.paused) {
-      await _player.resume();
-      audioState = 'Play';
-      loadState = 'Play';
-      isPlaying = PlayingStatus.playing;
-      notifyListeners();
-    }
+    await _audioHandler.play();
+    audioState = 'Play';
+    loadState = 'Play';
+    isPlaying = PlayingStatus.playing;
+    notifyListeners();
   }
 
   Future<void> pausePlayback() async {
-    if (_player.state == PlayerState.playing) {
-      await _player.pause();
-      audioState = 'Pause';
-      loadState = 'Detail';
-      isPlaying = PlayingStatus.paused;
-      notifyListeners();
-    }
+    await _audioHandler.pause();
+    audioState = 'Pause';
+    loadState = 'Detail';
+    isPlaying = PlayingStatus.paused;
+    notifyListeners();
   }
 
   void rewind() {
     if (playerPosition.inSeconds - int.parse(rewindIntervalConfig) > 0) {
-      _player.seek(Duration(
+      _audioHandler.seek(Duration(
           seconds: playerPosition.inSeconds - int.parse(rewindIntervalConfig)));
     }
   }
@@ -193,7 +203,7 @@ class AudioController extends ChangeNotifier {
   void fastForward() {
     if (playerPosition.inSeconds + int.parse(fastForwardIntervalConfig) <
         playerTotalDuration.inSeconds) {
-      _player.seek(Duration(
+      _audioHandler.seek(Duration(
           seconds:
               playerPosition.inSeconds + int.parse(fastForwardIntervalConfig)));
     }
@@ -203,7 +213,7 @@ class AudioController extends ChangeNotifier {
     final int index = audioSpeedOptions.indexOf(playbackSpeedConfig);
     final int newIndex = (index + 1) % audioSpeedOptions.length;
     playbackSpeedConfig = audioSpeedOptions[newIndex];
-    _player.setPlaybackRate(double.parse(playbackSpeedConfig.split('x').first));
+    _audioHandler.setSpeed(double.parse(playbackSpeedConfig.split('x').first));
     notifyListeners();
   }
 
@@ -215,7 +225,7 @@ class AudioController extends ChangeNotifier {
         ((sliderValue * playerTotalDuration.inMilliseconds) /
                 playerTotalDuration.inMilliseconds)
             .clamp(0.0, 1.0);
-    _player.seek(duration);
+    _audioHandler.seek(duration);
     notifyListeners();
   }
 
@@ -604,7 +614,7 @@ class AudioController extends ChangeNotifier {
 
   Future<void> initializeAudio(BuildContext context) async {
     // Set up position listener
-    _player.onPositionChanged.listen((Duration position) {
+    _audioHandler.positionStream.listen((Duration position) {
       playerPosition = position;
       currentPlaybackPositionString = formatPlaybackPosition(position);
       if (playerTotalDuration.inMilliseconds > 0) {
@@ -620,40 +630,40 @@ class AudioController extends ChangeNotifier {
     });
 
     // Set up duration listener
-    _player.onDurationChanged.listen((Duration duration) {
-      playerTotalDuration = duration;
-      currentPlaybackDurationString = formatPlaybackPosition(duration);
-      notifyListeners();
+    _audioHandler.durationStream.listen((Duration? duration) {
+      if (duration != null) {
+        playerTotalDuration = duration;
+        currentPlaybackDurationString = formatPlaybackPosition(duration);
+        notifyListeners();
+      }
     });
 
     // Set up player state listener
-    _player.onPlayerStateChanged.listen((PlayerState state) {
-      switch (state) {
-        case PlayerState.playing:
-          isPlaying = PlayingStatus.playing;
-          audioState = 'Play';
-          loadState = 'Play';
+    _audioHandler.playerStateStream.listen((PlayerState state) {
+      switch (state.processingState) {
+        case ProcessingState.ready:
+          if (state.playing) {
+            isPlaying = PlayingStatus.playing;
+            audioState = 'Play';
+            loadState = 'Play';
+          } else {
+            isPlaying = PlayingStatus.paused;
+            audioState = 'Pause';
+            loadState = 'Detail';
+          }
           break;
-        case PlayerState.paused:
-          isPlaying = PlayingStatus.paused;
-          audioState = 'Pause';
-          loadState = 'Detail';
-          break;
-        case PlayerState.stopped:
-          isPlaying = PlayingStatus.stop;
-          audioState = 'Stop';
-          loadState = 'Detail';
-          break;
-        case PlayerState.completed:
+        case ProcessingState.completed:
           isPlaying = PlayingStatus.stop;
           audioState = 'Stop';
           loadState = 'Detail';
           isCompleted = true;
           break;
-        case PlayerState.disposed:
+        case ProcessingState.idle:
           isPlaying = PlayingStatus.stop;
           audioState = 'Stop';
           loadState = 'Detail';
+          break;
+        default:
           break;
       }
       notifyListeners();
@@ -759,7 +769,7 @@ class AudioController extends ChangeNotifier {
       playerPosition,
     );
 
-    await _player.stop();
+    await _audioHandler.stop();
 
     Map<String, dynamic> previousEpisode = queueList[currentEpisodeIndex - 1];
     currentEpisode = previousEpisode;
@@ -818,10 +828,10 @@ class AudioController extends ChangeNotifier {
       final filename = '${currentEpisode!['guid']}.mp3';
       final filePath = await getDownloadsDirectory();
       final file = File('$filePath/$filename');
-      await _player.play(DeviceFileSource(file.path), position: position);
+      await _audioHandler.playFromFile(file.path, initialPosition: position);
     } else {
-      await _player.play(UrlSource(currentEpisode!['enclosureUrl']),
-          position: position);
+      await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl'],
+          initialPosition: position);
     }
 
     isPlaying = PlayingStatus.playing;
@@ -909,7 +919,7 @@ class AudioController extends ChangeNotifier {
       playerPosition,
     );
 
-    await _player.stop();
+    await _audioHandler.stop();
 
     final nextEpisodeData = queueList[currentEpisodeIndex + 1];
     currentEpisode = nextEpisodeData;

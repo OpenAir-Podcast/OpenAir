@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,14 +14,25 @@ import 'package:openair/home.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:openair/services/notification_service.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize audio service for background playback
+  await AudioService.init(
+    builder: () => OpenAirAudioHandler(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.liquidhive.openair',
+      androidNotificationChannelName: 'OpenAir Audio',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: false,
+    ),
+  );
 
   // Enable edge-to-edge with transparent system bars
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
