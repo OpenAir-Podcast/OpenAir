@@ -274,10 +274,6 @@ List<Category> getCategories(BuildContext context) => [
           icon: Icons.self_improvement_rounded,
           apiKey: 'self-improvement'),
       Category(
-          name: Translations.of(context).text('sexuality'),
-          icon: Icons.transgender_rounded,
-          apiKey: 'sexuality'),
-      Category(
           name: Translations.of(context).text('social'),
           icon: Icons.groups_rounded,
           apiKey: 'social'),
