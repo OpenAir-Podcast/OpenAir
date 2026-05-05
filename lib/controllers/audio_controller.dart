@@ -18,6 +18,7 @@ import 'package:openair/services/audio_handler.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
+import 'package:openair/views/nav_pages/history_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:opml/opml.dart';
@@ -116,8 +117,14 @@ class AudioController extends ChangeNotifier {
     BuildContext context,
   ) async {
     currentEpisode = episodeItem;
-    if (currentPodcast != null && currentEpisode!['podcastTitle'] == null) {
-      currentEpisode!['podcastTitle'] = currentPodcast!.title;
+    if (currentPodcast != null) {
+      if (currentEpisode!['podcastTitle'] == null) {
+        currentEpisode!['podcastTitle'] = currentPodcast!.title;
+      }
+      if (currentEpisode!['author'] == null ||
+          currentEpisode!['author'].isEmpty) {
+        currentEpisode!['author'] = currentPodcast!.author ?? 'Unknown';
+      }
     }
     final bool isDownloaded = await isAudioDownloaded(currentEpisode!['guid']);
 
@@ -359,11 +366,12 @@ class AudioController extends ChangeNotifier {
     if (podcast != null) {
       historyPodcastId = podcast.id.toString();
       historyPodcastImage = podcast.imageUrl;
-      historyPodcastAuthor = podcast.author ?? 'Unknown';
+      historyPodcastAuthor = podcast.author ?? episode['author'] ?? 'Unknown';
     } else {
       historyPodcastId = episode['podcastId']?.toString() ?? '-1';
       historyPodcastImage = episode['image'] ?? '';
-      historyPodcastAuthor = episode['author'] ?? 'Unknown';
+      historyPodcastAuthor =
+          episode['author'] ?? episode['podcastTitle'] ?? 'Unknown';
     }
 
     final HistoryModel historyMod = HistoryModel(
@@ -384,6 +392,7 @@ class AudioController extends ChangeNotifier {
 
     final hiveService = ref.read(hiveServiceProvider);
     await hiveService.addToHistory(historyMod);
+    ref.invalidate(getHistoryProvider);
   }
 
   Future<void> addToQueue(Map<String, dynamic> episode, PodcastModel? podcast,
