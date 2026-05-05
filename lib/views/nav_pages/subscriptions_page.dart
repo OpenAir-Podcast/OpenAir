@@ -201,32 +201,40 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   void _showClearAllDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text(Translations.of(context).text('clearAllPodcasts')),
-        content:
-            Text(Translations.of(context).text('areYouSureClearAllPodcasts')),
-        actions: [
-          TextButton(
-            child: Text(Translations.of(context).text('cancel')),
-            onPressed: () => Navigator.of(dialogContext).pop(),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(Translations.of(context).text('clear')),
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await ref.read(openAirProvider).hiveService.deleteSubscriptions();
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(Translations.of(dialogContext).text('clearAllPodcasts')),
+          content: Text(Translations.of(dialogContext)
+              .text('areYouSureClearAllPodcasts')),
+          actions: [
+            TextButton(
+              child: Text(Translations.of(dialogContext).text('cancel')),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(Translations.of(dialogContext).text('clear')),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                await ref
+                    .read(openAirProvider)
+                    .hiveService
+                    .deleteSubscriptions();
 
-              ref.invalidate(subscriptionsProvider);
-              ref.invalidate(subCountProvider);
-              ref.invalidate(getSubscribedEpisodesProvider);
-              ref.invalidate(feedCountProvider);
-              ref.invalidate(getInboxProvider);
-              ref.invalidate(inboxCountProvider);
-            },
-          ),
-        ],
-      ),
+                ref.invalidate(subscriptionsProvider);
+                ref.invalidate(subCountProvider);
+                ref.invalidate(getSubscribedEpisodesProvider);
+                ref.invalidate(feedCountProvider);
+                ref.invalidate(getInboxProvider);
+                ref.invalidate(inboxCountProvider);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

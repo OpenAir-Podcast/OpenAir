@@ -278,11 +278,6 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
         return AlertDialog(
           title: Text(
             Translations.of(dialogContext).text('addPodcastByRssUrl'),
-            textAlign: TextAlign.start,
-            style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(dialogContext).colorScheme.primary,
-                ),
           ),
           content: SizedBox(
             width: MediaQuery.of(dialogContext).size.width * 0.85,
@@ -291,10 +286,6 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
               autofocus: true,
               controller: textInputControl,
               keyboardType: TextInputType.url,
-              style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(dialogContext).colorScheme.primary,
-                  ),
               decoration: InputDecoration(
                 icon: Icon(
                   Icons.link_rounded,
@@ -312,48 +303,34 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
             ),
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: Text(
-                  Translations.of(dialogContext).text('cancel'),
-                  style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
-                        color: Colors.blueAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                Translations.of(dialogContext).text('cancel'),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextButton(
-                onPressed: () async {
-                  final url = textInputControl.text;
-                  Navigator.pop(dialogContext);
+            FilledButton(
+              onPressed: () async {
+                final url = textInputControl.text;
+                Navigator.pop(dialogContext);
 
-                  if (url.isEmpty || !mounted) return;
+                if (url.isEmpty || !mounted) return;
 
-                  bool success = await ref
-                      .watch(audioProvider)
-                      .addPodcastByRssUrl(url, dialogContext);
+                bool success = await ref
+                    .watch(audioProvider)
+                    .addPodcastByRssUrl(url, dialogContext);
 
-                  if (mounted) {
-                    _showNotification(
-                      success
-                          ? Translations.of(context).text('subscribed')
-                          : Translations.of(context).text('errorAddingPodcast'),
-                      isError: !success,
-                    );
-                  }
-                },
-                child: Text(
-                  Translations.of(dialogContext).text('add'),
-                  style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
-                        color: Colors.blueAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+                if (mounted) {
+                  _showNotification(
+                    success
+                        ? Translations.of(context).text('subscribed')
+                        : Translations.of(context).text('errorAddingPodcast'),
+                    isError: !success,
+                  );
+                }
+              },
+              child: Text(
+                Translations.of(dialogContext).text('add'),
               ),
             ),
           ],
@@ -365,42 +342,36 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
   void _showDeleteEpisodesDialog() async {
     final bool? shouldDelete = await showDialog<bool>(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text(
-          Translations.of(dialogContext).text('deleteAllEpisode'),
-          style: Theme.of(dialogContext).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.ellipsis,
-                color: Theme.of(dialogContext).colorScheme.primary,
-              ),
-        ),
-        content: Text(
-          Translations.of(dialogContext).text('deleteAllEpisodeConfirmation'),
-          style: TextStyle(
-            color: Theme.of(dialogContext).brightness == Brightness.dark
-                ? Colors.white70
-                : Colors.black87,
-            fontSize: 16,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(
+            Translations.of(dialogContext).text('deleteAllEpisode'),
           ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text(Translations.of(dialogContext).text('cancel')),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(false);
-            },
+          content: Text(
+            Translations.of(dialogContext).text('deleteAllEpisodeConfirmation'),
           ),
-          TextButton(
-            child: Text(
-              Translations.of(dialogContext).text('delete'),
-              style: const TextStyle(color: Colors.red),
+          actions: <Widget>[
+            TextButton(
+              child: Text(Translations.of(dialogContext).text('cancel')),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
             ),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(true);
-            },
-          ),
-        ],
-      ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                Translations.of(dialogContext).text('delete'),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+            ),
+          ],
+        );
+      },
     );
 
     if (shouldDelete == true && mounted) {

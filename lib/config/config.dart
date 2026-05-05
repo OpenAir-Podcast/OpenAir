@@ -143,6 +143,40 @@ ListTileThemeData listTileThemeLight = ListTileThemeData(
   textColor: Colors.black,
 );
 
+DialogThemeData dialogThemeLight = DialogThemeData(
+  backgroundColor: Colors.white,
+  elevation: 8,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+  ),
+  titleTextStyle: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  ),
+  contentTextStyle: TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+  ),
+);
+
+DialogThemeData dialogThemeDark = DialogThemeData(
+  backgroundColor: Colors.grey[850],
+  elevation: 8,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+  ),
+  titleTextStyle: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+  ),
+  contentTextStyle: TextStyle(
+    fontSize: 16,
+    color: Colors.white70,
+  ),
+);
+
 Color scaffoldBackgroundColorLight = Colors.grey[100]!;
 Color scaffoldBackgroundColorDark = Colors.black;
 Color cardColorLight = Colors.white;

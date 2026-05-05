@@ -356,9 +356,6 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     return AlertDialog(
                       title: Text(
                         Translations.of(context).text('addPodcastByRssUrl'),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
                       ),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -367,10 +364,6 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                           autofocus: true,
                           controller: textInputControl,
                           keyboardType: TextInputType.url,
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
                           decoration: InputDecoration(
                             icon: Icon(
                               Icons.link_rounded,
@@ -384,95 +377,75 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                   textInputControl.clear();
                                 });
                               },
-                              icon: Icon(Icons.clear_rounded),
+                              icon: const Icon(Icons.clear_rounded),
                             ),
                           ),
                         ),
                       ),
                       actions: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              Translations.of(context).text('cancel'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            Translations.of(context).text('cancel'),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
+                        FilledButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
 
-                              if (textInputControl.text.isEmpty) {
-                                return;
-                              }
+                            if (textInputControl.text.isEmpty) {
+                              return;
+                            }
 
-                              bool i = await ref
-                                  .watch(audioProvider)
-                                  .addPodcastByRssUrl(
-                                      textInputControl.text, context);
+                            bool i = await ref
+                                .watch(audioProvider)
+                                .addPodcastByRssUrl(
+                                    textInputControl.text, context);
 
-                              if (context.mounted) {
-                                if (i == true) {
-                                  if (!Platform.isAndroid && !Platform.isIOS) {
-                                    ref
-                                        .read(notificationServiceProvider)
-                                        .showNotification(
-                                          'OpenAir ${Translations.of(context).text('notification')}',
-                                          Translations.of(context)
-                                              .text('subscribed'),
-                                        );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          Translations.of(context)
-                                              .text('subscribed'),
-                                        ),
-                                      ),
-                                    );
-                                  }
+                            if (context.mounted) {
+                              if (i == true) {
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('subscribed'),
+                                      );
                                 } else {
-                                  if (!Platform.isAndroid && !Platform.isIOS) {
-                                    ref
-                                        .read(notificationServiceProvider)
-                                        .showNotification(
-                                          'OpenAir ${Translations.of(context).text('notification')}',
-                                          Translations.of(context)
-                                              .text('errorAddingPodcast'),
-                                        );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          Translations.of(context)
-                                              .text('errorAddingPodcast'),
-                                        ),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('subscribed'),
                                       ),
-                                    );
-                                  }
+                                    ),
+                                  );
+                                }
+                              } else {
+                                if (!Platform.isAndroid && !Platform.isIOS) {
+                                  ref
+                                      .read(notificationServiceProvider)
+                                      .showNotification(
+                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                        Translations.of(context)
+                                            .text('errorAddingPodcast'),
+                                      );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        Translations.of(context)
+                                            .text('errorAddingPodcast'),
+                                      ),
+                                    ),
+                                  );
                                 }
                               }
-                            },
-                            child: Text(
-                              Translations.of(context).text('add'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
+                            }
+                          },
+                          child: Text(
+                            Translations.of(context).text('add'),
                           ),
                         ),
                       ],
@@ -499,9 +472,6 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     return AlertDialog(
                       title: Text(
                         Translations.of(context).text('searchPodcastIndex'),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
                       ),
                       content: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -510,10 +480,6 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                           autofocus: true,
                           controller: textInputControl,
                           keyboardType: TextInputType.url,
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
                           decoration: InputDecoration(
                             icon: Icon(
                               Icons.title_rounded,
@@ -527,7 +493,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                   textInputControl.clear();
                                 });
                               },
-                              icon: Icon(Icons.clear_rounded),
+                              icon: const Icon(Icons.clear_rounded),
                             ),
                           ),
                           onSubmitted: (value) async {

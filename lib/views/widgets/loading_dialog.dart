@@ -6,8 +6,10 @@ class LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double size = 150;
+    final theme = Theme.of(context);
 
-    return const AlertDialog(
+    return AlertDialog(
+      contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
       content: SizedBox(
         height: size,
         width: size,
@@ -15,9 +17,17 @@ class LoadingDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 35),
-              Text("Searching..."),
+              CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+                strokeWidth: 3,
+              ),
+              const SizedBox(height: 35),
+              Text(
+                "Searching...",
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),

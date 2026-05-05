@@ -52,72 +52,64 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (BuildContext dialogContext) => AlertDialog(
-                        title: Text(
-                          Translations.of(context).text('clearHistory'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          title: Text(
+                            Translations.of(dialogContext).text('clearHistory'),
                           ),
-                        ),
-                        content: Text(
-                          Translations.of(context)
-                              .text('areYouSureClearHistory'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
+                          content: Text(
+                            Translations.of(dialogContext)
+                                .text('areYouSureClearHistory'),
                           ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child:
-                                Text(Translations.of(context).text('cancel')),
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              Translations.of(context).text('clear'),
-                              style: TextStyle(
-                                color: Colors.red,
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text(
+                                Translations.of(dialogContext).text('cancel'),
                               ),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop();
+                              },
                             ),
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              await ref
-                                  .watch(openAirProvider)
-                                  .hiveService
-                                  .clearHistory();
-                              ref.invalidate(getHistoryProvider);
-                              if (context.mounted) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        Translations.of(context)
-                                            .text('historyCleared'),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('historyCleared'),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                Translations.of(dialogContext).text('clear'),
+                              ),
+                              onPressed: () async {
+                                Navigator.of(dialogContext).pop();
+                                await ref
+                                    .watch(openAirProvider)
+                                    .hiveService
+                                    .clearHistory();
+                                ref.invalidate(getHistoryProvider);
+                                if (context.mounted) {
+                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .showNotification(
+                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                          Translations.of(context)
+                                              .text('historyCleared'),
+                                        );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          Translations.of(context)
+                                              .text('historyCleared'),
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),

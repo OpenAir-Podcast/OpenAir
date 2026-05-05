@@ -404,29 +404,34 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text(Translations.of(context).text('confirmDeletion')),
-        content: Text(
-          '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
-        ),
-        actions: [
-          TextButton(
-            child: Text(Translations.of(context).text('cancel')),
-            onPressed: () => Navigator.of(dialogContext).pop(),
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(Translations.of(dialogContext).text('confirmDeletion')),
+          content: Text(
+            '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
           ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(Translations.of(context).text('remove')),
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await ref
-                  .read(audioProvider.notifier)
-                  .removeDownload(widget.episodeItem);
-              ref.invalidate(sortedDownloadsProvider);
-            },
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              child: Text(Translations.of(dialogContext).text('cancel')),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(Translations.of(dialogContext).text('remove')),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                await ref
+                    .read(audioProvider.notifier)
+                    .removeDownload(widget.episodeItem);
+                ref.invalidate(sortedDownloadsProvider);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
