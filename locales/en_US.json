@@ -512,5 +512,6 @@
     "support": "Support",
     "data": "Data",
     "appearance": "Appearance",
-    "completion": "Completion"
+    "completion": "Completion",
+    "cleanup": "Cleanup"
 }

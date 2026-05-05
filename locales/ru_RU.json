@@ -501,5 +501,6 @@
     "support": "Поддержка",
     "data": "Данные",
     "appearance": "Внешний вид",
-    "completion": "Завершение"
+    "completion": "Завершение",
+    "cleanup": "Очистка"
 }
