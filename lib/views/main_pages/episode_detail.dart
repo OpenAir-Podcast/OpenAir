@@ -22,10 +22,12 @@ class EpisodeDetail extends ConsumerStatefulWidget {
     super.key,
     this.episodeItem,
     this.podcast,
+    this.author,
   });
 
   final Map<String, dynamic>? episodeItem;
   final PodcastModel? podcast;
+  final String? author;
 
   @override
   EpisodeDetailState createState() => EpisodeDetailState();
@@ -105,7 +107,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            widget.podcast!.author ??
+                            widget.author ??
+                                widget.podcast!.author ??
+                                widget.episodeItem!['author'] ??
                                 Translations.of(context).text('unknown'),
                             style: Theme.of(context)
                                 .textTheme

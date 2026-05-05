@@ -74,6 +74,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
             builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
               podcast: widget.podcast,
+              author: widget.author,
             ),
           ),
         );

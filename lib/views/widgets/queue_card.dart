@@ -74,6 +74,7 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                   episodeItem: (widget.episodeItem).cast<String, dynamic>(),
                   podcast: PodcastModel.fromJson(
                       widget.episodeItem['podcast'].cast<String, dynamic>()),
+                  author: widget.episodeItem['author'],
                 ),
               ),
             );

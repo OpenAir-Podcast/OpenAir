@@ -60,6 +60,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
             builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
               podcast: widget.podcast,
+              author: widget.author,
             ),
           ),
         );
