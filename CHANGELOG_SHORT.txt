@@ -1,0 +1,14 @@
+What's New ✨
+
+🎨 Modern UI Overhaul
+• Sleek empty states for history, queue & downloads
+• Redesigned add podcast & episode detail pages
+• Rounded cards, progress bars & filled buttons
+• Modern dialogs with icon containers
+
+🔧 Fixes & Improvements
+• Play button now updates correctly when podcast ends
+• History, downloads & inbox auto-refresh on changes
+• Author name no longer shows as "Unknown"
+• Fixed text overflow on episode cards & pages
+• Add to queue no longer auto-downloads episodes
