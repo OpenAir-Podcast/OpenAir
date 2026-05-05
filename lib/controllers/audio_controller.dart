@@ -182,6 +182,7 @@ class AudioController extends ChangeNotifier {
     audioState = 'Play';
     loadState = 'Play';
     isPlaying = PlayingStatus.playing;
+    isCompleted = false;
     notifyListeners();
   }
 
@@ -617,15 +618,18 @@ class AudioController extends ChangeNotifier {
     _audioHandler.positionStream.listen((Duration position) {
       playerPosition = position;
       currentPlaybackPositionString = formatPlaybackPosition(position);
+
       if (playerTotalDuration.inMilliseconds > 0) {
         podcastCurrentPositionInMilliseconds =
             (position.inMilliseconds / playerTotalDuration.inMilliseconds)
                 .clamp(0.0, 1.0);
+
         final remaining = playerTotalDuration - position;
         currentPodcastTimeRemaining = formatPlaybackPosition(remaining);
       } else {
         podcastCurrentPositionInMilliseconds = 0.0;
       }
+
       notifyListeners();
     });
 
