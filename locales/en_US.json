@@ -515,5 +515,6 @@
     "completion": "Completion",
     "cleanup": "Cleanup",
     "opml": "OPML",
-    "rssFeed": "RSS Feed"
+    "rssFeed": "RSS Feed",
+    "ok": "OK"
 }

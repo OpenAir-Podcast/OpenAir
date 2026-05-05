@@ -504,5 +504,6 @@
     "completion": "Slutförande",
     "cleanup": "Rensning",
     "opml": "OPML",
-    "rssFeed": "RSS-flöde"
+    "rssFeed": "RSS-flöde",
+    "ok": "OK"
 }

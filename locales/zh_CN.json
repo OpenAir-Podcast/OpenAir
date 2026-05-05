@@ -504,5 +504,6 @@
     "completion": "完成",
     "cleanup": "清理",
     "opml": "OPML",
-    "rssFeed": "RSS 订阅"
+    "rssFeed": "RSS 订阅",
+    "ok": "确定"
 }
