@@ -47,8 +47,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
   void _searchFyydPodcasts(String query) async {
     if (query.trim().isEmpty) return;
 
+    final dialogContext = context;
     showDialog(
-      context: context,
+      context: dialogContext,
       barrierDismissible: false,
       builder: (context) => const LoadingDialog(),
     );
@@ -56,49 +57,38 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     try {
       final podcasts = await ref.read(fyydProvider).searchPodcasts(query);
 
-      if (!mounted) return;
-      Navigator.pop(context);
+      if (dialogContext.mounted) {
+        Navigator.pop(dialogContext);
 
-      if (podcasts.isEmpty) {
-        if (!Platform.isAndroid && !Platform.isIOS) {
-          ref.read(notificationServiceProvider).showNotification(
-                'OpenAir ${Translations.of(context).text('notification')}',
-                Translations.of(context).text('noPodcastsFound'),
-              );
+        if (podcasts.isEmpty) {
+          if (!Platform.isAndroid && !Platform.isIOS) {
+            ref.read(notificationServiceProvider).showNotification(
+                  'OpenAir ${Translations.of(dialogContext).text('notification')}',
+                  Translations.of(dialogContext).text('noPodcastsFound'),
+                );
+          } else {
+            ScaffoldMessenger.of(dialogContext).showSnackBar(
+              SnackBar(
+                content: Text(
+                    Translations.of(dialogContext).text('noPodcastsFound')),
+              ),
+            );
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(Translations.of(context).text('noPodcastsFound')),
+          Navigator.of(dialogContext).push(
+            MaterialPageRoute(
+              builder: (context) => FyydSearchPage(
+                podcasts: podcasts,
+                searchWord: query,
+              ),
             ),
           );
         }
-      } else {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => FyydSearchPage(
-              podcasts: podcasts,
-              searchWord: query,
-            ),
-          ),
-        );
       }
     } catch (e) {
       debugPrint('Failed to find podcasts: $e');
-      if (mounted) {
-        Navigator.pop(context);
-        if (!Platform.isAndroid && !Platform.isIOS) {
-          ref.read(notificationServiceProvider).showNotification(
-                'OpenAir ${Translations.of(context).text('notification')}',
-                Translations.of(context).text('failedToFindPodcasts'),
-              );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text(Translations.of(context).text('failedToFindPodcasts')),
-            ),
-          );
-        }
+      if (dialogContext.mounted) {
+        Navigator.pop(dialogContext);
       }
     }
   }
@@ -238,10 +228,11 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
 
     if (dialogContext.mounted) Navigator.pop(dialogContext);
 
+    final pageContext = context;
     showDialog(
-      context: context,
+      context: pageContext,
       barrierDismissible: false,
-      builder: (context) => const LoadingDialog(),
+      builder: (loadingContext) => const LoadingDialog(),
     );
 
     try {
@@ -249,9 +240,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
           await ref.read(podcastIndexProvider).searchPodcasts(query);
       final podcasts = FetchDataModel.fromJson(podcast);
 
-      if (mounted) {
-        Navigator.pop(context);
-        Navigator.of(context).push(
+      if (pageContext.mounted) {
+        Navigator.pop(pageContext);
+        Navigator.of(pageContext).push(
           MaterialPageRoute(
             builder: (context) => PodcastIndexSearchPage(
               podcasts: podcasts,
@@ -262,7 +253,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
       }
     } catch (e) {
       debugPrint('Failed to search Podcast Index: $e');
-      if (mounted) Navigator.pop(context);
+      if (pageContext.mounted) {
+        Navigator.pop(pageContext);
+      }
     }
   }
 
