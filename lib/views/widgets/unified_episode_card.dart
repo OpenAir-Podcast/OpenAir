@@ -143,10 +143,15 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                                   Icon(Icons.person,
                                       size: 12, color: Colors.grey[500]),
                                   const SizedBox(width: 2),
-                                  Text(
-                                    author,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[600],
+                                  Flexible(
+                                    child: Text(
+                                      author,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: Colors.grey[600],
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],

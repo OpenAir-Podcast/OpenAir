@@ -137,6 +137,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                     color: Colors.grey,
                                   ),
                               maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
