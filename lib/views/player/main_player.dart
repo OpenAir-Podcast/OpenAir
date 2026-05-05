@@ -237,8 +237,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             onTap: () {
                               audioState.audioState == 'Play'
                                   ? audioState.playerPauseButtonClicked()
-                                  : audioState.playerPlayButtonClicked(
-                                      currentEpisode, context);
+                                  : audioState.playerResumeButtonClicked();
                             },
                             child: Container(
                               height: 80,
