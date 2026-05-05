@@ -23,10 +23,14 @@ class OpenAirAudioHandler extends BaseAudioHandler
   void _notifyAudioHandlerAboutPlaybackEvents() {
     player.playbackEventStream.listen((PlaybackEvent event) {
       final playing = player.playing;
+      final processingState = player.processingState;
       playbackState.add(playbackState.value.copyWith(
         controls: [
           MediaControl.rewind,
-          if (playing) MediaControl.pause else MediaControl.play,
+          if (processingState != ProcessingState.completed && playing)
+            MediaControl.pause
+          else
+            MediaControl.play,
           MediaControl.stop,
           MediaControl.skipToNext,
         ],
@@ -42,8 +46,8 @@ class OpenAirAudioHandler extends BaseAudioHandler
           ProcessingState.buffering: AudioProcessingState.buffering,
           ProcessingState.ready: AudioProcessingState.ready,
           ProcessingState.completed: AudioProcessingState.completed,
-        }[player.processingState]!,
-        playing: playing,
+        }[processingState]!,
+        playing: processingState == ProcessingState.completed ? false : playing,
         updatePosition: player.position,
         bufferedPosition: player.bufferedPosition,
         speed: player.speed,
@@ -77,7 +81,12 @@ class OpenAirAudioHandler extends BaseAudioHandler
     player.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;
-      if (!isPlaying && processingState == ProcessingState.idle) {
+      if (processingState == ProcessingState.completed) {
+        playbackState.add(playbackState.value.copyWith(
+          processingState: AudioProcessingState.completed,
+          playing: false,
+        ));
+      } else if (!isPlaying && processingState == ProcessingState.idle) {
         stop();
       }
     });
