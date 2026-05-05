@@ -428,6 +428,17 @@
     "lastUpdate": "Last Update",
     "sync": "Sync",
     "loginSuccess": "Login Success",
+
+
+
+
+
+
+
+
+
+
+    
     "animals": "Animals",
     "animation": "Animation",
     "arts": "Arts",
@@ -496,5 +507,8 @@
     "trueCrime": "True Crime",
     "tv": "TV",
     "videoGames": "Video Games",
-    "visual": "Visual"
+    "visual": "Visual",
+    "general": "General",
+    "support": "Support",
+    "data": "Data"
 }

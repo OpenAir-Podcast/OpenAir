@@ -496,5 +496,8 @@
     "trueCrime": "True Crime",
     "tv": "TV",
     "videoGames": "TV-spel",
-    "visual": "Visuell konst"
+    "visual": "Visuell konst",
+    "general": "Allmänt",
+    "support": "Support",
+    "data": "Data"
 }
