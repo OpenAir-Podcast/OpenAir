@@ -400,8 +400,10 @@ class AudioController extends ChangeNotifier {
     ref.invalidate(getHistoryProvider);
   }
 
-  Future<void> addToQueue(Map<String, dynamic> episode, PodcastModel? podcast,
-      BuildContext context) async {
+  Future<void> addToQueue(
+      Map<String, dynamic> episode, PodcastModel? podcast, BuildContext context,
+      {bool autoDownload = false}) async {
+        
     final hiveService = ref.read(hiveServiceProvider);
     final queue = await hiveService.getQueue();
 
@@ -465,7 +467,7 @@ class AudioController extends ChangeNotifier {
       'playerPosition': Duration.zero.inMilliseconds,
     });
 
-    if (downloadQueuedEpisodesConfig) {
+    if (autoDownload) {
       await downloadEpisode(episode, podcast, null);
     }
 

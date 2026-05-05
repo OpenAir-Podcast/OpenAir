@@ -387,12 +387,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                     strokeWidth: 2.0)),
                             onPressed: null),
                       ),
-                    // Share Button
-                    IconButton(
-                      tooltip: Translations.of(context).text('share'),
-                      onPressed: () => ref.watch(openAirProvider).share(),
-                      icon: const Icon(Icons.share_rounded),
-                    ),
                     favoriteListAsync.when(
                       data: (data) {
                         bool isFavorite =
@@ -468,6 +462,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                           icon: const Icon(Icons.error_outline_rounded),
                         );
                       },
+                    ),
+                    // Share Button
+                    IconButton(
+                      tooltip: Translations.of(context).text('share'),
+                      onPressed: () => ref.watch(openAirProvider).share(),
+                      icon: const Icon(Icons.share_rounded),
                     ),
                   ],
                 ),
