@@ -502,5 +502,7 @@
     "data": "البيانات",
     "appearance": "المظهر",
     "completion": "الاكتمال",
-    "cleanup": "التنظيف"
+    "cleanup": "التنظيف",
+    "opml": "OPML",
+    "rssFeed": "تغذية RSS"
 }

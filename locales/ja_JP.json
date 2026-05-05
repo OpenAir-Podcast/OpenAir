@@ -502,5 +502,7 @@
     "data": "データ",
     "appearance": "外観",
     "completion": "完了",
-    "cleanup": "クリーンアップ"
+    "cleanup": "クリーンアップ",
+    "opml": "OPML",
+    "rssFeed": "RSS フィード"
 }

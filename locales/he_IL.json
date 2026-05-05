@@ -502,5 +502,7 @@
     "data": "נתונים",
     "appearance": "מראה",
     "completion": "השלמה",
-    "cleanup": "ניקוי"
+    "cleanup": "ניקוי",
+    "opml": "OPML",
+    "rssFeed": "פיד RSS"
 }

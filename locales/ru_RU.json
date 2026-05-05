@@ -502,5 +502,7 @@
     "data": "Данные",
     "appearance": "Внешний вид",
     "completion": "Завершение",
-    "cleanup": "Очистка"
+    "cleanup": "Очистка",
+    "opml": "OPML",
+    "rssFeed": "RSS-канал"
 }

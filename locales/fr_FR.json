@@ -502,5 +502,7 @@
     "data": "Données",
     "appearance": "Apparence",
     "completion": "Achèvement",
-    "cleanup": "Nettoyage"
+    "cleanup": "Nettoyage",
+    "opml": "OPML",
+    "rssFeed": "Flux RSS"
 }
