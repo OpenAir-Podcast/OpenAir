@@ -505,5 +505,6 @@
     "cleanup": "クリーンアップ",
     "opml": "OPML",
     "rssFeed": "RSS フィード",
-    "ok": "OK"
+    "ok": "OK",
+    "description": "説明"
 }

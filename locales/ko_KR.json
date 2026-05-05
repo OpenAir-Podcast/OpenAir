@@ -505,5 +505,6 @@
     "cleanup": "정리",
     "opml": "OPML",
     "rssFeed": "RSS 피드",
-    "ok": "확인"
+    "ok": "확인",
+    "description": "설명"
 }

@@ -505,5 +505,6 @@
     "cleanup": "Limpieza",
     "opml": "OPML",
     "rssFeed": "Fuente RSS",
-    "ok": "Aceptar"
+    "ok": "Aceptar",
+    "description": "Descripción"
 }

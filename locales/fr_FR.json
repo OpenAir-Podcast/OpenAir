@@ -505,5 +505,6 @@
     "cleanup": "Nettoyage",
     "opml": "OPML",
     "rssFeed": "Flux RSS",
-    "ok": "OK"
+    "ok": "OK",
+    "description": "Description"
 }

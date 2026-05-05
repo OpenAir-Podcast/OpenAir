@@ -505,5 +505,6 @@
     "cleanup": "ניקוי",
     "opml": "OPML",
     "rssFeed": "פיד RSS",
-    "ok": "אישור"
+    "ok": "אישור",
+    "description": "תיאור"
 }
