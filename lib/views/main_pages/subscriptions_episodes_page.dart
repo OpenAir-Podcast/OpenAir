@@ -63,7 +63,14 @@ class _SubscriptionsEpisodesPageState
               data: (isSubscribed) {
                 return Scaffold(
                   appBar: AppBar(
-                    title: Text(widget.podcast.title),
+                    title: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.55),
+                      child: Text(
+                        widget.podcast.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     actions: [
                       IconButton(
                         tooltip:
