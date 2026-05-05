@@ -84,12 +84,12 @@ class OpenAirAudioHandler extends BaseAudioHandler
 
       if (processingState == ProcessingState.completed) {
         debugPrint('AudioHandler: Playback completed - stopping player');
-        
+
         playbackState.add(playbackState.value.copyWith(
           processingState: AudioProcessingState.completed,
           playing: false,
         ));
-        
+
         stop();
       } else if (!isPlaying && processingState == ProcessingState.idle) {
         stop();
@@ -110,7 +110,10 @@ class OpenAirAudioHandler extends BaseAudioHandler
       title: title,
       artist: artist,
       album: album,
-      artUri: artUri != null ? Uri.parse(artUri) : null,
+      artUri: artUri != null &&
+              (artUri.startsWith('http://') || artUri.startsWith('https://'))
+          ? Uri.parse(artUri)
+          : null,
       duration: duration,
     );
     queue.add([mediaItem]);
