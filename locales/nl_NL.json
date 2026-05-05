@@ -505,5 +505,6 @@
     "cleanup": "Opschoning",
     "opml": "OPML",
     "rssFeed": "RSS-feed",
-    "ok": "OK"
+    "ok": "OK",
+    "description": "Beschrijving"
 }

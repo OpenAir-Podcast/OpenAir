@@ -505,5 +505,6 @@
     "cleanup": "Rensning",
     "opml": "OPML",
     "rssFeed": "RSS-flöde",
-    "ok": "OK"
+    "ok": "OK",
+    "description": "Beskrivning"
 }

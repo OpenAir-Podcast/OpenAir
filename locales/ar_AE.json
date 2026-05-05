@@ -505,5 +505,6 @@
     "cleanup": "التنظيف",
     "opml": "OPML",
     "rssFeed": "تغذية RSS",
-    "ok": "موافق"
+    "ok": "موافق",
+    "description": "الوصف"
 }
