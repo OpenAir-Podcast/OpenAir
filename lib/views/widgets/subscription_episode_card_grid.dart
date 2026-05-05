@@ -65,8 +65,8 @@ class _SubscriptionEpisodeCardGridState
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => EpisodeDetail(
-              podcast: widget.podcast,
               episodeItem: widget.episodeItem,
+              podcast: widget.podcast,
             ),
           ),
         );
