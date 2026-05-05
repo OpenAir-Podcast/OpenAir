@@ -50,7 +50,14 @@ class EpisodesPage extends ConsumerWidget {
               data: (isSubscribed) {
                 return Scaffold(
                   appBar: AppBar(
-                    title: Text(podcast.title),
+                    title: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.55),
+                      child: Text(
+                        podcast.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     actions: [
                       IconButton(
                         tooltip:
