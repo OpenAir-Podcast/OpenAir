@@ -9,6 +9,8 @@ import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/views/nav_pages/inbox_page.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 
 import 'package:openair/model/hive_models/completed_episode_model.dart';
 import 'package:openair/model/hive_models/feed_model.dart';
@@ -488,7 +490,7 @@ class HiveService {
                   'artwork': subscription.artwork,
                   'description': subscription.description,
                 };
-                
+
                 await episodeBox.put(guid, episode);
 
                 if (downloadNewEpisodesConfig) {
@@ -567,6 +569,8 @@ class HiveService {
                 }
               }
             }
+            ref.invalidate(getInboxProvider);
+            ref.invalidate(inboxCountProvider);
           }
         }
       } catch (e) {
@@ -1290,7 +1294,8 @@ class HiveService {
     return await box.get(query);
   }
 
-  Future<void> putSearchCache(String query, Map<String, dynamic> results) async {
+  Future<void> putSearchCache(
+      String query, Map<String, dynamic> results) async {
     final box = await searchCacheBox;
     await box.put(
       query,

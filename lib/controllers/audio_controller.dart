@@ -17,6 +17,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/audio_handler.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
+import 'package:openair/views/nav_pages/downloads_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/history_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
@@ -310,6 +311,7 @@ class AudioController extends ChangeNotifier {
       await hiveService.addToDownloads(downloadModel);
       ref.invalidate(sortedDownloadsProvider);
       ref.invalidate(downloadsCountProvider);
+      ref.invalidate(getDownloadsProvider);
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
       final filename = '${item['guid']}.mp3';
@@ -350,6 +352,9 @@ class AudioController extends ChangeNotifier {
       }
       final hiveService = ref.read(hiveServiceProvider);
       await hiveService.clearDownloads();
+      ref.invalidate(getDownloadsProvider);
+      ref.invalidate(sortedDownloadsProvider);
+      ref.invalidate(downloadsCountProvider);
       notifyListeners();
     } catch (e) {
       debugPrint('Error removing all downloaded podcasts: $e');
@@ -534,6 +539,8 @@ class AudioController extends ChangeNotifier {
       }
 
       ref.invalidate(getSubscribedEpisodesProvider);
+      ref.invalidate(subscriptionsProvider);
+      ref.invalidate(subCountProvider);
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to subscribe to ${podcast.title}: $e');
@@ -545,6 +552,9 @@ class AudioController extends ChangeNotifier {
     await hiveService.unsubscribe(podcast.title);
     await hiveService.removePodcastEpisodes(podcast);
     ref.invalidate(getSubscribedEpisodesProvider);
+    ref.invalidate(subscriptionsProvider);
+    ref.invalidate(subCountProvider);
+    ref.invalidate(inboxCountProvider);
     notifyListeners();
   }
 
@@ -599,6 +609,9 @@ class AudioController extends ChangeNotifier {
       final hiveService = ref.read(hiveServiceProvider);
       await hiveService.subscribe(subscription);
       if (context.mounted) await addPodcastEpisodes(subscription, context);
+      ref.invalidate(getSubscribedEpisodesProvider);
+      ref.invalidate(subscriptionsProvider);
+      ref.invalidate(subCountProvider);
     } catch (e) {
       debugPrint('Failed to subscribe (RSS Feed) to ${podcast.title}: $e');
       rethrow;
