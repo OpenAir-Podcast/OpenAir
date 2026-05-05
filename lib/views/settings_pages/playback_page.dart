@@ -211,7 +211,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
 
           return ListView(
             children: [
-              _buildSectionHeader('skipInterval', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('skipInterval'), context),
               _buildCard(
                 Column(
                   children: [
@@ -273,7 +274,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('queue', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('queue'), context),
               _buildCard(
                 Column(
                   children: [
@@ -340,7 +342,8 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('completion', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('completion'), context),
               _buildCard(
                 Column(
                   children: [
