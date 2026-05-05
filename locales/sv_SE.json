@@ -501,5 +501,6 @@
     "support": "Support",
     "data": "Data",
     "appearance": "Utseende",
-    "completion": "Slutförande"
+    "completion": "Slutförande",
+    "cleanup": "Rensning"
 }

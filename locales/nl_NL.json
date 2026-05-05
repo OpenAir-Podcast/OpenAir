@@ -501,5 +501,6 @@
     "support": "Ondersteuning",
     "data": "Gegevens",
     "appearance": "Weergave",
-    "completion": "Voltooiing"
+    "completion": "Voltooiing",
+    "cleanup": "Opschoning"
 }

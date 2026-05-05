@@ -246,7 +246,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
 
           return ListView(
             children: [
-              _buildSectionHeader('refresh', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('refresh'), context),
               _buildCard(
                 Column(
                   children: [
@@ -289,7 +290,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('downloads', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('downloads'), context),
               _buildCard(
                 Column(
                   children: [
@@ -349,7 +351,8 @@ class AutomaticPageState extends ConsumerState<AutomaticPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('cleanup', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('cleanup'), context),
               _buildCard(
                 Column(
                   children: [
