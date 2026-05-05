@@ -496,5 +496,8 @@
     "trueCrime": "Crime real",
     "tv": "Televisão",
     "videoGames": "Videojogos",
-    "visual": "Visual"
+    "visual": "Visual",
+    "general": "Geral",
+    "support": "Suporte",
+    "data": "Dados"
 }

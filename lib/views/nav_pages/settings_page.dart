@@ -148,7 +148,8 @@ class _SettingsState extends ConsumerState<Settings> {
       ),
       body: ListView(
         children: [
-          _buildSectionHeader('general', context),
+          _buildSectionHeader(
+              Translations.of(context).text('general'), context),
           _buildCard(
             Column(
               children: [
@@ -226,7 +227,7 @@ class _SettingsState extends ConsumerState<Settings> {
             ),
             context,
           ),
-          _buildSectionHeader('data', context),
+          _buildSectionHeader(Translations.of(context).text('data'), context),
           _buildCard(
             Column(
               children: [
@@ -266,7 +267,8 @@ class _SettingsState extends ConsumerState<Settings> {
             ),
             context,
           ),
-          _buildSectionHeader('support', context),
+          _buildSectionHeader(
+              Translations.of(context).text('support'), context),
           _buildCard(
             Column(
               children: [
