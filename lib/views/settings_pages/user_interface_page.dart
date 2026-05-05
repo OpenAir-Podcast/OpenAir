@@ -187,7 +187,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
 
           return Column(
             children: [
-              _buildSectionHeader('appearance', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('appearance'), context),
               _buildCard(
                 Padding(
                   padding:
@@ -294,7 +295,8 @@ class _UserInterfaceState extends ConsumerState<UserInterface> {
                 ),
                 context,
               ),
-              _buildSectionHeader('language', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('language'), context),
               _buildCard(
                 Padding(
                   padding:
