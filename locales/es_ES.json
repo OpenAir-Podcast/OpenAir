@@ -504,5 +504,6 @@
     "completion": "Finalización",
     "cleanup": "Limpieza",
     "opml": "OPML",
-    "rssFeed": "Fuente RSS"
+    "rssFeed": "Fuente RSS",
+    "ok": "Aceptar"
 }

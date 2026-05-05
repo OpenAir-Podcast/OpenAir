@@ -110,6 +110,18 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          icon: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(dialogContext).colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.rss_feed_rounded,
+              color: Theme.of(dialogContext).colorScheme.onPrimaryContainer,
+              size: 28,
+            ),
+          ),
           title: Text(
             Translations.of(dialogContext).text('addPodcastByRssUrl'),
           ),
@@ -127,9 +139,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
                 labelText: Translations.of(dialogContext).text('rssUrl'),
                 suffix: IconButton(
-                  onPressed: () {
-                    controller.clear();
-                  },
+                  onPressed: controller.clear,
                   icon: const Icon(Icons.clear_rounded),
                 ),
               ),
@@ -143,7 +153,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
             FilledButton(
               onPressed: () async {
                 final url = controller.text.trim();
-                if (url.isEmpty || !context.mounted) {
+                if (url.isEmpty || !dialogContext.mounted) {
                   Navigator.pop(dialogContext);
                   return;
                 }
@@ -154,7 +164,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     .addPodcastByRssUrl(url, context);
 
                 if (!mounted) return;
-                _showSubscribeResult(success);
+                _showResultDialog(success);
               },
               child: Text(Translations.of(dialogContext).text('add')),
             ),
@@ -171,6 +181,18 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          icon: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(dialogContext).colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.search_rounded,
+              color: Theme.of(dialogContext).colorScheme.onPrimaryContainer,
+              size: 28,
+            ),
+          ),
           title: Text(
             Translations.of(dialogContext).text('searchPodcastIndex'),
           ),
@@ -188,9 +210,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 ),
                 labelText: Translations.of(dialogContext).text('title'),
                 suffix: IconButton(
-                  onPressed: () {
-                    controller.clear();
-                  },
+                  onPressed: controller.clear,
                   icon: const Icon(Icons.clear_rounded),
                 ),
               ),
@@ -246,53 +266,57 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     }
   }
 
-  void _showSubscribeResult(bool success) {
-    if (!mounted) return;
-    if (success) {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        ref.read(notificationServiceProvider).showNotification(
-              'OpenAir ${Translations.of(context).text('notification')}',
-              Translations.of(context).text('subscribed'),
-            );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(Translations.of(context).text('subscribed'))),
+  void _showResultDialog(bool success) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = theme.colorScheme;
+
+        return AlertDialog(
+          icon: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: success
+                  ? colorScheme.primaryContainer
+                  : colorScheme.errorContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              success ? Icons.check_circle_rounded : Icons.error_rounded,
+              color: success
+                  ? colorScheme.onPrimaryContainer
+                  : colorScheme.onErrorContainer,
+              size: 28,
+            ),
+          ),
+          title: Text(
+            success
+                ? Translations.of(dialogContext).text('subscribed')
+                : Translations.of(dialogContext).text('oopsAnErrorOccurred'),
+          ),
+          content: Text(
+            success
+                ? Translations.of(dialogContext)
+                    .text('importedPodcastsFromOpml')
+                : Translations.of(dialogContext).text('errorAddingPodcast'),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(Translations.of(dialogContext).text('ok')),
+            ),
+          ],
         );
-      }
-    } else {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        ref.read(notificationServiceProvider).showNotification(
-              'OpenAir ${Translations.of(context).text('notification')}',
-              Translations.of(context).text('errorAddingPodcast'),
-            );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(Translations.of(context).text('errorAddingPodcast'))),
-        );
-      }
-    }
+      },
+    );
   }
 
   Future<void> _importOpml() async {
     final success =
         await ref.read(audioProvider).importPodcastFromOpml(context);
     if (!mounted) return;
-    if (success) {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        ref.read(notificationServiceProvider).showNotification(
-              'OpenAir ${Translations.of(context).text('notification')}',
-              Translations.of(context).text('importedPodcastsFromOpml'),
-            );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  Translations.of(context).text('importedPodcastsFromOpml'))),
-        );
-      }
-    }
+    _showResultDialog(success);
   }
 
   Widget _buildActionCard({

@@ -504,5 +504,6 @@
     "completion": "완료",
     "cleanup": "정리",
     "opml": "OPML",
-    "rssFeed": "RSS 피드"
+    "rssFeed": "RSS 피드",
+    "ok": "확인"
 }

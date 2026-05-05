@@ -504,5 +504,6 @@
     "completion": "Завершение",
     "cleanup": "Очистка",
     "opml": "OPML",
-    "rssFeed": "RSS-канал"
+    "rssFeed": "RSS-канал",
+    "ok": "ОК"
 }

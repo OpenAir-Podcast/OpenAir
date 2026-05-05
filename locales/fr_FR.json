@@ -504,5 +504,6 @@
     "completion": "Achèvement",
     "cleanup": "Nettoyage",
     "opml": "OPML",
-    "rssFeed": "Flux RSS"
+    "rssFeed": "Flux RSS",
+    "ok": "OK"
 }
