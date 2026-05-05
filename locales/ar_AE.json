@@ -506,5 +506,6 @@
     "opml": "OPML",
     "rssFeed": "تغذية RSS",
     "ok": "موافق",
-    "description": "الوصف"
+    "description": "الوصف",
+    "details": "التفاصيل"
 }

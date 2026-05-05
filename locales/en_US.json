@@ -516,5 +516,6 @@
     "cleanup": "Cleanup",
     "rssFeed": "RSS Feed",
     "ok": "OK",
-    "description": "Description"
+    "description": "Description",
+    "details": "Details"
 }
