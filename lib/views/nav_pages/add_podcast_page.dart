@@ -36,613 +36,598 @@ class AddPodcastPage extends ConsumerStatefulWidget {
 }
 
 class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
-  TextEditingController textInputControl = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
-    textInputControl.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  void _searchFyydPodcasts(String query) async {
+    if (query.trim().isEmpty) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const LoadingDialog(),
+    );
+
+    try {
+      final podcasts = await ref.read(fyydProvider).searchPodcasts(query);
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      if (podcasts.isEmpty) {
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                Translations.of(context).text('noPodcastsFound'),
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(Translations.of(context).text('noPodcastsFound')),
+            ),
+          );
+        }
+      } else {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => FyydSearchPage(
+              podcasts: podcasts,
+              searchWord: query,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to find podcasts: $e');
+      if (mounted) {
+        Navigator.pop(context);
+        if (!Platform.isAndroid && !Platform.isIOS) {
+          ref.read(notificationServiceProvider).showNotification(
+                'OpenAir ${Translations.of(context).text('notification')}',
+                Translations.of(context).text('failedToFindPodcasts'),
+              );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text(Translations.of(context).text('failedToFindPodcasts')),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  void _showRssDialog() {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(
+            Translations.of(dialogContext).text('addPodcastByRssUrl'),
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(dialogContext).size.width * 0.85,
+            child: TextField(
+              maxLength: 256,
+              autofocus: true,
+              controller: controller,
+              keyboardType: TextInputType.url,
+              decoration: InputDecoration(
+                icon: Icon(
+                  Icons.link_rounded,
+                  color: Theme.of(dialogContext).colorScheme.primary,
+                ),
+                labelText: Translations.of(dialogContext).text('rssUrl'),
+                suffix: IconButton(
+                  onPressed: () {
+                    controller.clear();
+                  },
+                  icon: const Icon(Icons.clear_rounded),
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(Translations.of(dialogContext).text('cancel')),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final url = controller.text.trim();
+                if (url.isEmpty || !context.mounted) {
+                  Navigator.pop(dialogContext);
+                  return;
+                }
+                Navigator.pop(dialogContext);
+
+                final success = await ref
+                    .read(audioProvider)
+                    .addPodcastByRssUrl(url, context);
+
+                if (!mounted) return;
+                _showSubscribeResult(success);
+              },
+              child: Text(Translations.of(dialogContext).text('add')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPodcastIndexDialog() {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(
+            Translations.of(dialogContext).text('searchPodcastIndex'),
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(dialogContext).size.width * 0.85,
+            child: TextField(
+              maxLength: 256,
+              autofocus: true,
+              controller: controller,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                icon: Icon(
+                  Icons.title_rounded,
+                  color: Theme.of(dialogContext).colorScheme.primary,
+                ),
+                labelText: Translations.of(dialogContext).text('title'),
+                suffix: IconButton(
+                  onPressed: () {
+                    controller.clear();
+                  },
+                  icon: const Icon(Icons.clear_rounded),
+                ),
+              ),
+              onSubmitted: (value) => _searchPodcastIndex(value, dialogContext),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(Translations.of(dialogContext).text('cancel')),
+            ),
+            FilledButton(
+              onPressed: () =>
+                  _searchPodcastIndex(controller.text.trim(), dialogContext),
+              child: Text(Translations.of(dialogContext).text('search')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _searchPodcastIndex(String query, BuildContext dialogContext) async {
+    if (query.isEmpty) return;
+
+    if (dialogContext.mounted) Navigator.pop(dialogContext);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const LoadingDialog(),
+    );
+
+    try {
+      final podcast =
+          await ref.read(podcastIndexProvider).searchPodcasts(query);
+      final podcasts = FetchDataModel.fromJson(podcast);
+
+      if (mounted) {
+        Navigator.pop(context);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PodcastIndexSearchPage(
+              podcasts: podcasts,
+              searchWord: query,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to search Podcast Index: $e');
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  void _showSubscribeResult(bool success) {
+    if (!mounted) return;
+    if (success) {
+      if (!Platform.isAndroid && !Platform.isIOS) {
+        ref.read(notificationServiceProvider).showNotification(
+              'OpenAir ${Translations.of(context).text('notification')}',
+              Translations.of(context).text('subscribed'),
+            );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(Translations.of(context).text('subscribed'))),
+        );
+      }
+    } else {
+      if (!Platform.isAndroid && !Platform.isIOS) {
+        ref.read(notificationServiceProvider).showNotification(
+              'OpenAir ${Translations.of(context).text('notification')}',
+              Translations.of(context).text('errorAddingPodcast'),
+            );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(Translations.of(context).text('errorAddingPodcast'))),
+        );
+      }
+    }
+  }
+
+  Future<void> _importOpml() async {
+    final success =
+        await ref.read(audioProvider).importPodcastFromOpml(context);
+    if (!mounted) return;
+    if (success) {
+      if (!Platform.isAndroid && !Platform.isIOS) {
+        ref.read(notificationServiceProvider).showNotification(
+              'OpenAir ${Translations.of(context).text('notification')}',
+              Translations.of(context).text('importedPodcastsFromOpml'),
+            );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  Translations.of(context).text('importedPodcastsFromOpml'))),
+        );
+      }
+    }
+  }
+
+  Widget _buildActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: colorScheme.onPrimaryContainer,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final podcastDataAsyncValue = ref.watch(podcastDataFeaturedProvider);
-    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('addPodcast')),
+        title: Text(
+          Translations.of(context).text('addPodcast'),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Search Bar
               TextField(
-                maxLength: 256,
-                controller: textInputControl,
+                controller: _searchController,
                 keyboardType: TextInputType.webSearch,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
                 decoration: InputDecoration(
-                  icon: Icon(
+                  filled: true,
+                  fillColor: colorScheme.surfaceContainerHighest,
+                  prefixIcon: Icon(
                     Icons.search_rounded,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: colorScheme.primary,
                   ),
-                  labelText: Translations.of(context).text('searchPodcastFyyd'),
-                  suffix: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        textInputControl.text = '';
-                        textInputControl.clear();
-                      });
-                    },
-                    icon: Icon(Icons.clear_rounded),
+                  hintText: Translations.of(context).text('searchPodcastFyyd'),
+                  suffixIcon: IconButton(
+                    onPressed: _searchController.clear,
+                    icon: const Icon(Icons.clear_rounded),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
-                autofocus: true,
-                onSubmitted: (value) async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) => LoadingDialog(),
-                  );
-
-                  try {
-                    List podcasts =
-                        await ref.read(fyydProvider).searchPodcasts(value);
-
-                    if (podcasts.isEmpty) {
-                      if (context.mounted) {
-                        if (!Platform.isAndroid && !Platform.isIOS) {
-                          ref
-                              .read(notificationServiceProvider)
-                              .showNotification(
-                                'OpenAir ${Translations.of(context).text('notification')}',
-                                Translations.of(context)
-                                    .text('noPodcastsFound'),
-                              );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                Translations.of(context)
-                                    .text('noPodcastsFound'),
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    } else {
-                      if (context.mounted) {
-                        Navigator.pop(context);
-
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => FyydSearchPage(
-                              podcasts: podcasts,
-                              searchWord: value,
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    debugPrint('Failed to find podcasts: $e');
-
-                    if (context.mounted) {
-                      if (!Platform.isAndroid && !Platform.isIOS) {
-                        ref.read(notificationServiceProvider).showNotification(
-                              'OpenAir ${Translations.of(context).text('notification')}',
-                              Translations.of(context)
-                                  .text('failedToFindPodcasts'),
-                            );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              Translations.of(context)
-                                  .text('failedToFindPodcasts'),
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  }
-                },
+                onSubmitted: _searchFyydPodcasts,
               ),
-              SizedBox(height: 15),
-              getConnectionStatusValue.when(
-                error: (error, stackTrace) {
-                  debugPrint('Error fetching connection status: $error');
-                  return const SizedBox.shrink();
-                },
-                loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                },
-                data: (data) {
-                  if (data == false) {
-                    return const NoConnection();
-                  }
+              const SizedBox(height: 24),
 
-                  return podcastDataAsyncValue.when(
-                    error: (error, stackTrace) {
-                      debugPrint('Error fetching podcast data: $error');
-                      return const SizedBox.shrink();
-                    },
-                    loading: () {
-                      return SizedBox(
-                        height: 336,
-                        child: GridView.builder(
-                          itemCount: 12,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisExtent: 100.0,
-                            crossAxisSpacing: 12.0,
-                            mainAxisSpacing: 12.0,
-                          ),
-                          itemBuilder: (context, index) {
-                            return Shimmer.fromColors(
-                              baseColor: Theme.of(context).cardColor,
-                              highlightColor: highlightColor!,
-                              child: Container(
-                                color: highlightColor,
+              // Connection Status & Featured Podcasts
+              Consumer(
+                builder: (context, ref, _) {
+                  final getConnectionStatusValue =
+                      ref.watch(getConnectionStatusProvider);
+
+                  return getConnectionStatusValue.when(
+                    data: (isConnected) {
+                      if (!isConnected) {
+                        return const NoConnection();
+                      }
+
+                      final podcastDataAsyncValue =
+                          ref.watch(podcastDataFeaturedProvider);
+
+                      return podcastDataAsyncValue.when(
+                        data: (snapshot) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                Translations.of(context).text('discoverMore'),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    data: (snapshot) {
-                      return Column(
-                        children: [
-                          SizedBox(
-                            height: 336,
-                            child: GridView.builder(
-                              itemCount: 12,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                mainAxisExtent: 100.0,
-                                crossAxisSpacing: 12.0,
-                                mainAxisSpacing: 12.0,
-                              ),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () async {
-                                    final xmlString = await ref
-                                        .watch(fyydProvider)
-                                        .getPodcastXml(
-                                            snapshot[index]['xmlURL']);
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 336,
+                                child: GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    mainAxisExtent: 100,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                  ),
+                                  itemCount: snapshot.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        final xmlString = await ref
+                                            .read(fyydProvider)
+                                            .getPodcastXml(
+                                                snapshot[index]['xmlURL']);
 
-                                    var rssFeed = RssFeed.parse(xmlString);
+                                        var rssFeed = RssFeed.parse(xmlString);
 
-                                    SubscriptionModel podcast =
-                                        SubscriptionModel(
-                                      id: snapshot[index]['id'],
-                                      feedUrl: snapshot[index]['xmlURL'],
-                                      title: rssFeed.title!,
-                                      description: rssFeed.description!,
-                                      author: rssFeed.author ?? 'unknown',
-                                      imageUrl: snapshot[index]['imgURL'],
-                                      episodeCount: rssFeed.items!.length,
-                                      artwork: snapshot[index]['imgURL'],
-                                      updatedAt: DateTime.now(),
-                                    );
+                                        final podcast = SubscriptionModel(
+                                          id: snapshot[index]['id'],
+                                          feedUrl: snapshot[index]['xmlURL'],
+                                          title: rssFeed.title!,
+                                          description: rssFeed.description!,
+                                          author: rssFeed.author ?? 'unknown',
+                                          imageUrl: snapshot[index]['imgURL'],
+                                          episodeCount: rssFeed.items!.length,
+                                          artwork: snapshot[index]['imgURL'],
+                                          updatedAt: DateTime.now(),
+                                        );
 
-                                    ref.read(audioProvider).currentPodcast =
-                                        PodcastModel.fromJson(podcast.toJson());
+                                        ref.read(audioProvider).currentPodcast =
+                                            PodcastModel.fromJson(
+                                                podcast.toJson());
 
-                                    if (context.mounted) {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => EpisodesPage(
-                                              podcast: PodcastModel.fromJson(
-                                                  podcast.toJson())),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: cardImageShadow,
-                                          blurRadius: blurRadius,
-                                        )
-                                      ],
-                                    ),
-                                    height: cardImageHeight,
-                                    width: cardImageWidth,
-                                    child: CachedNetworkImage(
-                                      memCacheHeight: cardImageHeight.ceil(),
-                                      memCacheWidth: cardImageWidth.ceil(),
-                                      imageUrl: snapshot[index]['imgURL'],
-                                      fit: BoxFit.fill,
-                                      errorWidget: (context, url, error) =>
-                                          LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          return Container(
-                                            color: Colors.brown,
-                                            alignment: Alignment.center,
-                                            child: Icon(
-                                              Icons.error,
-                                              // Set size relative to the current container dimensions
-                                              size: (constraints.maxWidth <
-                                                          constraints.maxHeight
-                                                      ? constraints.maxWidth
-                                                      : constraints.maxHeight) *
-                                                  0.5,
+                                        if (context.mounted) {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EpisodesPage(
+                                                podcast: PodcastModel.fromJson(
+                                                    podcast.toJson()),
+                                              ),
                                             ),
                                           );
-                                        },
+                                        }
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: cardImageShadow.withValues(
+                                                  alpha: 0.3),
+                                              blurRadius: blurRadius,
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: CachedNetworkImage(
+                                            memCacheHeight:
+                                                cardImageHeight.ceil(),
+                                            memCacheWidth:
+                                                cardImageWidth.ceil(),
+                                            imageUrl: snapshot[index]['imgURL'],
+                                            fit: BoxFit.cover,
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
+                                              color: Colors.brown,
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                Icons.error_rounded,
+                                                color: Colors.white,
+                                                size: 32,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Text(
+                                    Translations.of(context)
+                                        .text('discoveryPoweredByFyyd'),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
-                                );
-                              },
+                                  const Spacer(),
+                                  TextButton.icon(
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DiscoveryPage(
+                                            podcastDataAsyncValue:
+                                                podcastDataAsyncValue),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.double_arrow_rounded,
+                                        size: 18),
+                                    label: Text(Translations.of(context)
+                                        .text('discoverMore')),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                        loading: () => SizedBox(
+                          height: 336,
+                          child: GridView.builder(
+                            itemCount: 12,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              mainAxisExtent: 100,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
                             ),
+                            itemBuilder: (context, index) {
+                              return Shimmer.fromColors(
+                                baseColor: theme.cardColor,
+                                highlightColor: highlightColor!,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: highlightColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        ],
+                        ),
+                        error: (_, __) => const SizedBox.shrink(),
                       );
                     },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => const SizedBox.shrink(),
                   );
                 },
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Text(
-                    Translations.of(context).text('discoveryPoweredByFyyd'),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          Translations.of(context).text('discoverMore'),
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                        Icon(
-                          Icons.double_arrow_rounded,
-                          color: Colors.blue,
-                          size: 20.0,
-                        ),
-                      ],
-                    ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DiscoveryPage(
-                            podcastDataAsyncValue: podcastDataAsyncValue),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 15),
-              ListTile(
-                leading: Icon(
-                  Icons.rss_feed_rounded,
-                  size: 36.0,
-                ),
-                title: Text(
-                  Translations.of(context).text('addPodcastByRssUrl'),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) {
-                    TextEditingController textInputControl =
-                        TextEditingController();
 
-                    return AlertDialog(
-                      title: Text(
-                        Translations.of(context).text('addPodcastByRssUrl'),
-                      ),
-                      content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        child: TextField(
-                          maxLength: 256,
-                          autofocus: true,
-                          controller: textInputControl,
-                          keyboardType: TextInputType.url,
-                          decoration: InputDecoration(
-                            icon: Icon(
-                              Icons.link_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            labelText: Translations.of(context).text('rssUrl'),
-                            suffix: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  textInputControl.text = '';
-                                  textInputControl.clear();
-                                });
-                              },
-                              icon: const Icon(Icons.clear_rounded),
-                            ),
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            Translations.of(context).text('cancel'),
-                          ),
-                        ),
-                        FilledButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-
-                            if (textInputControl.text.isEmpty) {
-                              return;
-                            }
-
-                            bool i = await ref
-                                .watch(audioProvider)
-                                .addPodcastByRssUrl(
-                                    textInputControl.text, context);
-
-                            if (context.mounted) {
-                              if (i == true) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        Translations.of(context)
-                                            .text('subscribed'),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('subscribed'),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } else {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        Translations.of(context)
-                                            .text('errorAddingPodcast'),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('errorAddingPodcast'),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                          child: Text(
-                            Translations.of(context).text('add'),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+              // Action Cards
+              Text(
+                Translations.of(context).text('addPodcast'),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
-              ListTile(
-                leading: Icon(
-                  Icons.search_rounded,
-                  size: 36.0,
-                ),
-                title: Text(
-                  Translations.of(context).text('searchPodcastIndex'),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) {
-                    TextEditingController textInputControl =
-                        TextEditingController();
-
-                    return AlertDialog(
-                      title: Text(
-                        Translations.of(context).text('searchPodcastIndex'),
-                      ),
-                      content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        child: TextField(
-                          maxLength: 256,
-                          autofocus: true,
-                          controller: textInputControl,
-                          keyboardType: TextInputType.url,
-                          decoration: InputDecoration(
-                            icon: Icon(
-                              Icons.title_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            labelText: Translations.of(context).text('title'),
-                            suffix: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  textInputControl.text = '';
-                                  textInputControl.clear();
-                                });
-                              },
-                              icon: const Icon(Icons.clear_rounded),
-                            ),
-                          ),
-                          onSubmitted: (value) async {
-                            // Navigator.pop(context);
-
-                            if (textInputControl.text.isEmpty) {
-                              return;
-                            }
-
-                            showDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (BuildContext context) =>
-                                  LoadingDialog(),
-                            );
-
-                            final podcast = await ref
-                                .watch(podcastIndexProvider)
-                                .searchPodcasts(textInputControl.text);
-
-                            FetchDataModel podcasts =
-                                FetchDataModel.fromJson(podcast);
-
-                            if (context.mounted) {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => PodcastIndexSearchPage(
-                                    podcasts: podcasts,
-                                    searchWord: textInputControl.text,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      actions: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              Translations.of(context).text('cancel'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextButton(
-                            onPressed: () async {
-                              // Navigator.pop(context);
-
-                              if (textInputControl.text.isEmpty) {
-                                return;
-                              }
-
-                              showDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                builder: (BuildContext context) =>
-                                    LoadingDialog(),
-                              );
-
-                              final podcast = await ref
-                                  .watch(podcastIndexProvider)
-                                  .searchPodcasts(textInputControl.text);
-
-                              FetchDataModel podcasts =
-                                  FetchDataModel.fromJson(podcast);
-
-                              if (context.mounted) {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        PodcastIndexSearchPage(
-                                      podcasts: podcasts,
-                                      searchWord: textInputControl.text,
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              Translations.of(context).text('search'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+              const SizedBox(height: 12),
+              _buildActionCard(
+                icon: Icons.rss_feed_rounded,
+                title: Translations.of(context).text('addPodcastByRssUrl'),
+                subtitle: Translations.of(context).text('rssFeed'),
+                onTap: _showRssDialog,
               ),
-              SizedBox(height: 10),
-              ListTile(
-                leading: Icon(
-                  Icons.file_download_outlined,
-                  size: 36.0,
-                ),
-                title: Text(
-                  Translations.of(context).text('importPodcastListOpml'),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                onTap: () async {
-                  bool i = await ref
-                      .watch(audioProvider)
-                      .importPodcastFromOpml(context);
-
-                  if (context.mounted) {
-                    if (i == true) {
-                      if (!Platform.isAndroid && !Platform.isIOS) {
-                        ref.read(notificationServiceProvider).showNotification(
-                              'OpenAir ${Translations.of(context).text('notification')}',
-                              Translations.of(context)
-                                  .text('importedPodcastsFromOpml'),
-                            );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              Translations.of(context)
-                                  .text('importedPodcastsFromOpml'),
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  }
-                },
+              const SizedBox(height: 12),
+              _buildActionCard(
+                icon: Icons.search_rounded,
+                title: Translations.of(context).text('searchPodcastIndex'),
+                subtitle: Translations.of(context).text('search'),
+                onTap: _showPodcastIndexDialog,
               ),
+              const SizedBox(height: 12),
+              _buildActionCard(
+                icon: Icons.file_download_outlined,
+                title: Translations.of(context).text('importPodcastListOpml'),
+                subtitle: Translations.of(context).text('opml'),
+                onTap: _importOpml,
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
