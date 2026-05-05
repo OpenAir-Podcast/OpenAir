@@ -502,5 +502,7 @@
     "data": "Datos",
     "appearance": "Apariencia",
     "completion": "Finalización",
-    "cleanup": "Limpieza"
+    "cleanup": "Limpieza",
+    "opml": "OPML",
+    "rssFeed": "Fuente RSS"
 }

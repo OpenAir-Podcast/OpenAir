@@ -502,5 +502,7 @@
     "data": "Data",
     "appearance": "Utseende",
     "completion": "Slutförande",
-    "cleanup": "Rensning"
+    "cleanup": "Rensning",
+    "opml": "OPML",
+    "rssFeed": "RSS-flöde"
 }

@@ -432,7 +432,8 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
           return ListView(
             children: [
-              _buildSectionHeader('database', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('database'), context),
               _buildCard(
                 Column(
                   children: [
@@ -481,7 +482,8 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('opml', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('opml'), context),
               _buildCard(
                 Column(
                   children: [
@@ -510,7 +512,8 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('rssFeed', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('rssFeed'), context),
               _buildCard(
                 Column(
                   children: [
@@ -526,7 +529,8 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
                 ),
                 context,
               ),
-              _buildSectionHeader('userData', context),
+              _buildSectionHeader(
+                  Translations.of(context).text('userData'), context),
               _buildCard(
                 Column(
                   children: [

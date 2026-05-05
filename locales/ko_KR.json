@@ -502,5 +502,7 @@
     "data": "데이터",
     "appearance": "모양",
     "completion": "완료",
-    "cleanup": "정리"
+    "cleanup": "정리",
+    "opml": "OPML",
+    "rssFeed": "RSS 피드"
 }

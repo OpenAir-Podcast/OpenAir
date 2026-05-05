@@ -502,5 +502,7 @@
     "data": "Gegevens",
     "appearance": "Weergave",
     "completion": "Voltooiing",
-    "cleanup": "Opschoning"
+    "cleanup": "Opschoning",
+    "opml": "OPML",
+    "rssFeed": "RSS-feed"
 }

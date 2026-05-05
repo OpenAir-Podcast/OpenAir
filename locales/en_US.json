@@ -513,5 +513,7 @@
     "data": "Data",
     "appearance": "Appearance",
     "completion": "Completion",
-    "cleanup": "Cleanup"
+    "cleanup": "Cleanup",
+    "opml": "OPML",
+    "rssFeed": "RSS Feed"
 }
