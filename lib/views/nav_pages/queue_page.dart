@@ -28,6 +28,81 @@ class QueuePage extends ConsumerStatefulWidget {
 }
 
 class _QueuePageState extends ConsumerState<QueuePage> {
+  void _showClearQueueDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = theme.colorScheme;
+
+        return AlertDialog(
+          icon: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.delete_outline_rounded,
+              color: colorScheme.onErrorContainer,
+              size: 28,
+            ),
+          ),
+          title: Text(
+            Translations.of(dialogContext).text('clearQueue'),
+          ),
+          content: Text(
+            Translations.of(dialogContext).text('areYouSureClearQueue'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                Translations.of(dialogContext).text('cancel'),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(Translations.of(dialogContext).text('clear')),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+
+                await ref.read(openAirProvider).hiveService.clearQueue();
+
+                ref.invalidate(queueCountProvider);
+                ref.invalidate(sortedProvider);
+                ref.invalidate(inboxCountProvider);
+
+                if (!dialogContext.mounted) return;
+                final scaffoldMessenger = ScaffoldMessenger.of(dialogContext);
+                final translations = Translations.of(dialogContext);
+                if (!Platform.isAndroid && !Platform.isIOS) {
+                  ref.read(notificationServiceProvider).showNotification(
+                        'OpenAir ${translations.text('notification')}',
+                        translations.text('queueCleared'),
+                      );
+                } else {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        translations.text('queueCleared'),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final queueStream = ref.watch(sortedProvider);
@@ -42,76 +117,18 @@ class _QueuePageState extends ConsumerState<QueuePage> {
       appBar: AppBar(
         title: Text(
           Translations.of(context).text('queue'),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext dialogContext) {
-                  return AlertDialog(
-                    title: Text(
-                      Translations.of(dialogContext).text('clearQueue'),
-                    ),
-                    content: Text(
-                      Translations.of(dialogContext)
-                          .text('areYouSureClearQueue'),
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child:
-                            Text(Translations.of(dialogContext).text('cancel')),
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                        },
-                      ),
-                      FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                        ),
-                        child:
-                            Text(Translations.of(dialogContext).text('clear')),
-                        onPressed: () async {
-                          Navigator.of(dialogContext).pop();
-
-                          await ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .clearQueue();
-
-                          ref.invalidate(queueCountProvider);
-                          ref.invalidate(sortedProvider);
-                          ref.invalidate(inboxCountProvider);
-
-                          if (context.mounted) {
-                            if (!Platform.isAndroid && !Platform.isIOS) {
-                              ref
-                                  .read(notificationServiceProvider)
-                                  .showNotification(
-                                    'OpenAir ${Translations.of(context).text('notification')}',
-                                    Translations.of(context)
-                                        .text('queueCleared'),
-                                  );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    Translations.of(context)
-                                        .text('queueCleared'),
-                                  ),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            icon: const Icon(Icons.delete_outline_rounded),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: IconButton(
+              onPressed: _showClearQueueDialog,
+              icon: const Icon(Icons.delete_outline_rounded),
+              tooltip: Translations.of(context).text('clearQueue'),
+            ),
           ),
         ],
       ),
@@ -131,6 +148,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
 
           return ReorderableListView.builder(
             buildDefaultDragHandles: false,
+            padding: const EdgeInsets.only(bottom: 16),
             itemBuilder: (context, index) {
               final MapEntry<String, Map> entry = sortedQueueList[index];
               final Map<String, dynamic> item =
@@ -138,28 +156,22 @@ class _QueuePageState extends ConsumerState<QueuePage> {
 
               final bool isQueueSelected = currentPlayingGuid == item['guid'];
 
-              return Padding(
+              return QueueCard(
                 key: ValueKey(item['guid']),
-                padding: const EdgeInsets.all(8.0),
-                child: QueueCard(
-                  episodeItem: item,
-                  index: index,
-                  isQueueSelected: isQueueSelected,
-                ),
+                episodeItem: item,
+                index: index,
+                isQueueSelected: isQueueSelected,
               );
             },
             itemCount: sortedQueueList.length,
             onReorder: (oldIndex, newIndex) async {
-              // Show loading indicator or disable interaction during reorder
               try {
                 final hive = ref.read(openAirProvider).hiveService;
                 await hive.reorderQueue(oldIndex, newIndex);
-                // Refresh the provider to update the UI
                 ref.invalidate(sortedProvider);
               } catch (e) {
                 debugPrint('Failed to reorder queue: $e');
 
-                // Optionally show a snackbar or error message to the user
                 if (context.mounted) {
                   if (!Platform.isAndroid && !Platform.isIOS) {
                     ref.read(notificationServiceProvider).showNotification(
@@ -180,13 +192,56 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             },
           );
         },
-        loading: () => Container(
-            color: Brightness.dark == Theme.of(context).brightness
-                ? Colors.black
-                : Colors.white,
-            child: const Center(child: CircularProgressIndicator())),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) {
-          return Center(child: Text('Error loading queue: $error'));
+          final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
+
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: colorScheme.errorContainer.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.error_outline_rounded,
+                      size: 60,
+                      color: colorScheme.onErrorContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    Translations.of(context).text('oopsTryAgainLater'),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () => ref.invalidate(sortedProvider),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(Translations.of(context).text('retry')),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
       bottomNavigationBar: SizedBox(
