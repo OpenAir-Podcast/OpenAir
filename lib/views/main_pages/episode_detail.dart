@@ -45,7 +45,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.episodeItem!['title']),
+        title: Text(widget.podcast!.title),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -89,11 +89,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Podcast Title
+                        // Episode Title
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            widget.podcast!.title,
+                            widget.episodeItem!['title'],
                             style: Theme.of(context)
                                 .textTheme
                                 .titleSmall
@@ -104,6 +104,23 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
+                        // Podcast Name
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 140.0,
+                          child: Text(
+                            widget.podcast!.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        // Author
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
@@ -111,15 +128,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 widget.podcast!.author ??
                                 widget.episodeItem!['author'] ??
                                 Translations.of(context).text('unknown'),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                            maxLines: 1,
                           ),
                         ),
                         // Podcast Published Date
