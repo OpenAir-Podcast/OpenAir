@@ -269,65 +269,74 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             onPressed = () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext dialogContext) =>
-                                    AlertDialog(
-                                  title: Text(Translations.of(context)
-                                      .text('confirmDeletion')),
-                                  content: Text(
-                                      '${Translations.of(context).text('AreYouSureYouWantToRemoveDownload')} \'${widget.episodeItem!['title']}\'?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('cancel')),
-                                      onPressed: () {
-                                        Navigator.of(dialogContext)
-                                            .pop(); // Dismiss the dialog
-                                      },
+                                builder: (BuildContext dialogContext) {
+                                  return AlertDialog(
+                                    title: Text(
+                                      Translations.of(dialogContext)
+                                          .text('confirmDeletion'),
                                     ),
-                                    TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('removed')),
-                                      onPressed: () async {
-                                        // Pop the dialog first
-                                        Navigator.of(dialogContext).pop();
+                                    content: Text(
+                                      '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem!['title']}\'?',
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text(
+                                          Translations.of(dialogContext)
+                                              .text('cancel'),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(dialogContext).pop();
+                                        },
+                                      ),
+                                      FilledButton(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: Text(
+                                          Translations.of(dialogContext)
+                                              .text('remove'),
+                                        ),
+                                        onPressed: () async {
+                                          Navigator.of(dialogContext).pop();
 
-                                        // Then perform the removal
-                                        await ref
-                                            .read(audioProvider.notifier)
-                                            .removeDownload(
-                                                widget.episodeItem!);
+                                          // Then perform the removal
+                                          await ref
+                                              .read(audioProvider.notifier)
+                                              .removeDownload(
+                                                  widget.episodeItem!);
 
-                                        // Show feedback
-                                        if (context.mounted) {
-                                          if (!Platform.isAndroid &&
-                                              !Platform.isIOS) {
-                                            ref
-                                                .read(
-                                                    notificationServiceProvider)
-                                                .showNotification(
-                                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
-                                                );
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                          // Show feedback
+                                          if (context.mounted) {
+                                            if (!Platform.isAndroid &&
+                                                !Platform.isIOS) {
+                                              ref
+                                                  .read(
+                                                      notificationServiceProvider)
+                                                  .showNotification(
+                                                    'OpenAir ${Translations.of(context).text('notification')}',
+                                                    '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                                  );
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                                  ),
                                                 ),
-                                              ),
-                                            );
+                                              );
+                                            }
                                           }
-                                        }
 
-                                        ref.invalidate(sortedDownloadsProvider);
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                          ref.invalidate(
+                                              sortedDownloadsProvider);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
                               );
-
-                              ref.invalidate(sortedDownloadsProvider);
                             };
                           }
                           // Episode not downloaded

@@ -48,67 +48,67 @@ class _QueuePageState extends ConsumerState<QueuePage> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (BuildContext dialogContext) => AlertDialog(
-                  title: Text(
-                    Translations.of(context).text('clearQueue'),
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
+                builder: (BuildContext dialogContext) {
+                  return AlertDialog(
+                    title: Text(
+                      Translations.of(dialogContext).text('clearQueue'),
                     ),
-                  ),
-                  content: Text(
-                    Translations.of(context).text('areYouSureClearQueue'),
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
+                    content: Text(
+                      Translations.of(dialogContext)
+                          .text('areYouSureClearQueue'),
                     ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text(Translations.of(context).text('cancel')),
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: Text(Translations.of(context).text('clear'),
-                          style: TextStyle(color: Colors.red)),
-                      onPressed: () async {
-                        Navigator.of(dialogContext).pop();
+                    actions: <Widget>[
+                      TextButton(
+                        child:
+                            Text(Translations.of(dialogContext).text('cancel')),
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                      ),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child:
+                            Text(Translations.of(dialogContext).text('clear')),
+                        onPressed: () async {
+                          Navigator.of(dialogContext).pop();
 
-                        await ref
-                            .read(openAirProvider)
-                            .hiveService
-                            .clearQueue();
+                          await ref
+                              .read(openAirProvider)
+                              .hiveService
+                              .clearQueue();
 
-                        ref.invalidate(queueCountProvider);
-                        ref.invalidate(sortedProvider);
-                        ref.invalidate(inboxCountProvider);
+                          ref.invalidate(queueCountProvider);
+                          ref.invalidate(sortedProvider);
+                          ref.invalidate(inboxCountProvider);
 
-                        if (context.mounted) {
-                          if (!Platform.isAndroid && !Platform.isIOS) {
-                            ref
-                                .read(notificationServiceProvider)
-                                .showNotification(
-                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                  Translations.of(context).text('queueCleared'),
-                                );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  Translations.of(context).text('queueCleared'),
+                          if (context.mounted) {
+                            if (!Platform.isAndroid && !Platform.isIOS) {
+                              ref
+                                  .read(notificationServiceProvider)
+                                  .showNotification(
+                                    'OpenAir ${Translations.of(context).text('notification')}',
+                                    Translations.of(context)
+                                        .text('queueCleared'),
+                                  );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    Translations.of(context)
+                                        .text('queueCleared'),
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           }
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
             },
             icon: const Icon(Icons.delete_outline_rounded),

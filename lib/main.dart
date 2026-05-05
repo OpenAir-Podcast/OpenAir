@@ -206,6 +206,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 0.875),
             snackBarTheme: snackBarThemeLight,
             listTileTheme: listTileThemeLight,
+            dialogTheme: dialogThemeLight,
           ),
         ),
         AppTheme(
@@ -222,6 +223,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.0),
             snackBarTheme: snackBarThemeLight,
             listTileTheme: listTileThemeLight,
+            dialogTheme: dialogThemeLight,
           ),
         ),
         AppTheme(
@@ -238,6 +240,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.2),
             snackBarTheme: snackBarThemeLight,
             listTileTheme: listTileThemeLight,
+            dialogTheme: dialogThemeLight,
           ),
         ),
         AppTheme(
@@ -254,6 +257,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.4),
             snackBarTheme: snackBarThemeLight,
             listTileTheme: listTileThemeLight,
+            dialogTheme: dialogThemeLight,
           ),
         ),
         AppTheme(
@@ -270,6 +274,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 0.875),
             snackBarTheme: snackBarThemeDark,
             listTileTheme: listTileThemeDark,
+            dialogTheme: dialogThemeDark,
           ),
         ),
         AppTheme(
@@ -286,6 +291,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.0),
             snackBarTheme: snackBarThemeDark,
             listTileTheme: listTileThemeDark,
+            dialogTheme: dialogThemeDark,
           ),
         ),
         AppTheme(
@@ -302,6 +308,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.2),
             snackBarTheme: snackBarThemeDark,
             listTileTheme: listTileThemeDark,
+            dialogTheme: dialogThemeDark,
           ),
         ),
         AppTheme(
@@ -318,6 +325,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             textTheme: scaleTextTheme(baseTextTheme, 1.4),
             snackBarTheme: snackBarThemeDark,
             listTileTheme: listTileThemeDark,
+            dialogTheme: dialogThemeDark,
           ),
         ),
       ],

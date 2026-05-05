@@ -331,62 +331,73 @@ class _SubscriptionEpisodeCardGridState
                                   onPressed = () {
                                     showDialog(
                                       context: context,
-                                      builder: (BuildContext dialogContext) =>
-                                          AlertDialog(
-                                        title: const Text('Confirm Deletion'),
-                                        content: Text(
-                                            'Are you sure you want to remove the download for \'${widget.episodeItem['title']}\'?'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text('Cancel'),
-                                            onPressed: () {
-                                              Navigator.of(dialogContext)
-                                                  .pop(); // Dismiss the dialog
-                                            },
+                                      builder: (BuildContext dialogContext) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            Translations.of(dialogContext)
+                                                .text('confirmDeletion'),
                                           ),
-                                          TextButton(
-                                            child: Text(
-                                              Translations.of(context)
-                                                  .text('remove'),
-                                              style: TextStyle(
-                                                color: Colors.red,
+                                          content: Text(
+                                            '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text(
+                                                Translations.of(dialogContext)
+                                                    .text('cancel'),
                                               ),
+                                              onPressed: () {
+                                                Navigator.of(dialogContext)
+                                                    .pop();
+                                              },
                                             ),
-                                            onPressed: () async {
-                                              // Pop the dialog first
-                                              Navigator.of(dialogContext).pop();
+                                            FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                                foregroundColor: Colors.white,
+                                              ),
+                                              child: Text(
+                                                Translations.of(dialogContext)
+                                                    .text('remove'),
+                                              ),
+                                              onPressed: () async {
+                                                Navigator.of(dialogContext)
+                                                    .pop();
 
-                                              // Then perform the removal
-                                              await ref
-                                                  .read(audioProvider.notifier)
-                                                  .removeDownload(
-                                                      widget.episodeItem);
+                                                // Then perform the removal
+                                                await ref
+                                                    .read(
+                                                        audioProvider.notifier)
+                                                    .removeDownload(
+                                                        widget.episodeItem);
 
-                                              if (context.mounted) {
-                                                if (!Platform.isAndroid &&
-                                                    !Platform.isIOS) {
-                                                  ref
-                                                      .read(
-                                                          notificationServiceProvider)
-                                                      .showNotification(
-                                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                                        'Removed \'${widget.episodeItem['title']}\'',
-                                                      );
-                                                } else {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Removed \'${widget.episodeItem['title']}\'',
+                                                if (context.mounted) {
+                                                  if (!Platform.isAndroid &&
+                                                      !Platform.isIOS) {
+                                                    ref
+                                                        .read(
+                                                            notificationServiceProvider)
+                                                        .showNotification(
+                                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                                          'Removed \'${widget.episodeItem['title']}\'',
+                                                        );
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          'Removed \'${widget.episodeItem['title']}\'',
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
+                                                    );
+                                                  }
                                                 }
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      ),
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
                                   };
                                 }
