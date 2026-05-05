@@ -141,7 +141,7 @@ class _SubscriptionEpisodeCardGridState
                               SizedBox(
                                 width:
                                     MediaQuery.of(context).size.width - 130.0,
-                                // Podcast title
+                                // Podcast author
                                 child: Text(
                                   widget.podcast.author ??
                                       Translations.of(context).text('unknown'),
@@ -153,6 +153,7 @@ class _SubscriptionEpisodeCardGridState
                                         overflow: TextOverflow.ellipsis,
                                         color: Colors.grey,
                                       ),
+                                  maxLines: 1,
                                 ),
                               ),
                               Text(
