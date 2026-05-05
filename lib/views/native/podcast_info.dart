@@ -181,7 +181,6 @@ class PodcastInfoPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 32),
-
               // Description section
               if (podcastInfo['description']?.isNotEmpty == true) ...[
                 Row(

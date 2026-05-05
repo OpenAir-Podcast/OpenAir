@@ -506,5 +506,6 @@
     "opml": "OPML",
     "rssFeed": "RSS 订阅",
     "ok": "确定",
-    "description": "描述"
+    "description": "描述",
+    "details": "详情"
 }

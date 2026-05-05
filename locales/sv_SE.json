@@ -506,5 +506,6 @@
     "opml": "OPML",
     "rssFeed": "RSS-flöde",
     "ok": "OK",
-    "description": "Beskrivning"
+    "description": "Beskrivning",
+    "details": "Detaljer"
 }

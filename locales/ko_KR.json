@@ -506,5 +506,6 @@
     "opml": "OPML",
     "rssFeed": "RSS 피드",
     "ok": "확인",
-    "description": "설명"
+    "description": "설명",
+    "details": "세부 정보"
 }

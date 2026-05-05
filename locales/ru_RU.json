@@ -506,5 +506,6 @@
     "opml": "OPML",
     "rssFeed": "RSS-канал",
     "ok": "ОК",
-    "description": "Описание"
+    "description": "Описание",
+    "details": "Детали"
 }
