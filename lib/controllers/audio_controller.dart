@@ -379,6 +379,17 @@ class AudioController extends ChangeNotifier {
           episode['author'] ?? episode['podcastTitle'] ?? 'Unknown';
     }
 
+    // Try to get author from subscriptions if still unknown
+    if (historyPodcastAuthor == 'Unknown' && historyPodcastId != '-1') {
+      final subs = await ref.read(hiveServiceProvider).getSubscriptions();
+      for (final entry in subs.entries) {
+        if (entry.value.id.toString() == historyPodcastId) {
+          historyPodcastAuthor = entry.value.author ?? 'Unknown';
+          break;
+        }
+      }
+    }
+
     final HistoryModel historyMod = HistoryModel(
       guid: episode['guid'],
       image: historyPodcastImage,
@@ -886,6 +897,11 @@ class AudioController extends ChangeNotifier {
     BuildContext context,
   ) async {
     currentEpisode = queueItem;
+    if (queueItem['podcast'] != null) {
+      currentPodcast = queueItem['podcast'] is PodcastModel
+          ? queueItem['podcast']
+          : PodcastModel.fromJson(queueItem['podcast']);
+    }
     isPodcastSelected = true;
     onceQueueComplete = false;
     isCompleted = false;
