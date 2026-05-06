@@ -507,5 +507,6 @@
     "rssFeed": "RSS フィード",
     "ok": "OK",
     "description": "説明",
-    "details": "詳細"
+    "details": ""details": "詳細"",
+    "selectAll": "Select All",
 }

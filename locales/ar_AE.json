@@ -507,5 +507,6 @@
     "rssFeed": "تغذية RSS",
     "ok": "موافق",
     "description": "الوصف",
-    "details": "التفاصيل"
+    "details": ""details": "التفاصيل"",
+    "selectAll": "Select All",
 }

@@ -507,5 +507,6 @@
     "rssFeed": "RSS-flöde",
     "ok": "OK",
     "description": "Beskrivning",
-    "details": "Detaljer"
+    "details": ""details": "Detaljer"",
+    "selectAll": "Select All",
 }

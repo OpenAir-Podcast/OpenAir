@@ -507,5 +507,9 @@
     "rssFeed": "Fuente RSS",
     "ok": "Aceptar",
     "description": "Descripción",
-    "details": "Detalles"
+    "details": ""details": "Detalles",",
+    "selectAll": "Seleccionar todo",
+    "confirmUnsubscribe": "Confirmar baja",
+    "unsubscribeConfirmMsg": "¿Está seguro de que desea darse de baja de {count} podcast(s) seleccionado(s)?",
+    "unsubscribe": "Darse de baja"
 }

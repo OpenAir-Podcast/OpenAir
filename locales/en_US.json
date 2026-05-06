@@ -428,17 +428,6 @@
     "lastUpdate": "Last Update",
     "sync": "Sync",
     "loginSuccess": "Login Success",
-
-
-
-
-
-
-
-
-
-
-    
     "animals": "Animals",
     "animation": "Animation",
     "arts": "Arts",
@@ -517,5 +506,9 @@
     "rssFeed": "RSS Feed",
     "ok": "OK",
     "description": "Description",
-    "details": "Details"
+    "details": "Details",
+    "selectAll": "Select All",
+    "confirmUnsubscribe": "Confirm Unsubscribe",
+    "unsubscribeConfirmMsg": "Are you sure you want to unsubscribe from {count} selected podcast(s)?",
+    "unsubscribe": "Unsubscribe"
 }

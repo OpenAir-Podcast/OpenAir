@@ -507,5 +507,9 @@
     "rssFeed": "RSS-Feed",
     "ok": "OK",
     "description": "Beschreibung",
-    "details": "Details"
+    "details": ""details": "Details",",
+    "selectAll": "Alles auswählen",
+    "confirmUnsubscribe": "Abmelden bestätigen",
+    "unsubscribeConfirmMsg": "Sind Sie sicher, dass Sie {count} ausgewählte Podcast(s) abmelden möchten?",
+    "unsubscribe": "Abmelden"
 }

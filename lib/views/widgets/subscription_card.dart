@@ -13,11 +13,19 @@ class SubscriptionCard extends ConsumerWidget {
     required this.subs,
     required this.ref,
     required this.index,
+    this.isSelected = false,
+    this.isSelectionMode = false,
+    this.onToggleSelection,
+    this.onLongPress,
   });
 
   final List<SubscriptionModel> subs;
   final WidgetRef ref;
   final int index;
+  final bool isSelected;
+  final bool isSelectionMode;
+  final VoidCallback? onToggleSelection;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,99 +39,124 @@ class SubscriptionCard extends ConsumerWidget {
         final newEpisodes = countData['newEpisodes'] as int? ?? 0;
 
         return GestureDetector(
-          onTap: () {
-            ref.read(audioProvider.notifier).currentPodcast =
-                PodcastModel.fromJson(subs[index].toJson());
+          onTap: isSelectionMode
+              ? onToggleSelection
+              : () {
+                  ref.read(audioProvider.notifier).currentPodcast =
+                      PodcastModel.fromJson(subs[index].toJson());
 
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => SubscriptionsEpisodesPage(
-                  podcast: PodcastModel.fromJson(subs[index].toJson()),
-                  id: subs[index].id,
-                ),
-              ),
-            );
-          },
-          child: Column(
-            children: [
-              // Podcast artwork
-              Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SubscriptionsEpisodesPage(
+                        podcast: PodcastModel.fromJson(subs[index].toJson()),
+                        id: subs[index].id,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          memCacheHeight: 200,
-                          memCacheWidth: 200,
-                          imageUrl: subs[index].artwork,
-                          fit: BoxFit.cover,
-                          errorWidget: (context, url, error) => Container(
-                            color: theme.cardColor,
-                            child: Icon(
-                              Icons.podcasts,
-                              size: 48,
-                              color: Colors.grey[400],
+                    ),
+                  );
+                },
+          onLongPress: onLongPress,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // Podcast artwork
+                  Stack(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: CachedNetworkImage(
+                              memCacheHeight: 200,
+                              memCacheWidth: 200,
+                              imageUrl: subs[index].artwork,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => Container(
+                                color: theme.cardColor,
+                                child: Icon(
+                                  Icons.podcasts,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  // New episode badge
-                  if (newEpisodes > 0)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          newEpisodes > 99 ? '99+' : '$newEpisodes',
-                          style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                      // New episode badge
+                      if (newEpisodes > 0)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              newEpisodes > 99 ? '99+' : '$newEpisodes',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
+                            ),
+                          ),
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Podcast title
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        subs[index].title,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          height: 1.1,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
                     ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 6),
-              // Podcast title
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    subs[index].title,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      height: 1.1,
+              // Selection overlay
+              if (isSelected)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue, width: 2),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    child: const Icon(
+                      Icons.check_circle,
+                      color: Colors.blue,
+                      size: 40,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         );

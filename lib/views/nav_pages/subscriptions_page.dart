@@ -54,12 +54,27 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
   }
 
   Future<void> _deleteSelected() async {
-    final confirmed = await showDialog<bool>(
+    final controller = ref.read(openAirProvider).subscriptionController;
+    for (final title in _selectedPodcasts) {
+      await controller.removeSubscription(title);
+    }
+    setState(() {
+      _selectedPodcasts.clear();
+      _isSelectionMode = false;
+    });
+    ref.invalidate(subscriptionsProvider);
+    ref.invalidate(subscriptionsWithCountsProvider);
+  }
+
+  Future<bool?> _showUnsubscribeDialog() async {
+    return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(Translations.of(context).text('confirmDelete')),
+        title: Text(Translations.of(context).text('confirmUnsubscribe')),
         content: Text(
-          'Delete ${_selectedPodcasts.length} podcast(s)?',
+          Translations.of(context)
+              .text('unsubscribeConfirmMsg')
+              .replaceAll('{count}', _selectedPodcasts.length.toString()),
         ),
         actions: [
           TextButton(
@@ -72,24 +87,11 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(Translations.of(context).text('delete')),
+            child: Text(Translations.of(context).text('unsubscribe')),
           ),
         ],
       ),
     );
-
-    if (confirmed == true) {
-      final controller = ref.read(openAirProvider).subscriptionController;
-      for (final title in _selectedPodcasts) {
-        await controller.removeSubscription(title);
-      }
-      setState(() {
-        _selectedPodcasts.clear();
-        _isSelectionMode = false;
-      });
-      ref.invalidate(subscriptionsProvider);
-      ref.invalidate(subscriptionsWithCountsProvider);
-    }
   }
 
   @override
@@ -160,36 +162,80 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                         ],
                       ],
                     ),
-                    actions: [
-                      IconButton(
-                        tooltip:
-                            Translations.of(context).text('refreshAllPodcasts'),
-                        icon: const Icon(Icons.refresh_rounded),
-                        onPressed: () async {
-                          await ref
-                              .read(openAirProvider)
-                              .hiveService
-                              .updateSubscriptions();
-                          ref.invalidate(subscriptionsWithCountsProvider);
-                          ref.invalidate(subscriptionsProvider);
-                        },
-                      ),
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert_rounded),
-                        onSelected: (value) async {
-                          if (value == 'clear_all') {
-                            _showClearAllDialog(context);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'clear_all',
-                            child: Text(Translations.of(context)
-                                .text('clearAllPodcasts')),
-                          ),
-                        ],
-                      ),
-                    ],
+                    actions: _isSelectionMode
+                        ? [
+                            Text(
+                              '${_selectedPodcasts.length}',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            IconButton(
+                              tooltip:
+                                  Translations.of(context).text('selectAll'),
+                              icon: const Icon(Icons.select_all),
+                              onPressed: () {
+                                setState(() {
+                                  _isSelectionMode = true;
+                                  _selectedPodcasts.clear();
+                                  for (final sub in subs) {
+                                    _selectedPodcasts.add(sub.title);
+                                  }
+                                });
+                              },
+                            ),
+                            IconButton(
+                              tooltip:
+                                  Translations.of(context).text('unsubscribe'),
+                              icon: const Icon(Icons.delete),
+                              color: Colors.red,
+                              onPressed: () async {
+                                final confirmed =
+                                    await _showUnsubscribeDialog();
+                                if (confirmed == true) {
+                                  await _deleteSelected();
+                                }
+                              },
+                            ),
+                            IconButton(
+                              tooltip: Translations.of(context).text('cancel'),
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                setState(() {
+                                  _selectedPodcasts.clear();
+                                  _isSelectionMode = false;
+                                });
+                              },
+                            ),
+                          ]
+                        : [
+                            IconButton(
+                              tooltip: Translations.of(context)
+                                  .text('refreshAllPodcasts'),
+                              icon: const Icon(Icons.refresh_rounded),
+                              onPressed: () async {
+                                await ref
+                                    .read(openAirProvider)
+                                    .hiveService
+                                    .updateSubscriptions();
+                                ref.invalidate(subscriptionsWithCountsProvider);
+                                ref.invalidate(subscriptionsProvider);
+                              },
+                            ),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert_rounded),
+                              onSelected: (value) async {
+                                if (value == 'clear_all') {
+                                  _showClearAllDialog(context);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'clear_all',
+                                  child: Text(Translations.of(context)
+                                      .text('clearAllPodcasts')),
+                                ),
+                              ],
+                            ),
+                          ],
                   ),
                   body: GridView.builder(
                     padding: const EdgeInsets.all(12),
@@ -203,10 +249,17 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                       mainAxisSpacing: 12,
                     ),
                     itemBuilder: (context, index) {
+                      final title = subs[index].title;
+                      final isSelected = _selectedPodcasts.contains(title);
+
                       return SubscriptionCard(
                         subs: subs,
                         ref: ref,
                         index: index,
+                        isSelected: isSelected,
+                        isSelectionMode: _isSelectionMode,
+                        onToggleSelection: () => _toggleSelection(title),
+                        onLongPress: () => _enterSelectionMode(title),
                       );
                     },
                   ),

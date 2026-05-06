@@ -507,5 +507,6 @@
     "rssFeed": "פיד RSS",
     "ok": "אישור",
     "description": "תיאור",
-    "details": "פרטים"
+    "details": ""details": "פרטים"",
+    "selectAll": "Select All",
 }
