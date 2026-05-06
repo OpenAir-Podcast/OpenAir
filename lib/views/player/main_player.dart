@@ -1,4 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +9,6 @@ import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'dart:ui';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
 
@@ -19,6 +21,118 @@ class MainPlayer extends ConsumerStatefulWidget {
 
 class MainPlayerState extends ConsumerState<MainPlayer> {
   final double imageSize = 250.0;
+
+  Timer? _sleepTimer;
+  int? _sleepTimerMinutes;
+  int? _remainingSeconds;
+
+  @override
+  void dispose() {
+    _sleepTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startSleepTimer(int minutes) {
+    _sleepTimer?.cancel();
+    setState(() {
+      _sleepTimerMinutes = minutes;
+      _remainingSeconds = minutes * 60;
+    });
+
+    _sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _remainingSeconds = _remainingSeconds! - 1;
+        if (_remainingSeconds! <= 0) {
+          timer.cancel();
+          _sleepTimerMinutes = null;
+          _remainingSeconds = null;
+          ref.read(audioProvider).audioHandler.pause();
+        }
+      });
+    });
+  }
+
+  void _cancelSleepTimer() {
+    _sleepTimer?.cancel();
+    setState(() {
+      _sleepTimerMinutes = null;
+      _remainingSeconds = null;
+    });
+  }
+
+  String _formatRemainingTime() {
+    if (_remainingSeconds == null) return '';
+    final minutes = _remainingSeconds! ~/ 60;
+    final seconds = _remainingSeconds! % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _showTimerDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Translations.of(context).text('sleepTimer')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('15 min'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(15);
+              },
+            ),
+            ListTile(
+              title: const Text('30 min'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(30);
+              },
+            ),
+            ListTile(
+              title: const Text('45 min'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(45);
+              },
+            ),
+            ListTile(
+              title: const Text('1 hour'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(60);
+              },
+            ),
+            ListTile(
+              title: const Text('90 min'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(90);
+              },
+            ),
+            ListTile(
+              title: const Text('2 hours'),
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(120);
+              },
+            ),
+            if (_sleepTimerMinutes != null)
+              ListTile(
+                title: Text(
+                  Translations.of(context).text('cancelTimer'),
+                  style: const TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _cancelSleepTimer();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -289,8 +403,24 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.timer_outlined),
-                            onPressed: () {},
+                            icon: _sleepTimerMinutes != null
+                                ? Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      const Icon(Icons.timer_outlined),
+                                      Text(
+                                        '$_sleepTimerMinutes',
+                                        style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  )
+                                : const Icon(Icons.timer_outlined),
+                            tooltip: _sleepTimerMinutes != null
+                                ? '${_formatRemainingTime()} - Tap to change'
+                                : Translations.of(context).text('sleepTimer'),
+                            onPressed: _showTimerDialog,
                           ),
                           favoriteListAsync.when(
                             data: (favoriteList) {

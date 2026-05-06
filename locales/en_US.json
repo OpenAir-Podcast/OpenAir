@@ -325,6 +325,8 @@
     "reportABug": "Report a Bug",
     "suggestAFeature": "Suggest a Feature",
     "version": "Version",
+    "sleepTimer": "Sleep Timer",
+    "cancelTimer": "Cancel Timer",
     "sourceCode": "Source Code",
     "licenses": "Licenses",
     "thirdPartyLicenses": "Third Party Licenses",
