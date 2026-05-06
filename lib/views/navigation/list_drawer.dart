@@ -167,7 +167,10 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                 ),
                 const Divider(),
                 ListTile(
-                  leading: const Icon(Icons.favorite_rounded),
+                  leading: const Icon(
+                    Icons.favorite_rounded,
+                    color: Colors.redAccent,
+                  ),
                   title: Text(Translations.of(context).text('favorites')),
                   onTap: () => _navigateTo(const FavoritesPage()),
                 ),
