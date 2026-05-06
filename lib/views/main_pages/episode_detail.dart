@@ -464,7 +464,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             });
                           },
                           icon: isFavorite
-                              ? const Icon(Icons.favorite_rounded)
+                              ? const Icon(
+                                  Icons.favorite_rounded,
+                                  color: Colors.redAccent,
+                                )
                               : const Icon(Icons.favorite_border_rounded),
                         );
                       },
