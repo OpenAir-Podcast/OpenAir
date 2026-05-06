@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "Spola nästa i kö automatiskt",
     "autoMarkEpisodesAsCompleted": "Markera avsnitt som klara automatiskt",
     "keepSkippedEpisodes": "Behåll hoppade över avsnitt",
+    "navigatePodcastEpisodes": "Navigera i podd-avsnitt",
     "automatic": "Automatisk",
     "refreshPodcasts": "Uppdatera podcasts",
     "never": "Aldrig",

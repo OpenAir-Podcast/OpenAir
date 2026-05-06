@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "キューの次のものを自動再生",
     "autoMarkEpisodesAsCompleted": "エピソードを自動的に完了としてマーク",
     "keepSkippedEpisodes": "スキップしたエピソードを保持",
+    "navigatePodcastEpisodes": "ポッドキャストエピソードをナビゲート",
     "automatic": "自動",
     "refreshPodcasts": "ポッドキャストを更新",
     "never": "なし",
