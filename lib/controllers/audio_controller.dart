@@ -170,7 +170,7 @@ class AudioController extends ChangeNotifier {
       nextEpisode = currentEpisode;
 
       await addToHistory(currentEpisode!, currentPodcast,
-          author: currentPodcast?.author);
+          author: currentEpisode!['author']);
       notifyListeners();
     } on TimeoutException {
       _handlePlaybackError();

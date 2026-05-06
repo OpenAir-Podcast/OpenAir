@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "إلغاء الاشتراك في البودكاست",
     "confirmUnsubscribe": "تأكيد الإلغاء",
     "unsubscribeConfirmMsg": "هل أنت متأكد من إلغاء الاشتراك في {count} بودكاست المحددة؟",
-    "unsubscribe": "إلغاء الاشتراك"
+    "unsubscribe": "إلغاء الاشتراك",
     "subscribeToPodcast": "الاشتراك في البودكاست",
     "unsubscribedFrom": "تم إلغاء الاشتراك من",
     "subscribedTo": "تم الاشتراك في",
@@ -509,10 +509,9 @@
     "appearance": "المظهر",
     "completion": "الاكتمال",
     "cleanup": "التنظيف",
-    "opml": "OPML",
     "rssFeed": "تغذية RSS",
     "ok": "موافق",
     "description": "الوصف",
-    "details": ""details": "التفاصيل"",
-    "selectAll": "Select All",
+    "details": "التفاصيل",
+    "selectAll": "Select All"
 }
