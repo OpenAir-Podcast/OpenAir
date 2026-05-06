@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "Автовоспроизведение следующего в очереди",
     "autoMarkEpisodesAsCompleted": "Автоматически отмечать эпизоды как завершенные",
     "keepSkippedEpisodes": "Сохранять пропущенные эпизоды",
+    "navigatePodcastEpisodes": "Навигация по эпизодам подкаста",
     "automatic": "Автоматически",
     "refreshPodcasts": "Обновить подкасты",
     "never": "Никогда",

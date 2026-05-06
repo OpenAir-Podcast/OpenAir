@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "تشغيل التالي في قائمة الانتظار تلقائيًا",
     "autoMarkEpisodesAsCompleted": "وضع علامة على الحلقات كمكتملة تلقائيًا",
     "keepSkippedEpisodes": "الاحتفاظ بالحلقات المتخطاة",
+    "navigatePodcastEpisodes": "تنقل بين حلقات البودكاست",
     "automatic": "تلقائي",
     "refreshPodcasts": "تحديث البودكاست",
     "never": "أبداً",

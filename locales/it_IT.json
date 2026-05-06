@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "Riproduci automaticamente il prossimo in coda",
     "autoMarkEpisodesAsCompleted": "Segna automaticamente gli episodi come completati",
     "keepSkippedEpisodes": "Mantieni episodi saltati",
+    "navigatePodcastEpisodes": "Naviga episodi podcast",
     "automatic": "Automatico",
     "refreshPodcasts": "Aggiorna podcast",
     "never": "Mai",

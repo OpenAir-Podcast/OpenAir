@@ -271,6 +271,7 @@
     "autoPlayNextInQueue": "Reproduzir automaticamente o próximo na fila",
     "autoMarkEpisodesAsCompleted": "Marcar automaticamente episódios como concluídos",
     "keepSkippedEpisodes": "Manter episódios pulados",
+    "navigatePodcastEpisodes": "Navegar em episódios do podcast",
     "automatic": "Automático",
     "refreshPodcasts": "Atualizar podcasts",
     "never": "Nunca",
