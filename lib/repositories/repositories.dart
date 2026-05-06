@@ -53,6 +53,7 @@ class SubscriptionRepository {
     for (final episode in allEpisodes.entries) {
       if (episode.value['author'] == podcast.author) {
         await _episodeBox.delete(episode.key);
+        await _feedBox.delete(episode.key);
       }
     }
   }

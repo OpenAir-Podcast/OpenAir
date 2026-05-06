@@ -590,11 +590,13 @@ class HiveService {
 
   Future<void> removePodcastEpisodes(PodcastModel podcast) async {
     final box = await episodeBox;
+    final feed = await feedBox;
     Map<String, Map> episodes = await box.getAllValues();
 
     for (final episode in episodes.entries) {
       if (episode.value['author'] == podcast.author) {
         await box.delete(episode.key);
+        await feed.delete(episode.key);
       }
     }
   }
