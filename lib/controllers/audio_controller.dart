@@ -403,7 +403,6 @@ class AudioController extends ChangeNotifier {
   Future<void> addToQueue(
       Map<String, dynamic> episode, PodcastModel? podcast, BuildContext context,
       {bool autoDownload = false}) async {
-        
     final hiveService = ref.read(hiveServiceProvider);
     final queue = await hiveService.getQueue();
 
@@ -767,50 +766,87 @@ class AudioController extends ChangeNotifier {
   void mainPlayerSliderClicked(double sliderValue) => seekTo(sliderValue);
 
   Future<void> playPreviousEpisode(BuildContext context) async {
-    // Implementation in audio controller
     final hiveService = ref.read(hiveServiceProvider);
     Map queueMap = await hiveService.getQueue();
 
-    List<Map<String, dynamic>> queueList =
-        queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
-    queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+    if (queueMap.isNotEmpty) {
+      List<Map<String, dynamic>> queueList =
+          queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
+      queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
 
-    int currentEpisodeIndex = -1;
-    for (int i = 0; i < queueList.length; i++) {
-      if (queueList[i]['guid'] == currentEpisode!['guid']) {
-        currentEpisodeIndex = i;
-        break;
+      int currentEpisodeIndex = -1;
+      for (int i = 0; i < queueList.length; i++) {
+        if (queueList[i]['guid'] == currentEpisode!['guid']) {
+          currentEpisodeIndex = i;
+          break;
+        }
       }
+
+      if (!keepSkippedEpisodesConfig) {
+        await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
+      }
+
+      if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
+        // Not in queue or first in queue, try podcast episodes
+        await _playPreviousFromPodcast(context);
+        return;
+      }
+
+      await updateCurrentQueueCard(
+        currentEpisode!['guid'],
+        podcastCurrentPositionInMilliseconds,
+        currentPlaybackPositionString,
+        currentPlaybackRemainingTimeString,
+        playerPosition,
+      );
+
+      await _audioHandler.stop();
+
+      Map<String, dynamic> previousEpisode = queueList[currentEpisodeIndex - 1];
+      currentEpisode = previousEpisode;
+      currentPodcast = previousEpisode['podcast'];
+
+      if (context.mounted) {
+        await queuePlayButtonClicked(
+          previousEpisode,
+          previousEpisode['playerPosition'],
+          context,
+        );
+      }
+    } else {
+      await _playPreviousFromPodcast(context);
     }
+    notifyListeners();
+  }
 
-    if (!keepSkippedEpisodesConfig) {
-      await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
-    }
+  Future<void> _playPreviousFromPodcast(BuildContext context) async {
+    if (currentPodcast == null || currentEpisode == null) return;
 
-    if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) return;
+    final hiveService = ref.read(hiveServiceProvider);
+    final episodes =
+        await hiveService.getEpisodesForPodcast(currentPodcast!.id.toString());
+    final sortedEpisodes = episodes
+        .map((e) => Map<String, dynamic>.from(e.value))
+        .toList()
+      ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
-    await updateCurrentQueueCard(
-      currentEpisode!['guid'],
-      podcastCurrentPositionInMilliseconds,
-      currentPlaybackPositionString,
-      currentPlaybackRemainingTimeString,
-      playerPosition,
-    );
+    int currentIndex = sortedEpisodes
+        .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
+
+    if (currentIndex <= 0) return;
 
     await _audioHandler.stop();
-
-    Map<String, dynamic> previousEpisode = queueList[currentEpisodeIndex - 1];
+    final previousEpisode = sortedEpisodes[currentIndex - 1];
     currentEpisode = previousEpisode;
-    currentPodcast = previousEpisode['podcast'];
+    currentPodcast = PodcastModel.fromJson(previousEpisode['podcast'] ?? {});
 
     if (context.mounted) {
       await queuePlayButtonClicked(
         previousEpisode,
-        previousEpisode['playerPosition'],
+        Duration.zero,
         context,
       );
     }
-    notifyListeners();
   }
 
   void rewindButtonClicked() => rewind();
@@ -918,47 +954,82 @@ class AudioController extends ChangeNotifier {
     final hiveService = ref.read(hiveServiceProvider);
     final queueMap = await hiveService.getQueue();
 
-    List<Map<String, dynamic>> queueList =
-        queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
-    queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+    if (queueMap.isNotEmpty) {
+      List<Map<String, dynamic>> queueList =
+          queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
+      queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
 
-    int currentEpisodeIndex = -1;
-    for (int i = 0; i < queueList.length; i++) {
-      if (queueList[i]['guid'] == currentEpisode!['guid']) {
-        currentEpisodeIndex = i;
-        break;
+      int currentEpisodeIndex = -1;
+      for (int i = 0; i < queueList.length; i++) {
+        if (queueList[i]['guid'] == currentEpisode!['guid']) {
+          currentEpisodeIndex = i;
+          break;
+        }
       }
-    }
 
-    if (!keepSkippedEpisodesConfig) {
-      await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
-    }
+      if (!keepSkippedEpisodesConfig) {
+        await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
+      }
 
-    if (currentEpisodeIndex == -1 ||
-        currentEpisodeIndex == queueList.length - 1) {
-      return;
-    }
+      if (currentEpisodeIndex == -1 ||
+          currentEpisodeIndex == queueList.length - 1) {
+        await _playNextFromPodcast(context);
+        return;
+      }
 
-    await updateCurrentQueueCard(
-      currentEpisode!['guid'],
-      podcastCurrentPositionInMilliseconds,
-      currentPlaybackPositionString,
-      currentPlaybackRemainingTimeString,
-      playerPosition,
-    );
+      await updateCurrentQueueCard(
+        currentEpisode!['guid'],
+        podcastCurrentPositionInMilliseconds,
+        currentPlaybackPositionString,
+        currentPlaybackRemainingTimeString,
+        playerPosition,
+      );
 
-    await _audioHandler.stop();
+      await _audioHandler.stop();
 
-    final nextEpisodeData = queueList[currentEpisodeIndex + 1];
-    currentEpisode = nextEpisodeData;
-    currentPodcast = nextEpisodeData['podcast'];
+      final nextEpisodeData = queueList[currentEpisodeIndex + 1];
+      currentEpisode = nextEpisodeData;
+      currentPodcast = nextEpisodeData['podcast'];
 
-    if (context.mounted) {
-      await queuePlayButtonClicked(
-          nextEpisodeData, nextEpisodeData['playerPosition'], context);
+      if (context.mounted) {
+        await queuePlayButtonClicked(
+            nextEpisodeData, nextEpisodeData['playerPosition'], context);
+      }
+    } else {
+      await _playNextFromPodcast(context);
     }
 
     notifyListeners();
+  }
+
+  Future<void> _playNextFromPodcast(BuildContext context) async {
+    if (currentPodcast == null || currentEpisode == null) return;
+
+    final hiveService = ref.read(hiveServiceProvider);
+    final episodes =
+        await hiveService.getEpisodesForPodcast(currentPodcast!.id.toString());
+    final sortedEpisodes = episodes
+        .map((e) => Map<String, dynamic>.from(e.value))
+        .toList()
+      ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
+
+    int currentIndex = sortedEpisodes
+        .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
+
+    if (currentIndex == -1 || currentIndex == sortedEpisodes.length - 1) return;
+
+    await _audioHandler.stop();
+    final nextEpisode = sortedEpisodes[currentIndex + 1];
+    currentEpisode = nextEpisode;
+    currentPodcast = PodcastModel.fromJson(nextEpisode['podcast'] ?? {});
+
+    if (context.mounted) {
+      await queuePlayButtonClicked(
+        nextEpisode,
+        Duration.zero,
+        context,
+      );
+    }
   }
 
   String formatCurrentPlaybackPosition(Duration timeline) {
