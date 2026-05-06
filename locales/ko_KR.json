@@ -108,6 +108,9 @@
     "share": "分享",
     "podcastDetails": "播客详情",
     "unsubscribeToPodcast": "取消订阅播客",
+    "confirmUnsubscribe": "구독 취소 확인",
+    "unsubscribeConfirmMsg": "{count}개의 선택된 팟캐스트 구독을 취소하시겠습니까?",
+    "unsubscribe": "구독 취소"
     "subscribeToPodcast": "订阅播客",
     "unsubscribedFrom": "已取消订阅",
     "subscribedTo": "已订阅",

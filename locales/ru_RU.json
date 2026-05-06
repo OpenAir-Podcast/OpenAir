@@ -108,6 +108,9 @@
     "share": "Поделиться",
     "podcastDetails": "Детали подкаста",
     "unsubscribeToPodcast": "Отписаться от подкаста",
+    "confirmUnsubscribe": "Подтвердить отписку",
+    "unsubscribeConfirmMsg": "Вы уверены, что хотите отписаться от {count} выбранных подкаст(ов)?",
+    "unsubscribe": "Отписаться"
     "subscribeToPodcast": "Подписаться на подкаст",
     "unsubscribedFrom": "Отписался от",
     "subscribedTo": "Подписался на",

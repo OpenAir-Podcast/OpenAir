@@ -108,6 +108,9 @@
     "share": "Compartilhar",
     "podcastDetails": "Detalhes do podcast",
     "unsubscribeToPodcast": "Cancelar inscrição no podcast",
+    "confirmUnsubscribe": "Confirmar cancelamento",
+    "unsubscribeConfirmMsg": "Tem certeza que deseja cancelar {count} podcast(s) selecionado(s)?",
+    "unsubscribe": "Cancelar"
     "subscribeToPodcast": "Inscrever-se no podcast",
     "unsubscribedFrom": "Inscrição cancelada em",
     "subscribedTo": "Inscrito em",

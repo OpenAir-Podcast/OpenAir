@@ -108,6 +108,9 @@
     "share": "שתף",
     "podcastDetails": "פרטי הפודקאסט",
     "unsubscribeToPodcast": "בטל מנוי לפודקאסט",
+    "confirmUnsubscribe": "אישור ביטול",
+    "unsubscribeConfirmMsg": "האם אתה בטוח שברצונך לבטל את המנוי של {count} פודקאסטים שנבחרו?",
+    "unsubscribe": "בטל מנוי"
     "subscribeToPodcast": "הירשם לפודקאסט",
     "unsubscribedFrom": "בוטל המנוי ל",
     "subscribedTo": "נרשמת ל",
