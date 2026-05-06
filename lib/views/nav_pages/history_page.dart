@@ -229,8 +229,13 @@ class _HistoryState extends ConsumerState<HistoryPage> {
           ),
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+      loading: () => Scaffold(
+        appBar: AppBar(
+          title: Text(Translations.of(context).text('history')),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }
