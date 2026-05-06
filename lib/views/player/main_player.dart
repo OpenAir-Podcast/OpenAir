@@ -404,15 +404,20 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                           ),
                           IconButton(
                             icon: _sleepTimerMinutes != null
-                                ? Stack(
-                                    alignment: Alignment.center,
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.timer_outlined),
+                                      Icon(
+                                        Icons.timer_outlined,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 4),
                                       Text(
                                         '$_sleepTimerMinutes',
-                                        style: const TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.primary),
                                       ),
                                     ],
                                   )
