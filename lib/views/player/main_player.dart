@@ -9,6 +9,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
@@ -402,6 +403,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                 color: theme.colorScheme.primary,
                               ),
                             ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.share_rounded),
+                            tooltip: Translations.of(context).text('share'),
+                            onPressed: () => ref.watch(openAirProvider).share(),
                           ),
                           IconButton(
                             icon: _sleepTimerMinutes != null
