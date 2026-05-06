@@ -328,6 +328,8 @@
     "reportABug": "الإبلاغ عن خطأ",
     "suggestAFeature": "اقتراح ميزة",
     "version": "الإصدار",
+    "sleepTimer": "مؤقت النوم",
+    "cancelTimer": "إلغاء المؤقت",
     "sourceCode": "الكود المصدري",
     "licenses": "التراخيص",
     "thirdPartyLicenses": "تراخيص الطرف الثالث",

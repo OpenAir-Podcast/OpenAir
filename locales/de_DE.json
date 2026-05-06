@@ -325,6 +325,8 @@
     "reportABug": "Einen Fehler melden",
     "suggestAFeature": "Eine Funktion vorschlagen",
     "version": "Version",
+    "sleepTimer": "Schlaf-timer",
+    "cancelTimer": "Timer abbrechen",
     "sourceCode": "Quellcode",
     "licenses": "Lizenzen",
     "thirdPartyLicenses": "Lizenzen von Drittanbietern",

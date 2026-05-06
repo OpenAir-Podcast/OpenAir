@@ -328,6 +328,8 @@
     "reportABug": "Rapportera en bugg",
     "suggestAFeature": "Föreslå en funktion",
     "version": "Version",
+    "sleepTimer": "Sömntimer",
+    "cancelTimer": "Avbryt timer",
     "sourceCode": "Källkod",
     "licenses": "Licenser",
     "thirdPartyLicenses": "Licenser från tredje part",

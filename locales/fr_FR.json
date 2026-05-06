@@ -325,6 +325,8 @@
     "reportABug": "Signaler un bug",
     "suggestAFeature": "Suggérer une fonctionnalité",
     "version": "Version",
+    "sleepTimer": "Minuterie de sommeil",
+    "cancelTimer": "Annuler la minuterie",
     "sourceCode": "Code source",
     "licenses": "Licences",
     "thirdPartyLicenses": "Licences tierces",

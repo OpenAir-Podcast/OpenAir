@@ -328,6 +328,8 @@
     "reportABug": "报告错误",
     "suggestAFeature": "建议功能",
     "version": "版本",
+    "sleepTimer": "睡眠定时器",
+    "cancelTimer": "取消定时器",
     "sourceCode": "源代码",
     "licenses": "许可证",
     "thirdPartyLicenses": "第三方许可证",
