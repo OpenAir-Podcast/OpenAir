@@ -306,6 +306,9 @@ class HiveService {
     downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
     downloadQueuedEpisodesConfig = automaticSettings['downloadQueuedEpisodes'];
 
+    // Clear feed if no subscriptions
+    await clearFeedIfNoSubscriptions();
+
     // 5, 10, 25, 50, 75, 100, 500, unlimited
     downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
 
@@ -467,9 +470,21 @@ class HiveService {
     episodesList.clear();
   }
 
+  Future<void> clearFeedIfNoSubscriptions() async {
+    final subs = await getSubscriptions();
+    if (subs.isEmpty) {
+      final feedBox = await this.feedBox;
+      await feedBox.clear();
+      final epiBox = await episodeBox;
+      await epiBox.clear();
+      episodesList.clear();
+    }
+  }
+
   Future<void> deleteSubscription(String id) async {
     final box = await subscriptionBox;
     await box.delete(id); // Add await
+    await clearFeedIfNoSubscriptions();
   }
 
   Future<void> updateSubscriptions() async {
