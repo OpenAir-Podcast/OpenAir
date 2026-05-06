@@ -552,15 +552,20 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                               ),
                               const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    Translations.of(context)
-                                        .text('discoveryPoweredByFyyd'),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
+                                  Flexible(
+                                    child: Text(
+                                      Translations.of(context)
+                                          .text('discoveryPoweredByFyyd'),
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  const Spacer(),
                                   TextButton.icon(
                                     onPressed: () => Navigator.push(
                                       context,
@@ -572,8 +577,10 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                                     ),
                                     icon: const Icon(Icons.double_arrow_rounded,
                                         size: 18),
-                                    label: Text(Translations.of(context)
-                                        .text('discoverMore')),
+                                    label: Text(
+                                      Translations.of(context)
+                                          .text('discoverMore'),
+                                    ),
                                   ),
                                 ],
                               ),
