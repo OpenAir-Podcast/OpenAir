@@ -268,6 +268,7 @@
     "autoPlayNextInQueue": "Auto Play Next in Queue",
     "autoMarkEpisodesAsCompleted": "Auto Mark Episodes as Completed",
     "keepSkippedEpisodes": "Keep Skipped Episodes",
+    "navigatePodcastEpisodes": "Navigate Podcast Episodes",
     "automatic": "Automatic",
     "refreshPodcasts": "Refresh Podcasts",
     "never": "Never",
