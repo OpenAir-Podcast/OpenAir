@@ -108,6 +108,9 @@
     "share": "مشاركة",
     "podcastDetails": "تفاصيل البودكاست",
     "unsubscribeToPodcast": "إلغاء الاشتراك في البودكاست",
+    "confirmUnsubscribe": "تأكيد الإلغاء",
+    "unsubscribeConfirmMsg": "هل أنت متأكد من إلغاء الاشتراك في {count} بودكاست المحددة؟",
+    "unsubscribe": "إلغاء الاشتراك"
     "subscribeToPodcast": "الاشتراك في البودكاست",
     "unsubscribedFrom": "تم إلغاء الاشتراك من",
     "subscribedTo": "تم الاشتراك في",

@@ -108,6 +108,9 @@
     "share": "Dela",
     "podcastDetails": "Podcast-detaljer",
     "unsubscribeToPodcast": "Säg upp prenumeration på podcast",
+    "confirmUnsubscribe": "Bekräfta avprenumeration",
+    "unsubscribeConfirmMsg": "Är du säker på att du vill avprenumerera {count} valda podcast(s)?",
+    "unsubscribe": "Avprenumerera"
     "subscribeToPodcast": "Prenumerera på podcast",
     "unsubscribedFrom": "Prenumeration uppsagd från",
     "subscribedTo": "Prenumererar på",
