@@ -657,7 +657,23 @@ class HiveService {
 
   Future<Map<String, FeedModel>> getFeed() async {
     final box = await feedBox;
-    return box.getAllValues();
+    final episodeBox = await this.episodeBox;
+    final subscriptions = await getSubscriptions();
+
+    final allFeedItems = await box.getAllValues();
+    final filteredFeedItems = <String, FeedModel>{};
+
+    for (final entry in allFeedItems.entries) {
+      final episode = await episodeBox.get(entry.key);
+      if (episode != null) {
+        final podcastTitle = episode['podcast']?['title'] ?? episode['author'];
+        if (podcastTitle != null && subscriptions.containsKey(podcastTitle)) {
+          filteredFeedItems[entry.key] = entry.value;
+        }
+      }
+    }
+
+    return filteredFeedItems;
   }
 
   Future<void> deleteFeed() async {
