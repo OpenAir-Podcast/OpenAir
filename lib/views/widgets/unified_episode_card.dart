@@ -443,6 +443,9 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   }
 
   void _downloadEpisode(BuildContext context, WidgetRef ref) {
+    widget.episodeItem['author'] = widget.author;
+    widget.podcast.author = widget.author;
+
     ref.read(audioProvider.notifier).downloadEpisode(
           widget.episodeItem,
           widget.podcast,
