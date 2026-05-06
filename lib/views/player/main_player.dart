@@ -25,6 +25,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     final audioState = ref.watch(audioProvider);
     final currentEpisode = audioState.currentEpisode;
     final subsAsync = ref.watch(subscriptionsProvider);
+    final favoriteListAsync = ref.watch(getFavoriteProvider);
 
     if (currentEpisode == null || currentEpisode.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -291,9 +292,45 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             icon: const Icon(Icons.timer_outlined),
                             onPressed: () {},
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.favorite_border_rounded),
-                            onPressed: () {},
+                          favoriteListAsync.when(
+                            data: (favoriteList) {
+                              final isFavorite = favoriteList
+                                  .containsKey(currentEpisode['guid']);
+                              return IconButton(
+                                icon: Icon(
+                                  isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border_rounded,
+                                  color: isFavorite ? Colors.red : null,
+                                ),
+                                onPressed: () {
+                                  if (isFavorite) {
+                                    ref
+                                        .read(audioProvider)
+                                        .removeEpisodeFromFavorite(
+                                          currentEpisode['guid'],
+                                        );
+                                  } else if (audioState.currentPodcast !=
+                                      null) {
+                                    ref
+                                        .read(audioProvider)
+                                        .addEpisodeToFavorite(
+                                          currentEpisode,
+                                          audioState.currentPodcast!,
+                                        );
+                                  }
+                                  ref.invalidate(getFavoriteProvider);
+                                },
+                              );
+                            },
+                            loading: () => IconButton(
+                              icon: const Icon(Icons.favorite_border_rounded),
+                              onPressed: null,
+                            ),
+                            error: (_, __) => IconButton(
+                              icon: const Icon(Icons.favorite_border_rounded),
+                              onPressed: null,
+                            ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.playlist_play_rounded,
