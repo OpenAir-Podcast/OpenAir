@@ -507,5 +507,6 @@
     "rssFeed": "Feed RSS",
     "ok": "OK",
     "description": "Descrição",
-    "details": "Detalhes"
+    "details": ""details": "Detalhes"",
+    "selectAll": "Select All",
 }

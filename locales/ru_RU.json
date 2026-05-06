@@ -507,5 +507,6 @@
     "rssFeed": "RSS-канал",
     "ok": "ОК",
     "description": "Описание",
-    "details": "Детали"
+    "details": ""details": "Детали"",
+    "selectAll": "Select All",
 }

@@ -507,5 +507,9 @@
     "rssFeed": "Flux RSS",
     "ok": "OK",
     "description": "Description",
-    "details": "Détails"
+    "details": ""details": "Détails",",
+    "selectAll": "Tout sélectionner",
+    "confirmUnsubscribe": "Confirmer le désabonnement",
+    "unsubscribeConfirmMsg": "Êtes-vous sûr de vouloir vous désabonner de {count} podcast(s) sélectionné(s) ?",
+    "unsubscribe": "Se désabonner"
 }

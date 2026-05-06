@@ -507,5 +507,6 @@
     "rssFeed": "RSS 订阅",
     "ok": "确定",
     "description": "描述",
-    "details": "详情"
+    "details": ""details": "详情"",
+    "selectAll": "Select All",
 }
