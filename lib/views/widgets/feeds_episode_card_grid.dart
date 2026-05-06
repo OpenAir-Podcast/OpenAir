@@ -527,7 +527,10 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                                     ref
                                         .read(audioProvider)
                                         .addEpisodeToFavorite(
-                                            widget.episodeItem, widget.podcast);
+                                            widget.episodeItem, widget.podcast,
+                                            author:
+                                                widget.episodeItem['author'] ??
+                                                    widget.podcast.author);
 
                                     ref.invalidate(getFavoriteProvider);
 

@@ -501,7 +501,10 @@ class _SubscriptionEpisodeCardGridState
                                           .read(audioProvider)
                                           .addEpisodeToFavorite(
                                               widget.episodeItem,
-                                              widget.podcast);
+                                              widget.podcast,
+                                              author: widget
+                                                      .episodeItem['author'] ??
+                                                  widget.podcast.author);
 
                                       if (context.mounted) {
                                         if (!Platform.isAndroid &&

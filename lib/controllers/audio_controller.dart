@@ -639,9 +639,11 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> addEpisodeToFavorite(
-      Map<String, dynamic> episode, PodcastModel podcast) async {
+      Map<String, dynamic> episode, PodcastModel podcast,
+      {String? author}) async {
     final hiveService = ref.read(hiveServiceProvider);
-    hiveService.addEpisodeToFavorite(episode, podcast);
+    podcast.author ??= author ?? 'Unknown';
+    hiveService.addEpisodeToFavorite(episode, podcast, author: author);
     ref.invalidate(getFavoriteProvider);
   }
 

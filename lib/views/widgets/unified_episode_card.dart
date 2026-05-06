@@ -392,6 +392,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
               ref.read(audioProvider).addEpisodeToFavorite(
                     widget.episodeItem,
                     widget.podcast,
+                    author: widget.author,
                   );
               ref.invalidate(getFavoriteProvider);
             }
