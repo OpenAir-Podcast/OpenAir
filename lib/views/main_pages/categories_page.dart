@@ -156,7 +156,7 @@ List<Category> getCategories(BuildContext context) => [
       Category(
           name: Translations.of(context).text('howTo'),
           icon: Icons.how_to_reg_rounded,
-          apiKey: 'how-to'),
+          apiKey: 'how to'),
       Category(
           name: Translations.of(context).text('interview'),
           icon: Icons.record_voice_over_rounded,
@@ -272,7 +272,7 @@ List<Category> getCategories(BuildContext context) => [
       Category(
           name: Translations.of(context).text('selfImprovement'),
           icon: Icons.self_improvement_rounded,
-          apiKey: 'self-improvement'),
+          apiKey: 'self improvement'),
       Category(
           name: Translations.of(context).text('social'),
           icon: Icons.groups_rounded,
@@ -296,7 +296,7 @@ List<Category> getCategories(BuildContext context) => [
       Category(
           name: Translations.of(context).text('videoGames'),
           icon: Icons.videogame_asset_rounded,
-          apiKey: 'video-games'),
+          apiKey: 'video games'),
       Category(
           name: Translations.of(context).text('visual'),
           icon: Icons.remove_red_eye_rounded,
@@ -304,7 +304,7 @@ List<Category> getCategories(BuildContext context) => [
       Category(
           name: Translations.of(context).text('trueCrime'),
           icon: Icons.gavel_rounded,
-          apiKey: 'true-crime'),
+          apiKey: 'true crime'),
       Category(
           name: Translations.of(context).text('tv'),
           icon: Icons.tv_rounded,
