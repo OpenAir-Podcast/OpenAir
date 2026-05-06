@@ -54,7 +54,7 @@ class _SubscriptionEpisodeCardGridState
         .getPodcastPublishedDateFromEpoch(widget.episodeItem['datePublished']);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 

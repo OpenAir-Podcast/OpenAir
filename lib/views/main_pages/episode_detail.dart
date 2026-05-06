@@ -39,7 +39,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
     final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
@@ -347,8 +347,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                             }
                                           }
 
-                                          ref.invalidate(
-                                              sortedDownloadsProvider);
+                                          ref.invalidate(getDownloadsProvider);
                                         },
                                       ),
                                     ],

@@ -197,7 +197,7 @@ class SyncController extends ChangeNotifier {
     }
 
     final downloads = await hiveService.getDownloads();
-    for (final episode in downloads.values) {
+    for (final episode in downloads) {
       final downloadItem = episode.toJson();
       downloadItem['duration'] = episode.duration;
       downloadItem['downloadDate'] =
