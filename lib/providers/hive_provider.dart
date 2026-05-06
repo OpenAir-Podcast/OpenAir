@@ -1353,7 +1353,7 @@ class HiveService {
       return;
     }
 
-    // Register periodic task
+    // Register periodic task using v0.9.x API
     debugPrint('Registering background fetch with interval: $duration');
 
     Workmanager().registerPeriodicTask(
@@ -1363,7 +1363,7 @@ class HiveService {
       constraints: Constraints(
         networkType: NetworkType.connected,
       ),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     );
   }
 }
