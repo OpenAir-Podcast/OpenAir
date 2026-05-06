@@ -11,6 +11,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/nav_pages/queue_page.dart';
 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
@@ -470,9 +471,16 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.playlist_play_rounded,
-                                size: 28),
-                            onPressed: () {},
+                            icon: const Icon(Icons.queue_music_rounded),
+                            tooltip: Translations.of(context).text('queue'),
+                            onPressed: () {
+                              // Navigate to queue page or show queue bottom sheet
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const QueuePage(),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
