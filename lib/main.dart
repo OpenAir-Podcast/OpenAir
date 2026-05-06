@@ -15,15 +15,25 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/audio_handler.dart';
+import 'package:openair/services/background_service.dart';
 import 'package:openair/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize background task worker
+  if (Platform.isAndroid || Platform.isIOS) {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: false,
+    );
+  }
 
   // Initialize audio service for background playback
   await AudioService.init(
