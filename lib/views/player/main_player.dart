@@ -452,6 +452,8 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                         .addEpisodeToFavorite(
                                           currentEpisode,
                                           audioState.currentPodcast!,
+                                          author: currentEpisode['author'] ??
+                                              audioState.currentPodcast!.author,
                                         );
                                   }
                                   ref.invalidate(getFavoriteProvider);

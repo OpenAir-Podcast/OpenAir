@@ -438,7 +438,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 }
                               } else {
                                 ref.read(audioProvider).addEpisodeToFavorite(
-                                    widget.episodeItem!, widget.podcast!);
+                                    widget.episodeItem!, widget.podcast!,
+                                    author: widget.episodeItem!['author'] ??
+                                        widget.podcast!.author);
 
                                 if (context.mounted) {
                                   if (!Platform.isAndroid && !Platform.isIOS) {

@@ -81,9 +81,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                             artwork: podcastData.artwork,
                             imageUrl: podcastData.imageUrl,
                           ),
-                          author: podcastData.author?.isNotEmpty == true
-                              ? podcastData.author!
-                              : Translations.of(context).text('unknown'),
+                          author: podcastData.author ??=
+                              Translations.of(context).text('unknown'),
                         );
                       },
                     )
