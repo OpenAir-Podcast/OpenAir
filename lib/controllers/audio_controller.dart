@@ -787,8 +787,10 @@ class AudioController extends ChangeNotifier {
       }
 
       if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
-        // Not in queue or first in queue, try podcast episodes
-        await _playPreviousFromPodcast(context);
+        // Not in queue or first in queue, try podcast episodes if enabled
+        if (navigatePodcastEpisodesConfig) {
+          await _playPreviousFromPodcast(context);
+        }
         return;
       }
 
@@ -814,7 +816,10 @@ class AudioController extends ChangeNotifier {
         );
       }
     } else {
-      await _playPreviousFromPodcast(context);
+      // No queue, try podcast episodes if enabled
+      if (navigatePodcastEpisodesConfig) {
+        await _playPreviousFromPodcast(context);
+      }
     }
     notifyListeners();
   }
@@ -973,7 +978,10 @@ class AudioController extends ChangeNotifier {
 
       if (currentEpisodeIndex == -1 ||
           currentEpisodeIndex == queueList.length - 1) {
-        await _playNextFromPodcast(context);
+        // Not in queue or last in queue, try podcast episodes if enabled
+        if (navigatePodcastEpisodesConfig) {
+          await _playNextFromPodcast(context);
+        }
         return;
       }
 
@@ -996,7 +1004,10 @@ class AudioController extends ChangeNotifier {
             nextEpisodeData, nextEpisodeData['playerPosition'], context);
       }
     } else {
-      await _playNextFromPodcast(context);
+      // No queue, try podcast episodes if enabled
+      if (navigatePodcastEpisodesConfig) {
+        await _playNextFromPodcast(context);
+      }
     }
 
     notifyListeners();

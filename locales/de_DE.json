@@ -268,6 +268,7 @@
     "autoPlayNextInQueue": "Nächstes in Warteschlange automatisch abspielen",
     "autoMarkEpisodesAsCompleted": "Folgen automatisch als abgeschlossen markieren",
     "keepSkippedEpisodes": "Übersprungene Folgen behalten",
+    "navigatePodcastEpisodes": "Podcast-Episoden navigieren",
     "automatic": "Automatisch",
     "refreshPodcasts": "Podcasts aktualisieren",
     "never": "Nie",

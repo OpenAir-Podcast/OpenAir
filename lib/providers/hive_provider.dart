@@ -293,6 +293,8 @@ class HiveService {
     }
 
     keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
+    navigatePodcastEpisodesConfig =
+        playbackSettings['navigatePodcastEpisodes'] ?? true;
 
     // Automatic
     Map<String, dynamic> automaticSettings = await getAutomaticSettings();
@@ -938,6 +940,9 @@ class HiveService {
         'continuePlayback': true,
         'smartMarkAsCompleted': '30 seconds',
         'keepSkippedEpisodes': false,
+
+        // Navigation
+        'navigatePodcastEpisodes': true,
       };
       await box.put('playback', playbackSettings);
     }

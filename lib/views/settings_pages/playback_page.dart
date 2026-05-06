@@ -343,6 +343,27 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
                 context,
               ),
               _buildSectionHeader(
+                  Translations.of(context).text('navigation'), context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildToggleTile(
+                      label: Translations.of(context)
+                          .text('navigatePodcastEpisodes'),
+                      value: playbackData['navigatePodcastEpisodes'] ?? true,
+                      onChanged: (value) {
+                        playbackData['navigatePodcastEpisodes'] = value;
+                        navigatePodcastEpisodesConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                  ],
+                ),
+                context,
+              ),
+              _buildSectionHeader(
                   Translations.of(context).text('completion'), context),
               _buildCard(
                 Column(

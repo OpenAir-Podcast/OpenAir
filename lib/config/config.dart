@@ -200,6 +200,7 @@ late bool enqueueDownloadedConfig;
 late bool autoplayNextInQueueConfig;
 late String smartMarkAsCompletionConfig;
 late bool keepSkippedEpisodesConfig;
+late bool navigatePodcastEpisodesConfig;
 
 // Automatic
 late String refreshPodcastsConfig;
