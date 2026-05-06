@@ -1,14 +1,13 @@
 What's New ✨
 
-🎨 Modern UI Overhaul
-• Sleek empty states for history, queue & downloads
-• Redesigned add podcast & episode detail pages
-• Rounded cards, progress bars & filled buttons
-• Modern dialogs with icon containers
+🎨 New Features
+• Sleep timer - Set a timer to automatically stop playback
+• Share button - Easily share episodes from the player controls
+• Queue navigation - Quick access to your playback queue from the player
+• Favorite button - Add episodes to favorites directly from the main player
+• Author information now displayed in downloads, favorites, and history
 
-🔧 Fixes & Improvements
-• Play button now updates correctly when podcast ends
-• History, downloads & inbox auto-refresh on changes
-• Author name no longer shows as "Unknown"
-• Fixed text overflow on episode cards & pages
-• Add to queue no longer auto-downloads episodes
+🔧 Improvements
+• Improved feed management with clear feed option when no subscriptions exist
+• Enhanced layout in AddPodcastPage for better text alignment
+• Various UI improvements and bug fixes
