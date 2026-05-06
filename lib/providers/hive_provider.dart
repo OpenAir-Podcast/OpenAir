@@ -31,6 +31,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
 import 'package:xml/xml.dart';
 
+import 'package:workmanager/workmanager.dart';
+import 'package:openair/services/background_service.dart';
+
 final hiveServiceProvider = Provider<HiveService>(
   (ref) => HiveService(ref),
 );
@@ -373,6 +376,11 @@ class HiveService {
       refreshTimer.schedule(DateTime.now().add(duration));
     }
 
+    // Register background fetch for mobile platforms
+    if (Platform.isAndroid || Platform.isIOS) {
+      _registerBackgroundFetch(duration);
+    }
+
     // Auto Export DB every day at 2 AM
     autoExportDBTimer = ScheduledTimer(
       id: 'auto_export_db_timer',
@@ -554,19 +562,11 @@ class HiveService {
               await feedBox.put(guid, FeedModel(guid: guid));
 
               if (receiveNotificationsForNewEpisodesConfig && context.mounted) {
-                if (!Platform.isAndroid && !Platform.isIOS) {
-                  ref.read(notificationServiceProvider).showNotification(
-                        Translations.of(context).text('newEpisodeAvailable'),
-                        episode['title'],
-                      );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${Translations.of(context).text('newEpisodeAvailable')} - ${episode['title']}'),
-                    ),
-                  );
-                }
+                final podcastTitle = episode['podcast']?['title'] ?? 'Podcast';
+                ref.read(notificationServiceProvider).showNotification(
+                      '$podcastTitle',
+                      '${Translations.of(context).text('newEpisodeAvailable')}: ${episode['title']}',
+                    );
               }
             }
             ref.invalidate(getInboxProvider);
@@ -1052,6 +1052,40 @@ class HiveService {
   void saveNotificationsSettings(Map notificationsSettings) async {
     final box = await settingsBox;
     await box.put('notifications', notificationsSettings);
+
+    // Update background fetch when notification settings change
+    if (Platform.isAndroid || Platform.isIOS) {
+      final refreshPodcastsConfig =
+          notificationsSettings['refreshPodcasts'] ?? 'Never';
+      Duration duration;
+      switch (refreshPodcastsConfig) {
+        case 'Every hour':
+          duration = const Duration(hours: 1);
+          break;
+        case 'Every 2 hours':
+          duration = const Duration(hours: 2);
+          break;
+        case 'Every 4 hours':
+          duration = const Duration(hours: 4);
+          break;
+        case 'Every 8 hours':
+          duration = const Duration(hours: 8);
+          break;
+        case 'Every 12 hours':
+          duration = const Duration(hours: 12);
+          break;
+        case 'Every day':
+          duration = const Duration(days: 1);
+          break;
+        case 'Every 3 days':
+          duration = const Duration(days: 3);
+          break;
+        case 'Never':
+        default:
+          duration = Duration.zero;
+      }
+      _registerBackgroundFetch(duration);
+    }
   }
 
   Future<Map<String, dynamic>?> getNotificationsSettings() async {
@@ -1304,6 +1338,32 @@ class HiveService {
         results: results,
         timestamp: DateTime.now(),
       ),
+    );
+  }
+
+  // Register background fetch for new episodes
+  void _registerBackgroundFetch(Duration duration) {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+
+    // Cancel existing background tasks
+    Workmanager().cancelAll();
+
+    if (duration == Duration.zero) {
+      debugPrint('Background fetch disabled');
+      return;
+    }
+
+    // Register periodic task
+    debugPrint('Registering background fetch with interval: $duration');
+
+    Workmanager().registerPeriodicTask(
+      'openair_refresh_subscriptions',
+      refreshSubscriptionsTask,
+      frequency: duration,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+      ),
+      existingWorkPolicy: ExistingWorkPolicy.replace,
     );
   }
 }
