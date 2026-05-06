@@ -8,6 +8,7 @@ import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/inbox_page.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
@@ -16,8 +17,10 @@ import 'package:openair/views/navigation/list_drawer.dart';
 
 final subscriptionsProvider =
     FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
-  ref.watch(openAirProvider).hiveService;
-  return await ref.read(openAirProvider).getSubscriptions();
+  // Watch the hiveService to trigger refetch when it changes
+  final hiveService = ref.watch(hiveServiceProvider);
+  // This forces the provider to refetch when subscriptions change
+  return await hiveService.getSubscriptions();
 });
 
 class SubscriptionsPage extends ConsumerStatefulWidget {
@@ -28,6 +31,67 @@ class SubscriptionsPage extends ConsumerStatefulWidget {
 }
 
 class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
+  final Set<String> _selectedPodcasts = {};
+  bool _isSelectionMode = false;
+
+  void _toggleSelection(String title) {
+    setState(() {
+      if (_selectedPodcasts.contains(title)) {
+        _selectedPodcasts.remove(title);
+        if (_selectedPodcasts.isEmpty) _isSelectionMode = false;
+      } else {
+        _selectedPodcasts.add(title);
+        _isSelectionMode = true;
+      }
+    });
+  }
+
+  void _enterSelectionMode(String title) {
+    setState(() {
+      _isSelectionMode = true;
+      _selectedPodcasts.add(title);
+    });
+  }
+
+  Future<void> _deleteSelected() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Translations.of(context).text('confirmDelete')),
+        content: Text(
+          'Delete ${_selectedPodcasts.length} podcast(s)?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(Translations.of(context).text('cancel')),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(Translations.of(context).text('delete')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final controller = ref.read(openAirProvider).subscriptionController;
+      for (final title in _selectedPodcasts) {
+        await controller.removeSubscription(title);
+      }
+      setState(() {
+        _selectedPodcasts.clear();
+        _isSelectionMode = false;
+      });
+      ref.invalidate(subscriptionsProvider);
+      ref.invalidate(subscriptionsWithCountsProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
