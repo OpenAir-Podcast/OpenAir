@@ -325,6 +325,8 @@
     "reportABug": "Reportar un error",
     "suggestAFeature": "Sugerir una función",
     "version": "Versión",
+    "sleepTimer": "Temporizador de sueño",
+    "cancelTimer": "Cancelar temporizador",
     "sourceCode": "Código fuente",
     "licenses": "Licencias",
     "thirdPartyLicenses": "Licencias de terceros",

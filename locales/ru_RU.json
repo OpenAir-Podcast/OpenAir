@@ -328,6 +328,8 @@
     "reportABug": "Сообщить об ошибке",
     "suggestAFeature": "Предложить функцию",
     "version": "Версия",
+    "sleepTimer": "Таймер сна",
+    "cancelTimer": "Отменить таймер",
     "sourceCode": "Исходный код",
     "licenses": "Лицензии",
     "thirdPartyLicenses": "Сторонние лицензии",

@@ -328,6 +328,8 @@
     "reportABug": "バグを報告",
     "suggestAFeature": "機能を提案",
     "version": "バージョン",
+    "sleepTimer": "スリープタイマー",
+    "cancelTimer": "タイマーをキャンセル",
     "sourceCode": "ソースコード",
     "licenses": "ライセンス",
     "thirdPartyLicenses": "サードパーティライセンス",

@@ -328,6 +328,8 @@
     "reportABug": "Segnala un bug",
     "suggestAFeature": "Suggerisci una funzionalità",
     "version": "Versione",
+    "sleepTimer": "Timer di sospensione",
+    "cancelTimer": "Annulla timer",
     "sourceCode": "Codice sorgente",
     "licenses": "Licenze",
     "thirdPartyLicenses": "Licenze di terze parti",
