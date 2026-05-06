@@ -25,7 +25,7 @@ import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/nav_pages/downloads_page.dart';
+
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
@@ -38,31 +38,26 @@ final hiveServiceProvider = Provider<HiveService>(
   (ref) => HiveService(ref),
 );
 
-final subscriptionsProvider =
-    FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.subscriptionBox;
-
-  // Emit the initial state
-  return await box.getAllValues();
+final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getSubscriptions();
 });
 
 final getQueueProvider = FutureProvider.autoDispose((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.queueBox;
-
-  return await box.getAllValues();
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getQueue();
 });
 
-final sortedDownloadsProvider = FutureProvider.autoDispose<List<DownloadModel>>(
-  (ref) async {
-    final hiveService = ref.watch(hiveServiceProvider);
-    return hiveService.getSortedDownloads();
-  },
-);
+final getDownloadsProvider =
+    FutureProvider.autoDispose<List<DownloadModel>>((ref) async {
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getDownloads();
+});
+
+// Removed sortedDownloadsProvider - use getDownloadsProvider instead
 
 final getFavoriteProvider = FutureProvider.autoDispose((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
+  final hiveService = ref.read(hiveServiceProvider);
   return await hiveService.getFavoriteEpisodes();
 });
 
@@ -449,7 +444,8 @@ class HiveService {
 
   Future<Map<String, SubscriptionModel>> getSubscriptions() async {
     final box = await subscriptionBox;
-    return box.getAllValues();
+    final values = await box.getAllValues();
+    return values.map((key, value) => MapEntry(key.toString(), value));
   }
 
   Future<SubscriptionModel?> getSubscription(String title) async {
@@ -681,11 +677,11 @@ class HiveService {
     final filteredFeedItems = <String, FeedModel>{};
 
     for (final entry in allFeedItems.entries) {
-      final episode = await episodeBox.get(entry.key);
+      final episode = await episodeBox.get(entry.key.toString());
       if (episode != null) {
         final podcastTitle = episode['podcast']?['title'] ?? episode['author'];
         if (podcastTitle != null && subscriptions.containsKey(podcastTitle)) {
-          filteredFeedItems[entry.key] = entry.value;
+          filteredFeedItems[entry.key.toString()] = entry.value;
         }
       }
     }
@@ -797,9 +793,10 @@ class HiveService {
     await box.put(download.guid, download);
   }
 
-  Future<Map<String, DownloadModel>> getDownloads() async {
+  Future<List<DownloadModel>> getDownloads() async {
     final box = await downloadBox;
-    return box.getAllValues();
+    final values = await box.getAllValues();
+    return values.values.cast<DownloadModel>().toList();
   }
 
   Future<List<DownloadModel>> getSortedDownloads() async {

@@ -10,12 +10,6 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
-final getDownloadsProvider =
-    FutureProvider.autoDispose<List<DownloadModel>>((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return hiveService.getSortedDownloads();
-});
-
 class DownloadsPage extends ConsumerStatefulWidget {
   const DownloadsPage({super.key});
 

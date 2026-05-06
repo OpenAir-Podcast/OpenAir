@@ -320,7 +320,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   }
 
   Widget _buildDownloadButton(BuildContext context, WidgetRef ref) {
-    final downloadedListProvider = ref.watch(sortedDownloadsProvider);
+    final downloadedListProvider = ref.watch(getDownloadsProvider);
 
     return downloadedListProvider.when(
       data: (downloads) {
@@ -433,7 +433,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                 await ref
                     .read(audioProvider.notifier)
                     .removeDownload(widget.episodeItem);
-                ref.invalidate(sortedDownloadsProvider);
+                ref.invalidate(getDownloadsProvider);
               },
             ),
           ],

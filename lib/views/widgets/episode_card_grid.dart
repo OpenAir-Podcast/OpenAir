@@ -53,7 +53,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListProvider =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
@@ -386,7 +386,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                               }
 
                                               ref.invalidate(
-                                                  sortedDownloadsProvider);
+                                                  getDownloadsProvider);
                                             },
                                           ),
                                         ],

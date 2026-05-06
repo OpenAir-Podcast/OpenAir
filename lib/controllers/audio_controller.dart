@@ -17,7 +17,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/audio_handler.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/nav_pages/downloads_page.dart';
+
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/history_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
@@ -310,7 +310,7 @@ class AudioController extends ChangeNotifier {
       );
 
       await hiveService.addToDownloads(downloadModel);
-      ref.invalidate(sortedDownloadsProvider);
+      ref.invalidate(getDownloadsProvider);
       ref.invalidate(downloadsCountProvider);
       ref.invalidate(getDownloadsProvider);
     } catch (e) {
@@ -354,7 +354,7 @@ class AudioController extends ChangeNotifier {
       final hiveService = ref.read(hiveServiceProvider);
       await hiveService.clearDownloads();
       ref.invalidate(getDownloadsProvider);
-      ref.invalidate(sortedDownloadsProvider);
+      ref.invalidate(getDownloadsProvider);
       ref.invalidate(downloadsCountProvider);
       notifyListeners();
     } catch (e) {

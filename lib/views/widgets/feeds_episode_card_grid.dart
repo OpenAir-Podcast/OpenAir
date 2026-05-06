@@ -51,7 +51,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     return GestureDetector(
       onTap: () {
@@ -392,7 +392,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                                                 }
 
                                                 ref.invalidate(
-                                                    sortedDownloadsProvider);
+                                                    getDownloadsProvider);
                                               },
                                             ),
                                           ],
