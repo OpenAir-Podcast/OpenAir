@@ -169,7 +169,8 @@ class AudioController extends ChangeNotifier {
       loadState = 'Play';
       nextEpisode = currentEpisode;
 
-      await addToHistory(currentEpisode!, currentPodcast);
+      await addToHistory(currentEpisode!, currentPodcast,
+          author: currentPodcast?.author);
       notifyListeners();
     } on TimeoutException {
       _handlePlaybackError();
@@ -361,33 +362,40 @@ class AudioController extends ChangeNotifier {
     }
   }
 
-  Future<void> addToHistory(
-      Map<String, dynamic> episode, PodcastModel? podcast) async {
+  Future<void> addToHistory(Map<String, dynamic> episode, PodcastModel? podcast,
+      {String? author}) async {
     final String downloadSize = getEpisodeSize(episode['enclosureLength']);
     String historyPodcastId;
     String historyPodcastImage;
-    String? historyPodcastAuthor;
+    String? historyPodcastAuthor = author;
 
-    if (podcast != null) {
-      historyPodcastId = podcast.id.toString();
-      historyPodcastImage = podcast.imageUrl;
-      historyPodcastAuthor = podcast.author ?? episode['author'] ?? 'Unknown';
-    } else {
-      historyPodcastId = episode['podcastId']?.toString() ?? '-1';
-      historyPodcastImage = episode['image'] ?? '';
-      historyPodcastAuthor =
-          episode['author'] ?? episode['podcastTitle'] ?? 'Unknown';
-    }
+    if (historyPodcastAuthor == null) {
+      if (podcast != null) {
+        historyPodcastId = podcast.id.toString();
+        historyPodcastImage = podcast.imageUrl;
+        historyPodcastAuthor = podcast.author ?? episode['author'] ?? 'Unknown';
+      } else {
+        historyPodcastId = episode['podcastId']?.toString() ?? '-1';
+        historyPodcastImage = episode['image'] ?? '';
+        historyPodcastAuthor =
+            episode['author'] ?? episode['podcastTitle'] ?? 'Unknown';
+      }
 
-    // Try to get author from subscriptions if still unknown
-    if (historyPodcastAuthor == 'Unknown' && historyPodcastId != '-1') {
-      final subs = await ref.read(hiveServiceProvider).getSubscriptions();
-      for (final entry in subs.entries) {
-        if (entry.value.id.toString() == historyPodcastId) {
-          historyPodcastAuthor = entry.value.author ?? 'Unknown';
-          break;
+      // Try to get author from subscriptions if still unknown
+      if (historyPodcastAuthor == 'Unknown' && historyPodcastId != '-1') {
+        final subs = await ref.read(hiveServiceProvider).getSubscriptions();
+        for (final entry in subs.entries) {
+          if (entry.value.id.toString() == historyPodcastId) {
+            historyPodcastAuthor = entry.value.author ?? 'Unknown';
+            break;
+          }
         }
       }
+    } else {
+      historyPodcastId =
+          podcast?.id.toString() ?? episode['podcastId']?.toString() ?? '-1';
+      historyPodcastImage =
+          podcast?.imageUrl ?? episode['image'] ?? episode['feedImage'] ?? '';
     }
 
     final HistoryModel historyMod = HistoryModel(
@@ -924,7 +932,8 @@ class AudioController extends ChangeNotifier {
     loadState = 'Play';
     nextEpisode = currentEpisode;
 
-    await addToHistory(currentEpisode!, currentPodcast);
+    await addToHistory(currentEpisode!, currentPodcast,
+        author: currentEpisode!['author'] ?? currentPodcast?.author);
     notifyListeners();
   }
 
