@@ -205,6 +205,9 @@ class _SubscribeButton extends ConsumerWidget {
       audioController.subscribe(podcast, context);
     }
 
+    // Invalidate the provider to refresh the UI
+    ref.invalidate(isSubscribedProvider(podcast.title));
+
     final msg = isSubscribed
         ? '${Translations.of(context).text('unsubscribedFrom')} ${podcast.title}'
         : '${Translations.of(context).text('subscribedTo')} ${podcast.title}';

@@ -10,6 +10,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
+import 'package:openair/providers/subscription_providers.dart';
 
 final categoryDataProvider = FutureProvider.family
     .autoDispose<FetchDataModel, String>((ref, apiKey) async {
@@ -169,26 +170,31 @@ class _PodcastListTile extends ConsumerWidget {
                   ],
                 ),
               ),
-              FutureBuilder<bool>(
-                future: ref.watch(openAirProvider).isSubscribed(podcast.title),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const SizedBox.shrink();
+              Consumer(
+                builder: (context, ref, _) {
+                  final isSubscribedAsync =
+                      ref.watch(isSubscribedProvider(podcast.title));
 
-                  return IconButton(
-                    icon: Icon(
-                      snapshot.data!
-                          ? Icons.check_circle
-                          : Icons.add_circle_outline,
-                      color: snapshot.data! ? theme.primaryColor : null,
+                  return isSubscribedAsync.when(
+                    data: (isSubscribed) => IconButton(
+                      icon: Icon(
+                        isSubscribed
+                            ? Icons.check_circle
+                            : Icons.add_circle_outline,
+                        color: isSubscribed ? theme.primaryColor : null,
+                      ),
+                      onPressed: () async {
+                        if (isSubscribed) {
+                          ref.read(audioProvider).unsubscribe(podcast);
+                        } else {
+                          ref.read(audioProvider).subscribe(podcast, context);
+                        }
+                        ref.invalidate(categoryDataProvider(apiKey));
+                        ref.invalidate(isSubscribedProvider(podcast.title));
+                      },
                     ),
-                    onPressed: () async {
-                      if (snapshot.data!) {
-                        ref.read(audioProvider).unsubscribe(podcast);
-                      } else {
-                        ref.read(audioProvider).subscribe(podcast, context);
-                      }
-                      ref.invalidate(categoryDataProvider(apiKey));
-                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
                   );
                 },
               ),
