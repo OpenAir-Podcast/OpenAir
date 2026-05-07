@@ -27,7 +27,7 @@ class EpisodesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final podCastUrl = ref.watch(audioProvider).currentPodcast!.feedUrl;
     final podCastDataAsync = ref.watch(podCastDataByUrlProvider(podCastUrl));
-    final podCastInfoAsync =
+    final podcastInfoAsync =
         ref.watch(getPodcastInfoByTitleProvider(podcast.title));
     final isSubscribedAsync = ref.watch(isSubscribedProvider(podcast.title));
 
@@ -44,8 +44,10 @@ class EpisodesPage extends ConsumerWidget {
                 ref.invalidate(podCastDataByUrlProvider(podCastUrl))),
       ),
       data: (snapshot) {
-        return podCastInfoAsync.when(
-          data: (data) {
+        return podcastInfoAsync.when(
+          data: (podcastInfoData) {
+            podcast.author = podcastInfoData['author'];
+
             return isSubscribedAsync.when(
               data: (isSubscribed) {
                 return Scaffold(
@@ -67,7 +69,7 @@ class EpisodesPage extends ConsumerWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  PodcastInfoPage(podcastInfo: data),
+                                  PodcastInfoPage(podcastInfo: podcastInfoData),
                             ),
                           );
                         },
@@ -79,7 +81,8 @@ class EpisodesPage extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  body: _buildEpisodeList(context, ref, snapshot, data),
+                  body: _buildEpisodeList(
+                      context, ref, snapshot, podcastInfoData),
                   bottomNavigationBar: _buildBottomBar(context, ref),
                 );
               },
@@ -133,7 +136,7 @@ class EpisodesPage extends ConsumerWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodeCount,
       itemBuilder: (context, index) {
-        final author = (podCastInfo?['author']?.isNotEmpty == true ||
+        String author = (podCastInfo?['author']?.isNotEmpty == true ||
                 podcast.author?.isNotEmpty == true)
             ? (podCastInfo?['author'] ?? podcast.author!)
             : Translations.of(context).text('unknown');
