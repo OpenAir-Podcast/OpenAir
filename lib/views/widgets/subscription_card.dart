@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/subscriptions_episodes_page.dart';
 
@@ -42,14 +43,24 @@ class SubscriptionCard extends ConsumerWidget {
           onTap: isSelectionMode
               ? onToggleSelection
               : () {
+                  final sub = subs[index];
                   ref.read(audioProvider.notifier).currentPodcast =
-                      PodcastModel.fromJson(subs[index].toJson());
+                      PodcastModel.fromJson(sub.toJson());
+
+                  final countData = data[title] ?? {};
+                  final total = countData['totalEpisodes'] as int? ?? 0;
+
+                  if (total > sub.episodeCount) {
+                    sub.episodeCount = total;
+                    ref.read(hiveServiceProvider).subscribe(sub);
+                    ref.invalidate(subscriptionsWithCountsProvider);
+                  }
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => SubscriptionsEpisodesPage(
-                        podcast: PodcastModel.fromJson(subs[index].toJson()),
-                        id: subs[index].id,
+                        podcast: PodcastModel.fromJson(sub.toJson()),
+                        id: sub.id,
                       ),
                     ),
                   );
