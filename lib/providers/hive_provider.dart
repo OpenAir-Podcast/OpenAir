@@ -681,7 +681,9 @@ class HiveService {
     for (final entry in allFeedItems.entries) {
       final episode = await episodeBox.get(entry.key.toString());
       if (episode != null) {
-        final podcastTitle = episode['podcast']?['title'] ?? episode['author'];
+        final podcastTitle = episode['podcast']?['title'] ??
+            episode['podcastTitle'] ??
+            episode['author'];
         if (podcastTitle != null && subscriptions.containsKey(podcastTitle)) {
           filteredFeedItems[entry.key.toString()] = entry.value;
         }
