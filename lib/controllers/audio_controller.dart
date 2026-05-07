@@ -76,6 +76,39 @@ class AudioController extends ChangeNotifier {
 
   List downloadingPodcasts = [];
 
+  Timer? _sleepTimer;
+  int? _sleepTimerMinutes;
+  int? _remainingSeconds;
+
+  int? get sleepTimerMinutes => _sleepTimerMinutes;
+  int? get remainingSeconds => _remainingSeconds;
+  bool get isSleepTimerActive => _sleepTimerMinutes != null;
+
+  void startSleepTimer(int minutes) {
+    _sleepTimer?.cancel();
+    _sleepTimerMinutes = minutes;
+    _remainingSeconds = minutes * 60;
+    notifyListeners();
+
+    _sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _remainingSeconds = _remainingSeconds! - 1;
+      if (_remainingSeconds! <= 0) {
+        timer.cancel();
+        _sleepTimerMinutes = null;
+        _remainingSeconds = null;
+        pausePlayback();
+      }
+      notifyListeners();
+    });
+  }
+
+  void cancelSleepTimer() {
+    _sleepTimer?.cancel();
+    _sleepTimerMinutes = null;
+    _remainingSeconds = null;
+    notifyListeners();
+  }
+
   Icon getDownloadIcon(DownloadStatus downloadStatus) {
     Icon icon;
     switch (downloadStatus) {

@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'dart:async';
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
- 
+
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
 
@@ -23,48 +23,19 @@ class MainPlayer extends ConsumerStatefulWidget {
 class MainPlayerState extends ConsumerState<MainPlayer> {
   final double imageSize = 250.0;
 
-  Timer? _sleepTimer;
-  int? _sleepTimerMinutes;
-  int? _remainingSeconds;
-
-  @override
-  void dispose() {
-    _sleepTimer?.cancel();
-    super.dispose();
-  }
-
   void _startSleepTimer(int minutes) {
-    _sleepTimer?.cancel();
-    setState(() {
-      _sleepTimerMinutes = minutes;
-      _remainingSeconds = minutes * 60;
-    });
-
-    _sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _remainingSeconds = _remainingSeconds! - 1;
-        if (_remainingSeconds! <= 0) {
-          timer.cancel();
-          _sleepTimerMinutes = null;
-          _remainingSeconds = null;
-          ref.read(audioProvider).audioHandler.pause();
-        }
-      });
-    });
+    ref.read(audioProvider).startSleepTimer(minutes);
   }
 
   void _cancelSleepTimer() {
-    _sleepTimer?.cancel();
-    setState(() {
-      _sleepTimerMinutes = null;
-      _remainingSeconds = null;
-    });
+    ref.read(audioProvider).cancelSleepTimer();
   }
 
   String _formatRemainingTime() {
-    if (_remainingSeconds == null) return '';
-    final minutes = _remainingSeconds! ~/ 60;
-    final seconds = _remainingSeconds! % 60;
+    final remainingSeconds = ref.read(audioProvider).remainingSeconds;
+    if (remainingSeconds == null) return '';
+    final minutes = remainingSeconds ~/ 60;
+    final seconds = remainingSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
@@ -118,7 +89,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 _startSleepTimer(120);
               },
             ),
-            if (_sleepTimerMinutes != null)
+            if (ref.read(audioProvider).isSleepTimerActive)
               ListTile(
                 title: Text(
                   Translations.of(context).text('cancelTimer'),
@@ -404,7 +375,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             ),
                           ),
                           IconButton(
-                            icon: _sleepTimerMinutes != null
+                            icon: audioState.isSleepTimerActive
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -414,7 +385,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        '$_sleepTimerMinutes',
+                                        '${audioState.sleepTimerMinutes}',
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -423,7 +394,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                     ],
                                   )
                                 : const Icon(Icons.timer_outlined),
-                            tooltip: _sleepTimerMinutes != null
+                            tooltip: audioState.isSleepTimerActive
                                 ? '${_formatRemainingTime()} - Tap to change'
                                 : Translations.of(context).text('sleepTimer'),
                             onPressed: _showTimerDialog,
