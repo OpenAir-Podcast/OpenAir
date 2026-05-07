@@ -97,7 +97,9 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                       }
 
                       final podcast = PodcastModel(
-                        id: episodeData['podcastId'] ?? -1,
+                        id: int.tryParse(
+                                episodeData['podcastId']?.toString() ?? '') ??
+                            -1,
                         title: episodeData['podcastTitle'] ??
                             episodeData['title'] ??
                             '',
