@@ -1210,33 +1210,26 @@ class HiveService {
 
   Future<String> feedsCount() async {
     final box = await episodeBox;
-    final Map<String, Map> allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result.toString();
+    final keys = await box.getAllKeys();
+    return keys.length.toString();
   }
 
   Future<int> getNewInboxCount() async {
     final box = await feedBox;
-    final Map<String, FeedModel> allFeeds = await box.getAllValues();
-
-    return allFeeds.length;
+    final keys = await box.getAllKeys();
+    return keys.length;
   }
 
   Future<String> queueCount() async {
     final box = await queueBox;
-    final Map allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result.toString();
+    final keys = await box.getAllKeys();
+    return keys.length.toString();
   }
 
   Future<int> downloadsCount() async {
     final box = await downloadBox;
-    final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result;
+    final keys = await box.getAllKeys();
+    return keys.length;
   }
 
   Future<int> getAccumulatedEpisodes() async {

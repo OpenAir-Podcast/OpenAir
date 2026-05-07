@@ -2,6 +2,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
@@ -16,8 +17,9 @@ import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
 
+// Legacy providers kept for backward compatibility
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
-  final hiveService = ref.watch(openAirProvider).hiveService;
+  final hiveService = ref.read(openAirProvider).hiveService;
   var episodes = await hiveService.getNewEpisodesCount();
 
   if (episodes != -1) {
@@ -43,6 +45,35 @@ final downloadsCountProvider = FutureProvider.autoDispose<int>((ref) async {
   return await ref.read(openAirProvider).getDownloadsCount();
 });
 
+final drawerCountsProvider =
+    FutureProvider.autoDispose<DrawerCounts>((ref) async {
+  final openAir = ref.read(openAirProvider);
+  final hiveService = openAir.hiveService;
+
+  final results = await Future.wait([
+    hiveService.getNewEpisodesCount(),
+    hiveService.feedsCount(),
+    hiveService.getNewInboxCount(),
+    hiveService.queueCount(),
+    hiveService.downloadsCount(),
+  ]);
+
+  String subCount;
+  if (results[0] != -1) {
+    subCount = (results[0] as int).toString();
+  } else {
+    subCount = await openAir.getAccumulatedSubscriptionCount();
+  }
+
+  return DrawerCounts(
+    subscriptions: subCount,
+    feeds: results[1] as String,
+    inbox: (results[2] as int).toString(),
+    queue: results[3] as String,
+    downloads: (results[4] as int).toString(),
+  );
+});
+
 class ListDrawer extends ConsumerStatefulWidget {
   const ListDrawer({
     super.key,
@@ -55,12 +86,8 @@ class ListDrawer extends ConsumerStatefulWidget {
 class _ListDrawerState extends ConsumerState<ListDrawer> {
   @override
   Widget build(BuildContext context) {
-    ref.watch(localeProvider); // Ensure rebuild on language change
-    final getSubCountValue = ref.watch(subCountProvider);
-    final getFeedsCountValue = ref.watch(feedCountProvider);
-    final getInboxCountValue = ref.watch(inboxCountProvider);
-    final getQueueCountValue = ref.watch(queueCountProvider);
-    final getDownloadsCountValue = ref.watch(downloadsCountProvider);
+    ref.watch(localeProvider);
+    final drawerCounts = ref.watch(drawerCountsProvider);
 
     final supabaseService = ref.watch(supabaseServiceProvider);
     final session = supabaseService.client.auth.currentUser;
@@ -130,7 +157,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   context,
                   Icons.subscriptions_rounded,
                   Translations.of(context).text('subscriptions'),
-                  getSubCountValue,
+                  drawerCounts,
+                  (c) => c.subscriptions,
                   () => _navigateTo(const SubscriptionsPage()),
                 ),
                 const Divider(),
@@ -138,7 +166,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   context,
                   Icons.feed_rounded,
                   Translations.of(context).text('feeds'),
-                  getFeedsCountValue,
+                  drawerCounts,
+                  (c) => c.feeds,
                   () => _navigateTo(const FeedsPage()),
                 ),
                 const Divider(),
@@ -146,7 +175,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   context,
                   Icons.inbox_rounded,
                   Translations.of(context).text('inbox'),
-                  getInboxCountValue,
+                  drawerCounts,
+                  (c) => c.inbox,
                   () => _navigateTo(const InboxPage()),
                 ),
                 const Divider(),
@@ -154,7 +184,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   context,
                   Icons.queue_rounded,
                   Translations.of(context).text('queue'),
-                  getQueueCountValue,
+                  drawerCounts,
+                  (c) => c.queue,
                   () => _navigateTo(const QueuePage()),
                 ),
                 const Divider(),
@@ -162,7 +193,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   context,
                   Icons.download_rounded,
                   Translations.of(context).text('downloads'),
-                  getDownloadsCountValue,
+                  drawerCounts,
+                  (c) => c.downloads,
                   () => _navigateTo(const DownloadsPage()),
                 ),
                 const Divider(),
@@ -200,10 +232,11 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
     BuildContext context,
     IconData icon,
     String title,
-    AsyncValue<dynamic> countValue,
+    AsyncValue<DrawerCounts> drawerCounts,
+    String Function(DrawerCounts) selector,
     VoidCallback onTap,
   ) {
-    return countValue.when(
+    return drawerCounts.when(
       loading: () => ListTile(
         leading: Icon(icon),
         title: Text(title),
@@ -223,7 +256,7 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
         leading: Icon(icon),
         title: Text(title),
         trailing: Text(
-          data.toString(),
+          selector(data),
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
