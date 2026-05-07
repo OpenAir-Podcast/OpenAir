@@ -97,13 +97,21 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                       }
 
                       final podcast = PodcastModel(
-                        id: episodeData['id'] ?? -1,
-                        title: episodeData['title'] ?? '',
-                        author: episodeData['author'] ?? '',
+                        id: episodeData['podcastId'] ?? -1,
+                        title: episodeData['podcastTitle'] ??
+                            episodeData['title'] ??
+                            '',
+                        author: episodeData['author'] ??
+                            episodeData['feedAuthor'] ??
+                            '',
                         feedUrl: episodeData['feedUrl'] ?? '',
-                        imageUrl: episodeData['image'] ?? '',
+                        imageUrl: episodeData['image'] ??
+                            episodeData['feedImage'] ??
+                            '',
                         description: episodeData['description'] ?? '',
-                        artwork: episodeData['image'] ?? '',
+                        artwork: episodeData['image'] ??
+                            episodeData['feedImage'] ??
+                            '',
                       );
 
                       return GestureDetector(
@@ -123,6 +131,7 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                           podcast: podcast,
                           title: episodeData['title'] ?? '',
                           author: episodeData['author'] ??
+                              episodeData['feedAuthor'] ??
                               Translations.of(context).text('unknown'),
                           showAuthor: true,
                         ),

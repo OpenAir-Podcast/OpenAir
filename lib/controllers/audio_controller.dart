@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
@@ -20,6 +21,7 @@ import 'package:openair/services/podcast_index_service.dart';
 
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/history_page.dart';
+import 'package:openair/views/nav_pages/inbox_page.dart';
 import 'package:openair/views/nav_pages/queue_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:opml/opml.dart';
@@ -509,10 +511,11 @@ class AudioController extends ChangeNotifier {
     final hiveService = ref.read(hiveServiceProvider);
 
     for (int i = 0; i < episodes['count']; i++) {
+      final guid = episodes['items'][i]['guid'];
       final episode = {
         'podcastId': podcast.id.toString(),
         'podcastTitle': podcast.title,
-        'guid': episodes['items'][i]['guid'],
+        'guid': guid,
         'title': episodes['items'][i]['title'],
         'author': podcast.author,
         'image': episodes['items'][i]['feedImage'],
@@ -533,10 +536,13 @@ class AudioController extends ChangeNotifier {
           'description': podcast.description,
         },
       };
-      await hiveService.insertEpisode(episode, episode['guid']);
+      await hiveService.insertEpisode(episode, guid);
+      await hiveService.addToFeed(FeedModel(guid: guid));
     }
 
     ref.invalidate(feedCountProvider);
+    ref.invalidate(getInboxProvider);
+    ref.invalidate(inboxCountProvider);
     notifyListeners();
   }
 
