@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
@@ -50,12 +51,7 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
   Widget build(BuildContext context) {
     ref.watch(localeProvider);
 
-    final getSubCountValue = ref.watch(subCountProvider);
-    final getFeedsCountValue = ref.watch(feedCountProvider);
-    final getInboxCountValue = ref.watch(inboxCountProvider);
-    final getQueueCountValue = ref.watch(queueCountProvider);
-    final getDownloadsCountValue = ref.watch(downloadsCountProvider);
-
+    final drawerCounts = ref.watch(drawerCountsProvider);
     final session = ref.watch(getSessionProvider);
     final supabaseService = ref.watch(supabaseServiceProvider);
 
@@ -118,93 +114,34 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                 },
               ),
               const Divider(),
-              getSubCountValue.when(
-                loading: () => ListTile(
-                  leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(
-                    Translations.of(context).text('subscriptions'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: const Text('...'),
-                ),
-                error: (error, stackTrace) => ListTile(
-                  leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(
-                    Translations.of(context).text('subscriptions'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: ElevatedButton(
-                    child: const Text('Retry'),
-                    onPressed: () => ref.invalidate(subCountProvider),
-                  ),
-                ),
-                data: (data) => ListTile(
-                  leading: const Icon(Icons.subscriptions_rounded),
-                  title: Text(
-                    Translations.of(context).text('subscriptions'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: Text(data),
-                  onTap: () {
-                    widget.onPageSelected(SubscriptionsPage());
-                  },
-                ),
+              _buildDrawerCountTile(
+                drawerCounts,
+                Icons.subscriptions_rounded,
+                Translations.of(context).text('subscriptions'),
+                (c) => c.subscriptions,
+                () => widget.onPageSelected(SubscriptionsPage()),
+                onRetry: () => ref.invalidate(subCountProvider),
               ),
               const Divider(),
-              getFeedsCountValue.when(
-                loading: () => ListTile(
-                  leading: const Icon(Icons.feed_rounded),
-                  title: Text(Translations.of(context).text('feeds')),
-                  trailing: const Text('...'),
-                ),
-                error: (error, stackTrace) => ListTile(
-                  leading: const Icon(Icons.feed_rounded),
-                  title: Text(Translations.of(context).text('feeds')),
-                  trailing: ElevatedButton(
-                    child: const Text('Retry'),
-                    onPressed: () => ref.invalidate(feedCountProvider),
-                  ),
-                ),
-                data: (data) => ListTile(
-                  leading: const Icon(Icons.feed_rounded),
-                  title: Text(Translations.of(context).text('feeds')),
-                  trailing: Text(data),
-                  onTap: () {
-                    ref.invalidate(feedCountProvider);
-                    ref.invalidate(getSubscribedEpisodesProvider);
-                    widget.onPageSelected(FeedsPage());
-                  },
-                ),
+              _buildDrawerCountTile(
+                drawerCounts,
+                Icons.feed_rounded,
+                Translations.of(context).text('feeds'),
+                (c) => c.feeds,
+                () {
+                  ref.invalidate(getSubscribedEpisodesProvider);
+                  widget.onPageSelected(FeedsPage());
+                },
+                onRetry: () => ref.invalidate(feedCountProvider),
               ),
               const Divider(),
-              getInboxCountValue.when(
-                loading: () => ListTile(
-                  leading: const Icon(Icons.inbox_rounded),
-                  title: Text(Translations.of(context).text('inbox')),
-                  trailing: const Text('...'),
-                ),
-                error: (error, stackTrace) => ListTile(
-                  leading: const Icon(Icons.inbox_rounded),
-                  title: Text(Translations.of(context).text('inbox')),
-                  trailing: ElevatedButton(
-                    child: const Text('Retry'),
-                    onPressed: () => ref.invalidate(inboxCountProvider),
-                  ),
-                ),
-                data: (data) => ListTile(
-                  leading: const Icon(Icons.inbox_rounded),
-                  title: Text(Translations.of(context).text('inbox')),
-                  trailing: Text('$data'),
-                  onTap: () {
-                    widget.onPageSelected(InboxPage());
-                  },
-                ),
+              _buildDrawerCountTile(
+                drawerCounts,
+                Icons.inbox_rounded,
+                Translations.of(context).text('inbox'),
+                (c) => c.inbox,
+                () => widget.onPageSelected(InboxPage()),
+                onRetry: () => ref.invalidate(inboxCountProvider),
               ),
               const Divider(),
               ListTile(
@@ -218,69 +155,25 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
                 },
               ),
               const Divider(),
-              getQueueCountValue.when(
-                loading: () => ListTile(
-                  leading: const Icon(Icons.queue_music_rounded),
-                  title: Text(Translations.of(context).text('queue')),
-                  trailing: const Text('...'),
-                ),
-                error: (error, stackTrace) => ListTile(
-                  leading: const Icon(Icons.queue_music_rounded),
-                  title: Text(Translations.of(context).text('queue')),
-                  trailing: ElevatedButton(
-                    child: const Text('Retry'),
-                    onPressed: () => ref.invalidate(queueCountProvider),
-                  ),
-                ),
-                data: (data) => ListTile(
-                  leading: const Icon(Icons.queue_music_rounded),
-                  title: Text(Translations.of(context).text('queue')),
-                  trailing: Text(data),
-                  onTap: () {
-                    ref.invalidate(queueCountProvider);
-                    ref.invalidate(sortedProvider);
-                    widget.onPageSelected(QueuePage());
-                  },
-                ),
+              _buildDrawerCountTile(
+                drawerCounts,
+                Icons.queue_music_rounded,
+                Translations.of(context).text('queue'),
+                (c) => c.queue,
+                () {
+                  ref.invalidate(sortedProvider);
+                  widget.onPageSelected(QueuePage());
+                },
+                onRetry: () => ref.invalidate(queueCountProvider),
               ),
               const Divider(),
-              getDownloadsCountValue.when(
-                loading: () => ListTile(
-                  leading: const Icon(Icons.download_rounded),
-                  title: Text(
-                    Translations.of(context).text('downloads'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: const Text('...'),
-                ),
-                error: (error, stackTrace) => ListTile(
-                  leading: const Icon(Icons.download_rounded),
-                  title: Text(
-                    Translations.of(context).text('downloads'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: ElevatedButton(
-                    child: const Text('Retry'),
-                    onPressed: () => ref.invalidate(downloadsCountProvider),
-                  ),
-                ),
-                data: (data) => ListTile(
-                  leading: const Icon(Icons.download_rounded),
-                  title: Text(
-                    Translations.of(context).text('downloads'),
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  trailing: Text(data.toString()),
-                  onTap: () {
-                    widget.onPageSelected(DownloadsPage());
-                  },
-                ),
+              _buildDrawerCountTile(
+                drawerCounts,
+                Icons.download_rounded,
+                Translations.of(context).text('downloads'),
+                (c) => c.downloads,
+                () => widget.onPageSelected(DownloadsPage()),
+                onRetry: () => ref.invalidate(downloadsCountProvider),
               ),
               const Divider(),
               ListTile(
@@ -317,6 +210,40 @@ class __WideDrawerState extends ConsumerState<WideDrawer> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildDrawerCountTile(
+    AsyncValue<DrawerCounts> counts,
+    IconData icon,
+    String title,
+    String Function(DrawerCounts) selector,
+    VoidCallback onTap, {
+    VoidCallback? onRetry,
+  }) {
+    return counts.when(
+      loading: () => ListTile(
+        leading: Icon(icon),
+        title: Text(title,
+            style: const TextStyle(overflow: TextOverflow.ellipsis)),
+        trailing: const Text('...'),
+      ),
+      error: (_, __) => ListTile(
+        leading: Icon(icon),
+        title: Text(title,
+            style: const TextStyle(overflow: TextOverflow.ellipsis)),
+        trailing: onRetry != null
+            ? ElevatedButton(onPressed: onRetry, child: const Text('Retry'))
+            : const Icon(Icons.error_outline),
+        onTap: onRetry,
+      ),
+      data: (data) => ListTile(
+        leading: Icon(icon),
+        title: Text(title,
+            style: const TextStyle(overflow: TextOverflow.ellipsis)),
+        trailing: Text(selector(data)),
+        onTap: onTap,
+      ),
     );
   }
 }
