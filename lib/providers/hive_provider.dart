@@ -607,7 +607,9 @@ class HiveService {
     Map<String, Map> episodes = await box.getAllValues();
 
     for (final episode in episodes.entries) {
-      if (episode.value['author'] == podcast.author) {
+      if (episode.value['feedUrl'] == podcast.feedUrl ||
+          episode.value['podcastTitle'] == podcast.title ||
+          episode.value['author'] == podcast.author) {
         await box.delete(episode.key);
         await feed.delete(episode.key);
       }

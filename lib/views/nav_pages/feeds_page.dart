@@ -81,10 +81,18 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                       : PodcastModel(
                           id: -1,
                           feedUrl: episodeItem['feedUrl'] ?? '',
-                          title: episodeItem['feedTitle'] ?? 'Unknown Podcast',
-                          author: episodeItem['author'] ?? 'Unknown Author',
-                          imageUrl: episodeItem['feedImage'] ?? '',
-                          artwork: episodeItem['feedImage'] ?? '',
+                          title: episodeItem['podcastTitle'] ??
+                              episodeItem['feedTitle'] ??
+                              'Unknown',
+                          author: episodeItem['author'] ??
+                              episodeItem['feedAuthor'] ??
+                              'Unknown Author',
+                          imageUrl: episodeItem['image'] ??
+                              episodeItem['feedImage'] ??
+                              '',
+                          artwork: episodeItem['image'] ??
+                              episodeItem['feedImage'] ??
+                              '',
                           description: '',
                         );
 
