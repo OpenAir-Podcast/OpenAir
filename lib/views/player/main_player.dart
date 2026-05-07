@@ -12,8 +12,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/views/main_pages/episodes_page.dart';
-import 'package:openair/views/nav_pages/queue_page.dart';
-
+ 
 class MainPlayer extends ConsumerStatefulWidget {
   const MainPlayer({super.key});
 
@@ -405,11 +404,6 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.share_rounded),
-                            tooltip: Translations.of(context).text('share'),
-                            onPressed: () => ref.watch(openAirProvider).share(),
-                          ),
-                          IconButton(
                             icon: _sleepTimerMinutes != null
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -477,16 +471,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.queue_music_rounded),
-                            tooltip: Translations.of(context).text('queue'),
-                            onPressed: () {
-                              // Navigate to queue page or show queue bottom sheet
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const QueuePage(),
-                                ),
-                              );
-                            },
+                            icon: const Icon(Icons.share_rounded),
+                            tooltip: Translations.of(context).text('share'),
+                            onPressed: () => ref.watch(openAirProvider).share(),
                           ),
                         ],
                       ),
