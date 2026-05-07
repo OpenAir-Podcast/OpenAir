@@ -523,6 +523,15 @@ class AudioController extends ChangeNotifier {
         'size': getEpisodeSize(episodes['items'][i]['enclosureLength']),
         'enclosureLength': episodes['items'][i]['enclosureLength'],
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
+        'podcast': {
+          'id': podcast.id,
+          'title': podcast.title,
+          'author': podcast.author,
+          'url': podcast.feedUrl,
+          'image': podcast.imageUrl,
+          'artwork': podcast.artwork,
+          'description': podcast.description,
+        },
       };
       await hiveService.insertEpisode(episode, episode['guid']);
     }

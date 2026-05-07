@@ -105,6 +105,7 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                         memCacheHeight: 144,
                         memCacheWidth: 144,
                         imageUrl: widget.episodeItem['feedImage'] ??
+                            widget.episodeItem['image'] ??
                             widget.podcast.imageUrl,
                         fit: BoxFit.cover,
                         errorWidget: (context, url, error) => Icon(
