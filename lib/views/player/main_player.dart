@@ -31,8 +31,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     ref.read(audioProvider).cancelSleepTimer();
   }
 
-  String _formatRemainingTime() {
-    final remainingSeconds = ref.read(audioProvider).remainingSeconds;
+  String _formatRemainingTime(int? remainingSeconds) {
     if (remainingSeconds == null) return '';
     final minutes = remainingSeconds ~/ 60;
     final seconds = remainingSeconds % 60;
@@ -42,66 +41,57 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
   void _showTimerDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(Translations.of(context).text('sleepTimer')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('15 min'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(15);
-              },
-            ),
-            ListTile(
-              title: const Text('30 min'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(30);
-              },
-            ),
-            ListTile(
-              title: const Text('45 min'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(45);
-              },
-            ),
-            ListTile(
-              title: const Text('1 hour'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(60);
-              },
-            ),
-            ListTile(
-              title: const Text('90 min'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(90);
-              },
-            ),
-            ListTile(
-              title: const Text('2 hours'),
-              onTap: () {
-                Navigator.pop(context);
-                _startSleepTimer(120);
-              },
-            ),
-            if (ref.read(audioProvider).isSleepTimerActive)
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('cancelTimer'),
-                  style: const TextStyle(color: Colors.red),
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final audioState = ref.watch(audioProvider);
+          
+          Widget buildTimerOption(int minutes, String label) {
+            final isActive = audioState.sleepTimerMinutes == minutes;
+            final theme = Theme.of(context);
+            return ListTile(
+              title: Text(
+                label,
+                style: TextStyle(
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                  color: isActive ? theme.colorScheme.primary : null,
                 ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _cancelSleepTimer();
-                },
               ),
-          ],
-        ),
+              trailing: isActive ? Icon(Icons.check, color: theme.colorScheme.primary) : null,
+              onTap: () {
+                Navigator.pop(context);
+                _startSleepTimer(minutes);
+              },
+            );
+          }
+
+          return AlertDialog(
+            title: Text(audioState.isSleepTimerActive
+                ? '${Translations.of(context).text('sleepTimer')} (${_formatRemainingTime(audioState.remainingSeconds)})'
+                : Translations.of(context).text('sleepTimer')),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildTimerOption(15, '15 min'),
+                buildTimerOption(30, '30 min'),
+                buildTimerOption(45, '45 min'),
+                buildTimerOption(60, '1 hour'),
+                buildTimerOption(90, '90 min'),
+                buildTimerOption(120, '2 hours'),
+                if (audioState.isSleepTimerActive)
+                  ListTile(
+                    title: Text(
+                      Translations.of(context).text('cancelTimer'),
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _cancelSleepTimer();
+                    },
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -385,7 +375,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        '${audioState.sleepTimerMinutes}',
+                                        _formatRemainingTime(audioState.remainingSeconds),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -395,7 +385,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                   )
                                 : const Icon(Icons.timer_outlined),
                             tooltip: audioState.isSleepTimerActive
-                                ? '${_formatRemainingTime()} - Tap to change'
+                                ? '${_formatRemainingTime(audioState.remainingSeconds)} - Tap to change'
                                 : Translations.of(context).text('sleepTimer'),
                             onPressed: _showTimerDialog,
                           ),

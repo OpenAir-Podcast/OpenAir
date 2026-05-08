@@ -1,13 +1,10 @@
-What's New ✨
-
-🎨 New Features
-• Sleep timer - Set a timer to automatically stop playback
-• Share button - Easily share episodes from the player controls
-• Queue navigation - Quick access to your playback queue from the player
-• Favorite button - Add episodes to favorites directly from the main player
-• Author information now displayed in downloads, favorites, and history
+What's New in v0.16.4 ✨
 
 🔧 Improvements
-• Improved feed management with clear feed option when no subscriptions exist
-• Enhanced layout in AddPodcastPage for better text alignment
-• Various UI improvements and bug fixes
+• Sleep timer now displays active status and live countdown in the menu and main player
+• Inbox page crash fixed - podcast ID type mismatch resolved
+• Feed page now correctly displays author names and episode images
+• New subscription episodes now appear in the inbox immediately
+• Unsubscribe cleanup improved to prevent orphaned episodes
+• Drawer navigation optimized with consolidated provider counts
+• Subscription badges clear when opening a podcast
