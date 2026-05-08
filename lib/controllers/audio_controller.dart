@@ -451,7 +451,9 @@ class AudioController extends ChangeNotifier {
 
     final hiveService = ref.read(hiveServiceProvider);
     await hiveService.addToHistory(historyMod);
+    await hiveService.deleteFromFeed(guid: episode['guid']);
     ref.invalidate(getHistoryProvider);
+    ref.invalidate(getInboxProvider);
   }
 
   Future<void> addToQueue(
