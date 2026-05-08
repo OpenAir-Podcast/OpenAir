@@ -1,6 +1,7 @@
-What's New in v0.16.5 ✨
+What's New in v0.16.6 ✨
 
 🔧 Improvements
+• Application theme now correctly updates when system brightness changes
 • Sleep timer now displays active status and live countdown in the menu and main player
 • Inbox page crash fixed - podcast ID type mismatch resolved
 • Feed page now correctly displays author names and episode images
