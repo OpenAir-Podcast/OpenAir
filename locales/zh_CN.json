@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "取消订阅播客",
     "confirmUnsubscribe": "确认取消订阅",
     "unsubscribeConfirmMsg": "您确定要取消订阅 {count} 个选中的播客吗？",
-    "unsubscribe": "取消订阅"
+    "unsubscribe": "取消订阅",
     "subscribeToPodcast": "订阅播客",
     "unsubscribedFrom": "已取消订阅",
     "subscribedTo": "已订阅",
@@ -509,10 +509,11 @@
     "appearance": "外观",
     "completion": "完成",
     "cleanup": "清理",
-    "opml": "OPML",
     "rssFeed": "RSS 订阅",
     "ok": "确定",
     "description": "描述",
-    "details": ""details": "详情"",
-    "selectAll": "Select All",
+    "details": "详情",
+    "syncing": "同步中...",
+    "syncComplete": "同步完成！",
+    "syncFailed": "同步失败："
 }

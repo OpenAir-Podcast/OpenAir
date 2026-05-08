@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "Säg upp prenumeration på podcast",
     "confirmUnsubscribe": "Bekräfta avprenumeration",
     "unsubscribeConfirmMsg": "Är du säker på att du vill avprenumerera {count} valda podcast(s)?",
-    "unsubscribe": "Avprenumerera"
+    "unsubscribe": "Avprenumerera",
     "subscribeToPodcast": "Prenumerera på podcast",
     "unsubscribedFrom": "Prenumeration uppsagd från",
     "subscribedTo": "Prenumererar på",
@@ -509,10 +509,12 @@
     "appearance": "Utseende",
     "completion": "Slutförande",
     "cleanup": "Rensning",
-    "opml": "OPML",
     "rssFeed": "RSS-flöde",
     "ok": "OK",
     "description": "Beskrivning",
-    "details": ""details": "Detaljer"",
-    "selectAll": "Select All",
+    "details": "Detaljer",
+    "syncing": "Synkroniserar...",
+    "syncComplete": "Synkronisering klar!",
+    "syncFailed": "Synkronisering misslyckades:",
+    "selectAll": "Välj alla"
 }

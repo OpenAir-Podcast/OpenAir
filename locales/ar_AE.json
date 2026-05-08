@@ -434,7 +434,7 @@
     "lastUpdate": "آخر تحديث",
     "sync": "مزامنة",
     "loginSuccess": "تم تسجيل الدخول بنجاح",
-   "animals": "حيوانات",
+    "animals": "حيوانات",
     "animation": "رسوم متحركة",
     "arts": "فنون",
     "astronomy": "علم الفلك",
@@ -513,5 +513,8 @@
     "ok": "موافق",
     "description": "الوصف",
     "details": "التفاصيل",
-    "selectAll": "Select All"
+    "syncing": "جارٍ المزامنة...",
+    "syncComplete": "اكتملت المزامنة!",
+    "syncFailed": "فشلت المزامنة:",
+    "selectAll": "الكل"
 }

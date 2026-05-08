@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "ポッドキャストの購読を解除",
     "confirmUnsubscribe": "購読解除の確認",
     "unsubscribeConfirmMsg": "{count}個の選択されたポッドキャストの購読を解除しますか？",
-    "unsubscribe": "購読解除"
+    "unsubscribe": "購読解除",
     "subscribeToPodcast": "ポッドキャストを購読",
     "unsubscribedFrom": "購読を解除しました:",
     "subscribedTo": "購読しました:",
@@ -434,7 +434,7 @@
     "lastUpdate": "最終更新",
     "sync": "同期",
     "loginSuccess": "ログイン成功",
-   "animals": "動物",
+    "animals": "動物",
     "animation": "アニメーション",
     "arts": "アート",
     "astronomy": "天文学",
@@ -509,10 +509,12 @@
     "appearance": "外観",
     "completion": "完了",
     "cleanup": "クリーンアップ",
-    "opml": "OPML",
     "rssFeed": "RSS フィード",
     "ok": "OK",
     "description": "説明",
-    "details": ""details": "詳細"",
-    "selectAll": "Select All",
+    "details": "詳細",
+    "syncing": "同期中...",
+    "syncComplete": "同期完了!",
+    "syncFailed": "同期失敗:",
+    "selectAll": "全て選択"
 }

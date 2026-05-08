@@ -506,13 +506,15 @@
     "appearance": "Erscheinungsbild",
     "completion": "Abschluss",
     "cleanup": "Bereinigung",
-    "opml": "OPML",
     "rssFeed": "RSS-Feed",
     "ok": "OK",
     "description": "Beschreibung",
-    "details": ""details": "Details",",
+    "details": "Details",
     "selectAll": "Alles auswählen",
     "confirmUnsubscribe": "Abmelden bestätigen",
     "unsubscribeConfirmMsg": "Sind Sie sicher, dass Sie {count} ausgewählte Podcast(s) abmelden möchten?",
+    "syncing": "Synchronisiere...",
+    "syncComplete": "Synchronisierung abgeschlossen!",
+    "syncFailed": "Synchronisierung fehlgeschlagen:",
     "unsubscribe": "Abmelden"
 }
