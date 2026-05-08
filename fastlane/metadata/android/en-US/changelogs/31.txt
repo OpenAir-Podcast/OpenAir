@@ -1,9 +1,0 @@
-What's new in OpenAir 0.16.4:
-
-• Sleep timer - Set a timer to automatically stop playback
-• Share button - Easily share episodes from the player controls
-• Queue navigation - Quick access to your playback queue from the player
-• Author information - Now displayed in downloads, favorites, and history
-• Favorite button - Add episodes to favorites directly from the main player
-• Improved feed management - Clear feed option when you have no subscriptions
-• Various UI improvements and bug fixes
