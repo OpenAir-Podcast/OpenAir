@@ -53,6 +53,17 @@ class SupabaseService {
     return client.auth.signOut(scope: SignOutScope.global);
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      // Calls a stored procedure on Supabase to delete the authenticated user
+      await client.rpc('delete_user');
+      await signOut();
+    } catch (e) {
+      debugPrint('An error occurred during account deletion: $e');
+      throw Exception('Account deletion failed: $e');
+    }
+  }
+
   Future<void> logInUsingGoogle() async {
     try {
       await client.auth.signInWithOAuth(
