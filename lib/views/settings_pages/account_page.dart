@@ -522,11 +522,72 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => _showDeleteAccountDialog(supabaseService),
+                icon: const Icon(Icons.delete_forever, color: Colors.white),
+                label: Text(
+                  Translations.of(context).text('deleteAccount'),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: const Size.fromHeight(56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showDeleteAccountDialog(SupabaseService supabaseService) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(Translations.of(context).text('deleteAccount')),
+          content: Text(Translations.of(context).text('deleteAccountConfirmation')),
+          actions: <Widget>[
+            TextButton(
+              child: Text(Translations.of(context).text('cancel')),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+              },
+            ),
+            TextButton(
+              child: Text(
+                Translations.of(context).text('delete'),
+                style: const TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+                setState(() => _isLoading = true);
+                try {
+                  await supabaseService.deleteAccount();
+                  if (mounted) {
+                    _showSuccess('accountDeletedSuccessfully');
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    _showErrorWithMessage('errorDeletingAccount', e.toString());
+                  }
+                } finally {
+                  if (mounted) {
+                    setState(() => _isLoading = false);
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -1,4 +1,4 @@
-What's New in v0.16.4 ✨
+What's New in v0.16.5 ✨
 
 🔧 Improvements
 • Sleep timer now displays active status and live countdown in the menu and main player
@@ -8,3 +8,5 @@ What's New in v0.16.4 ✨
 • Unsubscribe cleanup improved to prevent orphaned episodes
 • Drawer navigation optimized with consolidated provider counts
 • Subscription badges clear when opening a podcast
+• Added account deletion functionality to comply with Google Play policies
+• Inbox now correctly clears played and completed episodes automatically
