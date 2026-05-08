@@ -513,7 +513,7 @@ class HiveService {
                 };
 
                 await episodeBox.put(guid, episode);
-                
+
                 final feedBox = await this.feedBox;
                 await feedBox.put(guid, FeedModel(guid: guid));
 
@@ -928,6 +928,7 @@ class HiveService {
     if (userInterfaceSettings == null) {
       userInterfaceSettings = {
         'fontSizeFactor': 'Medium',
+        'themeMode': 'System',
         'language': 'English',
         'locale': 'en_US',
       };
