@@ -212,11 +212,11 @@ late bool deletePlayedEpisodesConfig;
 late bool keepFavouriteEpisodesConfig;
 
 // Synchronization
-late bool syncFavouritesConfig;
-late bool syncQueueConfig;
-late bool syncHistoryConfig;
-late bool syncPlaybackPositionConfig;
-late bool syncSettingsConfig;
+bool syncFavouritesConfig = true;
+bool syncQueueConfig = true;
+bool syncHistoryConfig = true;
+bool syncPlaybackPositionConfig = true;
+bool syncSettingsConfig = true;
 
 // Import/Export
 late bool automaticExportDatabaseConfig;

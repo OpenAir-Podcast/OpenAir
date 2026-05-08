@@ -286,7 +286,7 @@
     "deletePlayedEpisodes": "Delete Played Episodes",
     "keepFavouriteEpisodes": "Keep Favourite Episodes",
     "removeEpisodesFromQueue": "Remove Episodes from Queue",
-    "syncFavourites": "Sync Favourites",
+    "syncFavourites": "Sync Subscriptions",
     "syncQueue": "Sync Queue",
     "syncHistory": "Sync History",
     "syncSettings": "Sync Settings",
@@ -513,5 +513,8 @@
     "selectAll": "Select All",
     "confirmUnsubscribe": "Confirm Unsubscribe",
     "unsubscribeConfirmMsg": "Are you sure you want to unsubscribe from {count} selected podcast(s)?",
-    "unsubscribe": "Unsubscribe"
+    "unsubscribe": "Unsubscribe",
+    "syncing": "Syncing...",
+    "syncComplete": "Sync complete!",
+    "syncFailed": "Sync failed:"
 }
