@@ -26,6 +26,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  bool _isSyncing = false;
 
   @override
   void dispose() {
@@ -495,12 +496,35 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               ),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () async {
-                  await ref.read(openAirProvider).synchronize(context);
-                  await supabaseService.client.auth.refreshSession();
-                },
-                icon: const Icon(Icons.sync),
-                label: Text(Translations.of(context).text('sync')),
+                onPressed: _isSyncing
+                    ? null
+                    : () async {
+                        setState(() => _isSyncing = true);
+                        try {
+                          await ref.read(openAirProvider).synchronize(context);
+                          await supabaseService.client.auth.refreshSession();
+                          if (mounted) _showSuccess('syncComplete');
+                        } catch (e) {
+                          if (mounted) {
+                            _showErrorWithMessage('syncFailed', e.toString());
+                          }
+                        } finally {
+                          if (mounted) setState(() => _isSyncing = false);
+                        }
+                      },
+                icon: _isSyncing
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.sync),
+                label: Text(_isSyncing
+                    ? Translations.of(context).text('syncing')
+                    : Translations.of(context).text('sync')),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(56),
                   shape: RoundedRectangleBorder(
@@ -553,7 +577,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text(Translations.of(context).text('deleteAccount')),
-          content: Text(Translations.of(context).text('deleteAccountConfirmation')),
+          content:
+              Text(Translations.of(context).text('deleteAccountConfirmation')),
           actions: <Widget>[
             TextButton(
               child: Text(Translations.of(context).text('cancel')),

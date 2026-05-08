@@ -1322,7 +1322,8 @@ class HiveService {
     ]);
   }
 
-  void addEpisodeToFavorite(Map<String, dynamic> episode, PodcastModel podcast,
+  Future<void> addEpisodeToFavorite(
+      Map<String, dynamic> episode, PodcastModel podcast,
       {String? author}) async {
     final box = await favoritesBox;
     await box.put(episode['guid'], episode);

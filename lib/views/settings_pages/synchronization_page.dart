@@ -19,6 +19,8 @@ class SynchronizationPage extends ConsumerStatefulWidget {
 }
 
 class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
+  bool _isSyncing = false;
+
   Widget _buildCard(Widget child, BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
@@ -203,8 +205,44 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
-                onPressed: () => ref.read(openAirProvider).synchronize(context),
-                icon: const Icon(Icons.sync_rounded),
+                onPressed: _isSyncing
+                    ? null
+                    : () async {
+                        setState(() => _isSyncing = true);
+                        try {
+                          await ref.read(openAirProvider).synchronize(context);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(Translations.of(context)
+                                    .text('syncComplete')),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${Translations.of(context).text('syncFailed')} $e',
+                                ),
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _isSyncing = false);
+                        }
+                      },
+                icon: _isSyncing
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.sync_rounded),
                 label: Text(
                   Translations.of(context).text('synchronizeNow'),
                   style: const TextStyle(
