@@ -506,13 +506,15 @@
     "appearance": "Apariencia",
     "completion": "Finalización",
     "cleanup": "Limpieza",
-    "opml": "OPML",
     "rssFeed": "Fuente RSS",
     "ok": "Aceptar",
     "description": "Descripción",
-    "details": ""details": "Detalles",",
+    "details": "Detalles",
     "selectAll": "Seleccionar todo",
     "confirmUnsubscribe": "Confirmar baja",
     "unsubscribeConfirmMsg": "¿Está seguro de que desea darse de baja de {count} podcast(s) seleccionado(s)?",
+    "syncing": "Sincronizando...",
+    "syncComplete": "¡Sincronización completada!",
+    "syncFailed": "Sincronización fallida:",
     "unsubscribe": "Darse de baja"
 }

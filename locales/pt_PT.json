@@ -110,8 +110,7 @@
     "unsubscribeToPodcast": "Cancelar inscrição no podcast",
     "confirmUnsubscribe": "Confirmar cancelamento",
     "unsubscribeConfirmMsg": "Tem certeza que deseja cancelar {count} podcast(s) selecionado(s)?",
-    "unsubscribe": "Cancelar"
-    "subscribeToPodcast": "Inscrever-se no podcast",
+    "unsubscribe": "Cancelar","subscribeToPodcast": "Inscrever-se no podcast",
     "unsubscribedFrom": "Inscrição cancelada em",
     "subscribedTo": "Inscrito em",
     "topPodcasts": "Podcasts em destaque",
@@ -509,10 +508,12 @@
     "appearance": "Aparência",
     "completion": "Conclusão",
     "cleanup": "Limpeza",
-    "opml": "OPML",
     "rssFeed": "Feed RSS",
     "ok": "OK",
     "description": "Descrição",
-    "details": ""details": "Detalhes"",
-    "selectAll": "Select All",
+    "details": "Detalhes",
+    "syncing": "A sincronizar...",
+    "syncComplete": "Sincronização concluída!",
+    "syncFailed": "Sincronização falhou:",
+    "selectAll": "Selecionar tudo"
 }

@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "בטל מנוי לפודקאסט",
     "confirmUnsubscribe": "אישור ביטול",
     "unsubscribeConfirmMsg": "האם אתה בטוח שברצונך לבטל את המנוי של {count} פודקאסטים שנבחרו?",
-    "unsubscribe": "בטל מנוי"
+    "unsubscribe": "בטל מנוי",
     "subscribeToPodcast": "הירשם לפודקאסט",
     "unsubscribedFrom": "בוטל המנוי ל",
     "subscribedTo": "נרשמת ל",
@@ -509,10 +509,12 @@
     "appearance": "מראה",
     "completion": "השלמה",
     "cleanup": "ניקוי",
-    "opml": "OPML",
     "rssFeed": "פיד RSS",
     "ok": "אישור",
     "description": "תיאור",
-    "details": ""details": "פרטים"",
-    "selectAll": "Select All",
+    "details": "פרטים",
+    "syncing": "מסנכרן...",
+    "syncComplete": "הסנכרון הושלם!",
+    "syncFailed": "הסנכרון נכשל:",
+    "selectAll": "הכל"
 }

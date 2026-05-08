@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "Отписаться от подкаста",
     "confirmUnsubscribe": "Подтвердить отписку",
     "unsubscribeConfirmMsg": "Вы уверены, что хотите отписаться от {count} выбранных подкаст(ов)?",
-    "unsubscribe": "Отписаться"
+    "unsubscribe": "Отписаться",
     "subscribeToPodcast": "Подписаться на подкаст",
     "unsubscribedFrom": "Отписался от",
     "subscribedTo": "Подписался на",
@@ -509,10 +509,12 @@
     "appearance": "Внешний вид",
     "completion": "Завершение",
     "cleanup": "Очистка",
-    "opml": "OPML",
     "rssFeed": "RSS-канал",
-    "ok": "ОК",
+    "ok": "Ок",
     "description": "Описание",
-    "details": ""details": "Детали"",
-    "selectAll": "Select All",
+    "details": "Детали",
+    "syncing": "Синхронизация...",
+    "syncComplete": "Синхронизация завершена!",
+    "syncFailed": "Синхронизация не удалась:",
+    "selectAll": "Выделить все"
 }

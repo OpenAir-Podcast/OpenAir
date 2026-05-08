@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "Disiscriviti dal podcast",
     "confirmUnsubscribe": "Conferma disiscrizione",
     "unsubscribeConfirmMsg": "Sei sicuro di voler disiscrivere {count} podcast selezionati?",
-    "unsubscribe": "Disiscriviti"
+    "unsubscribe": "Disiscriviti",
     "subscribeToPodcast": "Iscriviti al podcast",
     "unsubscribedFrom": "Disiscritto da",
     "subscribedTo": "Iscritto a",
@@ -509,10 +509,12 @@
     "appearance": "Aspetto",
     "completion": "Completamento",
     "cleanup": "Pulizia",
-    "opml": "OPML",
     "rssFeed": "Feed RSS",
     "ok": "OK",
     "description": "Descrizione",
-    "details": ""details": "Dettagli"",
-    "selectAll": "Select All",
+    "details": "Dettagli",
+    "syncing": "Sincronizzazione...",
+    "syncComplete": "Sincronizzazione completata!",
+    "syncFailed": "Sincronizzazione fallita:",
+    "selectAll": "Seleziona tutto"
 }

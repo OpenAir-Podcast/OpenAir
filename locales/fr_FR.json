@@ -506,13 +506,15 @@
     "appearance": "Apparence",
     "completion": "Achèvement",
     "cleanup": "Nettoyage",
-    "opml": "OPML",
     "rssFeed": "Flux RSS",
     "ok": "OK",
     "description": "Description",
-    "details": ""details": "Détails",",
+    "details": "Détails",
     "selectAll": "Tout sélectionner",
     "confirmUnsubscribe": "Confirmer le désabonnement",
     "unsubscribeConfirmMsg": "Êtes-vous sûr de vouloir vous désabonner de {count} podcast(s) sélectionné(s) ?",
+    "syncing": "Synchronisation...",
+    "syncComplete": "Synchronisation terminée !",
+    "syncFailed": "Synchronisation échouée :",
     "unsubscribe": "Se désabonner"
 }

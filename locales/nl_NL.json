@@ -110,7 +110,7 @@
     "unsubscribeToPodcast": "Abonnement op podcast opzeggen",
     "confirmUnsubscribe": "Bevestig afmelden",
     "unsubscribeConfirmMsg": "Weet u zeker dat u {count} geselecteerde podcast(s) wilt afmelden?",
-    "unsubscribe": "Afmelden"
+    "unsubscribe": "Afmelden",
     "subscribeToPodcast": "Abonneren op podcast",
     "unsubscribedFrom": "Abonnement opgezegd op",
     "subscribedTo": "Geabonneerd op",
@@ -509,10 +509,12 @@
     "appearance": "Weergave",
     "completion": "Voltooiing",
     "cleanup": "Opschoning",
-    "opml": "OPML",
     "rssFeed": "RSS-feed",
-    "ok": "OK",
+    "ok": "Ok",
     "description": "Beschrijving",
-    "details": ""details": "Details"",
-    "selectAll": "Select All",
+    "details": "Details",
+    "syncing": "Synchroniseren...",
+    "syncComplete": "Synchronisatie voltooid!",
+    "syncFailed": "Synchronisatie mislukt:",
+    "selectAll": "Alles selecteren"
 }
