@@ -513,6 +513,9 @@ class HiveService {
                 };
 
                 await episodeBox.put(guid, episode);
+                
+                final feedBox = await this.feedBox;
+                await feedBox.put(guid, FeedModel(guid: guid));
 
                 if (downloadNewEpisodesConfig) {
                   final podcast = PodcastModel(
@@ -869,6 +872,8 @@ class HiveService {
       CompletedEpisodeModel completedEpisode) async {
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);
+    await deleteFromFeed(guid: completedEpisode.guid);
+    ref.invalidate(getInboxProvider);
     deletePlayedEpisode(completedEpisode.guid);
   }
 
