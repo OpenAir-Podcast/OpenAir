@@ -385,7 +385,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                                   )
                                 : const Icon(Icons.timer_outlined),
                             tooltip: audioState.isSleepTimerActive
-                                ? '${_formatRemainingTime(audioState.remainingSeconds)} - Tap to change'
+                                ? '${audioState.sleepTimerMinutes} min - Tap to change'
                                 : Translations.of(context).text('sleepTimer'),
                             onPressed: _showTimerDialog,
                           ),
