@@ -185,8 +185,8 @@ Color primaryColorLight = Colors.blue;
 Color primaryColorDark = Colors.blue;
 
 // User Interface
-late String fontSizeConfig;
-late String themeModeConfig;
+String fontSizeConfig = 'Medium';
+String themeModeConfig = 'System';
 late String languageConfig;
 late String localeConfig;
 

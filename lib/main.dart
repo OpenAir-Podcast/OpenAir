@@ -372,6 +372,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   bool _minDelayPassed = false;
+  bool _systemThemeApplied = false;
 
   @override
   void initState() {
@@ -439,7 +440,7 @@ class _AppHomeState extends ConsumerState<_AppHome>
 
       if (settings != null && mounted) {
         final fontSizeFactor = settings['fontSizeFactor'] ?? 'Medium';
-        final themeMode = settings['themeMode'] ?? 'Light';
+        final themeMode = settings['themeMode'] ?? 'System';
 
         fontSizeConfig = fontSizeFactor;
         themeModeConfig = themeMode;
@@ -476,6 +477,13 @@ class _AppHomeState extends ConsumerState<_AppHome>
       future: widget.initialization,
       builder: (context, snapshot) {
         final initDone = snapshot.connectionState == ConnectionState.done;
+
+        // Apply system theme once initialization is done
+        if (initDone && _minDelayPassed && mounted && !_systemThemeApplied) {
+          _systemThemeApplied = true;
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _applySystemTheme());
+        }
 
         // Show splash while: init not done OR min delay not passed
         if (!initDone || !_minDelayPassed) {
