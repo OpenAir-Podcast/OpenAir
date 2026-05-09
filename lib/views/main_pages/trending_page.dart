@@ -1,6 +1,8 @@
 export 'package:openair/views/main_pages/trending_page.dart'
     show trendingDataProvider;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/translations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,13 +99,15 @@ class _TrendingView extends ConsumerWidget {
     final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     if (isWide) {
+      final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+      final spacing = isDesktop ? 16.0 : 4.0;
       return GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        padding: EdgeInsets.all(isDesktop ? 24 : 8),
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
           childAspectRatio: 3 / 4,
-          crossAxisSpacing: 4,
-          mainAxisSpacing: 4,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
         ),
         cacheExtent: cacheExtent,
         itemCount: data.count,

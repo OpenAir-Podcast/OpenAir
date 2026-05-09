@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -92,7 +94,6 @@ final podcastDataBySportsProvider = FutureProvider<FetchDataModel>((ref) async {
   final data = await podcastIndexService.getSportsPodcasts();
   return FetchDataModel.fromJson(data);
 });
-
 
 class FeaturedPage extends ConsumerStatefulWidget {
   const FeaturedPage({super.key});
@@ -287,10 +288,11 @@ class PodcastsCard extends ConsumerWidget {
   }
 
   Widget _buildLoadingShimmer(BuildContext context) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: 5,
+      itemCount: isDesktop ? 10 : 5,
       separatorBuilder: (context, index) => const SizedBox(width: 16),
       itemBuilder: (context, index) {
         return SizedBox(
@@ -377,7 +379,10 @@ class PodcastsCard extends ConsumerWidget {
 
   Widget _buildContent(
       BuildContext context, WidgetRef ref, FetchDataModel snapshot) {
-    final itemCount = snapshot.feeds.length > 5 ? 5 : snapshot.feeds.length;
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final maxCards = isDesktop ? 10 : 5;
+    final itemCount =
+        snapshot.feeds.length > maxCards ? maxCards : snapshot.feeds.length;
 
     if (itemCount == 0) {
       return Center(
