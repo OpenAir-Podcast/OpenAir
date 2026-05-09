@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 class DownloadsPage extends ConsumerStatefulWidget {
@@ -42,25 +45,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
               ),
             ],
           ),
-          body: ListView.separated(
-            padding: const EdgeInsets.all(12),
-            cacheExtent: cacheExtent,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              final author = data[index].author.isNotEmpty == true
-                  ? data[index].author
-                  : Translations.of(context).text('unknown');
-
-              return UnifiedEpisodeCard(
-                episodeItem: data[index].toJson(),
-                podcast: PodcastModel.fromJson(data[index].toJson()),
-                title: data[index].title,
-                author: author,
-                showAuthor: true,
-              );
-            },
-          ),
+          body: _buildDownloadsList(context, data),
           bottomNavigationBar: _buildBottomBar(context, ref),
         );
       },
@@ -71,6 +56,57 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
         appBar: AppBar(title: Text(Translations.of(context).text('downloads'))),
         body: _ErrorView(error: error.toString()),
       ),
+    );
+  }
+
+  Widget _buildDownloadsList(BuildContext context, List<DownloadModel> data) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+
+    if (isDesktop) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300.0,
+          mainAxisExtent: 312.0,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        cacheExtent: cacheExtent,
+        itemCount: data.length,
+        itemBuilder: (context, index) {
+          final author = data[index].author.isNotEmpty == true
+              ? data[index].author
+              : Translations.of(context).text('unknown');
+
+          return EpisodeCardGrid(
+            episodeItem: data[index].toJson(),
+            title: data[index].title,
+            author: author,
+            imageUrl: data[index].image,
+            podcast: PodcastModel.fromJson(data[index].toJson()),
+          );
+        },
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      cacheExtent: cacheExtent,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        final author = data[index].author.isNotEmpty == true
+            ? data[index].author
+            : Translations.of(context).text('unknown');
+
+        return UnifiedEpisodeCard(
+          episodeItem: data[index].toJson(),
+          podcast: PodcastModel.fromJson(data[index].toJson()),
+          title: data[index].title,
+          author: author,
+          showAuthor: true,
+        );
+      },
     );
   }
 

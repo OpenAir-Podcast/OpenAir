@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getSubscribedEpisodesProvider =
@@ -67,57 +70,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                   ),
                 ],
               ),
-              body: ListView.separated(
-                padding: const EdgeInsets.all(12),
-                cacheExtent: cacheExtent,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemCount: episodesDataSet.length,
-                itemBuilder: (context, index) {
-                  final episodeItem = episodesDataSet[index];
-                  final podcastMap =
-                      (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
-                  final podcast = podcastMap != null
-                      ? PodcastModel.fromJson(podcastMap)
-                      : PodcastModel(
-                          id: -1,
-                          feedUrl: episodeItem['feedUrl'] ?? '',
-                          title: episodeItem['podcastTitle'] ??
-                              episodeItem['feedTitle'] ??
-                              'Unknown',
-                          author: episodeItem['author'] ??
-                              episodeItem['feedAuthor'] ??
-                              'Unknown Author',
-                          imageUrl: episodeItem['image'] ??
-                              episodeItem['feedImage'] ??
-                              '',
-                          artwork: episodeItem['image'] ??
-                              episodeItem['feedImage'] ??
-                              '',
-                          description: '',
-                        );
-
-                  return GestureDetector(
-                    onTap: () {
-                      ref.read(audioProvider.notifier).currentPodcast = podcast;
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => EpisodesPage(
-                            podcast: podcast,
-                          ),
-                        ),
-                      );
-                    },
-                    child: UnifiedEpisodeCard(
-                      episodeItem: episodeItem.cast<String, dynamic>(),
-                      podcast: podcast,
-                      title: episodeItem['title'] ?? '',
-                      author: podcast.author ??
-                          Translations.of(context).text('unknown'),
-                      showAuthor: true,
-                    ),
-                  );
-                },
-              ),
+              body: _buildFeedsList(context, episodesDataSet),
             );
           },
           loading: () => Scaffold(
@@ -147,6 +100,103 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildFeedsList(
+      BuildContext context, List<Map<dynamic, dynamic>> episodesDataSet) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+
+    if (isDesktop) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300.0,
+          mainAxisExtent: 312.0,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        cacheExtent: cacheExtent,
+        itemCount: episodesDataSet.length,
+        itemBuilder: (context, index) {
+          final episodeItem = episodesDataSet[index];
+          final podcastMap =
+              (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
+          final podcast = podcastMap != null
+              ? PodcastModel.fromJson(podcastMap)
+              : PodcastModel(
+                  id: -1,
+                  feedUrl: episodeItem['feedUrl'] ?? '',
+                  title: episodeItem['podcastTitle'] ??
+                      episodeItem['feedTitle'] ??
+                      'Unknown',
+                  author: episodeItem['author'] ??
+                      episodeItem['feedAuthor'] ??
+                      'Unknown Author',
+                  imageUrl:
+                      episodeItem['image'] ?? episodeItem['feedImage'] ?? '',
+                  artwork:
+                      episodeItem['image'] ?? episodeItem['feedImage'] ?? '',
+                  description: '',
+                );
+
+          return EpisodeCardGrid(
+            episodeItem: episodeItem.cast<String, dynamic>(),
+            title: episodeItem['title'] ?? '',
+            author: podcast.author ?? Translations.of(context).text('unknown'),
+            imageUrl: podcast.imageUrl,
+            podcast: podcast,
+          );
+        },
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      cacheExtent: cacheExtent,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemCount: episodesDataSet.length,
+      itemBuilder: (context, index) {
+        final episodeItem = episodesDataSet[index];
+        final podcastMap =
+            (episodeItem['podcast'] as Map?)?.cast<String, dynamic>();
+        final podcast = podcastMap != null
+            ? PodcastModel.fromJson(podcastMap)
+            : PodcastModel(
+                id: -1,
+                feedUrl: episodeItem['feedUrl'] ?? '',
+                title: episodeItem['podcastTitle'] ??
+                    episodeItem['feedTitle'] ??
+                    'Unknown',
+                author: episodeItem['author'] ??
+                    episodeItem['feedAuthor'] ??
+                    'Unknown Author',
+                imageUrl:
+                    episodeItem['image'] ?? episodeItem['feedImage'] ?? '',
+                artwork: episodeItem['image'] ?? episodeItem['feedImage'] ?? '',
+                description: '',
+              );
+
+        return GestureDetector(
+          onTap: () {
+            ref.read(audioProvider.notifier).currentPodcast = podcast;
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => EpisodesPage(
+                  podcast: podcast,
+                ),
+              ),
+            );
+          },
+          child: UnifiedEpisodeCard(
+            episodeItem: episodeItem.cast<String, dynamic>(),
+            podcast: podcast,
+            title: episodeItem['title'] ?? '',
+            author: podcast.author ?? Translations.of(context).text('unknown'),
+            showAuthor: true,
+          ),
+        );
+      },
     );
   }
 }

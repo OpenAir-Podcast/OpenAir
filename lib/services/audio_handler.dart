@@ -1,11 +1,21 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 
 OpenAirAudioHandler? _audioHandlerInstance;
 
 OpenAirAudioHandler getAudioHandler() {
-  _audioHandlerInstance ??= OpenAirAudioHandler();
+  if (_audioHandlerInstance == null) {
+    JustAudioMediaKit.ensureInitialized(
+      linux: true,
+      windows: true,
+      android: true,
+      iOS: true,
+      macOS: true,
+    );
+    _audioHandlerInstance = OpenAirAudioHandler();
+  }
   return _audioHandlerInstance!;
 }
 
