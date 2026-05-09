@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/native/podcast_info.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final podCastDataByUrlProvider =
@@ -113,6 +116,7 @@ class EpisodesPage extends ConsumerWidget {
     Map? podCastInfo,
   ) {
     final episodeCount = snapshot['count'] ?? 0;
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
 
     if (episodeCount == 0) {
       return Center(
@@ -130,16 +134,44 @@ class EpisodesPage extends ConsumerWidget {
       );
     }
 
+    String getAuthor() {
+      return (podCastInfo?['author']?.isNotEmpty == true ||
+              podcast.author?.isNotEmpty == true)
+          ? (podCastInfo?['author'] ?? podcast.author!)
+          : Translations.of(context).text('unknown');
+    }
+
+    if (isDesktop) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300.0,
+          mainAxisExtent: 312.0,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        cacheExtent: cacheExtent,
+        itemCount: episodeCount,
+        itemBuilder: (context, index) {
+          final author = getAuthor();
+          return EpisodeCardGrid(
+            episodeItem: snapshot['items'][index],
+            title: snapshot['items'][index]['title'] ?? '',
+            author: author,
+            imageUrl: podcast.imageUrl,
+            podcast: podcast,
+          );
+        },
+      );
+    }
+
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       cacheExtent: cacheExtent,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodeCount,
       itemBuilder: (context, index) {
-        String author = (podCastInfo?['author']?.isNotEmpty == true ||
-                podcast.author?.isNotEmpty == true)
-            ? (podCastInfo?['author'] ?? podcast.author!)
-            : Translations.of(context).text('unknown');
+        final author = getAuthor();
 
         return UnifiedEpisodeCard(
           episodeItem: snapshot['items'][index],

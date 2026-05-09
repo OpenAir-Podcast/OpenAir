@@ -18,7 +18,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  just_audio: ^0.9.38
+  just_audio: ^0.10.5
+  just_audio_media_kit: ^2.1.0
   audio_service: ^0.18.4
   audio_session: ^0.1.16
   cached_network_image: ^3.4.1

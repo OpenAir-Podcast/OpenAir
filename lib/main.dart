@@ -23,7 +23,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
