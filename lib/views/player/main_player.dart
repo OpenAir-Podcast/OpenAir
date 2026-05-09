@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'dart:ui';
@@ -23,6 +25,13 @@ class MainPlayer extends ConsumerStatefulWidget {
 class MainPlayerState extends ConsumerState<MainPlayer> {
   final double imageSize = 250.0;
 
+  double _artworkSize(BuildContext context) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxSize = screenWidth * 0.8;
+    return isDesktop ? maxSize.clamp(0, 280) : maxSize;
+  }
+
   void _startSleepTimer(int minutes) {
     ref.read(audioProvider).startSleepTimer(minutes);
   }
@@ -44,7 +53,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final audioState = ref.watch(audioProvider);
-          
+
           Widget buildTimerOption(int minutes, String label) {
             final isActive = audioState.sleepTimerMinutes == minutes;
             final theme = Theme.of(context);
@@ -56,7 +65,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   color: isActive ? theme.colorScheme.primary : null,
                 ),
               ),
-              trailing: isActive ? Icon(Icons.check, color: theme.colorScheme.primary) : null,
+              trailing: isActive
+                  ? Icon(Icons.check, color: theme.colorScheme.primary)
+                  : null,
               onTap: () {
                 Navigator.pop(context);
                 _startSleepTimer(minutes);
@@ -173,279 +184,299 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
             ),
             SafeArea(
               child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Spacer(),
-                      // Artwork with hero and image
-                      Hero(
-                        tag: 'player_art',
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 30,
-                                offset: const Offset(0, 15),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: CachedNetworkImage(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              height: MediaQuery.of(context).size.width * 0.8,
-                              imageUrl: currentEpisode['feedImage'] ??
-                                  currentEpisode['image'] ??
-                                  '',
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => Container(
-                                color: theme.colorScheme.surfaceContainer,
-                                child: const Icon(Icons.podcasts, size: 100),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Title
-                      Text(
-                        currentEpisode['title'] ?? '',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      // Author with navigation
-                      GestureDetector(
-                        onTap: () {
-                          if (audioState.currentPodcast != null) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => EpisodesPage(
-                                    podcast: audioState.currentPodcast!),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          podcastTitle,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Seek Bar
-                      Column(
-                        children: [
-                          SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 4,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 6,
-                                elevation: 0,
-                              ),
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 14,
-                              ),
-                              activeTrackColor: theme.colorScheme.primary,
-                              inactiveTrackColor: theme.colorScheme.primary
-                                  .withValues(alpha: 0.3),
-                              thumbColor: theme.colorScheme.primary,
-                            ),
-                            child: Slider(
-                              min: 0.0,
-                              max: 1.0,
-                              value: audioState
-                                  .podcastCurrentPositionInMilliseconds,
-                              onChanged: (value) => audioState.seekTo(value),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  audioState.currentPlaybackPositionString,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                Text(
-                                  audioState.currentPlaybackDurationString ??
-                                      '00:00:00',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Main Controls
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.skip_previous_rounded,
-                                size: 36),
-                            onPressed: () =>
-                                audioState.playPreviousEpisode(context),
-                          ),
-                          _buildControlButton(context, Icons.replay_10_rounded,
-                              () => audioState.rewind()),
-                          // Play/Pause button
-                          GestureDetector(
-                            onTap: () {
-                              audioState.audioState == 'Play'
-                                  ? audioState.playerPauseButtonClicked()
-                                  : audioState.playerResumeButtonClicked();
-                            },
-                            child: Container(
-                              height: 80,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.4),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                audioState.audioState == 'Play'
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
-                                size: 48,
-                                color: theme.colorScheme.onPrimary,
-                              ),
-                            ),
-                          ),
-                          _buildControlButton(context, Icons.forward_10_rounded,
-                              () => audioState.fastForward()),
-                          IconButton(
-                            icon: const Icon(Icons.skip_next_rounded, size: 36),
-                            onPressed: () =>
-                                audioState.playNextEpisode(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Bottom Tools
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TextButton(
-                            onPressed: () => audioState.cyclePlaybackSpeed(),
-                            child: Text(
-                              playbackSpeedConfig,
-                              style: theme.textTheme.labelLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: audioState.isSleepTimerActive
-                                ? Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.timer_outlined,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _formatRemainingTime(audioState.remainingSeconds),
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: theme.colorScheme.primary),
-                                      ),
-                                    ],
-                                  )
-                                : const Icon(Icons.timer_outlined),
-                            tooltip: audioState.isSleepTimerActive
-                                ? '${audioState.sleepTimerMinutes} min - Tap to change'
-                                : Translations.of(context).text('sleepTimer'),
-                            onPressed: _showTimerDialog,
-                          ),
-                          favoriteListAsync.when(
-                            data: (favoriteList) {
-                              final isFavorite = favoriteList
-                                  .containsKey(currentEpisode['guid']);
-                              return IconButton(
-                                icon: Icon(
-                                  isFavorite
-                                      ? Icons.favorite
-                                      : Icons.favorite_border_rounded,
-                                  color: isFavorite ? Colors.red : null,
-                                ),
-                                onPressed: () {
-                                  if (isFavorite) {
-                                    ref
-                                        .read(audioProvider)
-                                        .removeEpisodeFromFavorite(
-                                          currentEpisode['guid'],
-                                        );
-                                  } else if (audioState.currentPodcast !=
-                                      null) {
-                                    ref
-                                        .read(audioProvider)
-                                        .addEpisodeToFavorite(
-                                          currentEpisode,
-                                          audioState.currentPodcast!,
-                                          author: currentEpisode['author'] ??
-                                              audioState.currentPodcast!.author,
-                                        );
-                                  }
-                                  ref.invalidate(getFavoriteProvider);
-                                },
-                              );
-                            },
-                            loading: () => IconButton(
-                              icon: const Icon(Icons.favorite_border_rounded),
-                              onPressed: null,
-                            ),
-                            error: (_, __) => IconButton(
-                              icon: const Icon(Icons.favorite_border_rounded),
-                              onPressed: null,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.share_rounded),
-                            tooltip: Translations.of(context).text('share'),
-                            onPressed: () => ref.watch(openAirProvider).share(),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                    ],
-                  )),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: _buildPlayerContent(
+                    context,
+                    currentEpisode,
+                    podcastTitle,
+                    audioState,
+                    theme,
+                    subsAsync,
+                    favoriteListAsync),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildPlayerContent(
+    BuildContext context,
+    Map<String, dynamic> currentEpisode,
+    String podcastTitle,
+    dynamic audioState,
+    ThemeData theme,
+    AsyncValue<Map<String, SubscriptionModel>> subsAsync,
+    AsyncValue favoriteListAsync,
+  ) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+
+    final content = Column(
+      mainAxisSize: isDesktop ? MainAxisSize.min : MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (!isDesktop) const Spacer(),
+        // Artwork with hero and image
+        Hero(
+          tag: 'player_art',
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: CachedNetworkImage(
+                width: _artworkSize(context),
+                height: _artworkSize(context),
+                imageUrl: currentEpisode['feedImage'] ??
+                    currentEpisode['image'] ??
+                    '',
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(
+                  color: theme.colorScheme.surfaceContainer,
+                  child: const Icon(Icons.podcasts, size: 100),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        // Title
+        Text(
+          currentEpisode['title'] ?? '',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            height: 1.2,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        // Author with navigation
+        GestureDetector(
+          onTap: () {
+            if (audioState.currentPodcast != null) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EpisodesPage(podcast: audioState.currentPodcast!),
+                ),
+              );
+            }
+          },
+          child: Text(
+            podcastTitle,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 24),
+        // Seek Bar
+        Column(
+          children: [
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 6,
+                  elevation: 0,
+                ),
+                overlayShape: const RoundSliderOverlayShape(
+                  overlayRadius: 14,
+                ),
+                activeTrackColor: theme.colorScheme.primary,
+                inactiveTrackColor:
+                    theme.colorScheme.primary.withValues(alpha: 0.3),
+                thumbColor: theme.colorScheme.primary,
+              ),
+              child: Slider(
+                min: 0.0,
+                max: 1.0,
+                value: audioState.podcastCurrentPositionInMilliseconds,
+                onChanged: (value) => audioState.seekTo(value),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    audioState.currentPlaybackPositionString,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    audioState.currentPlaybackDurationString ?? '00:00:00',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        // Main Controls
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.skip_previous_rounded, size: 36),
+              onPressed: () => audioState.playPreviousEpisode(context),
+            ),
+            _buildControlButton(
+                context, Icons.replay_10_rounded, () => audioState.rewind()),
+            // Play/Pause button
+            GestureDetector(
+              onTap: () {
+                audioState.audioState == 'Play'
+                    ? audioState.playerPauseButtonClicked()
+                    : audioState.playerResumeButtonClicked();
+              },
+              child: Container(
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  audioState.audioState == 'Play'
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  size: 48,
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ),
+            _buildControlButton(context, Icons.forward_10_rounded,
+                () => audioState.fastForward()),
+            IconButton(
+              icon: const Icon(Icons.skip_next_rounded, size: 36),
+              onPressed: () => audioState.playNextEpisode(context),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        // Bottom Tools
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            TextButton(
+              onPressed: () => audioState.cyclePlaybackSpeed(),
+              child: Text(
+                playbackSpeedConfig,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: audioState.isSleepTimerActive
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.timer_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _formatRemainingTime(audioState.remainingSeconds),
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary),
+                        ),
+                      ],
+                    )
+                  : const Icon(Icons.timer_outlined),
+              tooltip: audioState.isSleepTimerActive
+                  ? '${audioState.sleepTimerMinutes} min - Tap to change'
+                  : Translations.of(context).text('sleepTimer'),
+              onPressed: _showTimerDialog,
+            ),
+            favoriteListAsync.when(
+              data: (favoriteList) {
+                final isFavorite =
+                    favoriteList.containsKey(currentEpisode['guid']);
+                return IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border_rounded,
+                    color: isFavorite ? Colors.red : null,
+                  ),
+                  onPressed: () {
+                    if (isFavorite) {
+                      ref.read(audioProvider).removeEpisodeFromFavorite(
+                            currentEpisode['guid'],
+                          );
+                    } else if (audioState.currentPodcast != null) {
+                      ref.read(audioProvider).addEpisodeToFavorite(
+                            currentEpisode,
+                            audioState.currentPodcast!,
+                            author: currentEpisode['author'] ??
+                                audioState.currentPodcast!.author,
+                          );
+                    }
+                    ref.invalidate(getFavoriteProvider);
+                  },
+                );
+              },
+              loading: () => IconButton(
+                icon: const Icon(Icons.favorite_border_rounded),
+                onPressed: null,
+              ),
+              error: (_, __) => IconButton(
+                icon: const Icon(Icons.favorite_border_rounded),
+                onPressed: null,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.share_rounded),
+              tooltip: Translations.of(context).text('share'),
+              onPressed: () => ref.watch(openAirProvider).share(),
+            ),
+          ],
+        ),
+        if (!isDesktop) const Spacer(),
+      ],
+    );
+
+    if (isDesktop) {
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: content,
+        ),
+      );
+    }
+
+    return content;
   }
 
   Widget _buildControlButton(
