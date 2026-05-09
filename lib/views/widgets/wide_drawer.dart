@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
 import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
@@ -34,215 +33,412 @@ class WideDrawer extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WideDrawer> createState() => __WideDrawerState();
+  ConsumerState<WideDrawer> createState() => _WideDrawerState();
 }
 
-class __WideDrawerState extends ConsumerState<WideDrawer> {
+class _WideDrawerState extends ConsumerState<WideDrawer> {
   void returnFromSignin() {
-    // todo continue from here... need to return the user to the main page after logging in.
     debugPrint('Returned from SignIn');
-    // Navigator.of(context).pop();
-    // widget.onPageSelected(const FeaturedPage());
-    // ref.invalidate(getSessionProvider);
-    // widget.rebuildDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(localeProvider);
-
     final drawerCounts = ref.watch(drawerCountsProvider);
     final session = ref.watch(getSessionProvider);
     final supabaseService = ref.watch(supabaseServiceProvider);
+    final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Expanded(
-          flex: 4,
-          child: ListView(
-            children: [
-              DrawerHeader(
-                child: Center(
-                  child: Column(
-                    spacing: 16.0,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/icons/icon.png',
-                          width: circleSize,
-                          height: circleSize,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      session.when(
-                        data: (data) {
-                          return ElevatedButton(
-                            onPressed: () {
-                              if (session.value == null) {
-                                widget.onPageSelected(LogIn());
-                              } else {
-                                supabaseService.signOut();
-                                ref.invalidate(getSessionProvider);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                            ),
-                            child: Text(
-                              session.value == null
-                                  ? Translations.of(context).text('signIn')
-                                  : Translations.of(context).text('logout'),
-                            ),
-                          );
-                        },
-                        error: (error, stackTrace) => Text(
-                          Translations.of(context).text('errorLoadingData'),
-                        ),
-                        loading: () => const CircularProgressIndicator(),
-                      ),
-                    ],
+    return ColoredBox(
+      color: theme.colorScheme.surfaceContainerLow,
+      child: Column(
+        children: [
+          _buildHeader(theme, session, supabaseService),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(height: 1),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              children: [
+                _NavItem(
+                  icon: Icons.home_rounded,
+                  label: Translations.of(context).text('home'),
+                  onTap: () => widget.onPageSelected(const FeaturedPage()),
+                ),
+                const SizedBox(height: 2),
+                _CountNavItem(
+                  icon: Icons.subscriptions_rounded,
+                  label: Translations.of(context).text('subscriptions'),
+                  counts: drawerCounts,
+                  selector: (c) => c.subscriptions,
+                  onTap: () => widget.onPageSelected(SubscriptionsPage()),
+                ),
+                const SizedBox(height: 2),
+                _CountNavItem(
+                  icon: Icons.feed_rounded,
+                  label: Translations.of(context).text('feeds'),
+                  counts: drawerCounts,
+                  selector: (c) => c.feeds,
+                  onTap: () {
+                    ref.invalidate(getSubscribedEpisodesProvider);
+                    widget.onPageSelected(FeedsPage());
+                  },
+                ),
+                const SizedBox(height: 2),
+                _CountNavItem(
+                  icon: Icons.inbox_rounded,
+                  label: Translations.of(context).text('inbox'),
+                  counts: drawerCounts,
+                  selector: (c) => c.inbox,
+                  onTap: () => widget.onPageSelected(InboxPage()),
+                ),
+                const SizedBox(height: 2),
+                _CountNavItem(
+                  icon: Icons.queue_music_rounded,
+                  label: Translations.of(context).text('queue'),
+                  counts: drawerCounts,
+                  selector: (c) => c.queue,
+                  onTap: () {
+                    ref.invalidate(sortedProvider);
+                    widget.onPageSelected(QueuePage());
+                  },
+                ),
+                const SizedBox(height: 2),
+                _CountNavItem(
+                  icon: Icons.download_rounded,
+                  label: Translations.of(context).text('downloads'),
+                  counts: drawerCounts,
+                  selector: (c) => c.downloads,
+                  onTap: () => widget.onPageSelected(DownloadsPage()),
+                ),
+                const SizedBox(height: 2),
+                _NavItem(
+                  icon: Icons.favorite_rounded,
+                  label: Translations.of(context).text('favorites'),
+                  iconColor: Colors.redAccent,
+                  onTap: () => widget.onPageSelected(FavoritesPage()),
+                ),
+                const SizedBox(height: 2),
+                _NavItem(
+                  icon: Icons.history_rounded,
+                  label: Translations.of(context).text('history'),
+                  onTap: () => widget.onPageSelected(HistoryPage()),
+                ),
+                const SizedBox(height: 2),
+                _NavItem(
+                  icon: Icons.add_rounded,
+                  label: Translations.of(context).text('addPodcast'),
+                  onTap: () => widget.onPageSelected(AddPodcastPage()),
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(height: 1),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 12),
+            child: _NavItem(
+              icon: Icons.settings_rounded,
+              label: Translations.of(context).text('settings'),
+              onTap: () {
+                widget.onPageSelected(
+                  Settings(
+                    functionBuild: () {
+                      widget.rebuildDrawer();
+                      setState(() {});
+                    },
                   ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+      ThemeData theme, AsyncValue<dynamic> session, dynamic supabaseService) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  'assets/icons/icon.png',
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.cover,
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.home_rounded),
-                title: Text(Translations.of(context).text('home')),
-                onTap: () {
-                  widget.onPageSelected(const FeaturedPage());
-                },
-              ),
-              const Divider(),
-              _buildDrawerCountTile(
-                drawerCounts,
-                Icons.subscriptions_rounded,
-                Translations.of(context).text('subscriptions'),
-                (c) => c.subscriptions,
-                () => widget.onPageSelected(SubscriptionsPage()),
-                onRetry: () => ref.invalidate(subCountProvider),
-              ),
-              const Divider(),
-              _buildDrawerCountTile(
-                drawerCounts,
-                Icons.feed_rounded,
-                Translations.of(context).text('feeds'),
-                (c) => c.feeds,
-                () {
-                  ref.invalidate(getSubscribedEpisodesProvider);
-                  widget.onPageSelected(FeedsPage());
-                },
-                onRetry: () => ref.invalidate(feedCountProvider),
-              ),
-              const Divider(),
-              _buildDrawerCountTile(
-                drawerCounts,
-                Icons.inbox_rounded,
-                Translations.of(context).text('inbox'),
-                (c) => c.inbox,
-                () => widget.onPageSelected(InboxPage()),
-                onRetry: () => ref.invalidate(inboxCountProvider),
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(
-                  Icons.favorite_rounded,
-                  color: Colors.redAccent,
+              const SizedBox(width: 12),
+              Text(
+                'OpenAir',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
-                title: Text(Translations.of(context).text('favorites')),
-                onTap: () {
-                  widget.onPageSelected(FavoritesPage());
-                },
               ),
-              const Divider(),
-              _buildDrawerCountTile(
-                drawerCounts,
-                Icons.queue_music_rounded,
-                Translations.of(context).text('queue'),
-                (c) => c.queue,
-                () {
-                  ref.invalidate(sortedProvider);
-                  widget.onPageSelected(QueuePage());
-                },
-                onRetry: () => ref.invalidate(queueCountProvider),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: session.when(
+              data: (data) {
+                return FilledButton.tonal(
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (session.value == null) {
+                      widget.onPageSelected(LogIn());
+                    } else {
+                      supabaseService.signOut();
+                      ref.invalidate(getSessionProvider);
+                    }
+                  },
+                  child: Text(
+                    session.value == null
+                        ? Translations.of(context).text('signIn')
+                        : Translations.of(context).text('logout'),
+                  ),
+                );
+              },
+              error: (error, stackTrace) => Text(
+                Translations.of(context).text('errorLoadingData'),
               ),
-              const Divider(),
-              _buildDrawerCountTile(
-                drawerCounts,
-                Icons.download_rounded,
-                Translations.of(context).text('downloads'),
-                (c) => c.downloads,
-                () => widget.onPageSelected(DownloadsPage()),
-                onRetry: () => ref.invalidate(downloadsCountProvider),
+              loading: () => const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.history_rounded),
-                title: Text(Translations.of(context).text('history')),
-                onTap: () {
-                  widget.onPageSelected(HistoryPage());
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.add_rounded),
-                title: Text(Translations.of(context).text('addPodcast')),
-                onTap: () {
-                  widget.onPageSelected(AddPodcastPage());
-                },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? iconColor;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    this.iconColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        hoverColor: theme.colorScheme.surfaceContainerHighest,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(icon,
+                  size: 20,
+                  color: iconColor ?? theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
         ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.settings_rounded),
-          title: Text(Translations.of(context).text('settings')),
-          onTap: () {
-            widget.onPageSelected(
-              Settings(
-                functionBuild: () {
-                  widget.rebuildDrawer();
-                  setState(() {});
-                },
-              ),
-            );
-          },
-        ),
-      ],
+      ),
     );
   }
+}
 
-  Widget _buildDrawerCountTile(
-    AsyncValue<DrawerCounts> counts,
-    IconData icon,
-    String title,
-    String Function(DrawerCounts) selector,
-    VoidCallback onTap, {
-    VoidCallback? onRetry,
-  }) {
+class _CountNavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final AsyncValue<DrawerCounts> counts;
+  final String Function(DrawerCounts) selector;
+  final VoidCallback onTap;
+
+  const _CountNavItem({
+    required this.icon,
+    required this.label,
+    required this.counts,
+    required this.selector,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return counts.when(
-      loading: () => ListTile(
-        leading: Icon(icon),
-        title: Text(title,
-            style: const TextStyle(overflow: TextOverflow.ellipsis)),
-        trailing: const Text('...'),
+      loading: () => _LoadingItem(icon: icon, label: label, theme: theme),
+      error: (error, _) =>
+          _ErrorItem(icon: icon, label: label, theme: theme, onTap: onTap),
+      data: (data) {
+        final count = selector(data);
+        return Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTap,
+            hoverColor: theme.colorScheme.surfaceContainerHighest,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(icon,
+                      size: 20, color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (count.isNotEmpty && count != '0')
+                    Container(
+                      constraints: const BoxConstraints(minWidth: 22),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        count,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LoadingItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ThemeData theme;
+
+  const _LoadingItem({
+    required this.icon,
+    required this.label,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ],
       ),
-      error: (_, __) => ListTile(
-        leading: Icon(icon),
-        title: Text(title,
-            style: const TextStyle(overflow: TextOverflow.ellipsis)),
-        trailing: onRetry != null
-            ? ElevatedButton(onPressed: onRetry, child: const Text('Retry'))
-            : const Icon(Icons.error_outline),
-        onTap: onRetry,
-      ),
-      data: (data) => ListTile(
-        leading: Icon(icon),
-        title: Text(title,
-            style: const TextStyle(overflow: TextOverflow.ellipsis)),
-        trailing: Text(selector(data)),
+    );
+  }
+}
+
+class _ErrorItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ThemeData theme;
+  final VoidCallback onTap;
+
+  const _ErrorItem({
+    required this.icon,
+    required this.label,
+    required this.theme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
         onTap: onTap,
+        hoverColor: theme.colorScheme.surfaceContainerHighest,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(Icons.error_outline,
+                  size: 16, color: theme.colorScheme.error),
+            ],
+          ),
+        ),
       ),
     );
   }

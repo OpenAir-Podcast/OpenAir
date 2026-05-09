@@ -206,6 +206,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Light theme with blue accent",
           data: ThemeData(
             brightness: Brightness.light,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorLight,
             primaryColor: primaryColorLight,
             appBarTheme: appBarThemeLight,
@@ -223,6 +224,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Light theme with blue accent",
           data: ThemeData(
             brightness: Brightness.light,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorLight,
             primaryColor: primaryColorLight,
             appBarTheme: appBarThemeLight,
@@ -240,6 +242,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Light theme with blue accent",
           data: ThemeData(
             brightness: Brightness.light,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorLight,
             primaryColor: primaryColorLight,
             appBarTheme: appBarThemeLight,
@@ -257,6 +260,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Light theme with blue accent",
           data: ThemeData(
             brightness: Brightness.light,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorLight,
             primaryColor: primaryColorLight,
             appBarTheme: appBarThemeLight,
@@ -274,6 +278,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Dark theme with blue accent",
           data: ThemeData(
             brightness: Brightness.dark,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorDark,
             primaryColor: primaryColorDark,
             appBarTheme: appBarThemeDark,
@@ -291,6 +296,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Dark theme with blue accent",
           data: ThemeData(
             brightness: Brightness.dark,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorDark,
             primaryColor: primaryColorDark,
             appBarTheme: appBarThemeDark,
@@ -308,6 +314,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Dark theme with blue accent",
           data: ThemeData(
             brightness: Brightness.dark,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorDark,
             primaryColor: primaryColorDark,
             appBarTheme: appBarThemeDark,
@@ -325,6 +332,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           description: "Dark theme with blue accent",
           data: ThemeData(
             brightness: Brightness.dark,
+            useMaterial3: true,
             scaffoldBackgroundColor: scaffoldBackgroundColorDark,
             primaryColor: primaryColorDark,
             appBarTheme: appBarThemeDark,

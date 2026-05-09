@@ -103,28 +103,24 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   }
 
   Widget _buildWideLayout() {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Expanded(
-          flex: 2,
-          child: Card(
-            color: Theme.of(context).cardColor,
-            elevation: 2.0,
-            margin: EdgeInsets.zero,
-            shape:
-                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        SizedBox(
+          width: 260,
+          child: Material(
+            color: theme.colorScheme.surfaceContainerLow,
+            surfaceTintColor: theme.colorScheme.surfaceTint,
             child: WideDrawer(
               onPageSelected: _onPageSelected,
               rebuildDrawer: _rebuildDrawer,
             ),
           ),
         ),
+        const VerticalDivider(width: 1, thickness: 1),
         Expanded(
-          flex: 5,
           child: Scaffold(
             appBar: AppBar(
-              elevation: 4.0,
-              shadowColor: Colors.grey,
               title: Text(_getTitle()),
               actions: [
                 IconButton(
@@ -155,7 +151,6 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
                 CategoriesPage(),
               ],
             ),
-            drawer: null,
           ),
         ),
       ],

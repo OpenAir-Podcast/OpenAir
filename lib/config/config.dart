@@ -103,34 +103,16 @@ SnackBarThemeData snackBarThemeDark = SnackBarThemeData(
   ),
 );
 
-ColorScheme colorSchemeLight = ColorScheme.light(
-  primary: Colors.blue,
-  onPrimary: Colors.white,
-  secondary: Colors.blueAccent,
-  onSecondary: Colors.white,
+ColorScheme colorSchemeLight = ColorScheme.fromSeed(
+  seedColor: Colors.blue,
+  brightness: Brightness.light,
   surface: Colors.grey[100]!,
-  onSurface: Colors.black,
-  error: Colors.red[700]!,
-  onError: Colors.white,
-  primaryContainer: Colors.white,
-  onPrimaryContainer: Colors.black,
-  secondaryContainer: Colors.white,
-  onSecondaryContainer: Colors.black,
 );
 
-ColorScheme colorSchemeDark = ColorScheme.dark(
-  primary: Colors.blue,
-  onPrimary: Colors.white,
-  secondary: Colors.blueAccent,
-  onSecondary: Colors.white,
+ColorScheme colorSchemeDark = ColorScheme.fromSeed(
+  seedColor: Colors.blue,
+  brightness: Brightness.dark,
   surface: Colors.grey[850]!,
-  onSurface: Colors.white,
-  error: Colors.red[400]!,
-  onError: Colors.black,
-  primaryContainer: Colors.grey[900]!,
-  onPrimaryContainer: Colors.white,
-  secondaryContainer: Colors.grey[900]!,
-  onSecondaryContainer: Colors.white,
 );
 
 ListTileThemeData listTileThemeDark = ListTileThemeData(
