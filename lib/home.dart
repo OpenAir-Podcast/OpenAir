@@ -104,6 +104,8 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
 
   Widget _buildWideLayout() {
     final theme = Theme.of(context);
+    final isPodcastPlaying =
+        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
     return Row(
       children: [
         SizedBox(
@@ -150,6 +152,12 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
                 TrendingPage(),
                 CategoriesPage(),
               ],
+            ),
+            bottomNavigationBar: SizedBox(
+              height: isPodcastPlaying ? bannerAudioPlayerHeight : 0.0,
+              child: isPodcastPlaying
+                  ? const BannerAudioPlayer()
+                  : const SizedBox.shrink(),
             ),
           ),
         ),
