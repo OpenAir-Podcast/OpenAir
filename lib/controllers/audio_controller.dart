@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -138,6 +140,35 @@ class AudioController extends ChangeNotifier {
       await downloadsDir.create(recursive: true);
     }
     return downloadsDir.path;
+  }
+
+  Future<String?> downloadPodcastImage(String imageUrl) async {
+    if (kIsWeb || imageUrl.isEmpty) return null;
+    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      return null;
+    }
+
+    try {
+      final downloadsDir = await getDownloadsDirectory();
+      final imagesDir = Directory(join(downloadsDir, 'images'));
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);
+      }
+
+      final hash = sha256.convert(utf8.encode(imageUrl)).toString();
+      final imagePath = join(imagesDir.path, '$hash.jpg');
+
+      if (await File(imagePath).exists()) {
+        return imagePath;
+      }
+
+      final dio = Dio();
+      await dio.download(imageUrl, imagePath);
+      return imagePath;
+    } catch (e) {
+      debugPrint('Error downloading podcast image: $e');
+      return null;
+    }
   }
 
   Future<bool> isAudioDownloaded(String guid) async {
@@ -327,9 +358,12 @@ class AudioController extends ChangeNotifier {
       final savePath = join(downloadsDir, filename);
       await dio.download(url, savePath);
 
+      final imageUrl = item['image'] ?? item['feedImage'];
+      final localImagePath = await downloadPodcastImage(imageUrl);
+
       final downloadModel = DownloadModel(
         guid: guid,
-        image: item['image'] ?? item['feedImage'],
+        image: localImagePath ?? imageUrl,
         title: item['title'],
         author: podcast.author!,
         datePublished: item['datePublished'],
