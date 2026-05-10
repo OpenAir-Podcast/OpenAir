@@ -712,6 +712,8 @@ class AudioController extends ChangeNotifier {
   Future<void> initializeAudio(BuildContext context) async {
     // Set up position listener
     _audioHandler.positionStream.listen((Duration position) {
+      if (isPlaying == PlayingStatus.buffering) return;
+
       playerPosition = position;
       currentPlaybackPositionString = formatPlaybackPosition(position);
 
@@ -751,6 +753,11 @@ class AudioController extends ChangeNotifier {
             audioState = 'Pause';
             loadState = 'Detail';
           }
+          break;
+        case ProcessingState.buffering:
+          isPlaying = PlayingStatus.buffering;
+          audioState = 'Play';
+          loadState = 'Detail';
           break;
         case ProcessingState.completed:
           isPlaying = PlayingStatus.stop;
