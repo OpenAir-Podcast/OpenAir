@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -16,6 +15,7 @@ import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EpisodeCardGrid extends ConsumerStatefulWidget {
@@ -92,15 +92,11 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                         color: cardImageShadow,
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      child: CachedNetworkImage(
-                        memCacheHeight: 62,
-                        memCacheWidth: 62,
-                        imageUrl: widget.imageUrl,
+                      child: podcastImage(
+                        widget.imageUrl,
+                        width: 62,
+                        height: 62,
                         fit: BoxFit.fill,
-                        errorWidget: (context, url, error) => Icon(
-                          Icons.error,
-                          size: 56.0,
-                        ),
                       ),
                     ),
                   ),

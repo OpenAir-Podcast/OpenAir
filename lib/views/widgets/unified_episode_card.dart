@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -9,6 +8,7 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:openair/views/widgets/podcast_image.dart';
 
 class UnifiedEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
@@ -101,18 +101,13 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                       width: 72,
                       height: 72,
                       color: theme.cardColor,
-                      child: CachedNetworkImage(
-                        memCacheHeight: 144,
-                        memCacheWidth: 144,
-                        imageUrl: widget.episodeItem['feedImage'] ??
+                      child: podcastImage(
+                        widget.episodeItem['feedImage'] ??
                             widget.episodeItem['image'] ??
                             widget.podcast.imageUrl,
+                        width: 72,
+                        height: 72,
                         fit: BoxFit.cover,
-                        errorWidget: (context, url, error) => Icon(
-                          Icons.podcasts,
-                          size: 32,
-                          color: Colors.grey[400],
-                        ),
                       ),
                     ),
                   ),
