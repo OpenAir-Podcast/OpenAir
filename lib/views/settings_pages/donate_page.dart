@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/env.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DonatePage extends ConsumerStatefulWidget {
@@ -134,8 +134,8 @@ class DonatePageState extends ConsumerState<DonatePage> {
                   icon: Icons.paypal_rounded,
                   title: Translations.of(context).text('donateWithPayPal'),
                   onTap: () async {
-                    final url = dotenv.env['PAYPAL_URL'];
-                    if (url != null && context.mounted) {
+                    final url = Env.paypalUrl;
+                    if (context.mounted) {
                       await _launchUrl(url, context);
                     }
                   },
@@ -151,7 +151,7 @@ class DonatePageState extends ConsumerState<DonatePage> {
                 //   icon: Icons.coffee_rounded,
                 //   title: Translations.of(context).text('buyMeACoffee'),
                 //   onTap: () async {
-                //     final url = dotenv.env['BUY_ME_A_COFFEE_URL'];
+                //     final url = Env.buyMeACoffeeUrl;
                 //     if (url != null && context.mounted) {
                 //       await _launchUrl(url, context);
                 //     }
@@ -167,8 +167,8 @@ class DonatePageState extends ConsumerState<DonatePage> {
                   icon: Icons.local_drink_outlined,
                   title: Translations.of(context).text('donateWithKofi'),
                   onTap: () async {
-                    final url = dotenv.env['DONATE_WITH_KOFI_URL'];
-                    if (url != null && context.mounted) {
+                    final url = Env.donateWithKofiUrl;
+                    if (context.mounted) {
                       await _launchUrl(url, context);
                     }
                   },

@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:openair/env.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:openair/config/config.dart';
 import 'dart:io';
@@ -16,9 +16,9 @@ final podcastIndexProvider = Provider(
 );
 
 class PodcastIndexProvider {
-  final String? podcastIndexApi = dotenv.env['PODCAST_INDEX_API_KEY'];
-  final String? podcastIndexSecret = dotenv.env['PODCAST_INDEX_API_SECRET'];
-  final String? podcastIndexUserAgent = dotenv.env['PODCAST_USER_AGENT'];
+  final String? podcastIndexApi = Env.podcastIndexApiKey;
+  final String? podcastIndexSecret = Env.podcastIndexApiSecret;
+  final String? podcastIndexUserAgent = Env.podcastUserAgent;
 
   late int unixTime;
   late String newUnixTime;
@@ -155,7 +155,7 @@ class PodcastIndexProvider {
     final cached = await hiveService.getSearchCache(name);
 
     Map<String, dynamic> data;
-    
+
     if (cached != null && !cached.isExpired) {
       debugPrint('Returning cached episode count for: $name');
       data = cached.results;

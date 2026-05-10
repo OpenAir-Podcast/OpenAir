@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/env.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HelpAndFeedbackPage extends ConsumerStatefulWidget {
@@ -138,8 +138,8 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                   icon: Icons.forum_rounded,
                   title: Translations.of(context).text('joinOurDiscord'),
                   onTap: () async {
-                    final url = dotenv.env['DISCORD_URL'];
-                    if (url != null && context.mounted) {
+                    final url = Env.discordUrl;
+                    if (context.mounted) {
                       await _launchExternalUrl(url, context);
                     }
                   },
@@ -154,8 +154,8 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                   icon: Icons.bug_report_rounded,
                   title: Translations.of(context).text('reportABug'),
                   onTap: () async {
-                    final url = dotenv.env['GITHUB_ISSUES_URL'];
-                    if (url != null && context.mounted) {
+                    final url = Env.githubIssuesUrl;
+                    if (context.mounted) {
                       await _launchExternalUrl(url, context);
                     }
                   },
@@ -170,8 +170,8 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                   icon: Icons.lightbulb_rounded,
                   title: Translations.of(context).text('suggestAFeature'),
                   onTap: () async {
-                    final url = dotenv.env['GITHUB_DISCUSSION_URL'];
-                    if (url != null && context.mounted) {
+                    final url = Env.githubDiscussionUrl;
+                    if (context.mounted) {
                       await _launchExternalUrl(url, context);
                     }
                   },
@@ -186,8 +186,8 @@ class HelpAndFeedbackPageState extends ConsumerState<HelpAndFeedbackPage> {
                   icon: Icons.gavel_rounded,
                   title: Translations.of(context).text('privacyPolicy'),
                   onTap: () async {
-                    final url = dotenv.env['PRIVACY_POLICY'];
-                    if (url != null && context.mounted) {
+                    final url = Env.privacyPolicy;
+                    if (context.mounted) {
                       await _launchExternalUrl(url, context);
                     }
                   },

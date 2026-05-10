@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:openair/env.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
 
-  String? supabaseRedirectToString = dotenv.env['CALLBACK_METHOD'];
-  String? googleRedirectToString = dotenv.env['SUPABASE_GOOGLE_CALLBACK'];
-  String? githubRedirectToString = dotenv.env['SUPABASE_GITHUB_CALLBACK'];
+  String? supabaseRedirectToString = Env.callbackMethod;
+  String? googleRedirectToString = Env.supabaseGoogleCallback;
+  String? githubRedirectToString = Env.supabaseGithubCallback;
 
   // Example function to get user data
   Future<User?> getUser() async {
