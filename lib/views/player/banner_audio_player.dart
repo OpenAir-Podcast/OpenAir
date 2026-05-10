@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +5,7 @@ import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/player/main_player.dart';
+import 'package:openair/views/widgets/podcast_image.dart';
 
 class BannerAudioPlayer extends ConsumerStatefulWidget {
   const BannerAudioPlayer({
@@ -93,17 +93,13 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                         tag: 'player_art',
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            width: 48,
-                            height: 48,
-                            imageUrl: currentEpisode['feedImage'] ??
+                          child: podcastImage(
+                            currentEpisode['feedImage'] ??
                                 currentEpisode['image'] ??
                                 '',
+                            width: 48,
+                            height: 48,
                             fit: BoxFit.cover,
-                            errorWidget: (context, url, error) => Container(
-                              color: theme.colorScheme.onSurface,
-                              child: const Icon(Icons.podcasts, size: 24),
-                            ),
                           ),
                         ),
                       ),

@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'dart:ui';
+
+import 'package:openair/views/widgets/podcast_image.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -233,17 +233,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(32),
-              child: CachedNetworkImage(
+              child: podcastImage(
+                currentEpisode['feedImage'] ?? currentEpisode['image'] ?? '',
                 width: _artworkSize(context),
                 height: _artworkSize(context),
-                imageUrl: currentEpisode['feedImage'] ??
-                    currentEpisode['image'] ??
-                    '',
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: theme.colorScheme.surfaceContainer,
-                  child: const Icon(Icons.podcasts, size: 100),
-                ),
               ),
             ),
           ),
