@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/env.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:openair/views/settings_pages/licenses_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -209,8 +209,8 @@ class AboutPageState extends ConsumerState<AboutPage> {
                       icon: Icons.code_rounded,
                       title: Translations.of(context).text('sourceCode'),
                       onTap: () async {
-                        final url = dotenv.env['GITHUB_URL'];
-                        if (url != null) await _launchUrl(url);
+                        final url = Env.githubUrl;
+                        await _launchUrl(url);
                       },
                       context: context,
                       iconColor: Colors.grey[700],
@@ -241,8 +241,8 @@ class AboutPageState extends ConsumerState<AboutPage> {
                       icon: Icons.shield_rounded,
                       title: Translations.of(context).text('privacyPolicy'),
                       onTap: () async {
-                        final url = dotenv.env['PRIVACY_POLICY'];
-                        if (url != null) await _launchUrl(url);
+                        final url = Env.privacyPolicy;
+                        await _launchUrl(url);
                       },
                       context: context,
                       iconColor: Colors.teal,

@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/env.dart';
 import 'package:openair/home.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
@@ -23,6 +23,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -103,15 +104,9 @@ void main() async {
     });
   }
 
-  try {
-    await dotenv.load(fileName: '.env');
-  } on FileNotFoundError catch (_, e) {
-    debugPrint('Error loading .env file: $e');
-  }
-
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_PROJECT_URL']!,
-    anonKey: dotenv.env['SUPABASE_API_KEY']!,
+    url: Env.supabaseProjectUrl,
+    anonKey: Env.supabaseApiKey,
     debug: false,
   );
 

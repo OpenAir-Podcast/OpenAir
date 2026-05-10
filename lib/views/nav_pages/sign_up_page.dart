@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:openair/env.dart';
 import 'package:openair/providers/supabase_provider.dart';
 import 'package:openair/views/settings_pages/account_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
@@ -398,13 +398,11 @@ class _SignUpState extends ConsumerState<SignUp> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed: () =>
-                                _launchUrl(dotenv.env['TERMS_OF_SERVICE']),
+                            onPressed: () => _launchUrl(Env.termsOfService),
                             child: Text(Translations.of(context).text('terms')),
                           ),
                           TextButton(
-                            onPressed: () =>
-                                _launchUrl(dotenv.env['PRIVACY_POLICY']),
+                            onPressed: () => _launchUrl(Env.privacyPolicy),
                             child: Text(
                                 Translations.of(context).text('privacyPolicy')),
                           ),

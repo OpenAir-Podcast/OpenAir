@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:openair/env.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:dio/dio.dart';
@@ -6,7 +7,6 @@ import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:crypto/crypto.dart';
 
@@ -16,9 +16,9 @@ const String dailyRefreshTask = "dailyRefreshTask";
 class BackgroundPodcastService {
   final Dio _dio = Dio();
   String? _userAgent;
-  final String? podcastIndexApi = dotenv.env['PODCAST_INDEX_API_KEY'];
-  final String? podcastIndexSecret = dotenv.env['PODCAST_INDEX_API_SECRET'];
-  final String? podcastIndexUserAgent = dotenv.env['PODCAST_USER_AGENT'];
+  final String? podcastIndexApi = Env.podcastIndexApiKey;
+  final String? podcastIndexSecret = Env.podcastIndexApiSecret;
+  final String? podcastIndexUserAgent = Env.podcastUserAgent;
 
   Future<String> _getUserAgent() async {
     if (_userAgent != null) return _userAgent!;
@@ -67,8 +67,6 @@ void callbackDispatcher() {
     FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
 
     try {
-      await dotenv.load(fileName: '.env');
-
       // Initialize Hive for background isolate
       final appDocumentDir = await getApplicationDocumentsDirectory();
       final openAirPath = join(appDocumentDir.path, 'OpenAir');
