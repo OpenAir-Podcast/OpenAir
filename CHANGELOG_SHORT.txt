@@ -1,13 +1,17 @@
-What's New in v0.16.6 ✨
+What's New in v0.16.7 ✨
 
-🔧 Improvements
-• Application theme now correctly updates when system brightness changes
-• Sleep timer now displays active status and live countdown in the menu and main player
-• Inbox page crash fixed - podcast ID type mismatch resolved
-• Feed page now correctly displays author names and episode images
-• New subscription episodes now appear in the inbox immediately
-• Unsubscribe cleanup improved to prevent orphaned episodes
-• Drawer navigation optimized with consolidated provider counts
-• Subscription badges clear when opening a podcast
-• Added account deletion functionality to comply with Google Play policies
-• Inbox now correctly clears played and completed episodes automatically
+🖼️ Image Handling
+• Replaced CachedNetworkImage with optimized podcast image component
+• Implemented podcast image downloading and caching
+
+🎵 Audio Playback
+• Enhanced buffering state handling to prevent UI updates during buffering
+
+🖥️ Desktop Improvements
+• Added responsive grid view for desktop episode browsing
+• Dynamic player artwork sizing for desktop layouts
+• Conditional banner audio player for wide layout
+• Refactored desktop layouts and wide drawer UI
+
+🛠️ Code Quality
+• Refactored code for improved readability and maintainability
