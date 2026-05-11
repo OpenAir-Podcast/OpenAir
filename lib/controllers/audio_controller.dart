@@ -441,7 +441,8 @@ class AudioController extends ChangeNotifier {
     if (historyPodcastAuthor == null) {
       if (podcast != null) {
         historyPodcastId = podcast.id.toString();
-        historyPodcastImage = podcast.imageUrl;
+        historyPodcastImage =
+            episode['image'] ?? episode['feedImage'] ?? podcast.imageUrl;
         historyPodcastAuthor = podcast.author ?? episode['author'] ?? 'Unknown';
       } else {
         historyPodcastId = episode['podcastId']?.toString() ?? '-1';
@@ -464,7 +465,7 @@ class AudioController extends ChangeNotifier {
       historyPodcastId =
           podcast?.id.toString() ?? episode['podcastId']?.toString() ?? '-1';
       historyPodcastImage =
-          podcast?.imageUrl ?? episode['image'] ?? episode['feedImage'] ?? '';
+          episode['image'] ?? episode['feedImage'] ?? podcast?.imageUrl ?? '';
     }
 
     final HistoryModel historyMod = HistoryModel(
