@@ -1,0 +1,127 @@
+name: Flutter Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "OpenAir ${{ github.ref_name }}" \
+            --notes-file CHANGELOG_SHORT.txt \
+            --draft \
+            --prerelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_linux:
+    needs: create_release
+    name: Linux (tar.gz)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build linux --release
+      - name: Package
+        run: |
+          RELEASE_NAME="openair-${{ github.ref_name }}-linux-x64.tar.gz"
+          cd build/linux/x64/release
+          tar -czvf ../../../$RELEASE_NAME .
+      - name: Upload
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "openair-${{ github.ref_name }}-linux-x64.tar.gz"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_windows:
+    needs: create_release
+    name: Windows (zip)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: Package
+        shell: powershell
+        run: |
+          $ZipName = "openair-${{ github.ref_name }}-windows-x64.zip"
+          Compress-Archive -Path build/windows/runner/Release\* -DestinationPath $ZipName
+      - name: Upload
+        shell: bash
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "openair-${{ github.ref_name }}-windows-x64.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_android:
+    needs: create_release
+    name: Android (APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - name: Upload
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_snap:
+    needs: create_release
+    name: Linux (Snap)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync version from pubspec
+        run: |
+          VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //; s/"//g; s/ //g')
+          sed -i "s/^version: .*/version: \"$VERSION\"/" snapcraft.yaml
+      - uses: snapcore/action-build@v1
+        id: snapcraft
+      - name: Upload
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "${{ steps.snapcraft.outputs.snap }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_flatpak:
+    needs: create_release
+    name: Linux (Flatpak)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync tag in flatpak manifest
+        run: |
+          sed -i "s|tag: .*|tag: ${{ github.ref_name }}|" flatpak/flatpak-flutter.yml
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: openair.flatpak
+          manifest-path: flatpak/flatpak-flutter.yml
+          cache-key: flatpak-${{ github.sha }}
+      - name: Upload
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            openair.flatpak
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
