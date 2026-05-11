@@ -253,7 +253,19 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> resumePlayback() async {
-    await _audioHandler.play();
+    if (_audioHandler.player.processingState == ProcessingState.idle &&
+        currentEpisode != null) {
+      final isDownloaded = await isAudioDownloaded(currentEpisode!['guid']);
+      if (isDownloaded) {
+        final downloadsDir = await getDownloadsDirectory();
+        final filePath = join(downloadsDir, '${currentEpisode!['guid']}.mp3');
+        await _audioHandler.playFromFile(filePath);
+      } else {
+        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl']);
+      }
+    } else {
+      await _audioHandler.play();
+    }
     audioState = 'Play';
     loadState = 'Play';
     isPlaying = PlayingStatus.playing;
