@@ -5,16 +5,17 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/history_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/history_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
-import 'package:openair/views/widgets/episode_card_list.dart';
 
-final getHistoryProvider = FutureProvider.autoDispose((ref) async {
+final getHistoryProvider =
+    FutureProvider.autoDispose<List<HistoryModel>>((ref) async {
   return await ref.read(openAirProvider).getSortedHistory();
 });
 
@@ -51,72 +52,64 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (BuildContext dialogContext) => AlertDialog(
-                        title: Text(
-                          Translations.of(context).text('clearHistory'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          title: Text(
+                            Translations.of(dialogContext).text('clearHistory'),
                           ),
-                        ),
-                        content: Text(
-                          Translations.of(context)
-                              .text('areYouSureClearHistory'),
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
+                          content: Text(
+                            Translations.of(dialogContext)
+                                .text('areYouSureClearHistory'),
                           ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child:
-                                Text(Translations.of(context).text('cancel')),
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              Translations.of(context).text('clear'),
-                              style: TextStyle(
-                                color: Colors.red,
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text(
+                                Translations.of(dialogContext).text('cancel'),
                               ),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop();
+                              },
                             ),
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              await ref
-                                  .watch(openAirProvider)
-                                  .hiveService
-                                  .clearHistory();
-                              ref.invalidate(getHistoryProvider);
-                              if (context.mounted) {
-                                if (!Platform.isAndroid && !Platform.isIOS) {
-                                  ref
-                                      .read(notificationServiceProvider)
-                                      .showNotification(
-                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                        Translations.of(context)
-                                            .text('historyCleared'),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        Translations.of(context)
-                                            .text('historyCleared'),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                Translations.of(dialogContext).text('clear'),
+                              ),
+                              onPressed: () async {
+                                Navigator.of(dialogContext).pop();
+                                await ref
+                                    .watch(openAirProvider)
+                                    .hiveService
+                                    .clearHistory();
+                                ref.invalidate(getHistoryProvider);
+                                if (context.mounted) {
+                                  if (!Platform.isAndroid && !Platform.isIOS) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .showNotification(
+                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                          Translations.of(context)
+                                              .text('historyCleared'),
+                                        );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          Translations.of(context)
+                                              .text('historyCleared'),
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
@@ -139,7 +132,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
-                          id: int.parse(data[index].podcastId),
+                          id: int.tryParse(data[index].podcastId) ?? -1,
                           feedUrl: data[index].feedUrl,
                           title: data[index].title,
                           author: data[index].author,
@@ -150,7 +143,8 @@ class _HistoryState extends ConsumerState<HistoryPage> {
 
                         return EpisodeCardGrid(
                           title: data[index].title,
-                          aurthor: data[index].author!,
+                          author: data[index].author!,
+                          imageUrl: data[index].image,
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
                         );
@@ -161,7 +155,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
-                          id: int.parse(data[index].podcastId),
+                          id: int.tryParse(data[index].podcastId) ?? -1,
                           feedUrl: data[index].feedUrl,
                           title: data[index].title,
                           author: data[index].author,
@@ -170,11 +164,11 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                           artwork: data[index].image,
                         );
 
-                        return EpisodeCardList(
-                          title: data[index].title,
-                          author: data[index].author!,
+                        return UnifiedEpisodeCard(
                           episodeItem: data[index].toJson(),
                           podcast: podcastModel,
+                          title: data[index].title,
+                          author: data[index].author!,
                         );
                       },
                     ),
@@ -205,23 +199,14 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                 const SizedBox(height: 20.0),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Brightness.light == Theme.of(context).brightness
-                        ? Colors.black
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Brightness.light == Theme.of(context).brightness
-                        ? Colors.black
-                        : Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(
@@ -244,8 +229,13 @@ class _HistoryState extends ConsumerState<HistoryPage> {
           ),
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+      loading: () => Scaffold(
+        appBar: AppBar(
+          title: Text(Translations.of(context).text('history')),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

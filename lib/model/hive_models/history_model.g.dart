@@ -1,0 +1,80 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'history_model.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
+  @override
+  final typeId = 5;
+
+  @override
+  HistoryModel read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return HistoryModel(
+      guid: fields[0] as String,
+      image: fields[1] as String,
+      title: fields[2] as String,
+      author: fields[3] as String?,
+      datePublished: (fields[4] as num).toInt(),
+      description: fields[5] as String,
+      feedUrl: fields[6] as String,
+      duration: (fields[7] as num).toInt(),
+      size: fields[8] as String,
+      podcastId: fields[9] as String,
+      enclosureLength: (fields[10] as num).toInt(),
+      enclosureUrl: fields[11] as String,
+      playDate: (fields[12] as num).toInt(),
+      position: fields[13] as int? ?? 0,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, HistoryModel obj) {
+    writer
+      ..writeByte(14)
+      ..writeByte(0)
+      ..write(obj.guid)
+      ..writeByte(1)
+      ..write(obj.image)
+      ..writeByte(2)
+      ..write(obj.title)
+      ..writeByte(3)
+      ..write(obj.author)
+      ..writeByte(4)
+      ..write(obj.datePublished)
+      ..writeByte(5)
+      ..write(obj.description)
+      ..writeByte(6)
+      ..write(obj.feedUrl)
+      ..writeByte(7)
+      ..write(obj.duration)
+      ..writeByte(8)
+      ..write(obj.size)
+      ..writeByte(9)
+      ..write(obj.podcastId)
+      ..writeByte(10)
+      ..write(obj.enclosureLength)
+      ..writeByte(11)
+      ..write(obj.enclosureUrl)
+      ..writeByte(12)
+      ..write(obj.playDate)
+      ..writeByte(13)
+      ..write(obj.position);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HistoryModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

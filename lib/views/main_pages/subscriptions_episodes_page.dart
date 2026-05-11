@@ -1,203 +1,291 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/services/podcast_index_service.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
-import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/widgets/subscription_episode_card_list.dart';
-import 'package:openair/views/widgets/subscription_episode_card_grid.dart';
 import 'package:openair/views/native/podcast_info.dart';
+import 'package:openair/views/player/banner_audio_player.dart';
+import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 
-// Ensure providers are defined as top-level variables
-final podcastDataByUrlProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, podcastUrl) async {
-  final podcastIndexService = ref.watch(podcastIndexProvider);
-  return await podcastIndexService.getEpisodesByFeedUrl(podcastUrl);
+final podCastDataByUrlProvider =
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, podCastUrl) async {
+  final podCastIndexService = ref.watch(podcastIndexProvider);
+  return await podCastIndexService.getEpisodesByFeedUrl(podCastUrl);
 });
 
 class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
   const SubscriptionsEpisodesPage({
-    super.key, 
-    required this.podcast, 
-    required this.id
+    super.key,
+    required this.podcast,
+    required this.id,
   });
-  
+
   final PodcastModel podcast;
   final int id;
 
   @override
-  ConsumerState<SubscriptionsEpisodesPage> createState() => _SubscriptionsEpisodesPageState();
+  ConsumerState<SubscriptionsEpisodesPage> createState() =>
+      _SubscriptionsEpisodesPageState();
 }
 
-class _SubscriptionsEpisodesPageState extends ConsumerState<SubscriptionsEpisodesPage> {
-  bool once = false;
-
-  Future<bool> getSub() async {
-    return await ref.watch(openAirProvider).isSubscribed(widget.podcast.title);
-  }
-
+class _SubscriptionsEpisodesPageState
+    extends ConsumerState<SubscriptionsEpisodesPage> {
   @override
   Widget build(BuildContext context) {
-    final String podcastUrl = widget.podcast.feedUrl;
-    final podcastDataAsyncValue = ref.watch(podcastDataByUrlProvider(podcastUrl));
-    final podcastDataInfoAsyncValue = ref.watch(getPodcastInfoByTitleProvider(widget.podcast.title));
+    final podCastUrl = widget.podcast.feedUrl;
+    final podCastDataAsync = ref.watch(podCastDataByUrlProvider(podCastUrl));
+    final podCastDataInfoAsync =
+        ref.watch(getPodcastInfoByTitleProvider(widget.podcast.title));
+    final isSubscribedAsync =
+        ref.watch(isSubscribedProvider(widget.podcast.title));
 
-    return podcastDataAsyncValue.when(
+    return podCastDataAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stackTrace) => Scaffold(
-        body: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline_rounded, size: 75.0, color: Colors.grey),
-              const SizedBox(height: 20.0),
-              Text(
-                Translations.of(context).text('oopsTryAgainLater'),
-                style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              Text('$error', style: const TextStyle(fontSize: 16.0)),
-              const SizedBox(height: 20.0),
-              SizedBox(
-                width: 180.0,
-                height: 40.0,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                  ),
-                  onPressed: () async => ref.invalidate(podcastIndexProvider),
-                  child: const Text('Retry'),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(title: Text(widget.podcast.title)),
+        body: _ErrorView(
+          error: error.toString(),
+          podCastFeedUrl: podCastUrl,
         ),
       ),
       data: (snapshot) {
-        return podcastDataInfoAsyncValue.when(
+        return podCastDataInfoAsync.when(
           data: (data) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(ref.watch(audioProvider).currentPodcast?.title ?? "Episodes"),
-                actions: [
-                  IconButton(
-                    tooltip: Translations.of(context).text('podcastDetails'),
-                    onPressed: () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PodcastInfoPage(podcastInfo: data)),
-                      );
-                    },
-                    icon: const Icon(Icons.info_outline_rounded, size: 30.0),
+            return isSubscribedAsync.when(
+              data: (isSubscribed) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.55),
+                      child: Text(
+                        widget.podcast.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    actions: [
+                      IconButton(
+                        tooltip:
+                            Translations.of(context).text('podCastDetails'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PodcastInfoPage(podcastInfo: data),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.info_outline_rounded, size: 30),
+                      ),
+                      _SubscribeButton(
+                        podcast: widget.podcast,
+                        isSubscribed: isSubscribed,
+                      ),
+                    ],
                   ),
-                  FutureBuilder<bool>(
-                    future: ref.watch(openAirProvider).isSubscribed(widget.podcast.title),
-                    builder: (context, subSnapshot) {
-                      if (!subSnapshot.hasData && !once) {
-                        once = true;
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Center(child: Text('...')),
-                        );
-                      }
-
-                      final isSubscribed = subSnapshot.data ?? false;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: IconButton(
-                          tooltip: isSubscribed ? 'Unsubscribe to podcast' : 'Subscribe to podcast',
-                          onPressed: () async {
-                            if (isSubscribed) {
-                              ref.read(audioProvider).unsubscribe(widget.podcast);
-                            } else {
-                              ref.read(audioProvider).subscribe(widget.podcast, context);
-                            }
-
-                            final msg = isSubscribed
-                                ? 'Unsubscribed from ${widget.podcast.title}'
-                                : 'Subscribed to ${widget.podcast.title}';
-
-                            if (!Platform.isAndroid && !Platform.isIOS) {
-                              ref.read(notificationServiceProvider).showNotification(
-                                'OpenAir ${Translations.of(context).text('notification')}',
-                                msg,
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-                            }
-
-                            ref.invalidate(podcastDataByUrlProvider(podcastUrl));
-                          },
-                          icon: Icon(isSubscribed ? Icons.check : Icons.add),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                  body: _buildEpisodeList(context, ref, snapshot, data),
+                  bottomNavigationBar: _buildBottomBar(context, ref),
+                );
+              },
+              loading: () => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: RefreshIndicator(
-                  onRefresh: () async => ref.invalidate(podcastDataByUrlProvider(podcastUrl)),
-                  child: wideScreenMinWidth < MediaQuery.sizeOf(context).width
-                      ? LayoutBuilder(
-                          builder: (context, constraints) {
-                            const double targetCardWidth = 250.0;
-                            int dynamicCrossAxisCount = (constraints.maxWidth / targetCardWidth).floor();
-                            if (dynamicCrossAxisCount < 1) dynamicCrossAxisCount = 1;
-
-                            return GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: dynamicCrossAxisCount,
-                                childAspectRatio: 1.2,
-                                mainAxisExtent: 294,
-                                crossAxisSpacing: 4,
-                                mainAxisSpacing: 4,
-                              ),
-                              cacheExtent: cacheExtent,
-                              itemCount: snapshot['count'],
-                              itemBuilder: (context, index) => SubscriptionEpisodeCardGrid(
-                                title: snapshot['items'][index]['title'],
-                                episodeItem: snapshot['items'][index],
-                                podcast: widget.podcast,
-                              ),
-                            );
-                          },
-                        )
-                      : ListView.builder(
-                          itemCount: snapshot['count'],
-                          itemBuilder: (context, index) {
-                            return SubscriptionEpisodeCardList(
-                              title: snapshot['items'][index]['title'],
-                              episodeItem: snapshot['items'][index],
-                              podcast: widget.podcast,
-                            );
-                          },
-                        ),
-                ),
-              ),
-              bottomNavigationBar: SizedBox(
-                height: ref.watch(audioProvider).isPodcastSelected ? bannerAudioPlayerHeight : 0.0,
-                child: ref.watch(audioProvider).isPodcastSelected ? const BannerAudioPlayer() : const SizedBox(),
+              error: (_, __) => const Scaffold(
+                body: Center(child: Text('Error loading subscription status')),
               ),
             );
           },
-          error: (error, stackTrace) => Scaffold(
-            body: Center(child: Text('Error loading podcast info: $error', style: const TextStyle(fontSize: 16.0))),
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           ),
-          loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+          error: (_, __) => Scaffold(
+            appBar: AppBar(title: Text(widget.podcast.title)),
+            body: _buildEpisodeList(context, ref, snapshot, null),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildEpisodeList(
+    BuildContext context,
+    WidgetRef ref,
+    Map snapshot,
+    Map? podcastInfo,
+  ) {
+    final episodeCount = snapshot['count'] ?? 0;
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+
+    if (episodeCount == 0) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.podcasts, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              Translations.of(context).text('noResults'),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      );
+    }
+
+    String getAuthor() {
+      return (podcastInfo?['author']?.isNotEmpty == true ||
+              widget.podcast.author?.isNotEmpty == true)
+          ? (podcastInfo?['author'] ?? widget.podcast.author!)
+          : Translations.of(context).text('unknown');
+    }
+
+    if (isDesktop) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300.0,
+          mainAxisExtent: 312.0,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        cacheExtent: cacheExtent,
+        itemCount: episodeCount,
+        itemBuilder: (context, index) {
+          final author = getAuthor();
+          return EpisodeCardGrid(
+            episodeItem: snapshot['items'][index],
+            title: snapshot['items'][index]['title'] ?? '',
+            author: author,
+            imageUrl: widget.podcast.imageUrl,
+            podcast: widget.podcast,
+          );
+        },
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      cacheExtent: cacheExtent,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemCount: episodeCount,
+      itemBuilder: (context, index) {
+        final author = getAuthor();
+
+        return UnifiedEpisodeCard(
+          episodeItem: snapshot['items'][index],
+          podcast: widget.podcast,
+          title: snapshot['items'][index]['title'],
+          author: author,
+          showAuthor: true,
+        );
+      },
+    );
+  }
+
+  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
+    final isPodcastSelected = ref.watch(
+      audioProvider.select((p) => p.isPodcastSelected),
+    );
+
+    if (!isPodcastSelected) return null;
+
+    return SizedBox(
+      height: bannerAudioPlayerHeight,
+      child: const BannerAudioPlayer(),
+    );
+  }
+}
+
+class _SubscribeButton extends ConsumerWidget {
+  const _SubscribeButton({
+    required this.podcast,
+    required this.isSubscribed,
+  });
+
+  final PodcastModel podcast;
+  final bool isSubscribed;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      tooltip: isSubscribed
+          ? Translations.of(context).text('unsubscribeToPodCast')
+          : Translations.of(context).text('subscribeToPodCast'),
+      onPressed: () => _toggleSubscription(context, ref),
+      icon: Icon(isSubscribed ? Icons.check : Icons.add),
+    );
+  }
+
+  void _toggleSubscription(BuildContext context, WidgetRef ref) async {
+    final audioController = ref.read(audioProvider);
+
+    if (isSubscribed) {
+      audioController.unsubscribe(podcast);
+    } else {
+      audioController.subscribe(podcast, context);
+    }
+
+    // Invalidate the provider to refresh the UI
+    ref.invalidate(isSubscribedProvider(podcast.title));
+
+    final msg = isSubscribed
+        ? '${Translations.of(context).text('unsubscribedFrom')} ${podcast.title}'
+        : '${Translations.of(context).text('subscribedTo')} ${podcast.title}';
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+}
+
+class _ErrorView extends ConsumerWidget {
+  final String error;
+
+  const _ErrorView({required this.error, required this.podCastFeedUrl});
+
+  final String podCastFeedUrl;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 64, color: Colors.grey),
+          const SizedBox(height: 20),
+          Text(
+            Translations.of(context).text('oopsTryAgainLater'),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey,
+                ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () =>
+                ref.invalidate(podCastDataByUrlProvider(podCastFeedUrl)),
+            child: Text(Translations.of(context).text('retry')),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 
@@ -26,186 +25,234 @@ class _QueueCardState extends ConsumerState<QueueCard> {
   @override
   Widget build(BuildContext context) {
     final audioProviderNotifier = ref.read(audioProvider.notifier);
-    // Watch the provider to get live updates for the active card.
     final openAir = ref.watch(audioProvider);
 
     final double currentPositionMilliseconds;
     final String currentPositionString;
     final String audioState;
 
-    // If this card is the selected one (playing or paused), get its state
-    // from the provider. Otherwise, get the saved state from the item model.
     if (widget.isQueueSelected) {
       currentPositionMilliseconds =
           openAir.podcastCurrentPositionInMilliseconds;
-
       currentPositionString = openAir.currentPlaybackPositionString;
-
       audioState = openAir.audioState;
     } else {
-      // This is an inactive item in the queue. Show its saved progress.
       currentPositionMilliseconds =
-          widget.episodeItem['podcastCurrentPositionInMilliseconds'];
-
+          widget.episodeItem['podcastCurrentPositionInMilliseconds'] ?? 0;
       currentPositionString =
-          widget.episodeItem['currentPlaybackPositionString'];
-
+          widget.episodeItem['currentPlaybackPositionString'] ?? '';
       audioState = 'Pause';
     }
 
-    return Card(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Theme.of(context).bottomAppBarTheme.color
-          : Theme.of(context).colorScheme.primaryContainer,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final date = ref.read(audioProvider).getPodcastPublishedDateFromEpoch(
+          widget.episodeItem['datePublished'],
+        );
+    final size = widget.episodeItem['downloadSize'] ?? '';
+
+    return Container(
       key: ValueKey(widget.episodeItem['guid']),
-      child: ListTile(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => EpisodeDetail(
-                episodeItem: (widget.episodeItem).cast<String, dynamic>(),
-                podcast: PodcastModel.fromJson(
-                    widget.episodeItem['podcast'].cast<String, dynamic>()),
-              ),
-            ),
-          );
-        },
-        leading: ReorderableDragStartListener(
-          index: widget.index,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.drag_handle),
-              const SizedBox(width: 8),
-              Container(
-                width: 62.0,
-                height: 62.0,
-                decoration: BoxDecoration(
-                  color: cardImageShadow,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: CachedNetworkImage(
-                  memCacheHeight: 52,
-                  memCacheWidth: 52,
-                  imageUrl: widget.episodeItem['image'],
-                  fit: BoxFit.fill,
-                  errorWidget: (context, url, error) => Icon(
-                    Icons.error,
-                    size: 56.0,
-                  ),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: widget.isQueueSelected
+            ? colorScheme.primaryContainer.withValues(alpha: 0.7)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: widget.isQueueSelected
+            ? Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.3), width: 1.5)
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => EpisodeDetail(
+                  episodeItem: (widget.episodeItem).cast<String, dynamic>(),
+                  podcast: PodcastModel.fromJson(
+                      widget.episodeItem['podcast'].cast<String, dynamic>()),
+                  author: widget.episodeItem['author'],
                 ),
               ),
-            ],
-          ),
-        ),
-        title: Column(
-          children: [
-            Row(
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  ref.read(audioProvider).getPodcastPublishedDateFromEpoch(
-                        widget.episodeItem['datePublished'],
-                      ),
-                  style: const TextStyle(fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  textAlign: TextAlign.left,
-                ),
-                const Text(' | '),
-                Text(
-                  widget.episodeItem['downloadSize'],
-                  style: const TextStyle(fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              ],
-            ),
-            Text(
-              widget.episodeItem['title'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              textAlign: TextAlign.left,
-            ),
-          ],
-        ),
-        subtitle: Column(
-          children: [
-            // Seek bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                5.0,
-                10.0,
-                5.0,
-                10.0,
-              ),
-              child: LinearProgressIndicator(
-                value: currentPositionMilliseconds,
-                backgroundColor: Colors.purple.shade100,
-              ),
-            ),
-            // Seek positions
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    currentPositionString,
+                // Drag handle + artwork
+                ReorderableDragStartListener(
+                  index: widget.index,
+                  child: SizedBox(
+                    width: 56,
+                    child: Icon(
+                      Icons.drag_handle_rounded,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                  Text(
-                    openAir.formatCurrentPlaybackPosition(
-                      Duration(
-                        seconds: widget.episodeItem['duration'],
+                ),
+                const SizedBox(width: 4),
+                // Artwork
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    color: colorScheme.surfaceContainerHighest,
+                    child: CachedNetworkImage(
+                      memCacheHeight: 56,
+                      memCacheWidth: 56,
+                      imageUrl: widget.episodeItem['image'] ?? '',
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.podcasts_rounded,
+                        size: 28,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12),
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Meta info
+                      Row(
+                        children: [
+                          Text(
+                            date,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (size.isNotEmpty) ...[
+                            Text(
+                              ' • ',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(
+                              size,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Title
+                      Text(
+                        widget.episodeItem['title'] ?? '',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      // Progress bar
+                      LinearProgressIndicator(
+                        value: currentPositionMilliseconds,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          widget.isQueueSelected && audioState == 'Play'
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.5),
+                        ),
+                        minHeight: 3,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      const SizedBox(height: 6),
+                      // Time info
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            currentPositionString,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures()
+                              ],
+                            ),
+                          ),
+                          Text(
+                            openAir.formatCurrentPlaybackPosition(
+                              Duration(
+                                seconds: widget.episodeItem['duration'] ?? 0,
+                              ),
+                            ),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures()
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Play/Pause button
+                IconButton(
+                  icon: Icon(
+                    widget.isQueueSelected && audioState == 'Play'
+                        ? Icons.pause_circle_filled_rounded
+                        : Icons.play_circle_filled_rounded,
+                    size: 40,
+                    color: widget.isQueueSelected && audioState == 'Play'
+                        ? colorScheme.primary
+                        : colorScheme.primary.withValues(alpha: 0.8),
+                  ),
+                  onPressed: () {
+                    if (widget.isQueueSelected &&
+                        openAir.isPlaying == PlayingStatus.playing) {
+                      audioProviderNotifier.playerPauseButtonClicked();
+                    } else if (widget.isQueueSelected &&
+                        openAir.isPlaying == PlayingStatus.paused) {
+                      audioProviderNotifier.playerResumeButtonClicked();
+                    } else if (!widget.isQueueSelected) {
+                      if (openAir.currentEpisode != null &&
+                          openAir.currentEpisode!.isNotEmpty) {
+                        audioProviderNotifier.updateCurrentQueueCard(
+                          openAir.currentEpisode!['guid'],
+                          openAir.podcastCurrentPositionInMilliseconds,
+                          openAir.currentPlaybackPositionString,
+                          openAir.currentPlaybackRemainingTimeString,
+                          openAir.playerPosition,
+                        );
+                      }
+
+                      openAir.playerPosition =
+                          widget.episodeItem['playerPosition'] ?? 0;
+                      openAir.currentPodcast =
+                          PodcastModel.fromJson(widget.episodeItem);
+                      openAir.currentEpisode = widget.episodeItem;
+
+                      audioProviderNotifier.playNewQueueItem(
+                        widget.episodeItem,
+                        context,
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-        trailing: IconButton(
-          iconSize: 40.0,
-          icon: Icon(
-            widget.isQueueSelected && audioState == 'Play'
-                ? Icons.pause_circle_outline_rounded
-                : Icons.play_circle_outline_rounded,
-            size: 40.0,
           ),
-          onPressed: () {
-            if (widget.isQueueSelected &&
-                openAir.isPlaying == PlayingStatus.playing) {
-              audioProviderNotifier.playerPauseButtonClicked();
-            } else if (widget.isQueueSelected &&
-                openAir.isPlaying == PlayingStatus.paused) {
-              audioProviderNotifier.playerResumeButtonClicked();
-            } else if (!widget.isQueueSelected) {
-              if (openAir.currentEpisode!.isNotEmpty) {
-                audioProviderNotifier.updateCurrentQueueCard(
-                  openAir.currentEpisode!['guid'],
-                  openAir.podcastCurrentPositionInMilliseconds,
-                  openAir.currentPlaybackPositionString,
-                  openAir.currentPlaybackRemainingTimeString,
-                  openAir.playerPosition,
-                );
-              }
-
-              openAir.playerPosition = widget.episodeItem['playerPosition'];
-
-              openAir.currentPodcast =
-                  PodcastModel.fromJson(widget.episodeItem);
-
-              openAir.currentEpisode = widget.episodeItem;
-
-              audioProviderNotifier.playNewQueueItem(
-                widget.episodeItem,
-                context,
-              );
-            }
-          },
         ),
       ),
     );

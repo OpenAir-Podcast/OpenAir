@@ -8,10 +8,10 @@ display_name: OpenAir
 executable_name: OpenAir
 
 # The ID of the application (must match the desktop file ID)
-app_id: org.openair.podcast
+app_id: com.openair.podcast
 
 # The path to the desktop file (relative to the project root or `linux/`)
-desktop_file: linux/org.openair.podcast.desktop
+desktop_file: linux/com.openair.podcast.desktop
 
 # The path to the application icon file (PNG format is recommended)
 icon_file: assets/icons/icon.png

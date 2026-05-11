@@ -1,35 +1,36 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
-import 'package:openair/views/main_pages/episodes_page.dart';
-import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EpisodeCardGrid extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
   final String title;
-  final String aurthor;
+  final String author;
+  final String imageUrl;
   final PodcastModel podcast;
 
   const EpisodeCardGrid({
     super.key,
     required this.episodeItem,
     required this.title,
-    required this.aurthor,
+    required this.author,
+    required this.imageUrl,
     required this.podcast,
   });
 
@@ -52,7 +53,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListProvider =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
@@ -63,6 +64,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
             builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
               podcast: widget.podcast,
+              author: widget.author,
             ),
           ),
         );
@@ -90,17 +92,11 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                         color: cardImageShadow,
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      child: CachedNetworkImage(
-                        memCacheHeight: 62,
-                        memCacheWidth: 62,
-                        imageUrl: widget.episodeItem['image'] ??
-                            widget.episodeItem['feedImage'] ??
-                            widget.podcast.imageUrl,
+                      child: podcastImage(
+                        widget.imageUrl,
+                        width: 62,
+                        height: 62,
                         fit: BoxFit.fill,
-                        errorWidget: (context, url, error) => Icon(
-                          Icons.error,
-                          size: 56.0,
-                        ),
                       ),
                     ),
                   ),
@@ -116,37 +112,36 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                             // Podcast title
                             child: Text(
                               widget.title,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis,
-                                color: Brightness.dark ==
-                                        Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                               maxLines: 2,
                             ),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width - 130.0,
-                            // Podcast title
+                            // Podcast author
                             child: Text(
-                              widget.aurthor,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                overflow: TextOverflow.ellipsis,
-                                color: Colors.grey,
-                              ),
+                              widget.author,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
                             podcastDate,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
                           ),
                         ],
                       ),
@@ -167,10 +162,11 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                         maxLines: 4,
                         textOverflow: TextOverflow.ellipsis,
                         margin: Margins.zero,
-                        fontSize: FontSize(14.0),
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
+                        fontSize: FontSize(
+                          Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                              14.0,
+                        ),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     },
                   ),
@@ -202,7 +198,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                               );
 
                           ref.watch(audioProvider).currentEpisode!['author'] =
-                              widget.aurthor;
+                              widget.author;
                         }
                       },
                       child: PlayButtonWidget(
@@ -281,7 +277,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                           },
                           loading: () {
                             // Handle loading by showing previous state's icon, disabled
-                            final previousList = queueListAsync.valueOrNull;
+                            final previousList = queueListAsync.value;
 
                             final isQueuedPreviously = previousList
                                     ?.containsKey(widget.episodeItem['guid']) ??
@@ -325,71 +321,74 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                 onPressed = () {
                                   showDialog(
                                     context: context,
-                                    builder: (BuildContext dialogContext) =>
-                                        AlertDialog(
-                                      title: Text(Translations.of(context)
-                                          .text('confirmDeletion')),
-                                      content: Text(
-                                          '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: Text(Translations.of(context)
-                                              .text('cancel')),
-                                          onPressed: () {
-                                            Navigator.of(dialogContext)
-                                                .pop(); // Dismiss the dialog
-                                          },
+                                    builder: (BuildContext dialogContext) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          Translations.of(dialogContext)
+                                              .text('confirmDeletion'),
                                         ),
-                                        TextButton(
-                                          child: Text(
-                                            Translations.of(context)
-                                                .text('remove'),
-                                            style: TextStyle(
-                                              color: Colors.red,
+                                        content: Text(
+                                          '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text(
+                                              Translations.of(dialogContext)
+                                                  .text('cancel'),
                                             ),
+                                            onPressed: () {
+                                              Navigator.of(dialogContext).pop();
+                                            },
                                           ),
-                                          onPressed: () async {
-                                            // Pop the dialog first
-                                            Navigator.of(dialogContext).pop();
+                                          FilledButton(
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            child: Text(
+                                              Translations.of(dialogContext)
+                                                  .text('remove'),
+                                            ),
+                                            onPressed: () async {
+                                              Navigator.of(dialogContext).pop();
 
-                                            // Then perform the removal
-                                            await ref
-                                                .read(audioProvider.notifier)
-                                                .removeDownload(
-                                                    widget.episodeItem);
+                                              // Then perform the removal
+                                              await ref
+                                                  .read(audioProvider.notifier)
+                                                  .removeDownload(
+                                                      widget.episodeItem);
 
-                                            if (context.mounted &&
-                                                receiveNotificationsWhenDownloadConfig) {
-                                              if (!Platform.isAndroid &&
-                                                  !Platform.isIOS) {
-                                                ref
-                                                    .read(
-                                                        notificationServiceProvider)
-                                                    .showNotification(
-                                                      'OpenAir ${Translations.of(context).text('notification')}',
-                                                      '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
-                                                    );
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                              if (context.mounted &&
+                                                  receiveNotificationsWhenDownloadConfig) {
+                                                if (!Platform.isAndroid &&
+                                                    !Platform.isIOS) {
+                                                  ref
+                                                      .read(
+                                                          notificationServiceProvider)
+                                                      .showNotification(
+                                                        'OpenAir ${Translations.of(context).text('notification')}',
+                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                      );
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
+                                                  );
+                                                }
                                               }
-                                            }
 
-                                            ref.invalidate(
-                                                sortedDownloadsProvider);
-                                          },
-                                        ),
-                                      ],
-                                    ),
+                                              ref.invalidate(
+                                                  getDownloadsProvider);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
-
-                                  ref.invalidate(sortedDownloadsProvider);
                                 };
                               }
                               // Not downloaded
@@ -472,12 +471,6 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                 ),
                                 onPressed: null),
                           ),
-                        // TODO: On PC, replace the share and like icons with more options icon because the btn bar overflow the card
-                        IconButton(
-                          tooltip: Translations.of(context).text('share'),
-                          onPressed: () => ref.watch(openAirProvider).share(),
-                          icon: const Icon(Icons.share_rounded),
-                        ),
                         favoriteListAsync.when(
                           data: (data) {
                             isFavorite =
@@ -515,7 +508,9 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                   }
                                 } else {
                                   ref.read(audioProvider).addEpisodeToFavorite(
-                                      widget.episodeItem, widget.podcast);
+                                      widget.episodeItem, widget.podcast,
+                                      author: widget.episodeItem['author'] ??
+                                          widget.podcast.author);
 
                                   ref.invalidate(getFavoriteProvider);
 

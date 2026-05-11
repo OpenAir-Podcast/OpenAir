@@ -7,14 +7,13 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
-import 'package:openair/views/main_pages/subscriptions_episodes_page.dart';
-import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,7 +51,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
     final AsyncValue queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     return GestureDetector(
       onTap: () {
@@ -61,6 +60,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
             builder: (context) => EpisodeDetail(
               episodeItem: widget.episodeItem,
               podcast: widget.podcast,
+              author: widget.author,
             ),
           ),
         );
@@ -92,6 +92,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                         memCacheHeight: 62,
                         memCacheWidth: 62,
                         imageUrl: widget.episodeItem['feedImage'] ??
+                            widget.episodeItem['image'] ??
                             widget.podcast.imageUrl,
                         fit: BoxFit.fill,
                         errorWidget: (context, url, error) => Icon(
@@ -113,37 +114,36 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                             // Podcast title
                             child: Text(
                               widget.title,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis,
-                                color: Brightness.dark ==
-                                        Theme.of(context).brightness
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                               maxLines: 2,
                             ),
                           ),
                           SizedBox(
                             width: MediaQuery.of(context).size.width - 130.0,
-                            // Podcast title
+                            // Podcast author
                             child: Text(
                               widget.author,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                overflow: TextOverflow.ellipsis,
-                                color: Colors.grey,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
                             podcastDate,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
                           ),
                         ],
                       ),
@@ -164,10 +164,11 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                         maxLines: 4,
                         textOverflow: TextOverflow.ellipsis,
                         margin: Margins.zero,
-                        fontSize: FontSize(14.0),
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
+                        fontSize: FontSize(
+                          Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                              14.0,
+                        ),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     },
                   ),
@@ -281,7 +282,7 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                             },
                             loading: () {
                               // Handle loading by showing previous state's icon, disabled
-                              final previousList = queueListAsync.valueOrNull;
+                              final previousList = queueListAsync.value;
 
                               final isQueuedPreviously =
                                   previousList?.containsKey(
@@ -327,71 +328,78 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                                   onPressed = () {
                                     showDialog(
                                       context: context,
-                                      builder: (BuildContext dialogContext) =>
-                                          AlertDialog(
-                                        title: Text(Translations.of(context)
-                                            .text('confirmDeletion')),
-                                        content: Text(
-                                            '${Translations.of(context).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text(Translations.of(context)
-                                                .text('cancel')),
-                                            onPressed: () {
-                                              Navigator.of(dialogContext)
-                                                  .pop(); // Dismiss the dialog
-                                            },
+                                      builder: (BuildContext dialogContext) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            Translations.of(dialogContext)
+                                                .text('confirmDeletion'),
                                           ),
-                                          TextButton(
-                                            child: Text(
-                                              Translations.of(context)
-                                                  .text('remove'),
-                                              style: TextStyle(
-                                                color: Colors.red,
+                                          content: Text(
+                                            '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem['title']}\'?',
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text(
+                                                Translations.of(dialogContext)
+                                                    .text('cancel'),
                                               ),
+                                              onPressed: () {
+                                                Navigator.of(dialogContext)
+                                                    .pop();
+                                              },
                                             ),
-                                            onPressed: () async {
-                                              // Pop the dialog first
-                                              Navigator.of(dialogContext).pop();
+                                            FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                                foregroundColor: Colors.white,
+                                              ),
+                                              child: Text(
+                                                Translations.of(dialogContext)
+                                                    .text('remove'),
+                                              ),
+                                              onPressed: () async {
+                                                Navigator.of(dialogContext)
+                                                    .pop();
 
-                                              // Then perform the removal
-                                              await ref
-                                                  .read(audioProvider.notifier)
-                                                  .removeDownload(
-                                                      widget.episodeItem);
+                                                // Then perform the removal
+                                                await ref
+                                                    .read(
+                                                        audioProvider.notifier)
+                                                    .removeDownload(
+                                                        widget.episodeItem);
 
-                                              if (context.mounted &&
-                                                  receiveNotificationsWhenDownloadConfig) {
-                                                if (!Platform.isAndroid &&
-                                                    !Platform.isIOS) {
-                                                  ref
-                                                      .read(
-                                                          notificationServiceProvider)
-                                                      .showNotification(
-                                                        'OpenAir ${Translations.of(context).text('notification')}',
-                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
-                                                      );
-                                                } else {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                if (context.mounted &&
+                                                    receiveNotificationsWhenDownloadConfig) {
+                                                  if (!Platform.isAndroid &&
+                                                      !Platform.isIOS) {
+                                                    ref
+                                                        .read(
+                                                            notificationServiceProvider)
+                                                        .showNotification(
+                                                          'OpenAir ${Translations.of(context).text('notification')}',
+                                                          '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                        );
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          '${Translations.of(context).text('removed')} \'${widget.episodeItem['title']}\'',
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
+                                                    );
+                                                  }
                                                 }
-                                              }
 
-                                              ref.invalidate(
-                                                  sortedDownloadsProvider);
-                                            },
-                                          ),
-                                        ],
-                                      ),
+                                                ref.invalidate(
+                                                    getDownloadsProvider);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
-
-                                    ref.invalidate(sortedDownloadsProvider);
                                   };
                                 }
                                 // Not downloaded
@@ -520,7 +528,10 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
                                     ref
                                         .read(audioProvider)
                                         .addEpisodeToFavorite(
-                                            widget.episodeItem, widget.podcast);
+                                            widget.episodeItem, widget.podcast,
+                                            author:
+                                                widget.episodeItem['author'] ??
+                                                    widget.podcast.author);
 
                                     ref.invalidate(getFavoriteProvider);
 

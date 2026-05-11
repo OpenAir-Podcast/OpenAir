@@ -4,10 +4,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 
@@ -28,7 +28,7 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         ref.read(audioProvider).currentPodcast = widget.podcastItem;
         Navigator.of(context).push(
@@ -37,58 +37,57 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
           ),
         );
       },
-      child: Card(
-        color: Theme.of(context).cardColor,
-        elevation: 2.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
               child: CachedNetworkImage(
-                memCacheHeight: 56,
+                memCacheHeight: 72,
+                memCacheWidth: 72,
+                height: 72.0,
+                width: 72.0,
                 imageUrl: widget.podcastItem.imageUrl,
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(
-                  color: cardImageShadow,
-                  child: const Icon(
-                    Icons.error,
-                    size: 56.0,
-                  ),
+                  height: 72.0,
+                  width: 72.0,
+                  color: Theme.of(context).cardColor,
+                  child: const Icon(Icons.error, size: 36.0),
                 ),
               ),
             ),
+            const SizedBox(width: 16.0),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.podcastItem.title,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Brightness.dark == Theme.of(context).brightness
-                            ? Colors.white
-                            : Colors.black,
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 1,
-                    ),
-                    Text(
-                      widget.podcastItem.author ??
-                          Translations.of(context).text('unknown'),
-                      maxLines: 1,
-                      style: const TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.podcastItem.title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    (widget.podcastItem.author?.isNotEmpty == true)
+                        ? widget.podcastItem.author!
+                        : Translations.of(context).text('unknown'),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            FutureBuilder(
+            const SizedBox(width: 8.0),
+            FutureBuilder<bool>(
               future: ref
                   .watch(openAirProvider)
                   .isSubscribed(widget.podcastItem.title),

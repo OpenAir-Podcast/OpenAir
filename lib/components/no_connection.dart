@@ -10,50 +10,54 @@ class NoConnection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          Icons.wifi_off,
-          size: 75.0,
-          color: Colors.grey,
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            color: colorScheme.errorContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.wifi_off_rounded,
+            size: 60.0,
+            color: colorScheme.onErrorContainer,
+          ),
         ),
-        const SizedBox(height: 20.0),
+        const SizedBox(height: 24.0),
         Text(
           Translations.of(context).text('oopsAnErrorOccurred'),
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20.0,
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Brightness.dark == Theme.of(context).brightness
-                ? Colors.white
-                : Colors.black,
+            color: colorScheme.onSurface,
           ),
         ),
-        Text(
-          Translations.of(context).text('pleaseConnectToNetwork'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Brightness.dark == Theme.of(context).brightness
-                ? Colors.white
-                : Colors.black,
-          ),
-        ),
-        const SizedBox(height: 20.0),
-        SizedBox(
-          width: 180.0,
-          height: 40.0,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
+        const SizedBox(height: 8.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Text(
+            Translations.of(context).text('pleaseConnectToNetwork'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-            onPressed: () async {
-              ref.read(openAirProvider).getConnectionStatusTriggered();
-            },
-            child: Text(Translations.of(context).text('retry')),
+          ),
+        ),
+        const SizedBox(height: 24.0),
+        FilledButton.icon(
+          onPressed: () async {
+            ref.read(openAirProvider).getConnectionStatusTriggered();
+          },
+          icon: const Icon(Icons.refresh_rounded),
+          label: Text(Translations.of(context).text('retry')),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           ),
         ),
       ],

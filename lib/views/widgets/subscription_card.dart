@@ -1,176 +1,204 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/services/podcast_index_service.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/subscriptions_episodes_page.dart';
 
-final getSubscriptionsCountProvider =
-    FutureProvider.family.autoDispose<String, String>((ref, title) async {
-  HiveService hiveService = ref.watch(openAirProvider).hiveService;
-
-  // Gets episodes count from last stored index of episodes
-  int currentSubEpCount =
-      await hiveService.podcastSubscribedEpisodeCount(title);
-
-  // Gets episodes count from PodcastIndex
-  int podcastEpisodeCount =
-      await ref.read(podcastIndexProvider).getPodcastEpisodeCountByTitle(title);
-
-  int result = podcastEpisodeCount - currentSubEpCount;
-  return '$result';
-});
-
-class SubscriptionCard extends StatelessWidget {
+class SubscriptionCard extends ConsumerWidget {
   const SubscriptionCard({
     super.key,
     required this.subs,
     required this.ref,
     required this.index,
+    this.isSelected = false,
+    this.isSelectionMode = false,
+    this.onToggleSelection,
+    this.onLongPress,
   });
 
   final List<SubscriptionModel> subs;
   final WidgetRef ref;
   final int index;
+  final bool isSelected;
+  final bool isSelectionMode;
+  final VoidCallback? onToggleSelection;
+  final VoidCallback? onLongPress;
 
   @override
-  Widget build(BuildContext context) {
-    final subCountDataAsyncValue =
-        ref.watch(getSubscriptionsCountProvider(subs[index].title));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final subscriptionsWithCounts = ref.watch(subscriptionsWithCountsProvider);
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        cardSidePadding,
-        cardTopPadding,
-        cardSidePadding,
-        cardTopPadding,
-      ),
-      child: GestureDetector(
-        onTap: () {
-          ref.read(audioProvider.notifier).currentPodcast =
-              PodcastModel.fromJson(subs[index].toJson());
+    return subscriptionsWithCounts.when(
+      data: (data) {
+        final title = subs[index].title;
+        final countData = data[title] ?? {};
+        final newEpisodes = countData['newEpisodes'] as int? ?? 0;
 
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => SubscriptionsEpisodesPage(
-                podcast: PodcastModel.fromJson(subs[index].toJson()),
-                id: subs[index].id,
-              ),
-            ),
-          );
-        },
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: cardImageShadow,
-                        blurRadius: blurRadius,
-                      )
+        return GestureDetector(
+          onTap: isSelectionMode
+              ? onToggleSelection
+              : () {
+                  final sub = subs[index];
+                  ref.read(audioProvider.notifier).currentPodcast =
+                      PodcastModel.fromJson(sub.toJson());
+
+                  final countData = data[title] ?? {};
+                  final total = countData['totalEpisodes'] as int? ?? 0;
+
+                  if (total > sub.episodeCount) {
+                    sub.episodeCount = total;
+                    ref.read(hiveServiceProvider).subscribe(sub);
+                    ref.invalidate(subscriptionsWithCountsProvider);
+                  }
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SubscriptionsEpisodesPage(
+                        podcast: PodcastModel.fromJson(sub.toJson()),
+                        id: sub.id,
+                      ),
+                    ),
+                  );
+                },
+          onLongPress: onLongPress,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // Podcast artwork
+                  Stack(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: CachedNetworkImage(
+                              memCacheHeight: 200,
+                              memCacheWidth: 200,
+                              imageUrl: subs[index].artwork,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => Container(
+                                color: theme.cardColor,
+                                child: Icon(
+                                  Icons.podcasts,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // New episode badge
+                      if (newEpisodes > 0)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              newEpisodes > 99 ? '99+' : '$newEpisodes',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                  height: cardImageHeight,
-                  width: cardImageWidth,
-                  child: CachedNetworkImage(
-                    memCacheHeight: cardImageHeight.ceil(),
-                    memCacheWidth: cardImageWidth.ceil(),
-                    imageUrl: subs[index].artwork,
-                    errorWidget: (context, url, error) => Icon(
-                      Icons.error,
-                      size: 56.0,
+                  const SizedBox(height: 6),
+                  // Podcast title
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        subs[index].title,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          height: 1.1,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  right: 0.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: subscriptionCountBoxColor,
-                    ),
-                    height: subscriptionCountBoxSize,
-                    width: subscriptionCountBoxSize,
-                    child: subCountDataAsyncValue.when(
-                      data: (data) {
-                        return Center(
-                          child: Text(
-                            data,
-                            style: TextStyle(
-                              color: subscriptionCountBoxTextColor,
-                              fontSize: subscriptionCountBoxFontSize,
-                              fontWeight: subscriptionCountBoxFontWeight,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        );
-                      },
-                      error: (error, stackTrace) {
-                        return Center(
-                          child: IconButton(
-                            onPressed: () {
-                              ref.invalidate(subscriptionsProvider);
-                            },
-                            icon: Icon(
-                              Icons.error_outline_rounded,
-                              color: Colors.white,
-                              size: subscriptionCountBoxSize - 12,
-                            ),
-                          ),
-                        );
-                      },
-                      loading: () {
-                        return Center(
-                          child: Text(
-                            '...',
-                            style: TextStyle(
-                              color: subscriptionCountBoxTextColor,
-                              fontSize: subscriptionCountBoxFontSize,
-                              fontWeight: subscriptionCountBoxFontWeight,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              height: cardLabelHeight,
-              width: cardLabelWidth,
-              decoration: BoxDecoration(
-                color: cardLabelBackground,
-                boxShadow: [
-                  BoxShadow(
-                    color: cardLabelShadow,
-                    blurRadius: blurRadius,
                   ),
                 ],
               ),
-              child: Padding(
-                padding: EdgeInsets.all(cardLabelPadding),
-                child: Text(
-                  subs[index].title,
-                  maxLines: cardLabelMaxLines,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: cardLabelTextColor,
-                    fontSize: cardLabelFontSize,
-                    fontWeight: cardLabelFontWeight,
+              // Selection overlay
+              if (isSelected)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.check_circle,
+                      color: Colors.blue,
+                      size: 40,
+                    ),
                   ),
                 ),
+            ],
+          ),
+        );
+      },
+      error: (error, stackTrace) {
+        return Column(
+          children: [
+            Icon(Icons.error_outline, color: Colors.grey),
+            const SizedBox(height: 4),
+            Text('Error', style: Theme.of(context).textTheme.bodySmall),
+          ],
+        );
+      },
+      loading: () => Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 12,
+            width: 80,
+            color: Colors.grey[300],
+          ),
+        ],
       ),
     );
   }

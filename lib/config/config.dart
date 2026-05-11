@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-int wideScreenMinWidth = 384;
+int wideScreenMinWidth = 599;
 double circleSize = 70.0;
 
 double bannerAudioPlayerHeight = 85.0;
@@ -40,13 +40,13 @@ double subscribedWideMainAxisExtent = 250.0;
 int narrowItemCount = 3;
 int wideItemCount = 6;
 
-double featuredCardHeight = 230.0;
+double featuredCardHeight = 180.0;
 
 double cardTopCornersRatio = 12.0;
 double cardBottomCornersRatio = 12.0;
 
-double cardImageHeight = 160.0;
-double cardImageWidth = 160.0;
+double cardImageHeight = 140.0;
+double cardImageWidth = 140.0;
 
 double cardSidePadding = 5.0;
 double cardTopPadding = 18.0;
@@ -103,34 +103,16 @@ SnackBarThemeData snackBarThemeDark = SnackBarThemeData(
   ),
 );
 
-ColorScheme colorSchemeLight = ColorScheme.light(
-  primary: Colors.blue,
-  onPrimary: Colors.white,
-  secondary: Colors.blueAccent,
-  onSecondary: Colors.white,
+ColorScheme colorSchemeLight = ColorScheme.fromSeed(
+  seedColor: Colors.blue,
+  brightness: Brightness.light,
   surface: Colors.grey[100]!,
-  onSurface: Colors.black,
-  error: Colors.red[700]!,
-  onError: Colors.white,
-  primaryContainer: Colors.white,
-  onPrimaryContainer: Colors.black,
-  secondaryContainer: Colors.white,
-  onSecondaryContainer: Colors.black,
 );
 
-ColorScheme colorSchemeDark = ColorScheme.dark(
-  primary: Colors.blue,
-  onPrimary: Colors.white,
-  secondary: Colors.blueAccent,
-  onSecondary: Colors.white,
+ColorScheme colorSchemeDark = ColorScheme.fromSeed(
+  seedColor: Colors.blue,
+  brightness: Brightness.dark,
   surface: Colors.grey[850]!,
-  onSurface: Colors.white,
-  error: Colors.red[400]!,
-  onError: Colors.black,
-  primaryContainer: Colors.grey[900]!,
-  onPrimaryContainer: Colors.white,
-  secondaryContainer: Colors.grey[900]!,
-  onSecondaryContainer: Colors.white,
 );
 
 ListTileThemeData listTileThemeDark = ListTileThemeData(
@@ -143,6 +125,40 @@ ListTileThemeData listTileThemeLight = ListTileThemeData(
   textColor: Colors.black,
 );
 
+DialogThemeData dialogThemeLight = DialogThemeData(
+  backgroundColor: Colors.white,
+  elevation: 8,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+  ),
+  titleTextStyle: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  ),
+  contentTextStyle: TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+  ),
+);
+
+DialogThemeData dialogThemeDark = DialogThemeData(
+  backgroundColor: Colors.grey[850],
+  elevation: 8,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+  ),
+  titleTextStyle: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+  ),
+  contentTextStyle: TextStyle(
+    fontSize: 16,
+    color: Colors.white70,
+  ),
+);
+
 Color scaffoldBackgroundColorLight = Colors.grey[100]!;
 Color scaffoldBackgroundColorDark = Colors.black;
 Color cardColorLight = Colors.white;
@@ -151,8 +167,8 @@ Color primaryColorLight = Colors.blue;
 Color primaryColorDark = Colors.blue;
 
 // User Interface
-late String fontSizeConfig;
-late String themeModeConfig;
+String fontSizeConfig = 'Medium';
+String themeModeConfig = 'System';
 late String languageConfig;
 late String localeConfig;
 
@@ -166,6 +182,7 @@ late bool enqueueDownloadedConfig;
 late bool autoplayNextInQueueConfig;
 late String smartMarkAsCompletionConfig;
 late bool keepSkippedEpisodesConfig;
+late bool navigatePodcastEpisodesConfig;
 
 // Automatic
 late String refreshPodcastsConfig;
@@ -177,11 +194,11 @@ late bool deletePlayedEpisodesConfig;
 late bool keepFavouriteEpisodesConfig;
 
 // Synchronization
-late bool syncFavouritesConfig;
-late bool syncQueueConfig;
-late bool syncHistoryConfig;
-late bool syncPlaybackPositionConfig;
-late bool syncSettingsConfig;
+bool syncFavouritesConfig = true;
+bool syncQueueConfig = true;
+bool syncHistoryConfig = true;
+bool syncPlaybackPositionConfig = true;
+bool syncSettingsConfig = true;
 
 // Import/Export
 late bool automaticExportDatabaseConfig;

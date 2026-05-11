@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/fetch_data_model.dart';
+import 'package:openair/model/hive_models/fetch_data_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/widgets/podcast_card_grid.dart';
 import 'package:openair/views/widgets/podcast_card_list.dart';
 
-final AutoDisposeFutureProvider<FetchDataModel> podcastDataByTrendingProvider =
-    FutureProvider.autoDispose((ref) async {
+final podcastDataByTrendingProvider =
+    FutureProvider.autoDispose<FetchDataModel>((ref) async {
   final FetchDataModel? topFeaturedPodcastData =
       await ref.watch(openAirProvider).hiveService.getTopFeaturedPodcast();
 
@@ -58,14 +58,13 @@ class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
               const SizedBox(height: 20.0),
               Text(
                 Translations.of(context).text('oopsAnErrorOccurred'),
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               Text(
                 Translations.of(context).text('oopsTryAgainLater'),
-                style: TextStyle(fontSize: 16.0),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 20.0),
               SizedBox(

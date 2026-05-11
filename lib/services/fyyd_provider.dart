@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:openair/env.dart';
 
 final fyydProvider = Provider((ref) => FyydProvider());
 
 class FyydProvider {
-  final String? _accessToken = dotenv.env['FYYD_ACCESS_TOKEN'];
+  final String _accessToken = Env.fyydAccessToken;
   static const String _baseUrl = 'https://api.fyyd.de/0.2';
 
   late Dio _dio;
@@ -20,15 +20,6 @@ class FyydProvider {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
-        if (_accessToken == null) {
-          return handler.reject(
-            DioException(
-              requestOptions: options,
-              error: 'Missing FYYD_ACCESS_TOKEN in .env file',
-            ),
-          );
-        }
-
         options.headers['Authorization'] = 'Bearer $_accessToken';
         options.headers['User-Agent'] =
             'OpenAirPodcastApp/1.0.0 (https://github.com/OpenAir-Podcast/OpenAir)';

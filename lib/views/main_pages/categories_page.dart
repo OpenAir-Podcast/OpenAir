@@ -1,315 +1,491 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/locale_provider.dart';
+import 'package:openair/model/category.dart';
 import 'package:openair/views/main_pages/category_page.dart';
 import 'package:openair/components/no_connection.dart';
+import 'package:openair/views/main_pages/trending_page.dart';
 
-final getConnectionStatusProvider = FutureProvider<bool>((ref) async {
-  final podcastIndexService = ref.read(openAirProvider);
-  return await podcastIndexService.getConnectionStatus();
-});
+List<Category> getCategories(BuildContext context) => [
+      Category(
+          name: Translations.of(context).text('animals'),
+          icon: Icons.pets_rounded,
+          apiKey: 'animals'),
+      Category(
+          name: Translations.of(context).text('animation'),
+          icon: Icons.animation_rounded,
+          apiKey: 'animation'),
+      Category(
+          name: Translations.of(context).text('arts'),
+          icon: Icons.palette_rounded,
+          apiKey: 'arts'),
+      Category(
+          name: Translations.of(context).text('astronomy'),
+          icon: Icons.rocket_launch_rounded,
+          apiKey: 'astronomy'),
+      Category(
+          name: Translations.of(context).text('automotive'),
+          icon: Icons.car_rental_rounded,
+          apiKey: 'automotive'),
+      Category(
+          name: Translations.of(context).text('aviation'),
+          icon: Icons.airplane_ticket_rounded,
+          apiKey: 'aviation'),
+      Category(
+          name: Translations.of(context).text('beauty'),
+          icon: Icons.face_retouching_natural_rounded,
+          apiKey: 'beauty'),
+      Category(
+          name: Translations.of(context).text('books'),
+          icon: Icons.book_rounded,
+          apiKey: 'books'),
+      Category(
+          name: Translations.of(context).text('business'),
+          icon: Icons.business_center_rounded,
+          apiKey: 'business'),
+      Category(
+          name: Translations.of(context).text('careers'),
+          icon: Icons.work_rounded,
+          apiKey: 'careers'),
+      Category(
+          name: Translations.of(context).text('chemistry'),
+          icon: Icons.science_rounded,
+          apiKey: 'chemistry'),
+      Category(
+          name: Translations.of(context).text('christianity'),
+          icon: Icons.church_rounded,
+          apiKey: 'christianity'),
+      Category(
+          name: Translations.of(context).text('comedy'),
+          icon: Icons.theater_comedy_rounded,
+          apiKey: 'comedy'),
+      Category(
+          name: Translations.of(context).text('commentary'),
+          icon: Icons.record_voice_over_rounded,
+          apiKey: 'commentary'),
+      Category(
+          name: Translations.of(context).text('courses'),
+          icon: Icons.menu_book_rounded,
+          apiKey: 'courses'),
+      Category(
+          name: Translations.of(context).text('crafts'),
+          icon: Icons.construction_rounded,
+          apiKey: 'crafts'),
+      Category(
+          name: Translations.of(context).text('daily'),
+          icon: Icons.today_rounded,
+          apiKey: 'daily'),
+      Category(
+          name: Translations.of(context).text('design'),
+          icon: Icons.design_services_rounded,
+          apiKey: 'design'),
+      Category(
+          name: Translations.of(context).text('drama'),
+          icon: Icons.theaters_rounded,
+          apiKey: 'drama'),
+      Category(
+          name: Translations.of(context).text('earth'),
+          icon: Icons.public_rounded,
+          apiKey: 'earth'),
+      Category(
+          name: Translations.of(context).text('education'),
+          icon: Icons.school_rounded,
+          apiKey: 'education'),
+      Category(
+          name: Translations.of(context).text('entertainment'),
+          icon: Icons.emoji_emotions_rounded,
+          apiKey: 'entertainment'),
+      Category(
+          name: Translations.of(context).text('entrepreneurship'),
+          icon: Icons.lightbulb_rounded,
+          apiKey: 'entrepreneurship'),
+      Category(
+          name: Translations.of(context).text('family'),
+          icon: Icons.family_restroom_rounded,
+          apiKey: 'family'),
+      Category(
+          name: Translations.of(context).text('fashion'),
+          icon: Icons.checkroom_rounded,
+          apiKey: 'fashion'),
+      Category(
+          name: Translations.of(context).text('fiction'),
+          icon: Icons.auto_stories_rounded,
+          apiKey: 'fiction'),
+      Category(
+          name: Translations.of(context).text('fitness'),
+          icon: Icons.fitness_center_rounded,
+          apiKey: 'fitness'),
+      Category(
+          name: Translations.of(context).text('food'),
+          icon: Icons.restaurant_rounded,
+          apiKey: 'food'),
+      Category(
+          name: Translations.of(context).text('games'),
+          icon: Icons.sports_esports_rounded,
+          apiKey: 'games'),
+      Category(
+          name: Translations.of(context).text('garden'),
+          icon: Icons.grass_rounded,
+          apiKey: 'garden'),
+      Category(
+          name: Translations.of(context).text('government'),
+          icon: Icons.account_balance_rounded,
+          apiKey: 'government'),
+      Category(
+          name: Translations.of(context).text('health'),
+          icon: Icons.health_and_safety_rounded,
+          apiKey: 'health'),
+      Category(
+          name: Translations.of(context).text('hinduism'),
+          icon: Icons.temple_hindu_rounded,
+          apiKey: 'hinduism'),
+      Category(
+          name: Translations.of(context).text('history'),
+          icon: Icons.history_rounded,
+          apiKey: 'history'),
+      Category(
+          name: Translations.of(context).text('hobbies'),
+          icon: Icons.extension_rounded,
+          apiKey: 'hobbies'),
+      Category(
+          name: Translations.of(context).text('home'),
+          icon: Icons.home_rounded,
+          apiKey: 'home'),
+      Category(
+          name: Translations.of(context).text('howTo'),
+          icon: Icons.how_to_reg_rounded,
+          apiKey: 'how to'),
+      Category(
+          name: Translations.of(context).text('interview'),
+          icon: Icons.record_voice_over_rounded,
+          apiKey: 'interview'),
+      Category(
+          name: Translations.of(context).text('investing'),
+          icon: Icons.trending_up_rounded,
+          apiKey: 'investing'),
+      Category(
+          name: Translations.of(context).text('islam'),
+          icon: Icons.mosque_rounded,
+          apiKey: 'islam'),
+      Category(
+          name: Translations.of(context).text('judaism'),
+          icon: Icons.star_rounded,
+          apiKey: 'judaism'),
+      Category(
+          name: Translations.of(context).text('kids'),
+          icon: Icons.child_care_rounded,
+          apiKey: 'kids'),
+      Category(
+          name: Translations.of(context).text('language'),
+          icon: Icons.translate_rounded,
+          apiKey: 'language'),
+      Category(
+          name: Translations.of(context).text('learning'),
+          icon: Icons.school_rounded,
+          apiKey: 'learning'),
+      Category(
+          name: Translations.of(context).text('leisure'),
+          icon: Icons.beach_access_rounded,
+          apiKey: 'leisure'),
+      Category(
+          name: Translations.of(context).text('life'),
+          icon: Icons.favorite_rounded,
+          apiKey: 'life'),
+      Category(
+          name: Translations.of(context).text('management'),
+          icon: Icons.manage_accounts_rounded,
+          apiKey: 'management'),
+      Category(
+          name: Translations.of(context).text('manga'),
+          icon: Icons.menu_book_rounded,
+          apiKey: 'manga'),
+      Category(
+          name: Translations.of(context).text('marketing'),
+          icon: Icons.campaign_rounded,
+          apiKey: 'marketing'),
+      Category(
+          name: Translations.of(context).text('mathematics'),
+          icon: Icons.calculate_rounded,
+          apiKey: 'mathematics'),
+      Category(
+          name: Translations.of(context).text('medicine'),
+          icon: Icons.local_hospital_rounded,
+          apiKey: 'medicine'),
+      Category(
+          name: Translations.of(context).text('mental'),
+          icon: Icons.psychology_rounded,
+          apiKey: 'mental'),
+      Category(
+          name: Translations.of(context).text('music'),
+          icon: Icons.music_note_rounded,
+          apiKey: 'music'),
+      Category(
+          name: Translations.of(context).text('natural'),
+          icon: Icons.eco_rounded,
+          apiKey: 'natural'),
+      Category(
+          name: Translations.of(context).text('nature'),
+          icon: Icons.nature_people_rounded,
+          apiKey: 'nature'),
+      Category(
+          name: Translations.of(context).text('news'),
+          icon: Icons.newspaper_rounded,
+          apiKey: 'news'),
+      Category(
+          name: Translations.of(context).text('nonProfit'),
+          icon: Icons.volunteer_activism_rounded,
+          apiKey: 'non-profit'),
+      Category(
+          name: Translations.of(context).text('nutrition'),
+          icon: Icons.food_bank_rounded,
+          apiKey: 'nutrition'),
+      Category(
+          name: Translations.of(context).text('parenting'),
+          icon: Icons.supervisor_account_rounded,
+          apiKey: 'parenting'),
+      Category(
+          name: Translations.of(context).text('performing'),
+          icon: Icons.theater_comedy_rounded,
+          apiKey: 'performing'),
+      Category(
+          name: Translations.of(context).text('pets'),
+          icon: Icons.pets_rounded,
+          apiKey: 'pets'),
+      Category(
+          name: Translations.of(context).text('physics'),
+          icon: Icons.biotech_rounded,
+          apiKey: 'physics'),
+      Category(
+          name: Translations.of(context).text('politics'),
+          icon: Icons.flag_rounded,
+          apiKey: 'politics'),
+      Category(
+          name: Translations.of(context).text('religion'),
+          icon: Icons.temple_hindu_rounded,
+          apiKey: 'religion'),
+      Category(
+          name: Translations.of(context).text('science'),
+          icon: Icons.science_rounded,
+          apiKey: 'science'),
+      Category(
+          name: Translations.of(context).text('selfImprovement'),
+          icon: Icons.self_improvement_rounded,
+          apiKey: 'self improvement'),
+      Category(
+          name: Translations.of(context).text('social'),
+          icon: Icons.groups_rounded,
+          apiKey: 'social'),
+      Category(
+          name: Translations.of(context).text('spirituality'),
+          icon: Icons.self_improvement_rounded,
+          apiKey: 'spirituality'),
+      Category(
+          name: Translations.of(context).text('sports'),
+          icon: Icons.sports_basketball_rounded,
+          apiKey: 'sports'),
+      Category(
+          name: Translations.of(context).text('standUp'),
+          icon: Icons.mic_rounded,
+          apiKey: 'stand-up'),
+      Category(
+          name: Translations.of(context).text('stories'),
+          icon: Icons.auto_stories_rounded,
+          apiKey: 'stories'),
+      Category(
+          name: Translations.of(context).text('videoGames'),
+          icon: Icons.videogame_asset_rounded,
+          apiKey: 'video games'),
+      Category(
+          name: Translations.of(context).text('visual'),
+          icon: Icons.remove_red_eye_rounded,
+          apiKey: 'visual'),
+      Category(
+          name: Translations.of(context).text('trueCrime'),
+          icon: Icons.gavel_rounded,
+          apiKey: 'true crime'),
+      Category(
+          name: Translations.of(context).text('tv'),
+          icon: Icons.tv_rounded,
+          apiKey: 'tv'),
+    ];
 
-class CategoriesPage extends ConsumerStatefulWidget {
+class CategoriesPage extends ConsumerWidget {
   const CategoriesPage({super.key});
 
   @override
-  ConsumerState<CategoriesPage> createState() => _CategoriesPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider); // Ensure rebuild on language change
+    final connectionAsync = ref.watch(connectionCheckProvider);
+
+    return connectionAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => _buildCategoryGrid(context),
+      data: (isConnected) =>
+          isConnected ? _buildCategoryGrid(context) : const NoConnection(),
+    );
+  }
+
+  Widget _buildCategoryGrid(BuildContext context) {
+    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+    final categories = getCategories(context);
+
+    return Scaffold(
+      body: isWide
+          ? GridView.builder(
+              padding: EdgeInsets.all(isDesktop ? 24 : 12),
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 3 / 2.5,
+                crossAxisSpacing: isDesktop ? 16 : 12,
+                mainAxisSpacing: isDesktop ? 16 : 12,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return _CategoryCard(
+                  category: category,
+                  onTap: () => _navigateToCategory(context, category),
+                );
+              },
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(12),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return _CategoryListTile(
+                  category: category,
+                  onTap: () => _navigateToCategory(context, category),
+                );
+              },
+            ),
+    );
+  }
+
+  void _navigateToCategory(BuildContext context, Category category) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CategoryPage(
+          category: category.name,
+          apiKey: category.apiKey,
+        ),
+      ),
+    );
+  }
 }
 
-class _CategoriesPageState extends ConsumerState<CategoriesPage> {
-  final List<IconData> sortedIcons = [
-    Icons.pets_rounded, // Animals
-    Icons.animation_rounded, // Animation
-    Icons.palette_rounded, // Arts
-    Icons.rocket_launch_rounded, // Astronomy
-    Icons.car_rental_rounded, // Automotive
-    Icons.airplane_ticket_rounded, // Aviation
-    Icons.face_retouching_natural_rounded, // Beauty
-    Icons.book_rounded, // Books
-    Icons.business_center_rounded, // Business
-    Icons.work_rounded, // Careers
-    Icons.science_rounded, // Chemistry
-    Icons.church_rounded, // Christianity
-    Icons.theater_comedy_rounded, // Comedy
-    Icons.record_voice_over_rounded, // Commentary
-    Icons.menu_book_rounded, // Courses
-    Icons.construction_rounded, // Crafts
-    Icons.today_rounded, // Daily
-    Icons.design_services_rounded, // Design
-    Icons.theaters_rounded, // Drama
-    Icons.public_rounded, // Earth
-    Icons.school_rounded, // Education
-    Icons.emoji_emotions_rounded, // Entertainment
-    Icons.lightbulb_rounded, // Entrepreneurship
-    Icons.family_restroom_rounded, // Family
-    Icons.checkroom_rounded, // Fashion
-    Icons.auto_stories_rounded, // Fiction
-    Icons.fitness_center_rounded, // Fitness
-    Icons.restaurant_rounded, // Food
-    Icons.sports_esports_rounded, // Games
-    Icons.grass_rounded, // Garden
-    Icons.account_balance_rounded, // Government
-    Icons.health_and_safety_rounded, // Health
-    Icons.temple_hindu_rounded, // Hinduism
-    Icons.history_rounded, // History
-    Icons.extension_rounded, // Hobbies
-    Icons.home_rounded, // Home
-    Icons.how_to_reg_rounded, // How-To
-    Icons.record_voice_over_rounded, // Interview
-    Icons.trending_up_rounded, // Investing
-    Icons.mosque_rounded, // Islam
-    Icons.star_rounded, // Judaism
-    Icons.child_care_rounded, // Kids
-    Icons.translate_rounded, // Language
-    Icons.school_rounded, // Learning
-    Icons.beach_access_rounded, // Leisure
-    Icons.favorite_rounded, // Life
-    Icons.manage_accounts_rounded, // Management
-    Icons.menu_book_rounded, // Manga
-    Icons.campaign_rounded, // Marketing
-    Icons.calculate_rounded, // Mathematics
-    Icons.local_hospital_rounded, // Medicine
-    Icons.psychology_rounded, // Mental
-    Icons.music_note_rounded, // Music
-    Icons.eco_rounded, // Natural
-    Icons.nature_people_rounded, // Nature
-    Icons.newspaper_rounded, // News
-    Icons.volunteer_activism_rounded, // Non-Profit
-    Icons.food_bank_rounded, // Nutrition
-    Icons.supervisor_account_rounded, // Parenting
-    Icons.theater_comedy_rounded, // Performing
-    Icons.pets_rounded, // Pets
-    Icons.biotech_rounded, // Physics
-    Icons.flag_rounded, // Politics
-    Icons.temple_hindu_rounded, // Religion
-    Icons.science_rounded, // Science
-    Icons.self_improvement_rounded, // Self-Improvement
-    Icons.transgender_rounded, // Sexuality
-    Icons.groups_rounded, // Social
-    Icons.self_improvement_rounded, // Spirituality
-    Icons.sports_basketball_rounded, // Sports
-    Icons.mic_rounded, // Stand-Up
-    Icons.auto_stories_rounded, // Stories
-    Icons.videogame_asset_rounded, // Video-Games
-    Icons.remove_red_eye_rounded, // Visual
-    Icons.gavel_rounded, // True Crime
-    Icons.tv_rounded // TV
-  ];
+class _CategoryCard extends StatelessWidget {
+  final Category category;
+  final VoidCallback onTap;
+
+  const _CategoryCard({required this.category, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
-
-    final List<String> sortedCategories = [
-      Translations.of(context).text('categoryAnimals'),
-      Translations.of(context).text('categoryAnimation'),
-      Translations.of(context).text('categoryArts'),
-      Translations.of(context).text('categoryAstronomy'),
-      Translations.of(context).text('categoryAutomotive'),
-      Translations.of(context).text('categoryAviation'),
-      Translations.of(context).text('categoryBeauty'),
-      Translations.of(context).text('categoryBooks'),
-      Translations.of(context).text('categoryBusiness'),
-      Translations.of(context).text('categoryCareers'),
-      Translations.of(context).text('categoryChemistry'),
-      Translations.of(context).text('categoryChristianity'),
-      Translations.of(context).text('categoryComedy'),
-      Translations.of(context).text('categoryCommentary'),
-      Translations.of(context).text('categoryCourses'),
-      Translations.of(context).text('categoryCrafts'),
-      Translations.of(context).text('categoryDaily'),
-      Translations.of(context).text('categoryDesign'),
-      Translations.of(context).text('categoryDrama'),
-      Translations.of(context).text('categoryEarth'),
-      Translations.of(context).text('categoryEducation'),
-      Translations.of(context).text('categoryEntertainment'),
-      Translations.of(context).text('categoryEntrepreneurship'),
-      Translations.of(context).text('categoryFamily'),
-      Translations.of(context).text('categoryFashion'),
-      Translations.of(context).text('categoryFiction'),
-      Translations.of(context).text('categoryFitness'),
-      Translations.of(context).text('categoryFood'),
-      Translations.of(context).text('categoryGames'),
-      Translations.of(context).text('categoryGarden'),
-      Translations.of(context).text('categoryGovernment'),
-      Translations.of(context).text('categoryHealth'),
-      Translations.of(context).text('categoryHinduism'),
-      Translations.of(context).text('categoryHistory'),
-      Translations.of(context).text('categoryHobbies'),
-      Translations.of(context).text('categoryHome'),
-      Translations.of(context).text('categoryHowTo'),
-      Translations.of(context).text('categoryInterviews'),
-      Translations.of(context).text('categoryInvesting'),
-      Translations.of(context).text('categoryIslam'),
-      Translations.of(context).text('categoryJudaism'),
-      Translations.of(context).text('categoryKids'),
-      Translations.of(context).text('categoryLanguage'),
-      Translations.of(context).text('categoryLearning'),
-      Translations.of(context).text('categoryLeisure'),
-      Translations.of(context).text('categoryLife'),
-      Translations.of(context).text('categoryManagement'),
-      Translations.of(context).text('categoryManga'),
-      Translations.of(context).text('categoryMarketing'),
-      Translations.of(context).text('categoryMathematics'),
-      Translations.of(context).text('categoryMedicine'),
-      Translations.of(context).text('categoryMental'),
-      Translations.of(context).text('categoryMusic'),
-      Translations.of(context).text('categoryNatural'),
-      Translations.of(context).text('categoryNature'),
-      Translations.of(context).text('categoryNews'),
-      Translations.of(context).text('categoryNonProfit'),
-      Translations.of(context).text('categoryNutrition'),
-      Translations.of(context).text('categoryParenting'),
-      Translations.of(context).text('categoryPerforming'),
-      Translations.of(context).text('categoryPets'),
-      Translations.of(context).text('categoryPhysics'),
-      Translations.of(context).text('categoryPolitics'),
-      Translations.of(context).text('categoryReligion'),
-      Translations.of(context).text('categoryScience'),
-      Translations.of(context).text('categorySelfImprovement'),
-      Translations.of(context).text('categorySexuality'),
-      Translations.of(context).text('categorySocial'),
-      Translations.of(context).text('categorySpirituality'),
-      Translations.of(context).text('categorySports'),
-      Translations.of(context).text('categoryStandUp'),
-      Translations.of(context).text('categoryStories'),
-      Translations.of(context).text('categoryVideoGames'),
-      Translations.of(context).text('categoryVisual'),
-      Translations.of(context).text('categoryTrueCrime'),
-      Translations.of(context).text('categoryTV'),
-    ];
-
-    return getConnectionStatusValue.when(
-      data: (data) {
-        if (data == false) {
-          return NoConnection();
-        }
-
-        if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200,
-                childAspectRatio: 3 / 2,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-              ),
-              itemCount: sortedCategories.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => CategoryPage(
-                          category: sortedCategories[index],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          sortedIcons[index],
-                          size: 48.0,
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          sortedCategories[index],
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          );
-        } else {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ListView.separated(
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemCount: sortedCategories.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(4.0, 2.0, 4.0, 4.0),
-                  child: ListTile(
-                    title: Text(
-                      sortedCategories[index],
-                    ),
-                    leading: Icon(
-                      sortedIcons[index],
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => CategoryPage(
-                            category: sortedCategories[index],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                category.icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 32.0,
+              ),
             ),
-          );
-        }
-      },
-      error: (error, stackTrace) => Scaffold(
-        body: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 75.0,
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 20.0),
-              Text(
-                Translations.of(context).text('oopsAnErrorOccurred'),
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                Translations.of(context).text('oopsTryAgainLater'),
-                style: TextStyle(fontSize: 16.0),
-              ),
-              const SizedBox(height: 20.0),
-              SizedBox(
-                width: 180.0,
-                height: 40.0,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+            const SizedBox(height: 12.0),
+            Text(
+              category.name,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
-                  onPressed: () async {
-                    ref.invalidate(getConnectionStatusProvider);
-                  },
-                  child: Text(Translations.of(context).text('retey')),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+    );
+  }
+}
+
+class _CategoryListTile extends StatelessWidget {
+  final Category category;
+  final VoidCallback onTap;
+
+  const _CategoryListTile({required this.category, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Icon(
+                category.icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24.0,
+              ),
+            ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Text(
+                category.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey[400],
+            ),
+          ],
         ),
       ),
     );

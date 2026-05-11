@@ -4,10 +4,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 
@@ -37,118 +37,145 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
           ),
         );
       },
-      child: Card(
-        color: Theme.of(context).cardColor,
-        elevation: 2.0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: CachedNetworkImage(
-                memCacheHeight: 300,
-                imageUrl: widget.podcastItem.imageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: cardImageShadow,
-                  child: const Icon(
-                    Icons.error,
-                    size: 56.0,
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16.0)),
+                child: CachedNetworkImage(
+                  memCacheHeight: 300,
+                  imageUrl: widget.podcastItem.imageUrl,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => Container(
+                    color: Theme.of(context).cardColor,
+                    child: const Icon(
+                      Icons.error,
+                      size: 56.0,
+                    ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.fromLTRB(12.0, 12.0, 8.0, 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    widget.podcastItem.title,
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.podcastItem.title,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2.0),
+                        Text(
+                          (widget.podcastItem.author?.isNotEmpty == true)
+                              ? widget.podcastItem.author!
+                              : Translations.of(context).text('unknown'),
+                          maxLines: 1,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
                   ),
-                  Text(
-                    widget.podcastItem.author ??
-                        Translations.of(context).text('unknown'),
-                    maxLines: 1,
-                    style: const TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      color: Colors.grey,
-                    ),
+                  const SizedBox(width: 4.0),
+                  FutureBuilder<bool>(
+                    future: ref
+                        .watch(openAirProvider)
+                        .isSubscribed(widget.podcastItem.title),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const SizedBox(
+                            width: 48,
+                            height: 48); // Placeholder size for icon button
+                      } else if (snapshot.hasError) {
+                        return const SizedBox(width: 48, height: 48);
+                      }
+
+                      return IconButton(
+                        tooltip: snapshot.data!
+                            ? Translations.of(context)
+                                .text('unsubscribeToPodcast')
+                            : Translations.of(context)
+                                .text('subscribeToPodcast'),
+                        onPressed: () async {
+                          snapshot.data!
+                              ? ref
+                                  .read(audioProvider)
+                                  .unsubscribe(widget.podcastItem)
+                              : ref.read(audioProvider).subscribe(
+                                    widget.podcastItem,
+                                    context,
+                                  );
+
+                          if (context.mounted) {
+                            if (!Platform.isAndroid && !Platform.isIOS) {
+                              ref
+                                  .read(notificationServiceProvider)
+                                  .showNotification(
+                                    'OpenAir ${Translations.of(context).text('notification')}',
+                                    snapshot.data!
+                                        ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
+                                        : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
+                                  );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    snapshot.data!
+                                        ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
+                                        : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+
+                          ref.invalidate(podcastDataByUrlProvider(
+                              widget.podcastItem.feedUrl));
+
+                          Future.delayed(
+                            Duration(seconds: 1),
+                            () {
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            },
+                          );
+                        },
+                        icon: snapshot.data!
+                            ? const Icon(Icons.check)
+                            : const Icon(Icons.add),
+                      );
+                    },
                   ),
                 ],
               ),
-            ),
-            FutureBuilder(
-              future: ref
-                  .watch(openAirProvider)
-                  .isSubscribed(widget.podcastItem.title),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const SizedBox.shrink();
-                } else if (snapshot.hasError) {
-                  return const SizedBox.shrink();
-                }
-
-                return IconButton(
-                  tooltip: snapshot.data!
-                      ? Translations.of(context).text('unsubscribeToPodcast')
-                      : Translations.of(context).text('subscribeToPodcast'),
-                  onPressed: () async {
-                    snapshot.data!
-                        ? ref
-                            .read(audioProvider)
-                            .unsubscribe(widget.podcastItem)
-                        : ref.read(audioProvider).subscribe(
-                              widget.podcastItem,
-                              context,
-                            );
-
-                    if (context.mounted) {
-                      if (!Platform.isAndroid && !Platform.isIOS) {
-                        ref.read(notificationServiceProvider).showNotification(
-                              'OpenAir ${Translations.of(context).text('notification')}',
-                              snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
-                            );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              snapshot.data!
-                                  ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
-                                  : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
-                            ),
-                          ),
-                        );
-                      }
-                    }
-
-                    ref.invalidate(
-                        podcastDataByUrlProvider(widget.podcastItem.feedUrl));
-
-                    Future.delayed(
-                      Duration(seconds: 1),
-                      () {
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                    );
-                  },
-                  icon: snapshot.data!
-                      ? const Icon(Icons.check)
-                      : const Icon(Icons.add),
-                );
-              },
             ),
           ],
         ),

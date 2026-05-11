@@ -7,12 +7,11 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/nav_pages/favorites_page.dart';
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
@@ -23,10 +22,12 @@ class EpisodeDetail extends ConsumerStatefulWidget {
     super.key,
     this.episodeItem,
     this.podcast,
+    this.author,
   });
 
   final Map<String, dynamic>? episodeItem;
   final PodcastModel? podcast;
+  final String? author;
 
   @override
   EpisodeDetailState createState() => EpisodeDetailState();
@@ -38,13 +39,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
     final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
 
     final AsyncValue<List<DownloadModel>> downloadedListAsync =
-        ref.watch(sortedDownloadsProvider);
+        ref.watch(getDownloadsProvider);
 
     final AsyncValue favoriteListAsync = ref.watch(getFavoriteProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.episodeItem!['title']),
+        title: Text(widget.podcast!.title),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -88,35 +89,35 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Podcast Title
+                        // Episode Title
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            widget.podcast!.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Brightness.dark ==
-                                      Theme.of(context).brightness
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
+                            widget.episodeItem!['title'],
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
                         ),
+                        // Author
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
                           child: Text(
-                            widget.podcast!.author ??
+                            widget.author ??
+                                widget.podcast!.author ??
+                                widget.episodeItem!['author'] ??
                                 Translations.of(context).text('unknown'),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Colors.grey,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                            maxLines: 1,
                           ),
                         ),
                         // Podcast Published Date
@@ -125,11 +126,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               .watch(audioProvider)
                               .getPodcastPublishedDateFromEpoch(
                                   widget.episodeItem!['datePublished']),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.0,
-                            color: Colors.grey,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                  ),
                         ),
                       ],
                     ),
@@ -228,7 +229,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       },
                       loading: () {
                         // Handle loading by showing previous state's icon, disabled
-                        final previousList = queueListAsync.valueOrNull;
+                        final previousList = queueListAsync.value;
                         final isQueuedPreviously = previousList
                                 ?.containsKey(widget.episodeItem!['guid']) ??
                             false;
@@ -270,65 +271,73 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             onPressed = () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext dialogContext) =>
-                                    AlertDialog(
-                                  title: Text(Translations.of(context)
-                                      .text('confirmDeletion')),
-                                  content: Text(
-                                      '${Translations.of(context).text('AreYouSureYouWantToRemoveDownload')} \'${widget.episodeItem!['title']}\'?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('cancel')),
-                                      onPressed: () {
-                                        Navigator.of(dialogContext)
-                                            .pop(); // Dismiss the dialog
-                                      },
+                                builder: (BuildContext dialogContext) {
+                                  return AlertDialog(
+                                    title: Text(
+                                      Translations.of(dialogContext)
+                                          .text('confirmDeletion'),
                                     ),
-                                    TextButton(
-                                      child: Text(Translations.of(context)
-                                          .text('removed')),
-                                      onPressed: () async {
-                                        // Pop the dialog first
-                                        Navigator.of(dialogContext).pop();
+                                    content: Text(
+                                      '${Translations.of(dialogContext).text('areYouSureYouWantToRemoveDownload')} \'${widget.episodeItem!['title']}\'?',
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text(
+                                          Translations.of(dialogContext)
+                                              .text('cancel'),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(dialogContext).pop();
+                                        },
+                                      ),
+                                      FilledButton(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: Text(
+                                          Translations.of(dialogContext)
+                                              .text('remove'),
+                                        ),
+                                        onPressed: () async {
+                                          Navigator.of(dialogContext).pop();
 
-                                        // Then perform the removal
-                                        await ref
-                                            .read(audioProvider.notifier)
-                                            .removeDownload(
-                                                widget.episodeItem!);
+                                          // Then perform the removal
+                                          await ref
+                                              .read(audioProvider.notifier)
+                                              .removeDownload(
+                                                  widget.episodeItem!);
 
-                                        // Show feedback
-                                        if (context.mounted) {
-                                          if (!Platform.isAndroid &&
-                                              !Platform.isIOS) {
-                                            ref
-                                                .read(
-                                                    notificationServiceProvider)
-                                                .showNotification(
-                                                  'OpenAir ${Translations.of(context).text('notification')}',
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
-                                                );
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                          // Show feedback
+                                          if (context.mounted) {
+                                            if (!Platform.isAndroid &&
+                                                !Platform.isIOS) {
+                                              ref
+                                                  .read(
+                                                      notificationServiceProvider)
+                                                  .showNotification(
+                                                    'OpenAir ${Translations.of(context).text('notification')}',
+                                                    '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                                  );
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '${Translations.of(context).text('removed')} \'${widget.episodeItem!['title']}\'',
+                                                  ),
                                                 ),
-                                              ),
-                                            );
+                                              );
+                                            }
                                           }
-                                        }
 
-                                        ref.invalidate(sortedDownloadsProvider);
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                          ref.invalidate(getDownloadsProvider);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
                               );
-
-                              ref.invalidate(sortedDownloadsProvider);
                             };
                           }
                           // Episode not downloaded
@@ -379,12 +388,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                     strokeWidth: 2.0)),
                             onPressed: null),
                       ),
-                    // Share Button
-                    IconButton(
-                      tooltip: Translations.of(context).text('share'),
-                      onPressed: () => ref.watch(openAirProvider).share(),
-                      icon: const Icon(Icons.share_rounded),
-                    ),
                     favoriteListAsync.when(
                       data: (data) {
                         bool isFavorite =
@@ -418,7 +421,9 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 }
                               } else {
                                 ref.read(audioProvider).addEpisodeToFavorite(
-                                    widget.episodeItem!, widget.podcast!);
+                                    widget.episodeItem!, widget.podcast!,
+                                    author: widget.episodeItem!['author'] ??
+                                        widget.podcast!.author);
 
                                 if (context.mounted) {
                                   if (!Platform.isAndroid && !Platform.isIOS) {
@@ -442,7 +447,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             });
                           },
                           icon: isFavorite
-                              ? const Icon(Icons.favorite_rounded)
+                              ? const Icon(
+                                  Icons.favorite_rounded,
+                                  color: Colors.redAccent,
+                                )
                               : const Icon(Icons.favorite_border_rounded),
                         );
                       },
@@ -461,6 +469,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         );
                       },
                     ),
+                    // Share Button
+                    IconButton(
+                      tooltip: Translations.of(context).text('share'),
+                      onPressed: () => ref.watch(openAirProvider).share(),
+                      icon: const Icon(Icons.share_rounded),
+                    ),
                   ],
                 ),
               ),
@@ -476,10 +490,11 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       maxLines: 4,
                       textOverflow: TextOverflow.ellipsis,
                       margin: Margins.zero,
-                      fontSize: FontSize(14.0),
-                      color: Brightness.dark == Theme.of(context).brightness
-                          ? Colors.white
-                          : Colors.black,
+                      fontSize: FontSize(
+                        Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                            14.0,
+                      ),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   },
                 ),

@@ -3,7 +3,6 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:theme_provider/theme_provider.dart';
 
 final FutureProvider<Map?> playbackSettingsDataProvider =
     FutureProvider((ref) async {
@@ -19,17 +18,133 @@ class PlaybackPage extends ConsumerStatefulWidget {
 }
 
 class PlaybackPageState extends ConsumerState<PlaybackPage> {
-  late Map playbackData;
+  Widget _buildCard(Widget child, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
 
-  late String fastForwardSkipTime;
-  late String rewindSkipTime;
-  late String playbackSpeed;
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: 0.5,
+              ),
+        ),
+      ),
+    );
+  }
 
-  late String enqueuePosition;
-  late bool enqueueDownloaded;
-  late bool autoplayNextInQueue;
-  late String smartMarkAsCompleted;
-  late bool keepSkippedEpisodes;
+  Widget _buildDropdownTile({
+    required String label,
+    required String currentValue,
+    required List<String> options,
+    required Map<String, String> valueMap,
+    required Function(String) onSave,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 160,
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                isDense: true,
+              ),
+              isExpanded: true,
+              initialValue: currentValue,
+              onChanged: (newValue) {
+                if (newValue == null) return;
+                final internalValue = valueMap[newValue];
+                if (internalValue != null) onSave(internalValue);
+              },
+              items: options.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value, textAlign: TextAlign.center),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleTile({
+    required String label,
+    required bool value,
+    required Function(bool) onChanged,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _savePlaybackSettings(Map playbackData, BuildContext context) {
+    ref.watch(openAirProvider).hiveService.savePlaybackSettings(playbackData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,597 +152,293 @@ class PlaybackPageState extends ConsumerState<PlaybackPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Translations.of(context).text('playback')),
+        title: Text(
+          Translations.of(context).text('playback'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: playback.when(
         data: (data) {
-          playbackData = data!;
+          final playbackData = data!;
 
-          enqueueDownloaded = playbackData['enqueueDownloaded'] ??= false;
-          autoplayNextInQueue = playbackData['continuePlayback'] ??= false;
+          final skipOptions = [
+            '3',
+            '5',
+            '10',
+            '15',
+            '30',
+            '45',
+            '60',
+          ];
 
-          smartMarkAsCompleted =
-              playbackData['smartMarkAsCompleted'] ??= 'Disabled';
+          final speedOptions = [
+            '0.5x',
+            '1.0x',
+            '1.25x',
+            '1.5x',
+            '2.0x',
+          ];
 
-          keepSkippedEpisodes = playbackData['keepSkippedEpisodes'] ??= false;
+          final enqueueOptions = [
+            Translations.of(context).text('last'),
+            Translations.of(context).text('first'),
+            Translations.of(context).text('afterCurrentEpisode'),
+          ];
 
-          switch (playbackData['fastForwardInterval']) {
-            case '3 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds3');
-              break;
-            case '5 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds5');
-              break;
-            case '10 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds10');
-              break;
-            case '15 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds15');
-              break;
-            case '30 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds30');
-              break;
-            case '45 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds45');
-              break;
-            case '60 seconds':
-              fastForwardSkipTime = Translations.of(context).text('seconds60');
-              break;
-            default:
-              fastForwardSkipTime = Translations.of(context).text('seconds10');
-              break;
-          }
+          final smartMarkOptions = [
+            Translations.of(context).text('disabled'),
+            Translations.of(context).text('seconds15'),
+            Translations.of(context).text('seconds30'),
+            Translations.of(context).text('seconds60'),
+            Translations.of(context).text('minutes3'),
+            Translations.of(context).text('minutes5'),
+          ];
 
-          switch (playbackData['rewindInterval']) {
-            case '3 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds3');
-              break;
-            case '5 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds5');
-              break;
-            case '10 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds10');
-              break;
-            case '15 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds15');
-              break;
-            case '30 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds30');
-              break;
-            case '45 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds45');
-              break;
-            case '60 seconds':
-              rewindSkipTime = Translations.of(context).text('seconds60');
-              break;
-            default:
-              rewindSkipTime = Translations.of(context).text('seconds10');
-              break;
-          }
+          final storedRewind = playbackData['rewindInterval'] ?? '10 seconds';
+          final storedFastForward =
+              playbackData['fastForwardInterval'] ?? '10 seconds';
+          final storedSpeed = playbackData['playbackSpeed'] ?? '1.0x';
+          final storedEnqueue = playbackData['enqueuePosition'] ?? 'Last';
+          final storedSmartMark =
+              playbackData['smartMarkAsCompleted'] ?? 'Disabled';
 
-          switch (playbackData['playbackSpeed']) {
-            case '0.5x':
-              playbackSpeed = Translations.of(context).text('x0.5');
-              break;
-            case '1.0x':
-              playbackSpeed = Translations.of(context).text('x1.0');
-              break;
-            case '1.25x':
-              playbackSpeed = Translations.of(context).text('x1.25');
-              break;
-            case '1.5x':
-              playbackSpeed = Translations.of(context).text('x1.5');
-              break;
-            case '2.0x':
-              playbackSpeed = Translations.of(context).text('x2.0');
-              break;
-            default:
-              playbackSpeed = Translations.of(context).text('x1.0');
-              break;
-          }
+          final enqueueDownloaded = playbackData['enqueueDownloaded'] ?? false;
+          final autoplayNextInQueue = playbackData['continuePlayback'] ?? false;
+          final keepSkippedEpisodes =
+              playbackData['keepSkippedEpisodes'] ?? false;
 
-          switch (playbackData['enqueuePosition']) {
-            case 'Last':
-              enqueuePosition = Translations.of(context).text('last');
-              break;
-            case 'First':
-              enqueuePosition = Translations.of(context).text('first');
-              break;
-            case 'After current episode':
-              enqueuePosition =
-                  Translations.of(context).text('afterCurrentEpisode');
-              break;
-            default:
-              enqueuePosition = Translations.of(context).text('last');
-              break;
-          }
-
-          switch (playbackData['smartMarkAsCompleted']) {
-            case 'Disabled':
-              smartMarkAsCompleted = Translations.of(context).text('disabled');
-              break;
-            case '15 seconds':
-              smartMarkAsCompleted = Translations.of(context).text('seconds15');
-              break;
-            case '30 seconds':
-              smartMarkAsCompleted = Translations.of(context).text('seconds30');
-              break;
-            case '60 seconds':
-              smartMarkAsCompleted = Translations.of(context).text('seconds60');
-              break;
-            case '3 minutes':
-              smartMarkAsCompleted = Translations.of(context).text('minutes3');
-              break;
-            case '5 minutes':
-              smartMarkAsCompleted = Translations.of(context).text('minutes5');
-              break;
-            default:
-              smartMarkAsCompleted = Translations.of(context).text('seconds30');
-              break;
-          }
-
-          return Column(
-            spacing: settingsSpacer,
+          return ListView(
             children: [
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('skipInterval'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('rewindSkipTime')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    value: rewindSkipTime,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        rewindSkipTime = newValue!;
-
-                        if (Translations.of(context).text('seconds3') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '3 seconds';
-                          rewindIntervalConfig = '3';
-                        } else if (Translations.of(context).text('seconds5') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '5 seconds';
-                          rewindIntervalConfig = '5';
-                        } else if (Translations.of(context).text('seconds10') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '10 seconds';
-                          rewindIntervalConfig = '10';
-                        } else if (Translations.of(context).text('seconds15') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '15 seconds';
-                          rewindIntervalConfig = '15';
-                        } else if (Translations.of(context).text('seconds30') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '30 seconds';
-                          rewindIntervalConfig = '30';
-                        } else if (Translations.of(context).text('seconds45') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '45 seconds';
-                          rewindIntervalConfig = '45';
-                        } else if (Translations.of(context).text('seconds60') ==
-                            newValue) {
-                          playbackData['rewindInterval'] = '60 seconds';
-                          rewindIntervalConfig = '60';
-                        }
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .savePlaybackSettings(playbackData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('seconds3'),
-                      Translations.of(context).text('seconds5'),
-                      Translations.of(context).text('seconds10'),
-                      Translations.of(context).text('seconds15'),
-                      Translations.of(context).text('seconds30'),
-                      Translations.of(context).text('seconds45'),
-                      Translations.of(context).text('seconds60'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('fastForwardSkipTime')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    value: fastForwardSkipTime,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        fastForwardSkipTime = newValue!;
-
-                        if (Translations.of(context).text('seconds3') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '3 seconds';
-                          fastForwardIntervalConfig = '3';
-                        } else if (Translations.of(context).text('seconds5') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '5 seconds';
-                          fastForwardIntervalConfig = '5';
-                        } else if (Translations.of(context).text('seconds10') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '10 seconds';
-                          fastForwardIntervalConfig = '10';
-                        } else if (Translations.of(context).text('seconds15') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '15 seconds';
-                          fastForwardIntervalConfig = '15';
-                        } else if (Translations.of(context).text('seconds30') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '30 seconds';
-                          fastForwardIntervalConfig = '30';
-                        } else if (Translations.of(context).text('seconds45') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '45 seconds';
-                          fastForwardIntervalConfig = '45';
-                        } else if (Translations.of(context).text('seconds60') ==
-                            newValue) {
-                          playbackData['fastForwardInterval'] = '60 seconds';
-                          fastForwardIntervalConfig = '60';
-                        }
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .savePlaybackSettings(playbackData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('seconds3'),
-                      Translations.of(context).text('seconds5'),
-                      Translations.of(context).text('seconds10'),
-                      Translations.of(context).text('seconds15'),
-                      Translations.of(context).text('seconds30'),
-                      Translations.of(context).text('seconds45'),
-                      Translations.of(context).text('seconds60'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('playbackSpeed')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    value: playbackSpeed,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        playbackSpeed = newValue!;
-
-                        if (Translations.of(context).text('x0.5') == newValue) {
-                          playbackData['playbackSpeed'] = '0.5x';
-                          playbackSpeed = '0.5x';
-                        } else if (Translations.of(context).text('x1.0') ==
-                            newValue) {
-                          playbackData['playbackSpeed'] = '1.0x';
-                          playbackSpeed = '1.0x';
-                        } else if (Translations.of(context).text('x1.25') ==
-                            newValue) {
-                          playbackData['playbackSpeed'] = '1.25x';
-                          playbackSpeed = '1.25x';
-                        } else if (Translations.of(context).text('x1.5') ==
-                            newValue) {
-                          playbackData['playbackSpeed'] = '1.5x';
-                          playbackSpeed = '1.5x';
-                        } else if (Translations.of(context).text('x2.0') ==
-                            newValue) {
-                          playbackData['playbackSpeed'] = '2.0x';
-                          playbackSpeed = '2.0x';
-                        }
-
-                        playbackSpeedConfig = playbackSpeed;
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .savePlaybackSettings(playbackData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('x0.5'),
-                      Translations.of(context).text('x1.0'),
-                      Translations.of(context).text('x1.25'),
-                      Translations.of(context).text('x1.5'),
-                      Translations.of(context).text('x2.0'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('queue'),
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                trailing: SizedBox(
-                  width: 200.0,
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('enqueuePosition')),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    value: enqueuePosition,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        enqueuePosition = newValue!;
-
-                        if (Translations.of(context).text('last') == newValue) {
-                          playbackData['enqueuePosition'] = 'Last';
-                          enqueuePositionConfig = 'Last';
-                        } else if (Translations.of(context).text('first') ==
-                            newValue) {
-                          playbackData['enqueuePosition'] = 'First';
-                          enqueuePositionConfig = 'First';
-                        } else if (Translations.of(context)
-                                .text('afterCurrentEpisode') ==
-                            newValue) {
-                          playbackData['enqueuePosition'] =
-                              'After current episode';
-
-                          enqueuePositionConfig = 'After current episode';
-                        }
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .savePlaybackSettings(playbackData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('last'),
-                      Translations.of(context).text('first'),
-                      Translations.of(context).text('afterCurrentEpisode'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(Translations.of(context).text('enqueueDownloaded')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [enqueueDownloaded, !enqueueDownloaded],
-                  onPressed: (int index) {
-                    setState(() {
-                      enqueueDownloaded = !enqueueDownloaded;
-
-                      playbackData['enqueueDownloaded'] = enqueueDownloaded;
-                      enqueueDownloadedConfig = enqueueDownloaded;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .savePlaybackSettings(playbackData);
-                    });
-
-                    if (enqueueDownloaded == true) {
-                      ref.watch(openAirProvider).downloadEnqueue(context);
-                    }
-                  },
+              _buildSectionHeader(
+                  Translations.of(context).text('skipInterval'), context),
+              _buildCard(
+                Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
+                    _buildDropdownTile(
+                      label: Translations.of(context).text('rewindSkipTime'),
+                      currentValue: '${storedRewind.split(' ')[0]}s',
+                      options: skipOptions.map((s) => '${s}s').toList(),
+                      valueMap: {
+                        for (var s in skipOptions) '${s}s': '$s seconds',
+                      },
+                      onSave: (value) {
+                        playbackData['rewindInterval'] = value;
+                        rewindIntervalConfig = value.split(' ')[0];
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildDropdownTile(
+                      label:
+                          Translations.of(context).text('fastForwardSkipTime'),
+                      currentValue: '${storedFastForward.split(' ')[0]}s',
+                      options: skipOptions.map((s) => '${s}s').toList(),
+                      valueMap: {
+                        for (var s in skipOptions) '${s}s': '$s seconds',
+                      },
+                      onSave: (value) {
+                        playbackData['fastForwardInterval'] = value;
+                        fastForwardIntervalConfig = value.split(' ')[0];
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildDropdownTile(
+                      label: Translations.of(context).text('playbackSpeed'),
+                      currentValue: storedSpeed,
+                      options: speedOptions,
+                      valueMap: {for (var s in speedOptions) s: s},
+                      onSave: (value) {
+                        playbackData['playbackSpeed'] = value;
+                        playbackSpeedConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
                   ],
-                )),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('autoPlayNextInQueue')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [autoplayNextInQueue, !autoplayNextInQueue],
-                  onPressed: (int index) {
-                    setState(() {
-                      autoplayNextInQueue = !autoplayNextInQueue;
-                      playbackData['continuePlayback'] = autoplayNextInQueue;
-
-                      autoplayNextInQueueConfig = autoplayNextInQueue;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .savePlaybackSettings(playbackData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                      ),
-                    ),
-                  ],
-                )),
-              ),
-              ListTile(
-                title: Text(
-                  Translations.of(context).text('autoMarkEpisodesAsCompleted'),
                 ),
-                trailing: SizedBox(
-                  width: 200.0,
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    style: TextStyle(
-                      color: ThemeProvider.themeOf(context).data.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w400,
+                context,
+              ),
+              _buildSectionHeader(
+                  Translations.of(context).text('queue'), context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildDropdownTile(
+                      label: Translations.of(context).text('enqueuePosition'),
+                      currentValue: {
+                        'Last': Translations.of(context).text('last'),
+                        'First': Translations.of(context).text('first'),
+                        'After current episode': Translations.of(context)
+                            .text('afterCurrentEpisode'),
+                      }[storedEnqueue]!,
+                      options: enqueueOptions,
+                      valueMap: {
+                        Translations.of(context).text('last'): 'Last',
+                        Translations.of(context).text('first'): 'First',
+                        Translations.of(context).text('afterCurrentEpisode'):
+                            'After current episode',
+                      },
+                      onSave: (value) {
+                        playbackData['enqueuePosition'] = value;
+                        enqueuePositionConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
-                    value: smartMarkAsCompleted,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        smartMarkAsCompleted = newValue!;
-
-                        if (Translations.of(context).text('disabled') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = 'Disabled';
-                          smartMarkAsCompletionConfig = 'Disabled';
-                        } else if (Translations.of(context).text('seconds15') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = '15 seconds';
-                          smartMarkAsCompletionConfig = '15';
-                        } else if (Translations.of(context).text('seconds30') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = '30 seconds';
-                          smartMarkAsCompletionConfig = '30';
-                        } else if (Translations.of(context).text('seconds60') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = '60 seconds';
-                          smartMarkAsCompletionConfig = '60';
-                        } else if (Translations.of(context).text('minutes3') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = '3 minutes';
-                          smartMarkAsCompletionConfig = '180';
-                        } else if (Translations.of(context).text('minutes5') ==
-                            newValue) {
-                          playbackData['smartMarkAsCompleted'] = '5 minutes';
-                          smartMarkAsCompletionConfig = '300';
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label: Translations.of(context).text('enqueueDownloaded'),
+                      value: enqueueDownloaded,
+                      onChanged: (value) {
+                        playbackData['enqueueDownloaded'] = value;
+                        enqueueDownloadedConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        if (value == true) {
+                          ref.watch(openAirProvider).downloadEnqueue(context);
                         }
-
-                        ref
-                            .watch(openAirProvider)
-                            .hiveService
-                            .savePlaybackSettings(playbackData);
-                      });
-                    },
-                    items: <String>[
-                      Translations.of(context).text('disabled'),
-                      Translations.of(context).text('seconds15'),
-                      Translations.of(context).text('seconds30'),
-                      Translations.of(context).text('seconds60'),
-                      Translations.of(context).text('minutes3'),
-                      Translations.of(context).text('minutes5'),
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              ListTile(
-                title:
-                    Text(Translations.of(context).text('keepSkippedEpisodes')),
-                trailing: SizedBox(
-                    child: ToggleButtons(
-                  isSelected: [keepSkippedEpisodes, !keepSkippedEpisodes],
-                  onPressed: (int index) {
-                    setState(() {
-                      keepSkippedEpisodes = !keepSkippedEpisodes;
-                      playbackData['keepSkippedEpisodes'] = keepSkippedEpisodes;
-
-                      keepSkippedEpisodesConfig = keepSkippedEpisodes;
-
-                      ref
-                          .watch(openAirProvider)
-                          .hiveService
-                          .savePlaybackSettings(playbackData);
-                    });
-                  },
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('on'),
-                      ),
+                        setState(() {});
+                      },
+                      context: context,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        Translations.of(context).text('off'),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label:
+                          Translations.of(context).text('autoPlayNextInQueue'),
+                      value: autoplayNextInQueue,
+                      onChanged: (value) {
+                        playbackData['continuePlayback'] = value;
+                        autoplayNextInQueueConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
                     ),
                   ],
-                )),
+                ),
+                context,
               ),
+              _buildSectionHeader(
+                  Translations.of(context).text('navigation'), context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildToggleTile(
+                      label: Translations.of(context)
+                          .text('navigatePodcastEpisodes'),
+                      value: playbackData['navigatePodcastEpisodes'] ?? true,
+                      onChanged: (value) {
+                        playbackData['navigatePodcastEpisodes'] = value;
+                        navigatePodcastEpisodesConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                  ],
+                ),
+                context,
+              ),
+              _buildSectionHeader(
+                  Translations.of(context).text('completion'), context),
+              _buildCard(
+                Column(
+                  children: [
+                    _buildDropdownTile(
+                      label: Translations.of(context)
+                          .text('autoMarkEpisodesAsCompleted'),
+                      currentValue: {
+                        'Disabled': Translations.of(context).text('disabled'),
+                        '15 seconds':
+                            Translations.of(context).text('seconds15'),
+                        '30 seconds':
+                            Translations.of(context).text('seconds30'),
+                        '60 seconds':
+                            Translations.of(context).text('seconds60'),
+                        '3 minutes': Translations.of(context).text('minutes3'),
+                        '5 minutes': Translations.of(context).text('minutes5'),
+                      }[storedSmartMark]!,
+                      options: smartMarkOptions,
+                      valueMap: {
+                        Translations.of(context).text('disabled'): 'Disabled',
+                        Translations.of(context).text('seconds15'):
+                            '15 seconds',
+                        Translations.of(context).text('seconds30'):
+                            '30 seconds',
+                        Translations.of(context).text('seconds60'):
+                            '60 seconds',
+                        Translations.of(context).text('minutes3'): '3 minutes',
+                        Translations.of(context).text('minutes5'): '5 minutes',
+                      },
+                      onSave: (value) {
+                        playbackData['smartMarkAsCompleted'] = value;
+                        final secondsMap = {
+                          'Disabled': 'Disabled',
+                          '15 seconds': '15',
+                          '30 seconds': '30',
+                          '60 seconds': '60',
+                          '3 minutes': '180',
+                          '5 minutes': '300',
+                        };
+                        smartMarkAsCompletionConfig = secondsMap[value]!;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                    Divider(
+                        height: 1,
+                        color: Theme.of(context)
+                            .dividerColor
+                            .withValues(alpha: 0.15)),
+                    _buildToggleTile(
+                      label:
+                          Translations.of(context).text('keepSkippedEpisodes'),
+                      value: keepSkippedEpisodes,
+                      onChanged: (value) {
+                        playbackData['keepSkippedEpisodes'] = value;
+                        keepSkippedEpisodesConfig = value;
+                        _savePlaybackSettings(playbackData, context);
+                        setState(() {});
+                      },
+                      context: context,
+                    ),
+                  ],
+                ),
+                context,
+              ),
+              const SizedBox(height: 24),
             ],
           );
         },
         error: (error, stackTrace) {
-          return Text(Translations.of(context).text('oopsAnErrorOccurred'));
+          return Center(
+            child: Text(Translations.of(context).text('oopsAnErrorOccurred')),
+          );
         },
         loading: () {
           return const Center(child: CircularProgressIndicator());

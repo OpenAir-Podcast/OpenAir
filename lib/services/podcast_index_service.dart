@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:openair/env.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:openair/config/config.dart';
+import 'dart:io';
 import 'package:openair/providers/openair_provider.dart';
 
 final podcastIndexProvider = Provider(
@@ -14,9 +16,9 @@ final podcastIndexProvider = Provider(
 );
 
 class PodcastIndexProvider {
-  final String? podcastIndexApi = dotenv.env['PODCAST_INDEX_API_KEY'];
-  final String? podcastIndexSecret = dotenv.env['PODCAST_INDEX_API_SECRET'];
-  final String? podcastIndexUserAgent = dotenv.env['PODCAST_USER_AGENT'];
+  final String? podcastIndexApi = Env.podcastIndexApiKey;
+  final String? podcastIndexSecret = Env.podcastIndexApiSecret;
+  final String? podcastIndexUserAgent = Env.podcastUserAgent;
 
   late int unixTime;
   late String newUnixTime;
@@ -24,6 +26,7 @@ class PodcastIndexProvider {
   late Digest digest;
   late Map<String, String> headers;
   late Dio _dio;
+  String? _userAgent;
 
   final Ref ref;
 
@@ -31,7 +34,31 @@ class PodcastIndexProvider {
     _dio = Dio();
   }
 
-  void _generateHeaders() {
+  Future<String> _getUserAgent() async {
+    if (_userAgent != null) return _userAgent!;
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final os = Platform.isAndroid
+          ? "Android"
+          : Platform.isIOS
+              ? "iOS"
+              : Platform.isLinux
+                  ? "Linux"
+                  : Platform.isMacOS
+                      ? "macOS"
+                      : Platform.isWindows
+                          ? "Windows"
+                          : "Unknown";
+      _userAgent =
+          "${packageInfo.appName}/${packageInfo.version} ($os; +https://github.com/OpenAir-Podcast/OpenAir)";
+    } catch (e) {
+      _userAgent = podcastIndexUserAgent ??
+          "OpenAir/1.0.0 (Unknown; +https://github.com/OpenAir-Podcast/OpenAir)";
+    }
+    return _userAgent!;
+  }
+
+  void _generateHeaders(String ua) {
     unixTime = (DateTime.now().millisecondsSinceEpoch / 1000).round();
     newUnixTime = unixTime.toString();
 
@@ -52,7 +79,7 @@ class PodcastIndexProvider {
       "X-Auth-Date": newUnixTime,
       "X-Auth-Key": podcastIndexApi!,
       "Authorization": digest.toString(),
-      "User-Agent": podcastIndexUserAgent!,
+      "User-Agent": ua,
     };
 
     _dio.options.headers = headers;
@@ -66,9 +93,18 @@ class PodcastIndexProvider {
     int attempt = 0;
     while (true) {
       try {
-        _generateHeaders();
+        final ua = await _getUserAgent();
+        _generateHeaders(ua);
         return await requestFactory();
       } on DioException catch (e) {
+        if (e.response?.statusCode == 429) {
+          final retryAfter = e.response?.headers.value('retry-after');
+          final seconds = int.tryParse(retryAfter ?? '') ?? 5;
+          debugPrint('429 Too Many Requests, retrying after $seconds seconds');
+          await Future.delayed(Duration(seconds: seconds));
+          continue;
+        }
+
         attempt++;
         if (attempt > retries) {
           debugPrint('DioError after $retries retries: ${e.message}');
@@ -115,8 +151,21 @@ class PodcastIndexProvider {
     String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
     String fullUrl = '$url&pretty';
 
-    final response = await _retry(() => _dio.get(fullUrl));
-    final feeds = response.data['feeds'];
+    final hiveService = ref.read(openAirProvider).hiveService;
+    final cached = await hiveService.getSearchCache(name);
+
+    Map<String, dynamic> data;
+
+    if (cached != null && !cached.isExpired) {
+      debugPrint('Returning cached episode count for: $name');
+      data = cached.results;
+    } else {
+      final response = await _retry(() => _dio.get(fullUrl));
+      data = response.data;
+      await hiveService.putSearchCache(name, data);
+    }
+
+    final feeds = data['feeds'];
 
     if (feeds is List && feeds.isNotEmpty) {
       // The 'feeds' key returns a list of feeds.
@@ -135,7 +184,10 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
 
+    debugPrint(url);
+
     final response = await _retry(() => _dio.get(url));
+
     ref
         .watch(openAirProvider)
         .hiveService
@@ -225,7 +277,18 @@ class PodcastIndexProvider {
     String fullUrl = '$url&pretty';
     debugPrint(fullUrl);
 
+    final hiveService = ref.read(openAirProvider).hiveService;
+    final cached = await hiveService.getSearchCache(title);
+
+    if (cached != null && !cached.isExpired) {
+      debugPrint('Returning cached search results for: $title');
+      return cached.results;
+    }
+
     final response = await _retry(() => _dio.get(fullUrl));
+
+    await hiveService.putSearchCache(title, response.data);
+
     return response.data;
   }
 
@@ -241,10 +304,20 @@ class PodcastIndexProvider {
     String url = 'https://api.podcastindex.org/api/1.0/search/bytitle?q=$cat';
     String fullUrl = '$url&pretty';
 
+    final hiveService = ref.read(openAirProvider).hiveService;
+    final cached = await hiveService.getSearchCache(title);
+
+    if (cached != null && !cached.isExpired) {
+      debugPrint('Returning cached details for: $title');
+      return cached.results['feeds'][0];
+    }
+
     final response = await _retry(() => _dio.get(fullUrl));
 
-    ref.watch(openAirProvider).hiveService.putPodcastInfo(
+    hiveService.putPodcastInfo(
         response.data['feeds'][0]['title'], response.data['feeds'][0]);
+
+    await hiveService.putSearchCache(title, response.data);
 
     return response.data['feeds'][0];
   }

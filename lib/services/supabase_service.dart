@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:openair/env.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
 
-  String? supabaseRedirectToString = dotenv.env['CALLBACK_METHOD'];
-  String? googleRedirectToString = dotenv.env['SUPABASE_GOOGLE_CALLBACK'];
-  String? githubRedirectToString = dotenv.env['SUPABASE_GITHUB_CALLBACK'];
+  String? supabaseRedirectToString = Env.callbackMethod;
+  String? googleRedirectToString = Env.supabaseGoogleCallback;
+  String? githubRedirectToString = Env.supabaseGithubCallback;
 
   // Example function to get user data
   Future<User?> getUser() async {
@@ -53,7 +53,18 @@ class SupabaseService {
     return client.auth.signOut(scope: SignOutScope.global);
   }
 
-  logInUsingGoogle() async {
+  Future<void> deleteAccount() async {
+    try {
+      // Calls a stored procedure on Supabase to delete the authenticated user
+      await client.rpc('delete_user');
+      await signOut();
+    } catch (e) {
+      debugPrint('An error occurred during account deletion: $e');
+      throw Exception('Account deletion failed: $e');
+    }
+  }
+
+  Future<void> logInUsingGoogle() async {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.google,
@@ -71,7 +82,7 @@ class SupabaseService {
     }
   }
 
-  logInUsingGithub() async {
+  Future<void> logInUsingGithub() async {
     try {
       await client.auth.signInWithOAuth(
         OAuthProvider.github,

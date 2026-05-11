@@ -9,51 +9,57 @@ import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/views/nav_pages/inbox_page.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 
-import 'package:openair/hive_models/completed_episode_model.dart';
-import 'package:openair/hive_models/feed_model.dart';
-import 'package:openair/hive_models/podcast_model.dart';
-import 'package:openair/hive_models/download_model.dart';
-import 'package:openair/hive_models/history_model.dart';
-import 'package:openair/hive_models/fetch_data_model.dart';
-import 'package:openair/hive_models/subscription_model.dart';
+import 'package:openair/model/hive_models/completed_episode_model.dart';
+import 'package:openair/model/hive_models/feed_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/download_model.dart';
+import 'package:openair/model/hive_models/history_model.dart';
+import 'package:openair/model/hive_models/fetch_data_model.dart';
+import 'package:openair/model/hive_models/subscription_model.dart';
+import 'package:openair/model/hive_models/search_cache_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:openair/views/nav_pages/downloads_page.dart';
+
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduled_timer/scheduled_timer.dart';
 import 'package:xml/xml.dart';
 
+import 'package:workmanager/workmanager.dart';
+import 'package:openair/services/background_service.dart';
+
 final hiveServiceProvider = Provider<HiveService>(
   (ref) => HiveService(ref),
 );
 
-final subscriptionsProvider =
-    FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.subscriptionBox;
-
-  // Emit the initial state
-  return await box.getAllValues();
+final subscriptionsProvider = FutureProvider.autoDispose((ref) async {
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getSubscriptions();
 });
 
 final getQueueProvider = FutureProvider.autoDispose((ref) async {
-  final hiveService = ref.watch(hiveServiceProvider);
-  final box = await hiveService.queueBox;
-
-  return await box.getAllValues();
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getQueue();
 });
 
-final sortedDownloadsProvider = FutureProvider.autoDispose<List<DownloadModel>>(
-  (ref) async {
-    final hiveService = ref.watch(hiveServiceProvider);
-    return hiveService.getSortedDownloads();
-  },
-);
+final getDownloadsProvider =
+    FutureProvider.autoDispose<List<DownloadModel>>((ref) async {
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getDownloads();
+});
+
+// Removed sortedDownloadsProvider - use getDownloadsProvider instead
+
+final getFavoriteProvider = FutureProvider.autoDispose((ref) async {
+  final hiveService = ref.read(hiveServiceProvider);
+  return await hiveService.getFavoriteEpisodes();
+});
 
 // Create a FutureProvider to fetch the podcast data
 final getPodcastInfoByTitleProvider =
@@ -92,6 +98,7 @@ class HiveService {
   late final Future<CollectionBox<Map>> podcastInfoBox;
 
   late final Future<CollectionBox<Map>> favoritesBox;
+  late final Future<CollectionBox<SearchCacheModel>> searchCacheBox;
 
   late final Directory openAirDir;
 
@@ -116,6 +123,7 @@ class HiveService {
     Hive.registerAdapter(SubscriptionModelAdapter());
 
     Hive.registerAdapter(FetchDataModelAdapter());
+    Hive.registerAdapter(SearchCacheModelAdapter());
 
     // Get the application documents directory
     if (!kIsWeb) {
@@ -148,6 +156,7 @@ class HiveService {
         'category',
         'favorites',
         'podcast_info',
+        'search_cache',
       },
       path: kIsWeb ? null : openAirDir.path,
     );
@@ -178,6 +187,7 @@ class HiveService {
     podcastInfoBox = collection.openBox<Map>('podcast_info');
 
     favoritesBox = collection.openBox<Map>('favorites');
+    searchCacheBox = collection.openBox<SearchCacheModel>('search_cache');
 
     Map<String, dynamic> playbackSettings = await getPlaybackSettings();
 
@@ -185,7 +195,7 @@ class HiveService {
         .then((value) => value['themeMode'] ?? 'System');
 
     fontSizeConfig = await getUserInterfaceSettings()
-        .then((value) => value['fontSizeFactor'].toString());
+        .then((value) => value['fontSizeFactor'] ?? 'Medium');
 
     languageConfig = await getUserInterfaceSettings()
         .then((value) => value['language'] ?? 'English');
@@ -193,39 +203,54 @@ class HiveService {
     localeConfig = await getUserInterfaceSettings()
         .then((value) => value['locale'] ?? 'en_US');
 
-    switch (languageConfig) {
-      case 'English':
-        Translations.changeLanguage(Localization.en_US);
-        break;
-      case 'Spanish':
-        Translations.changeLanguage(Localization.es_ES);
-        break;
-      case 'French':
-        Translations.changeLanguage(Localization.fr_FR);
-        break;
-      case 'German':
-        Translations.changeLanguage(Localization.de_DE);
-        break;
-      case 'Italian':
-        Translations.changeLanguage(Localization.it_IT);
-        break;
-      case 'Portuguese':
-        Translations.changeLanguage(Localization.pt_PT);
-        break;
-      case 'Russian':
-        Translations.changeLanguage(Localization.ru_RU);
-        break;
-      case 'Chinese':
-        Translations.changeLanguage(Localization.zh_CN);
-        break;
-      case 'Japanese':
-        Translations.changeLanguage(Localization.ja_JP);
-        break;
-      case 'Korean':
-        Translations.changeLanguage(Localization.ko_KR);
-        break;
-      default:
-        Translations.changeLanguage(Localization.en_US);
+    // Set the language from saved config
+    if (languageConfig.isNotEmpty) {
+      switch (languageConfig) {
+        case 'English':
+          Translations.changeLanguage(Localization.en_US);
+          break;
+        case 'Spanish':
+          Translations.changeLanguage(Localization.es_ES);
+          break;
+        case 'French':
+          Translations.changeLanguage(Localization.fr_FR);
+          break;
+        case 'German':
+          Translations.changeLanguage(Localization.de_DE);
+          break;
+        case 'Italian':
+          Translations.changeLanguage(Localization.it_IT);
+          break;
+        case 'Portuguese':
+          Translations.changeLanguage(Localization.pt_PT);
+          break;
+        case 'Russian':
+          Translations.changeLanguage(Localization.ru_RU);
+          break;
+        case 'Chinese':
+          Translations.changeLanguage(Localization.zh_CN);
+          break;
+        case 'Japanese':
+          Translations.changeLanguage(Localization.ja_JP);
+          break;
+        case 'Korean':
+          Translations.changeLanguage(Localization.ko_KR);
+          break;
+        case 'Arabic':
+          Translations.changeLanguage(Localization.ar_AE);
+          break;
+        case 'Hebrew':
+          Translations.changeLanguage(Localization.he_IL);
+          break;
+        case 'Dutch':
+          Translations.changeLanguage(Localization.nl_NL);
+          break;
+        case 'Swedish':
+          Translations.changeLanguage(Localization.sv_SE);
+          break;
+        default:
+          Translations.changeLanguage(Localization.en_US);
+      }
     }
 
     rewindIntervalConfig =
@@ -263,6 +288,8 @@ class HiveService {
     }
 
     keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
+    navigatePodcastEpisodesConfig =
+        playbackSettings['navigatePodcastEpisodes'] ?? true;
 
     // Automatic
     Map<String, dynamic> automaticSettings = await getAutomaticSettings();
@@ -273,6 +300,9 @@ class HiveService {
     refreshPodcastsConfig = automaticSettings['refreshPodcasts'];
     downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
     downloadQueuedEpisodesConfig = automaticSettings['downloadQueuedEpisodes'];
+
+    // Clear feed if no subscriptions
+    await clearFeedIfNoSubscriptions();
 
     // 5, 10, 25, 50, 75, 100, 500, unlimited
     downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
@@ -346,6 +376,11 @@ class HiveService {
       refreshTimer.schedule(DateTime.now().add(duration));
     }
 
+    // Register background fetch for mobile platforms
+    if (Platform.isAndroid || Platform.isIOS) {
+      _registerBackgroundFetch(duration);
+    }
+
     // Auto Export DB every day at 2 AM
     autoExportDBTimer = ScheduledTimer(
       id: 'auto_export_db_timer',
@@ -409,7 +444,8 @@ class HiveService {
 
   Future<Map<String, SubscriptionModel>> getSubscriptions() async {
     final box = await subscriptionBox;
-    return box.getAllValues();
+    final values = await box.getAllValues();
+    return values.map((key, value) => MapEntry(key.toString(), value));
   }
 
   Future<SubscriptionModel?> getSubscription(String title) async {
@@ -430,9 +466,21 @@ class HiveService {
     episodesList.clear();
   }
 
+  Future<void> clearFeedIfNoSubscriptions() async {
+    final subs = await getSubscriptions();
+    if (subs.isEmpty) {
+      final feedBox = await this.feedBox;
+      await feedBox.clear();
+      final epiBox = await episodeBox;
+      await epiBox.clear();
+      episodesList.clear();
+    }
+  }
+
   Future<void> deleteSubscription(String id) async {
     final box = await subscriptionBox;
     await box.delete(id); // Add await
+    await clearFeedIfNoSubscriptions();
   }
 
   Future<void> updateSubscriptions() async {
@@ -454,7 +502,20 @@ class HiveService {
               final guid = episode['guid'];
 
               if (await episodeBox.get(guid) == null) {
+                episode['podcast'] = {
+                  'id': subscription.id,
+                  'title': subscription.title,
+                  'author': subscription.author,
+                  'url': subscription.feedUrl,
+                  'image': subscription.imageUrl,
+                  'artwork': subscription.artwork,
+                  'description': subscription.description,
+                };
+
                 await episodeBox.put(guid, episode);
+
+                final feedBox = await this.feedBox;
+                await feedBox.put(guid, FeedModel(guid: guid));
 
                 if (downloadNewEpisodesConfig) {
                   final podcast = PodcastModel(
@@ -504,25 +565,28 @@ class HiveService {
           for (final episode in newEpisodes) {
             final guid = episode['guid'];
             if (await episodeBox.get(guid) == null) {
+              episode['podcast'] = {
+                'id': subscription.id,
+                'title': subscription.title,
+                'author': subscription.author,
+                'url': subscription.feedUrl,
+                'image': subscription.imageUrl,
+                'artwork': subscription.artwork,
+                'description': subscription.description,
+              };
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
 
               if (receiveNotificationsForNewEpisodesConfig && context.mounted) {
-                if (!Platform.isAndroid && !Platform.isIOS) {
-                  ref.read(notificationServiceProvider).showNotification(
-                        Translations.of(context).text('newEpisodeAvailable'),
-                        episode['title'],
-                      );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${Translations.of(context).text('newEpisodeAvailable')} - ${episode['title']}'),
-                    ),
-                  );
-                }
+                final podcastTitle = episode['podcast']?['title'] ?? 'Podcast';
+                ref.read(notificationServiceProvider).showNotification(
+                      '$podcastTitle',
+                      '${Translations.of(context).text('newEpisodeAvailable')}: ${episode['title']}',
+                    );
               }
             }
+            ref.invalidate(getInboxProvider);
+            ref.invalidate(inboxCountProvider);
           }
         }
       } catch (e) {
@@ -542,11 +606,15 @@ class HiveService {
 
   Future<void> removePodcastEpisodes(PodcastModel podcast) async {
     final box = await episodeBox;
+    final feed = await feedBox;
     Map<String, Map> episodes = await box.getAllValues();
 
     for (final episode in episodes.entries) {
-      if (episode.value['author'] == podcast.author) {
+      if (episode.value['feedUrl'] == podcast.feedUrl ||
+          episode.value['podcastTitle'] == podcast.title ||
+          episode.value['author'] == podcast.author) {
         await box.delete(episode.key);
+        await feed.delete(episode.key);
       }
     }
   }
@@ -607,7 +675,25 @@ class HiveService {
 
   Future<Map<String, FeedModel>> getFeed() async {
     final box = await feedBox;
-    return box.getAllValues();
+    final episodeBox = await this.episodeBox;
+    final subscriptions = await getSubscriptions();
+
+    final allFeedItems = await box.getAllValues();
+    final filteredFeedItems = <String, FeedModel>{};
+
+    for (final entry in allFeedItems.entries) {
+      final episode = await episodeBox.get(entry.key.toString());
+      if (episode != null) {
+        final podcastTitle = episode['podcast']?['title'] ??
+            episode['podcastTitle'] ??
+            episode['author'];
+        if (podcastTitle != null && subscriptions.containsKey(podcastTitle)) {
+          filteredFeedItems[entry.key.toString()] = entry.value;
+        }
+      }
+    }
+
+    return filteredFeedItems;
   }
 
   Future<void> deleteFeed() async {
@@ -714,9 +800,10 @@ class HiveService {
     await box.put(download.guid, download);
   }
 
-  Future<Map<String, DownloadModel>> getDownloads() async {
+  Future<List<DownloadModel>> getDownloads() async {
     final box = await downloadBox;
-    return box.getAllValues();
+    final values = await box.getAllValues();
+    return values.values.cast<DownloadModel>().toList();
   }
 
   Future<List<DownloadModel>> getSortedDownloads() async {
@@ -765,6 +852,11 @@ class HiveService {
     await box.put(history.guid, history);
   }
 
+  Future<HistoryModel?> getHistoryEntry(String guid) async {
+    final box = await historyBox;
+    return box.get(guid);
+  }
+
   Future<Map<String, HistoryModel>> getHistory() async {
     final box = await historyBox;
     return box.getAllValues();
@@ -785,6 +877,8 @@ class HiveService {
       CompletedEpisodeModel completedEpisode) async {
     final box = await completedEpisodeBox;
     await box.put(completedEpisode.guid, completedEpisode);
+    await deleteFromFeed(guid: completedEpisode.guid);
+    ref.invalidate(getInboxProvider);
     deletePlayedEpisode(completedEpisode.guid);
   }
 
@@ -838,7 +932,8 @@ class HiveService {
 
     if (userInterfaceSettings == null) {
       userInterfaceSettings = {
-        'fontSizeFactor': 'medium',
+        'fontSizeFactor': 'Medium',
+        'themeMode': 'System',
         'language': 'English',
         'locale': 'en_US',
       };
@@ -872,6 +967,9 @@ class HiveService {
         'continuePlayback': true,
         'smartMarkAsCompleted': '30 seconds',
         'keepSkippedEpisodes': false,
+
+        // Navigation
+        'navigatePodcastEpisodes': true,
       };
       await box.put('playback', playbackSettings);
     }
@@ -1004,6 +1102,40 @@ class HiveService {
   void saveNotificationsSettings(Map notificationsSettings) async {
     final box = await settingsBox;
     await box.put('notifications', notificationsSettings);
+
+    // Update background fetch when notification settings change
+    if (Platform.isAndroid || Platform.isIOS) {
+      final refreshPodcastsConfig =
+          notificationsSettings['refreshPodcasts'] ?? 'Never';
+      Duration duration;
+      switch (refreshPodcastsConfig) {
+        case 'Every hour':
+          duration = const Duration(hours: 1);
+          break;
+        case 'Every 2 hours':
+          duration = const Duration(hours: 2);
+          break;
+        case 'Every 4 hours':
+          duration = const Duration(hours: 4);
+          break;
+        case 'Every 8 hours':
+          duration = const Duration(hours: 8);
+          break;
+        case 'Every 12 hours':
+          duration = const Duration(hours: 12);
+          break;
+        case 'Every day':
+          duration = const Duration(days: 1);
+          break;
+        case 'Every 3 days':
+          duration = const Duration(days: 3);
+          break;
+        case 'Never':
+        default:
+          duration = Duration.zero;
+      }
+      _registerBackgroundFetch(duration);
+    }
   }
 
   Future<Map<String, dynamic>?> getNotificationsSettings() async {
@@ -1091,33 +1223,26 @@ class HiveService {
 
   Future<String> feedsCount() async {
     final box = await episodeBox;
-    final Map<String, Map> allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result.toString();
+    final keys = await box.getAllKeys();
+    return keys.length.toString();
   }
 
   Future<int> getNewInboxCount() async {
     final box = await feedBox;
-    final Map<String, FeedModel> allFeeds = await box.getAllValues();
-
-    return allFeeds.length;
+    final keys = await box.getAllKeys();
+    return keys.length;
   }
 
   Future<String> queueCount() async {
     final box = await queueBox;
-    final Map allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result.toString();
+    final keys = await box.getAllKeys();
+    return keys.length.toString();
   }
 
   Future<int> downloadsCount() async {
     final box = await downloadBox;
-    final Map<String, DownloadModel> allEpisodes = await box.getAllValues();
-
-    int result = allEpisodes.length;
-    return result;
+    final keys = await box.getAllKeys();
+    return keys.length;
   }
 
   Future<int> getAccumulatedEpisodes() async {
@@ -1202,10 +1327,10 @@ class HiveService {
     ]);
   }
 
-  void addEpisodeToFavorite(
-      Map<String, dynamic> episode, PodcastModel podcast) async {
+  Future<void> addEpisodeToFavorite(
+      Map<String, dynamic> episode, PodcastModel podcast,
+      {String? author}) async {
     final box = await favoritesBox;
-    episode['podcast'] = podcast;
     await box.put(episode['guid'], episode);
   }
 
@@ -1219,7 +1344,7 @@ class HiveService {
     return await box.getAllValues();
   }
 
-  updateEpisodePosition(String guid, Duration position) async {
+  Future<void> updateEpisodePosition(String guid, Duration position) async {
     final box = await episodeBox;
     final episode = await box.get(guid);
 
@@ -1229,7 +1354,7 @@ class HiveService {
     }
   }
 
-  markEpisodeAsCompleted(String guid) async {
+  Future<void> markEpisodeAsCompleted(String guid) async {
     final box = await episodeBox;
     final episode = await box.get(guid);
 
@@ -1239,5 +1364,49 @@ class HiveService {
       final completedEpisode = CompletedEpisodeModel(guid: guid);
       await addToCompletedEpisode(completedEpisode);
     }
+  }
+
+  Future<SearchCacheModel?> getSearchCache(String query) async {
+    final box = await searchCacheBox;
+    return await box.get(query);
+  }
+
+  Future<void> putSearchCache(
+      String query, Map<String, dynamic> results) async {
+    final box = await searchCacheBox;
+    await box.put(
+      query,
+      SearchCacheModel(
+        query: query,
+        results: results,
+        timestamp: DateTime.now(),
+      ),
+    );
+  }
+
+  // Register background fetch for new episodes
+  void _registerBackgroundFetch(Duration duration) {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+
+    // Cancel existing background tasks
+    Workmanager().cancelAll();
+
+    if (duration == Duration.zero) {
+      debugPrint('Background fetch disabled');
+      return;
+    }
+
+    // Register periodic task using v0.9.x API
+    debugPrint('Registering background fetch with interval: $duration');
+
+    Workmanager().registerPeriodicTask(
+      'openair_refresh_subscriptions',
+      refreshSubscriptionsTask,
+      frequency: duration,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+      ),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
+    );
   }
 }

@@ -8,3 +8,4 @@ const int completedEpisodeTypeId = 6;
 const int settingsTypeId = 7;
 const int podcastTypeId = 8;
 const int fetchDataTypeId = 9;
+const int searchCacheTypeId = 10;

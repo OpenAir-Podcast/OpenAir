@@ -3,13 +3,13 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/empty_favorites.dart';
 import 'package:openair/config/config.dart';
-import 'package:openair/hive_models/podcast_model.dart';
+import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
 import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
-import 'package:openair/views/widgets/episode_card_list.dart';
+import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getFavoriteProvider = StreamProvider.autoDispose((ref) async* {
   final hiveService = ref.watch(hiveServiceProvider);
@@ -71,6 +71,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         return EpisodeCardGrid(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
+                          imageUrl: podcastData.imageUrl,
                           podcast: PodcastModel(
                             id: podcastData.id,
                             title: podcastData.title,
@@ -80,7 +81,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                             artwork: podcastData.artwork,
                             imageUrl: podcastData.imageUrl,
                           ),
-                          aurthor: podcastData.author ?? 'Unknown',
+                          author: podcastData.author ??=
+                              Translations.of(context).text('unknown'),
                         );
                       },
                     )
@@ -91,10 +93,12 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         final episodeData = data.values.elementAt(index);
                         PodcastModel podcastData = episodeData['podcast'];
 
-                        return EpisodeCardList(
+                        return UnifiedEpisodeCard(
                           episodeItem: episodeData.cast<String, dynamic>(),
                           title: episodeData['title'],
-                          author: podcastData.author ?? 'Unknown',
+                          author: (podcastData.author?.isNotEmpty == true)
+                              ? podcastData.author!
+                              : Translations.of(context).text('unknown'),
                           podcast: PodcastModel(
                             id: podcastData.id,
                             title: podcastData.title,
@@ -134,17 +138,14 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                 const SizedBox(height: 20.0),
                 Text(
                   Translations.of(context).text('oopsTryAgainLater'),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Text(
                   '$error',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(
