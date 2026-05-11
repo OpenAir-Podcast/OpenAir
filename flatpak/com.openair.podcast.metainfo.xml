@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2025 OpenAir Podcast -->
-<component type="desktop-application">
+<component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="com.openair.podcast.metainfo.xsd" type="desktop-application">
   <id>com.openair.podcast</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>Apache-2.0</project_license>
@@ -60,7 +61,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.16.7" date="2026-05-10" />
+    <release version="0.16.8" date="2026-05-11" />
   </releases>
   <content_rating type="oars-1.1" />
   <translation type="gettext">openair</translation>
