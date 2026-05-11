@@ -124,9 +124,9 @@ jobs:
         run: flatpak install -y --noninteractive flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.freedesktop.Sdk.Extension.llvm19//24.08
       - name: Sync tag in flatpak manifest
         run: |
-          sed -i "s|tag: .*|tag: ${{ github.ref_name }}|" flatpak/flatpak-flutter.yml
+          sed -i "s|tag: .*|tag: ${{ github.ref_name }}|" flatpak/com.openair.podcast.yml
       - name: Build flatpak
-        run: flatpak-builder --force-clean --repo=repo flatpak_app flatpak/flatpak-flutter.yml
+        run: flatpak-builder --force-clean --repo=repo flatpak_app flatpak/com.openair.podcast.yml
       - name: Bundle
         run: flatpak build-bundle repo openair.flatpak com.openair.podcast master
       - name: Upload

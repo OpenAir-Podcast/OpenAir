@@ -21,10 +21,9 @@ finish-args:
   
   # Integration
   - --talk-name=org.freedesktop.Notifications
-  - --own-name=org.mpris.MediaPlayer2.com.openair.podcast
   
   # Note: MPRIS control usually requires talking to the bus as well
-  - --talk-name=org.mpris.MediaPlayer2.* ```
+  - --talk-name=org.mpris.MediaPlayer2.*
 
 modules:
   - name: openair
@@ -36,12 +35,21 @@ modules:
     sources:
       - type: git
         url: https://github.com/OpenAir-Podcast/OpenAir.git
-        tag: v0.16.7
+        tag: v0.16.8
       - type: git
         url: https://github.com/flutter/flutter.git
         tag: 3.35.6
         dest: flutter
+      - type: file
+        path: dart-sdk-linux-x64.zip
+        sha256: 20da5b821bfbabc2471a3ae566c89a28db46f30d1369264ea5efc553a395bd68
+        dest: flutter/bin/cache
     build-commands:
+      # Unpack Dart SDK into Flutter cache
+      - unzip -q flutter/bin/cache/dart-sdk-linux-x64.zip -d flutter/bin/cache/
+      - rm flutter/bin/cache/dart-sdk-linux-x64.zip
+      # Prevent Flutter from trying to download Dart SDK
+      - "truncate -s 0 flutter/bin/internal/update_dart_sdk.sh"
       # Build
       - flutter build linux --release
 
