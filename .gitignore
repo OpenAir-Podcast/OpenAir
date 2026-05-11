@@ -1,15 +1,14 @@
 # Miscellaneous
 *.class
 *.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-.cxx/*
+
+# Flatpak / Flathub build artifacts
+/flutter-sdk-*.json
+/pubspec-sources.json
+/.flatpak-builder/
+/build-dir/
+/repo/
+
 
 # Keystore files
 /keystores/
