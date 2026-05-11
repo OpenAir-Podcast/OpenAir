@@ -1,0 +1,108 @@
+name: Flutter Release
+
+on:
+  push:
+    # This workflow runs only when a new version tag is pushed (e.g., v1.0.0, v2.3.4)
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  # ----------------------------------------
+  # 1. CREATE THE RELEASE DRAFT
+  # ----------------------------------------
+  create_release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Tag Name
+        id: get_version
+        run: echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
+          release_name: Release ${{ steps.get_version.outputs.TAG_NAME }}
+          draft: true
+          prerelease: true
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag_name: ${{ steps.get_version.outputs.tag_name }}
+
+  # ----------------------------------------
+  # 2. BUILD FOR WINDOWS
+  # ----------------------------------------
+  build_windows:
+    needs: [create_release]
+    name: Build Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build Windows Executable
+        run: flutter build windows --release
+
+      - name: Compress Release Bundle (Windows)
+        # Note: PowerShell syntax used for Windows
+        shell: powershell
+        run: |
+          $ReleaseDir = "build/windows/runner/Release"
+          $ZipName = "openair-${{ needs.create_release.outputs.tag_name }}-windows-x64.zip"
+          # Zip the entire contents of the release directory
+          Compress-Archive -Path $ReleaseDir\* -DestinationPath $ZipName
+
+      - name: Upload Windows Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./openair-${{ needs.create_release.outputs.tag_name }}-windows-x64.zip
+          asset_name: openair-${{ needs.create_release.outputs.tag_name }}-windows-x64.zip
+          asset_content_type: application/zip
+
+  # ----------------------------------------
+  # 3. BUILD FOR LINUX (TAR.GZ)
+  # ----------------------------------------
+  build_linux_tar:
+    needs: [create_release]
+    name: Build Linux (x64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build Linux Executable
+        run: flutter build linux --release
+
+      - name: Compress Release Bundle (Linux)
+        # We navigate to the build directory and use the 'tar' command
+        # to create a compressed archive of the entire release folder contents.
+        run: |
+          RELEASE_NAME="openair-${{ needs.create_release.outputs.tag_name }}-linux-x64.tar.gz"
+          cd build/linux/x64/release
+          tar -czvf ../../../$RELEASE_NAME .
+
+      - name: Upload Linux Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./openair-${{ needs.create_release.outputs.tag_name }}-linux-x64.tar.gz
+          asset_name: openair-${{ needs.create_release.outputs.tag_name }}-linux-x64.tar.gz
+          asset_content_type: application/gzip
