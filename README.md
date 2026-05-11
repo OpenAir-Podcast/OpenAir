@@ -1,20 +1,16 @@
 # OpenAir: Breathe Life into Your Podcast Journey
-
 OpenAir is a free and open-source podcast app built with Flutter, empowering you to explore and enjoy the world of audio storytelling. Dive into a vast library of podcasts, personalize your listening experience, and connect with a vibrant community of fellow enthusiasts.
 
 ## Key Features
-
 - Explore: Discover a diverse range of podcasts with intuitive browsing by category, popularity, and personalized recommendations.
 - Listen: Stream podcasts seamlessly with smooth playback controls and offline listening capabilities for uninterrupted enjoyment.
 - Organize: Create custom playlists, manage subscriptions efficiently, and track your listening progress effortlessly.
 - Share: Recommend your favorite podcasts to friends and contribute to the OpenAir community by suggesting features and shaping the future of the app.
 
 ## Built with Openness in Mind
-
 OpenAir embraces open-source principles. The codebase is freely accessible, allowing anyone to contribute, report issues, and propose improvements. We believe in fostering a collaborative environment to create the best possible podcast experience for everyone.
 
 ## Get Involved
-
 Clone the repository: <https://github.com/OpenAir-Podcast/openair.git>
 
 Read the contribution guidelines: [click here for contribution guidelines](https://github.com/OpenAir-Podcast/openair/blob/main/Contribution%20Guidelines.md)
@@ -87,39 +83,27 @@ OpenAir fetches podcast information from the [PodcastIndex API](https://podcasti
     ```
 
 ## Contributing
-
 We welcome contributions of all kinds! Please refer to the contribution guidelines document (link above) for details on how to get started.
 
 ## License
-
 OpenAir is licensed under the MIT License (see LICENSE file for details).
 
 ## Disclaimer
-
 OpenAir is provided "as is" without warranty of any kind, express or implied. The application relies on data provided by the PodcastIndex API and other third-party services. OpenAir-Podcast is not responsible for the accuracy, completeness, legality, or availability of podcast content accessed through OpenAir, nor for any interruptions or errors in the PodcastIndex API or other third-party services. Users are solely responsible for their use of the application and for adhering to the terms of service of any external platforms they access through OpenAir.
 
 ## About OpenAir
-
 OpenAir is proudly developed and maintained by its contributors—who are enthusiastic podcast listeners themselves. Dedicated to building open-source tools for the community, by the community, we hope you enjoy using OpenAir!
 
 ## Screenshots
-
 ### Mobile
-
-
 <img width="330" alt="Screenshot_20250913_155418" src="https://github.com/user-attachments/assets/c897d272-de0e-4014-8904-c4abda1922bc" />
-
 <img width="330" alt="Screenshot_20250826_120748" src="https://github.com/user-attachments/assets/5a6f7e9a-d2f0-4f59-bbd2-06c0968d3abb" />
-
 <img width="330" alt="Screenshot_20250826_120811" src="https://github.com/user-attachments/assets/ff93f19f-88ed-49ef-86be-01b5dbe9b96a" />
-
 <img width="330" alt="Screenshot_20250826_120831" src="https://github.com/user-attachments/assets/64996ad3-3ffe-40bc-92bd-564ac0fc01fd" />
-
 <img width="330" alt="Screenshot_20250826_122518" src="https://github.com/user-attachments/assets/8695b9eb-5de7-466d-99ec-ddf9d6c9a168" />
-
 <img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />
 
 ### Desktop
-<img width="1332" height="819" alt="Screenshot_20251110_192037" src="https://github.com/user-attachments/assets/d100e77d-d552-42f3-8def-23e1c4da8bd9" />
-<img width="1332" height="819" alt="Screenshot_20251110_192157" src="https://github.com/user-attachments/assets/4c582617-b14b-4c7b-80b6-42ec9bc51bca" />
-<img width="1332" height="819" alt="Screenshot_20251110_192221" src="https://github.com/user-attachments/assets/b32b655e-cc1b-4536-96bb-a352433b57c4" />
+<img width="1370" height="858" alt="Screenshot_20260510_202709" src="https://github.com/user-attachments/assets/4faaab70-3bb3-4d30-b691-7958e74d076c" />
+<img width="1370" height="858" alt="Screenshot_20260510_202837" src="https://github.com/user-attachments/assets/2ebb9894-9d4b-4348-a474-a85f56d4c5ae" />
+<img width="1370" height="858" alt="Screenshot_20260510_202950" src="https://github.com/user-attachments/assets/083aa19d-6f75-4bda-9ef5-c49a598e7d2f" />
