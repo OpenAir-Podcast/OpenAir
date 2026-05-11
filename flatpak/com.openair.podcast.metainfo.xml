@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2025 OpenAir Podcast -->
+<component type="desktop-application">
+  <id>com.openair.podcast</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <developer>
+    <name>OpenAir Podcast Team</name>
+  </developer>
+  <developer_name>OpenAir Podcast</developer_name>
+  <name>OpenAir</name>
+  <summary>A free and open-source cross-platform podcast app</summary>
+  <description>
+    <p>
+      OpenAir is a free and open-source cross-platform podcast app that empowers
+      you to explore and enjoy the vast world of podcasts. With a clean,
+      intuitive interface, OpenAir makes it easy to discover, subscribe to, and
+      listen to your favorite podcasts.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Discover and subscribe to podcasts from anywhere on the internet</li>
+      <li>Stream or download episodes for offline listening</li>
+      <li>Background playback with media key support</li>
+      <li>Customizable playback speed</li>
+      <li>Sleep timer for bedtime listening</li>
+      <li>OPML import and export</li>
+      <li>Sync progress across devices (optional account)</li>
+    </ul>
+  </description>
+  <categories>
+    <category>Audio</category>
+    <category>Player</category>
+    <category>Network</category>
+  </categories>
+  <launchable type="desktop-id">com.openair.podcast.desktop</launchable>
+
+  <url type="homepage">https://openair-podcast.github.io/openair-website/</url>
+  <url type="donation">https://ko-fi.com/openairpodcast</url>
+  <url type="help">https://github.com/OpenAir-Podcast/OpenAir/discussions</url>
+  <url type="bugtracker">https://github.com/OpenAir-Podcast/OpenAir/issues</url>
+  <url type="vcs-browser">https://github.com/OpenAir-Podcast/OpenAir</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>
+        https://github.com/user-attachments/assets/bbf7fbdf-83dd-4bed-89e8-994fa5094f9f</image>
+      <caption>Main podcast library view</caption>
+    </screenshot>
+
+    <screenshot>
+      <image>
+        https://github.com/user-attachments/assets/4b30d2b1-e6be-43fa-80e2-4828fc5f4a3d</image>
+      <caption>Main podcast library view</caption>
+    </screenshot>
+
+    <screenshot>
+      <image>
+        https://github.com/user-attachments/assets/e1543902-5475-4b37-9a76-cb1743138ae8</image>
+      <caption>Main podcast library view</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.16.7" date="2026-05-10" />
+  </releases>
+  <content_rating type="oars-1.1" />
+  <translation type="gettext">openair</translation>
+  <custom>
+    <value key="flathub::manifestation">flatpak-flutter</value>
+  </custom>
+  <branding>
+    <color type="primary" scheme_preference="light">#2196F3</color>
+    <color type="primary" scheme_preference="dark">#0D47A1</color>
+  </branding>
+</component>

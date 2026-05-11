@@ -52,7 +52,7 @@ variables:
 
   CALLBACK_METHOD: "https://cicwndrzbcxciavwgjzr.supabase.co/auth/v1/callback"
 
-  APP_UNIQUE_ID: "org.openair.podcast"
+  APP_UNIQUE_ID: "com.openair.podcast"
   APP_GUID: ${APP_GUID}
 
 output: dist/
@@ -84,7 +84,7 @@ releases:
             app_name: OpenAir
             executable_name: OpenAir
             icon: assets/icons/icon.png
-            desktop_entry: linux/org.openair.podcast.desktop
+            desktop_entry: linux/com.openair.podcast.desktop
           build_args:
             dart-define:
               APP_ENV: dev
