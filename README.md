@@ -104,6 +104,6 @@ OpenAir is proudly developed and maintained by its contributors—who are enthus
 <img width="330" alt="Screenshot_20250826_122404" src="https://github.com/user-attachments/assets/5bd928b6-3dff-41be-a780-bc52b699edd6" />
 
 ### Desktop
-<img width="1370" height="858" alt="Screenshot_20260510_202709" src="https://github.com/user-attachments/assets/4faaab70-3bb3-4d30-b691-7958e74d076c" />
-<img width="1370" height="858" alt="Screenshot_20260510_202837" src="https://github.com/user-attachments/assets/2ebb9894-9d4b-4348-a474-a85f56d4c5ae" />
-<img width="1370" height="858" alt="Screenshot_20260510_202950" src="https://github.com/user-attachments/assets/083aa19d-6f75-4bda-9ef5-c49a598e7d2f" />
+<img width="1151" height="663" alt="Screenshot_20260510_203359" src="https://github.com/user-attachments/assets/bbf7fbdf-83dd-4bed-89e8-994fa5094f9f" />
+<img width="1147" height="661" alt="Screenshot_20260510_203425" src="https://github.com/user-attachments/assets/4b30d2b1-e6be-43fa-80e2-4828fc5f4a3d" />
+<img width="1147" height="661" alt="Screenshot_20260510_203436" src="https://github.com/user-attachments/assets/e1543902-5475-4b37-9a76-cb1743138ae8" />
