@@ -1,5 +1,8 @@
 name: Flutter Release
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
