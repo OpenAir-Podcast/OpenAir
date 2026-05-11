@@ -89,10 +89,7 @@ class OpenAirAudioHandler extends BaseAudioHandler
 
   void _listenToPlayerStateChanges() {
     player.playerStateStream.listen((playerState) {
-      final isPlaying = playerState.playing;
-      final processingState = playerState.processingState;
-
-      if (processingState == ProcessingState.completed) {
+      if (playerState.processingState == ProcessingState.completed) {
         debugPrint('AudioHandler: Playback completed - stopping player');
 
         playbackState.add(playbackState.value.copyWith(
@@ -100,8 +97,6 @@ class OpenAirAudioHandler extends BaseAudioHandler
           playing: false,
         ));
 
-        stop();
-      } else if (!isPlaying && processingState == ProcessingState.idle) {
         stop();
       }
     });
