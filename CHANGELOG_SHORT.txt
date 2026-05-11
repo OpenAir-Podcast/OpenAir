@@ -1,17 +1,16 @@
-What's New in v0.16.7 ✨
-
-🖼️ Image Handling
-• Replaced CachedNetworkImage with optimized podcast image component
-• Implemented podcast image downloading and caching
+What's New in v0.16.8 ✨
 
 🎵 Audio Playback
-• Enhanced buffering state handling to prevent UI updates during buffering
+• Fixed audio randomly stopping mid-playback due to spurious stop() on transient idle state
+• Fixed Android screen-off audio death — keeps foreground service alive when paused
+• Fixed play button becoming unresponsive — resumes playback by reloading lost audio source
+• Disabled media_kit on Android to fix setAndroidAudioAttributes crash and background playback issues
 
-🖥️ Desktop Improvements
-• Added responsive grid view for desktop episode browsing
-• Dynamic player artwork sizing for desktop layouts
-• Conditional banner audio player for wide layout
-• Refactored desktop layouts and wide drawer UI
+🖼️ Image Handling
+• Fixed history images being overwritten by podcast artwork when episode has unique image
+• Fixed empty image strings breaking fallback chain in history entries
 
-🛠️ Code Quality
-• Refactored code for improved readability and maintainability
+📋 History
+• History now saves and resumes playback position on pause
+• History page now updates immediately when new entries are added
+
