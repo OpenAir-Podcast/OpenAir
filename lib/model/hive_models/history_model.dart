@@ -19,6 +19,7 @@ class HistoryModel extends HiveObject {
     required this.enclosureLength,
     required this.enclosureUrl,
     required this.playDate,
+    this.position = 0,
   });
 
   @HiveField(0)
@@ -60,6 +61,9 @@ class HistoryModel extends HiveObject {
   @HiveField(12)
   int playDate;
 
+  @HiveField(13)
+  int position;
+
   factory HistoryModel.fromJson(Map<String, dynamic> json) => HistoryModel(
         guid: json["guid"],
         image: json["image"],
@@ -74,6 +78,7 @@ class HistoryModel extends HiveObject {
         enclosureLength: json["enclosureLength"],
         enclosureUrl: json["enclosureUrl"],
         playDate: json["playDate"],
+        position: json["position"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -90,5 +95,6 @@ class HistoryModel extends HiveObject {
         'enclosureLength': enclosureLength,
         'enclosureUrl': enclosureUrl,
         'playDate': playDate,
+        'position': position,
       };
 }

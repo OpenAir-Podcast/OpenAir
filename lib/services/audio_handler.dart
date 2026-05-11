@@ -10,7 +10,7 @@ OpenAirAudioHandler getAudioHandler() {
     JustAudioMediaKit.ensureInitialized(
       linux: true,
       windows: true,
-      android: true,
+      android: false,
       iOS: true,
       macOS: true,
     );

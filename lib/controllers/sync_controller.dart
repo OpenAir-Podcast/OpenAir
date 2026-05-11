@@ -104,7 +104,8 @@ class SyncController extends ChangeNotifier {
           podcastId TEXT,
           enclosureLength INTEGER,
           enclosureUrl TEXT,
-          playDate INTEGER
+          playDate INTEGER,
+          position INTEGER
         )
       ''');
 

@@ -40,7 +40,7 @@ void main() async {
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.liquidhive.openair',
       androidNotificationChannelName: 'OpenAir Audio',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
       androidStopForegroundOnPause: false,
     ),
   );

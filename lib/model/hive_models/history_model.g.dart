@@ -30,13 +30,14 @@ class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       playDate: (fields[12] as num).toInt(),
+      position: fields[13] as int? ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, HistoryModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.guid)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
       ..writeByte(11)
       ..write(obj.enclosureUrl)
       ..writeByte(12)
-      ..write(obj.playDate);
+      ..write(obj.playDate)
+      ..writeByte(13)
+      ..write(obj.position);
   }
 
   @override
