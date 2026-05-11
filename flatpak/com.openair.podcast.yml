@@ -40,10 +40,6 @@ modules:
         url: https://github.com/flutter/flutter.git
         tag: 3.35.6
         dest: flutter
-      - type: file
-        path: dart-sdk-linux-x64.zip
-        sha256: 20da5b821bfbabc2471a3ae566c89a28db46f30d1369264ea5efc553a395bd68
-        dest: flutter/bin/cache
     build-commands:
       # Unpack Dart SDK into Flutter cache
       - unzip -q flutter/bin/cache/dart-sdk-linux-x64.zip -d flutter/bin/cache/
