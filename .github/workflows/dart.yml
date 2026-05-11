@@ -15,7 +15,7 @@ jobs:
     
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter SDK
         # This action installs the Flutter SDK, which includes the Dart SDK.
