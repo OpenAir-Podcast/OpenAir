@@ -1,0 +1,70 @@
+name: openair
+base: core22
+version: "0.16.8+36"
+summary: A free and open-source cross-platform podcast app
+description: |
+  OpenAir is a free and open-source podcast app that empowers you to
+  explore and enjoy the vast world of podcasts.
+
+  Features:
+  • Discover podcasts via PodcastIndex and Fyyd
+  • Subscribe, stream, and download episodes
+  • Background playback with media key support
+  • OPML import and export
+  • Sync progress across devices (Supabase)
+  • Customizable themes (light/dark, text scaling)
+  • Sleep timer and playback speed control
+  • 14 language locales
+
+grade: stable
+confinement: strict
+
+apps:
+  openair:
+    command: OpenAir
+    desktop: usr/share/applications/com.openair.podcast.desktop
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
+      - unity7
+      - home
+      - removable-media
+      - notifications
+
+parts:
+  openair:
+    source: .
+    plugin: flutter
+    flutter-channel: stable
+    flutter-target: lib/main.dart
+    build-packages:
+      - cmake
+      - clang
+      - ninja-build
+      - pkg-config
+      - libgtk-3-dev
+      - liblzma-dev
+      - libsecret-1-dev
+      - libjsoncpp-dev
+      - libcurl4-openssl-dev
+    stage-packages:
+      - libgtk-3-0
+      - libpulse0
+      - libsqlite3-0
+      - libsecret-1-0
+      - libjsoncpp25
+      - libcurl4
+    override-build: |
+      set -e
+      snapcraftctl build
+      install -Dm644 linux/com.openair.podcast.desktop \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop"
+      install -Dm644 assets/icons/com.openair.podcast.svg \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg"
+      install -Dm644 assets/icons/icon.png \
+        "$SNAPCRAFT_PART_INSTALL/meta/gui/icon.png"
