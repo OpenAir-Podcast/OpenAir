@@ -27,81 +27,6 @@ class HistoryPage extends ConsumerStatefulWidget {
 }
 
 class _HistoryState extends ConsumerState<HistoryPage> {
-  Widget _buildProgressBar(HistoryModel episode) {
-    if (episode.position <= 0 || episode.duration <= 0) {
-      return const SizedBox.shrink();
-    }
-    final progress =
-        (episode.position / (episode.duration * 1000)).clamp(0.0, 1.0);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: LinearProgressIndicator(
-          value: progress,
-          minHeight: 3,
-          backgroundColor:
-              Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-          valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGridItem(HistoryModel episode) {
-    PodcastModel podcastModel = PodcastModel(
-      id: int.tryParse(episode.podcastId) ?? -1,
-      feedUrl: episode.feedUrl,
-      title: episode.title,
-      author: episode.author,
-      imageUrl: episode.image,
-      description: episode.description,
-      artwork: episode.image,
-    );
-
-    return Column(
-      children: [
-        Expanded(
-          child: EpisodeCardGrid(
-            title: episode.title,
-            author: episode.author!,
-            imageUrl: episode.image,
-            episodeItem: episode.toJson(),
-            podcast: podcastModel,
-          ),
-        ),
-        _buildProgressBar(episode),
-      ],
-    );
-  }
-
-  Widget _buildListItem(HistoryModel episode) {
-    PodcastModel podcastModel = PodcastModel(
-      id: int.tryParse(episode.podcastId) ?? -1,
-      feedUrl: episode.feedUrl,
-      title: episode.title,
-      author: episode.author,
-      imageUrl: episode.image,
-      description: episode.description,
-      artwork: episode.image,
-    );
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        UnifiedEpisodeCard(
-          episodeItem: episode.toJson(),
-          podcast: podcastModel,
-          title: episode.title,
-          author: episode.author!,
-        ),
-        _buildProgressBar(episode),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<HistoryModel>> getEpisodesValue =
@@ -205,14 +130,46 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       ),
                       cacheExtent: cacheExtent,
                       itemCount: data.length,
-                      itemBuilder: (context, index) =>
-                          _buildGridItem(data[index]),
+                      itemBuilder: (context, index) {
+                        PodcastModel podcastModel = PodcastModel(
+                          id: int.tryParse(data[index].podcastId) ?? -1,
+                          feedUrl: data[index].feedUrl,
+                          title: data[index].title,
+                          author: data[index].author,
+                          imageUrl: data[index].image,
+                          description: data[index].description,
+                          artwork: data[index].image,
+                        );
+
+                        return EpisodeCardGrid(
+                          title: data[index].title,
+                          author: data[index].author!,
+                          imageUrl: data[index].image,
+                          episodeItem: data[index].toJson(),
+                          podcast: podcastModel,
+                        );
+                      },
                     )
                   : ListView.builder(
                       cacheExtent: cacheExtent,
                       itemCount: data.length,
                       itemBuilder: (context, index) {
-                        return _buildListItem(data[index]);
+                        PodcastModel podcastModel = PodcastModel(
+                          id: int.tryParse(data[index].podcastId) ?? -1,
+                          feedUrl: data[index].feedUrl,
+                          title: data[index].title,
+                          author: data[index].author,
+                          imageUrl: data[index].image,
+                          description: data[index].description,
+                          artwork: data[index].image,
+                        );
+
+                        return UnifiedEpisodeCard(
+                          episodeItem: data[index].toJson(),
+                          podcast: podcastModel,
+                          title: data[index].title,
+                          author: data[index].author!,
+                        );
                       },
                     ),
             ),
