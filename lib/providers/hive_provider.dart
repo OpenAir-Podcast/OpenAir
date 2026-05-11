@@ -852,6 +852,11 @@ class HiveService {
     await box.put(history.guid, history);
   }
 
+  Future<HistoryModel?> getHistoryEntry(String guid) async {
+    final box = await historyBox;
+    return box.get(guid);
+  }
+
   Future<Map<String, HistoryModel>> getHistory() async {
     final box = await historyBox;
     return box.getAllValues();

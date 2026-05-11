@@ -215,12 +215,18 @@ class AudioController extends ChangeNotifier {
         artUri: imageUrl,
       );
 
+      final resumePosition = episodeItem['position'] != null
+          ? Duration(milliseconds: (episodeItem['position'] as num).toInt())
+          : Duration.zero;
+
       if (isDownloaded) {
         final downloadsDir = await getDownloadsDirectory();
         final filePath = join(downloadsDir, '${episodeItem['guid']}.mp3');
-        await _audioHandler.playFromFile(filePath);
+        await _audioHandler.playFromFile(filePath,
+            initialPosition: resumePosition);
       } else {
-        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl']);
+        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl'],
+            initialPosition: resumePosition);
       }
 
       Future.delayed(Duration(seconds: 3), () {
@@ -259,9 +265,11 @@ class AudioController extends ChangeNotifier {
       if (isDownloaded) {
         final downloadsDir = await getDownloadsDirectory();
         final filePath = join(downloadsDir, '${currentEpisode!['guid']}.mp3');
-        await _audioHandler.playFromFile(filePath);
+        await _audioHandler.playFromFile(filePath,
+            initialPosition: playerPosition);
       } else {
-        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl']);
+        await _audioHandler.playFromUrl(currentEpisode!['enclosureUrl'],
+            initialPosition: playerPosition);
       }
     } else {
       await _audioHandler.play();
@@ -273,7 +281,18 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateHistoryPlaybackPosition({int? positionOverride}) async {
+    if (currentEpisode == null) return;
+    final hiveService = ref.read(hiveServiceProvider);
+    final existing = await hiveService.getHistoryEntry(currentEpisode!['guid']);
+    if (existing != null) {
+      existing.position = positionOverride ?? playerPosition.inMilliseconds;
+      await hiveService.addToHistory(existing);
+    }
+  }
+
   Future<void> pausePlayback() async {
+    await updateHistoryPlaybackPosition();
     await _audioHandler.pause();
     audioState = 'Pause';
     loadState = 'Detail';
@@ -443,6 +462,11 @@ class AudioController extends ChangeNotifier {
     }
   }
 
+  String? _validImage(dynamic v) {
+    if (v is String && v.isNotEmpty) return v;
+    return null;
+  }
+
   Future<void> addToHistory(Map<String, dynamic> episode, PodcastModel? podcast,
       {String? author}) async {
     final String downloadSize = getEpisodeSize(episode['enclosureLength']);
@@ -453,8 +477,9 @@ class AudioController extends ChangeNotifier {
     if (historyPodcastAuthor == null) {
       if (podcast != null) {
         historyPodcastId = podcast.id.toString();
-        historyPodcastImage =
-            episode['image'] ?? episode['feedImage'] ?? podcast.imageUrl;
+        historyPodcastImage = _validImage(episode['image']) ??
+            _validImage(episode['feedImage']) ??
+            podcast.imageUrl;
         historyPodcastAuthor = podcast.author ?? episode['author'] ?? 'Unknown';
       } else {
         historyPodcastId = episode['podcastId']?.toString() ?? '-1';
@@ -476,8 +501,10 @@ class AudioController extends ChangeNotifier {
     } else {
       historyPodcastId =
           podcast?.id.toString() ?? episode['podcastId']?.toString() ?? '-1';
-      historyPodcastImage =
-          episode['image'] ?? episode['feedImage'] ?? podcast?.imageUrl ?? '';
+      historyPodcastImage = _validImage(episode['image']) ??
+          _validImage(episode['feedImage']) ??
+          podcast?.imageUrl ??
+          '';
     }
 
     final HistoryModel historyMod = HistoryModel(
@@ -494,6 +521,7 @@ class AudioController extends ChangeNotifier {
       enclosureLength: episode['enclosureLength'],
       enclosureUrl: episode['enclosureUrl'],
       playDate: DateTime.now().millisecondsSinceEpoch,
+      position: (episode['position'] as num?)?.toInt() ?? 0,
     );
 
     final hiveService = ref.read(hiveServiceProvider);
@@ -788,7 +816,7 @@ class AudioController extends ChangeNotifier {
     });
 
     // Set up player state listener
-    _audioHandler.playerStateStream.listen((PlayerState state) {
+    _audioHandler.playerStateStream.listen((PlayerState state) async {
       switch (state.processingState) {
         case ProcessingState.ready:
           if (state.playing) {
@@ -807,6 +835,7 @@ class AudioController extends ChangeNotifier {
           loadState = 'Detail';
           break;
         case ProcessingState.completed:
+          await updateHistoryPlaybackPosition(positionOverride: 0);
           isPlaying = PlayingStatus.stop;
           audioState = 'Stop';
           loadState = 'Detail';

@@ -104,22 +104,6 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
-                        // Podcast Name
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 140.0,
-                          child: Text(
-                            widget.podcast!.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
                         // Author
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
