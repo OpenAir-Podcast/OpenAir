@@ -16,6 +16,13 @@ description: |
   • Sleep timer and playback speed control
   • 14 language locales
 
+title: OpenAir
+contact: openairpodapp@gmail.com
+license: Apache-2.0
+website: https://openair-podcast.github.io/openair-website/
+source-code: https://github.com/OpenAir-Podcast/OpenAir
+issues: https://github.com/OpenAir-Podcast/OpenAir/issues
+donation: https://www.paypal.com/ncp/payment/LFM3C2KRXSR5W
 grade: stable
 confinement: strict
 
@@ -52,6 +59,9 @@ parts:
       - libsecret-1-dev
       - libjsoncpp-dev
       - libcurl4-openssl-dev
+      - libwebkit2gtk-4.1-dev
+      - lld-14
+      - llvm-14
     stage-packages:
       - libgtk-3-0
       - libpulse0
@@ -59,6 +69,7 @@ parts:
       - libsecret-1-0
       - libjsoncpp25
       - libcurl4
+      - libwebkit2gtk-4.1-0
     override-build: |
       set -e
       snapcraftctl build
