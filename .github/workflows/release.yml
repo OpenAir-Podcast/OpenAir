@@ -100,7 +100,7 @@ jobs:
       - name: Sync version from pubspec
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //; s/"//g; s/ //g')
-          sed -i "s/^version: .*/version: \"$VERSION\"/" snapcraft.yaml
+          sed -i "s/^version: .*/version: \"$VERSION\"/" snap/snapcraft.yaml
       - uses: snapcore/action-build@v1
         id: snapcraft
       - name: Upload

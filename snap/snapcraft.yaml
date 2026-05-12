@@ -18,9 +18,8 @@ confinement: strict
 
 apps:
   openair:
-    command: bin/openair
+    command: openair
     extensions: [gnome]
-    desktop: usr/share/applications/com.openair.podcast.desktop
     plugs:
       - network
       - network-bind
@@ -46,7 +45,6 @@ parts:
       - libjsoncpp-dev
       - libcurl4-openssl-dev
       - libwebkit2gtk-4.1-dev
-      - libmpv-dev
     stage-packages:
       - libgtk-3-0
       - libpulse0
@@ -55,15 +53,11 @@ parts:
       - libjsoncpp25
       - libcurl4
       - libwebkit2gtk-4.1-0
-      - libmpv1 # Ensure libmpv is bundled for the runtime
+      - fonts-dejavu-core
+      - fontconfig
     override-build: |
-      snapcraftctl build
-      # 4. FIX: Use standard relative paths for icon setup
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
-      install -Dm644 linux/com.openair.podcast.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
-
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps
-      install -Dm644 assets/icons/com.openair.podcast.svg $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg
-
-      # 5. FIX: Ensure the desktop file points to the right icon name, not a path
-      sed -i 's|^Icon=.*|Icon=com.openair.podcast|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
+      apt-get update
+      apt-get install -y libmpv1
+      craftctl default
+      find /usr/lib/ -maxdepth 2 -name 'libmpv.so.*' -exec cp -nL {} "$SNAPCRAFT_PART_INSTALL/usr/lib/x86_64-linux-gnu/" \;
+      cp "$SNAPCRAFT_PART_INSTALL/OpenAir" "$SNAPCRAFT_PART_INSTALL/openair"

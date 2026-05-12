@@ -1,11 +1,10 @@
 [Desktop Entry]
-Version=1.0
-Type=Application
 Name=OpenAir
 Comment=A Free and Open Source Podcast Player
-Exec=openair %U
-Icon=com.openair.podcast
+Exec=openair
+Icon=${SNAP}/meta/gui/com.openair.podcast.svg
 Terminal=false
+Type=Application
 Categories=AudioVideo;Audio;Player;
 Keywords=Podcast;Player;OpenAir;
 MimeType=application/x-feed;application/rss+xml;application/atom+xml;
