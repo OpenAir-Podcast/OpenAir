@@ -41,7 +41,6 @@ apps:
       - unity7
       - home
       - removable-media
-      - notifications
 
 parts:
   openair:
