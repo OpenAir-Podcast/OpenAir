@@ -6,16 +6,6 @@ description: |
   OpenAir is a free and open-source podcast app that empowers you to
   explore and enjoy the vast world of podcasts.
 
-  Features:
-  • Discover podcasts via PodcastIndex and Fyyd
-  • Subscribe, stream, and download episodes
-  • Background playback with media key support
-  • OPML import and export
-  • Sync progress across devices (Supabase)
-  • Customizable themes (light/dark, text scaling)
-  • Sleep timer and playback speed control
-  • 14 language locales
-
 title: OpenAir
 contact: openairpodapp@gmail.com
 license: Apache-2.0
@@ -28,19 +18,16 @@ confinement: strict
 
 apps:
   openair:
-    command: OpenAir
+    command: bin/openair
+    extensions: [gnome]
     desktop: usr/share/applications/com.openair.podcast.desktop
     plugs:
       - network
       - network-bind
       - audio-playback
-      - desktop
-      - desktop-legacy
-      - wayland
-      - x11
-      - unity7
       - home
       - removable-media
+      - screen-inhibit-control
 
 parts:
   openair:
@@ -59,8 +46,7 @@ parts:
       - libjsoncpp-dev
       - libcurl4-openssl-dev
       - libwebkit2gtk-4.1-dev
-      - lld-14
-      - llvm-14
+      - libmpv-dev
     stage-packages:
       - libgtk-3-0
       - libpulse0
@@ -69,15 +55,15 @@ parts:
       - libjsoncpp25
       - libcurl4
       - libwebkit2gtk-4.1-0
-    stage:
-      - -usr/lib/x86_64-linux-gnu/caca/libgl_plugin*
+      - libmpv1 # Ensure libmpv is bundled for the runtime
     override-build: |
-      set -e
       snapcraftctl build
-      desktop_file="$SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop"
-      install -Dm644 linux/com.openair.podcast.desktop "$desktop_file"
-      install -Dm644 assets/icons/com.openair.podcast.svg \
-        "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg"
-      install -Dm644 assets/icons/icon.png \
-        "$SNAPCRAFT_PART_INSTALL/meta/gui/icon.png"
-      sed -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg|' "$desktop_file"
+      # 4. FIX: Use standard relative paths for icon setup
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
+      install -Dm644 linux/com.openair.podcast.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
+
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps
+      install -Dm644 assets/icons/com.openair.podcast.svg $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg
+
+      # 5. FIX: Ensure the desktop file points to the right icon name, not a path
+      sed -i 's|^Icon=.*|Icon=com.openair.podcast|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
