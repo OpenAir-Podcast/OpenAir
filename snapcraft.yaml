@@ -70,12 +70,15 @@ parts:
       - libjsoncpp25
       - libcurl4
       - libwebkit2gtk-4.1-0
+    stage:
+      - -usr/lib/x86_64-linux-gnu/caca/libgl_plugin*
     override-build: |
       set -e
       snapcraftctl build
-      install -Dm644 linux/com.openair.podcast.desktop \
-        "$SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop"
+      desktop_file="$SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop"
+      install -Dm644 linux/com.openair.podcast.desktop "$desktop_file"
       install -Dm644 assets/icons/com.openair.podcast.svg \
         "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg"
       install -Dm644 assets/icons/icon.png \
         "$SNAPCRAFT_PART_INSTALL/meta/gui/icon.png"
+      sed -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg|' "$desktop_file"
