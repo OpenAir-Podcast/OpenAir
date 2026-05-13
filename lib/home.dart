@@ -231,6 +231,11 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     switch (_tabController.index) {
       case 0:
         await hiveService.removeAllFeaturedPodcasts();
+        ref.invalidate(podcastDataByTopProvider);
+        ref.invalidate(podcastDataByEducationProvider);
+        ref.invalidate(podcastDataByHealthProvider);
+        ref.invalidate(podcastDataByTechnologyProvider);
+        ref.invalidate(podcastDataBySportsProvider);
         break;
       case 1:
         await hiveService.removeAllTrendingPodcast();
