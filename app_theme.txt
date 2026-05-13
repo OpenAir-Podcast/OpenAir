@@ -1,0 +1,6 @@
+Element	Color
+Primary blue	            #2196F3
+Dark variant (from seed)    #1565C0
+Light variant (from seed)	#90CAF9
+Surface light	            #F5F5F5
+Surface dark	            #303030
