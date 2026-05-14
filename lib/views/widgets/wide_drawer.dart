@@ -17,9 +17,9 @@ import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
-final getSessionProvider = FutureProvider.autoDispose((ref) async {
+final getSessionProvider = StreamProvider.autoDispose((ref) {
   final supabaseService = ref.watch(supabaseServiceProvider);
-  return supabaseService.client.auth.currentUser;
+  return supabaseService.client.auth.onAuthStateChange;
 });
 
 class WideDrawer extends ConsumerStatefulWidget {
@@ -190,8 +190,9 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            child: session.when(
-              data: (data) {
+            child: Builder(
+              builder: (context) {
+                final currentUser = supabaseService.client.auth.currentUser;
                 return FilledButton.tonal(
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -200,28 +201,19 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
                     ),
                   ),
                   onPressed: () {
-                    if (session.value == null) {
-                      widget.onPageSelected(LogIn());
+                    if (currentUser == null) {
+                      widget.onPageSelected(const LogIn());
                     } else {
                       supabaseService.signOut();
-                      ref.invalidate(getSessionProvider);
                     }
                   },
                   child: Text(
-                    session.value == null
+                    currentUser == null
                         ? Translations.of(context).text('signIn')
                         : Translations.of(context).text('logout'),
                   ),
                 );
               },
-              error: (error, stackTrace) => Text(
-                Translations.of(context).text('errorLoadingData'),
-              ),
-              loading: () => const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
             ),
           ),
         ],
