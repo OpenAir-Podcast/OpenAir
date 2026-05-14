@@ -132,27 +132,45 @@ class _InboxPageState extends ConsumerState<InboxPage> {
               }
 
               final podcast = PodcastModel(
-                id: int.tryParse(episodeData['podcastId']?.toString() ?? '') ??
+                id: int.tryParse(episodeData['podcast']?['id']?.toString() ??
+                        episodeData['podcastId']?.toString() ??
+                        '') ??
                     -1,
-                title:
-                    episodeData['podcastTitle'] ?? episodeData['title'] ?? '',
-                author:
-                    episodeData['author'] ?? episodeData['feedAuthor'] ?? '',
-                feedUrl: episodeData['feedUrl'] ?? '',
-                imageUrl:
-                    episodeData['image'] ?? episodeData['feedImage'] ?? '',
-                description: episodeData['description'] ?? '',
-                artwork: episodeData['image'] ?? episodeData['feedImage'] ?? '',
+                title: episodeData['podcast']?['title'] ??
+                    episodeData['podcastTitle'] ??
+                    episodeData['title'] ??
+                    '',
+                author: episodeData['podcast']?['author'] ??
+                    episodeData['author'] ??
+                    episodeData['feedAuthor'] ??
+                    '',
+                feedUrl: episodeData['podcast']?['url'] ??
+                    episodeData['feedUrl'] ??
+                    '',
+                imageUrl: episodeData['podcast']?['image'] ??
+                    episodeData['image'] ??
+                    episodeData['feedImage'] ??
+                    '',
+                description: episodeData['podcast']?['description'] ??
+                    episodeData['description'] ??
+                    '',
+                artwork: episodeData['podcast']?['artwork'] ??
+                    episodeData['image'] ??
+                    episodeData['feedImage'] ??
+                    '',
               );
 
               return EpisodeCardGrid(
                 episodeItem: episodeData.cast<String, dynamic>(),
                 title: episodeData['title'] ?? '',
-                author: episodeData['author'] ??
+                author: episodeData['podcast']?['author'] ??
+                    episodeData['author'] ??
                     episodeData['feedAuthor'] ??
                     Translations.of(context).text('unknown'),
-                imageUrl:
-                    episodeData['image'] ?? episodeData['feedImage'] ?? '',
+                imageUrl: episodeData['podcast']?['image'] ??
+                    episodeData['image'] ??
+                    episodeData['feedImage'] ??
+                    '',
                 podcast: podcast,
               );
             },
@@ -179,14 +197,32 @@ class _InboxPageState extends ConsumerState<InboxPage> {
             }
 
             final podcast = PodcastModel(
-              id: int.tryParse(episodeData['podcastId']?.toString() ?? '') ??
+              id: int.tryParse(episodeData['podcast']?['id']?.toString() ??
+                      episodeData['podcastId']?.toString() ??
+                      '') ??
                   -1,
-              title: episodeData['podcastTitle'] ?? episodeData['title'] ?? '',
-              author: episodeData['author'] ?? episodeData['feedAuthor'] ?? '',
-              feedUrl: episodeData['feedUrl'] ?? '',
-              imageUrl: episodeData['image'] ?? episodeData['feedImage'] ?? '',
-              description: episodeData['description'] ?? '',
-              artwork: episodeData['image'] ?? episodeData['feedImage'] ?? '',
+              title: episodeData['podcast']?['title'] ??
+                  episodeData['podcastTitle'] ??
+                  episodeData['title'] ??
+                  '',
+              author: episodeData['podcast']?['author'] ??
+                  episodeData['author'] ??
+                  episodeData['feedAuthor'] ??
+                  '',
+              feedUrl: episodeData['podcast']?['url'] ??
+                  episodeData['feedUrl'] ??
+                  '',
+              imageUrl: episodeData['podcast']?['image'] ??
+                  episodeData['image'] ??
+                  episodeData['feedImage'] ??
+                  '',
+              description: episodeData['podcast']?['description'] ??
+                  episodeData['description'] ??
+                  '',
+              artwork: episodeData['podcast']?['artwork'] ??
+                  episodeData['image'] ??
+                  episodeData['feedImage'] ??
+                  '',
             );
 
             return GestureDetector(
@@ -204,7 +240,8 @@ class _InboxPageState extends ConsumerState<InboxPage> {
                 episodeItem: episodeData.cast<String, dynamic>(),
                 podcast: podcast,
                 title: episodeData['title'] ?? '',
-                author: episodeData['author'] ??
+                author: episodeData['podcast']?['author'] ??
+                    episodeData['author'] ??
                     episodeData['feedAuthor'] ??
                     Translations.of(context).text('unknown'),
                 showAuthor: true,
