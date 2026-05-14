@@ -79,8 +79,13 @@ class _TrendingView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final validFeeds = data.feeds
+        .where((feed) =>
+            feed.imageUrl.trim().isNotEmpty || feed.artwork.trim().isNotEmpty)
+        .toList();
+
     return Scaffold(
-      body: data.count == 0
+      body: validFeeds.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -91,11 +96,11 @@ class _TrendingView extends ConsumerWidget {
                 ],
               ),
             )
-          : _buildPodcastList(context),
+          : _buildPodcastList(context, validFeeds),
     );
   }
 
-  Widget _buildPodcastList(BuildContext context) {
+  Widget _buildPodcastList(BuildContext context, List validFeeds) {
     final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     if (isWide) {
@@ -111,9 +116,9 @@ class _TrendingView extends ConsumerWidget {
           mainAxisSpacing: spacing,
         ),
         cacheExtent: cacheExtent,
-        itemCount: data.count,
+        itemCount: validFeeds.length,
         itemBuilder: (context, index) => PodcastCardGrid(
-          podcastItem: data.feeds[index],
+          podcastItem: validFeeds[index],
         ),
       );
     }
@@ -121,9 +126,9 @@ class _TrendingView extends ConsumerWidget {
     return ListView.builder(
       padding: const EdgeInsets.all(8),
       cacheExtent: cacheExtent,
-      itemCount: data.count,
+      itemCount: validFeeds.length,
       itemBuilder: (context, index) => PodcastCardList(
-        podcastItem: data.feeds[index],
+        podcastItem: validFeeds[index],
       ),
     );
   }

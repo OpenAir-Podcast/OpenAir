@@ -381,12 +381,17 @@ class PodcastsCard extends ConsumerWidget {
 
   Widget _buildContent(
       BuildContext context, WidgetRef ref, FetchDataModel snapshot) {
+    final validFeeds = snapshot.feeds
+        .where((feed) =>
+            feed.imageUrl.trim().isNotEmpty || feed.artwork.trim().isNotEmpty)
+        .toList();
+
     final isWide = !Platform.isAndroid && !Platform.isIOS ||
         wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     final maxCards = (isWide || isWide) ? 10 : 5;
     final itemCount =
-        snapshot.feeds.length > maxCards ? maxCards : snapshot.feeds.length;
+        validFeeds.length > maxCards ? maxCards : validFeeds.length;
 
     if (itemCount == 0) {
       return Center(
@@ -403,7 +408,7 @@ class PodcastsCard extends ConsumerWidget {
       itemCount: itemCount,
       separatorBuilder: (context, index) => const SizedBox(width: 16),
       itemBuilder: (context, index) {
-        final feed = snapshot.feeds[index];
+        final feed = validFeeds[index];
         return GestureDetector(
           onTap: () {
             ref.read(audioProvider).currentPodcast = feed;

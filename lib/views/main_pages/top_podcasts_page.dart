@@ -87,6 +87,12 @@ class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
         ),
       ),
       data: (snapshot) {
+        final validFeeds = snapshot.feeds
+            .where((feed) =>
+                feed.imageUrl.trim().isNotEmpty ||
+                feed.artwork.trim().isNotEmpty)
+            .toList();
+
         if (wideScreenMinWidth < MediaQuery.sizeOf(context).width) {
           return Scaffold(
             appBar: AppBar(
@@ -121,9 +127,9 @@ class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
                   crossAxisSpacing: 4,
                   mainAxisSpacing: 4,
                 ),
-                itemCount: snapshot.feeds.length,
+                itemCount: validFeeds.length,
                 itemBuilder: (context, index) {
-                  return PodcastCardGrid(podcastItem: snapshot.feeds[index]);
+                  return PodcastCardGrid(podcastItem: validFeeds[index]);
                 },
               ),
             ),
@@ -136,9 +142,9 @@ class _TopPodcastsPageState extends ConsumerState<TopPodcastsPage> {
             body: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.builder(
-                itemCount: snapshot.feeds.length,
+                itemCount: validFeeds.length,
                 itemBuilder: (context, index) {
-                  return PodcastCardList(podcastItem: snapshot.feeds[index]);
+                  return PodcastCardList(podcastItem: validFeeds[index]);
                 },
               ),
             ),

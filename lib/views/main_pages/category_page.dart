@@ -62,7 +62,12 @@ class CategoryPage extends ConsumerWidget {
   }
 
   Widget _buildContent(BuildContext context, FetchDataModel data) {
-    if (data.count == 0) {
+    final validFeeds = data.feeds
+        .where((feed) =>
+            feed.imageUrl.trim().isNotEmpty || feed.artwork.trim().isNotEmpty)
+        .toList();
+
+    if (validFeeds.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -87,9 +92,9 @@ class CategoryPage extends ConsumerWidget {
           mainAxisSpacing: 12,
         ),
         cacheExtent: cacheExtent,
-        itemCount: data.count,
+        itemCount: validFeeds.length,
         itemBuilder: (context, index) => PodcastCardGrid(
-          podcastItem: data.feeds[index],
+          podcastItem: validFeeds[index],
         ),
       );
     }
@@ -97,10 +102,10 @@ class CategoryPage extends ConsumerWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       cacheExtent: cacheExtent,
-      itemCount: data.count,
+      itemCount: validFeeds.length,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) => _PodcastListTile(
-        podcast: data.feeds[index],
+        podcast: validFeeds[index],
         apiKey: apiKey,
       ),
     );
