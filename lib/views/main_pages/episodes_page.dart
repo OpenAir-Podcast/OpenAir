@@ -116,7 +116,8 @@ class EpisodesPage extends ConsumerWidget {
     Map? podCastInfo,
   ) {
     final episodeCount = snapshot['count'] ?? 0;
-    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     if (episodeCount == 0) {
       return Center(
@@ -141,7 +142,7 @@ class EpisodesPage extends ConsumerWidget {
           : Translations.of(context).text('unknown');
     }
 
-    if (isDesktop) {
+    if (isWide) {
       return GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

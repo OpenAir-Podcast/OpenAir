@@ -105,9 +105,10 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
 
   Widget _buildFeedsList(
       BuildContext context, List<Map<dynamic, dynamic>> episodesDataSet) {
-    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
-    if (isDesktop) {
+    if (isWide) {
       return GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

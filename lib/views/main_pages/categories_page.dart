@@ -332,19 +332,19 @@ class CategoriesPage extends ConsumerWidget {
   }
 
   Widget _buildCategoryGrid(BuildContext context) {
-    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = !Platform.isAndroid && !Platform.isIOS;
     final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
     final categories = getCategories(context);
 
     return Scaffold(
       body: isWide
           ? GridView.builder(
-              padding: EdgeInsets.all(isDesktop ? 24 : 12),
+              padding: EdgeInsets.all(isWide ? 24 : 12),
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
                 childAspectRatio: 3 / 2.5,
-                crossAxisSpacing: isDesktop ? 16 : 12,
-                mainAxisSpacing: isDesktop ? 16 : 12,
+                crossAxisSpacing: isWide ? 16 : 12,
+                mainAxisSpacing: isWide ? 16 : 12,
               ),
               itemCount: categories.length,
               itemBuilder: (context, index) {

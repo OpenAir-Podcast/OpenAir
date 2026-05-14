@@ -26,10 +26,12 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
   final double imageSize = 250.0;
 
   double _artworkSize(BuildContext context) {
-    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+
     final screenWidth = MediaQuery.of(context).size.width;
     final maxSize = screenWidth * 0.8;
-    return isDesktop ? maxSize.clamp(0, 280) : maxSize;
+    return isWide ? maxSize.clamp(0, 280) : maxSize;
   }
 
   void _startSleepTimer(int minutes) {
@@ -210,13 +212,14 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     AsyncValue<Map<String, SubscriptionModel>> subsAsync,
     AsyncValue favoriteListAsync,
   ) {
-    final isDesktop = !Platform.isAndroid && !Platform.isIOS;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     final content = Column(
-      mainAxisSize: isDesktop ? MainAxisSize.min : MainAxisSize.max,
+      mainAxisSize: isWide ? MainAxisSize.min : MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (!isDesktop) const Spacer(),
+        if (!isWide) const Spacer(),
         // Artwork with hero and image
         Hero(
           tag: 'player_art',
@@ -457,11 +460,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
             ),
           ],
         ),
-        if (!isDesktop) const Spacer(),
+        if (!isWide) const Spacer(),
       ],
     );
 
-    if (isDesktop) {
+    if (isWide) {
       return SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),

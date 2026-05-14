@@ -99,10 +99,11 @@ class _TrendingView extends ConsumerWidget {
     final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
     if (isWide) {
-      final isDesktop = !Platform.isAndroid && !Platform.isIOS;
-      final spacing = isDesktop ? 16.0 : 4.0;
+      final isWide = !Platform.isAndroid && !Platform.isIOS ||
+          wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+      final spacing = isWide ? 16.0 : 4.0;
       return GridView.builder(
-        padding: EdgeInsets.all(isDesktop ? 24 : 8),
+        padding: EdgeInsets.all(isWide ? 24 : 8),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 200,
           childAspectRatio: 3 / 4,
