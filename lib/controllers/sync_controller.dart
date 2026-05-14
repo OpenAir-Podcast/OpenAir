@@ -493,20 +493,27 @@ class SyncController extends ChangeNotifier {
           if (guid == null) continue;
           if (!history.containsKey(guid)) {
             try {
+              int parseInt(dynamic v) {
+                if (v == null) return 0;
+                if (v is int) return v;
+                if (v is double) return v.toInt();
+                return int.tryParse(v.toString()) ?? 0;
+              }
+
               final historyItem = HistoryModel(
                 guid: guid,
-                image: remoteItem['image'] ?? '',
-                title: remoteItem['title'] ?? '',
-                author: remoteItem['author'],
-                datePublished: remoteItem['date_published'] ?? 0,
-                description: remoteItem['description'] ?? '',
-                feedUrl: remoteItem['feed_url'] ?? '',
-                duration: remoteItem['duration'] ?? 0,
-                size: remoteItem['size'] ?? '',
-                podcastId: remoteItem['podcast_id'] ?? '',
-                enclosureLength: remoteItem['enclosure_length'] ?? 0,
-                enclosureUrl: remoteItem['enclosure_url'] ?? '',
-                playDate: remoteItem['play_date'] ?? 0,
+                image: remoteItem['image']?.toString() ?? '',
+                title: remoteItem['title']?.toString() ?? '',
+                author: remoteItem['author']?.toString(),
+                datePublished: parseInt(remoteItem['date_published']),
+                description: remoteItem['description']?.toString() ?? '',
+                feedUrl: remoteItem['feed_url']?.toString() ?? '',
+                duration: parseInt(remoteItem['duration']),
+                size: remoteItem['size']?.toString() ?? '',
+                podcastId: remoteItem['podcast_id']?.toString() ?? '',
+                enclosureLength: parseInt(remoteItem['enclosure_length']),
+                enclosureUrl: remoteItem['enclosure_url']?.toString() ?? '',
+                playDate: parseInt(remoteItem['play_date']),
               );
               await hiveService.addToHistory(historyItem);
             } catch (e) {
