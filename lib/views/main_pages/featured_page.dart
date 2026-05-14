@@ -288,8 +288,9 @@ class PodcastsCard extends ConsumerWidget {
   }
 
   Widget _buildLoadingShimmer(BuildContext context) {
-    final isWide = !Platform.isAndroid && !Platform.isIOS;
-    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -380,8 +381,9 @@ class PodcastsCard extends ConsumerWidget {
 
   Widget _buildContent(
       BuildContext context, WidgetRef ref, FetchDataModel snapshot) {
-    final isWide = !Platform.isAndroid && !Platform.isIOS;
-    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+
     final maxCards = (isWide || isWide) ? 10 : 5;
     final itemCount =
         snapshot.feeds.length > maxCards ? maxCards : snapshot.feeds.length;

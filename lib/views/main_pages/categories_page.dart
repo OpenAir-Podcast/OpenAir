@@ -332,8 +332,9 @@ class CategoriesPage extends ConsumerWidget {
   }
 
   Widget _buildCategoryGrid(BuildContext context) {
-    final isWide = !Platform.isAndroid && !Platform.isIOS;
-    final isWide = wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+    final isWide = !Platform.isAndroid && !Platform.isIOS ||
+        wideScreenMinWidth < MediaQuery.sizeOf(context).width;
+
     final categories = getCategories(context);
 
     return Scaffold(
