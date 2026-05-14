@@ -1,3 +1,16 @@
+What's New in v0.16.10 ✨
+
+UI & Layout
+• Filtered out blank/image-less podcasts from the Trending, Categories, Featured, and Top Podcasts pages.
+• Fixed episodes in the Inbox displaying author as "unknown" by robustly mapping podcast metadata.
+
+☁️ Cloud Sync & Stability
+• Fixed crash related to `type 'String' is not a subtype of type 'int'` when parsing Supabase remote history.
+• Fixed unmounted widget crash (`Bad state: Using "ref"`) when navigating away from the Subscriptions page while refreshing.
+• Resolved Supabase setting sync constraints and type mismatch issues.
+
+---
+
 What's New in v0.16.9 ✨
 
 🎨 Appearance
@@ -27,4 +40,3 @@ What's New in v0.16.8 ✨
 📋 History
 • History now saves and resumes playback position on pause
 • History page now updates immediately when new entries are added
-
