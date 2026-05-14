@@ -157,7 +157,6 @@ class PodcastIndexProvider {
     Map<String, dynamic> data;
 
     if (cached != null && !cached.isExpired) {
-      debugPrint('Returning cached episode count for: $name');
       data = cached.results;
     } else {
       final response = await _retry(() => _dio.get(fullUrl));
@@ -184,8 +183,6 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
 
-    debugPrint(url);
-
     final response = await _retry(() => _dio.get(url));
 
     ref
@@ -196,8 +193,6 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
-    debugPrint('Getting trending podcasts...');
-
     String url =
         'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=en&pretty';
 
@@ -275,13 +270,11 @@ class PodcastIndexProvider {
     String url =
         'https://api.podcastindex.org/api/1.0/search/byterm?max=$max&q=$cat';
     String fullUrl = '$url&pretty';
-    debugPrint(fullUrl);
 
     final hiveService = ref.read(openAirProvider).hiveService;
     final cached = await hiveService.getSearchCache(title);
 
     if (cached != null && !cached.isExpired) {
-      debugPrint('Returning cached search results for: $title');
       return cached.results;
     }
 
@@ -308,7 +301,6 @@ class PodcastIndexProvider {
     final cached = await hiveService.getSearchCache(title);
 
     if (cached != null && !cached.isExpired) {
-      debugPrint('Returning cached details for: $title');
       return cached.results['feeds'][0];
     }
 
