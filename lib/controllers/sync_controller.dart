@@ -449,6 +449,8 @@ class SyncController extends ChangeNotifier {
             }
           }
         }
+
+        await hiveService.populateInbox();
         syncCount++;
         debugPrint('Subscriptions synced');
       } catch (e) {
@@ -783,6 +785,8 @@ class SyncController extends ChangeNotifier {
         debugPrint('Error syncing settings: $e');
       }
     }
+
+    await hiveService.populateInbox();
 
     debugPrint('Synchronization complete — $syncCount categories synced');
   }

@@ -1,6 +1,13 @@
+What's New in v0.16.11 ✨
+
+🔄 Inbox & Sync
+• Inbox now populates automatically when syncing for the first time.
+
+---
+
 What's New in v0.16.10 ✨
 
-UI & Layout
+🖼️ UI & Layout
 • Filtered out blank/image-less podcasts from the Trending, Categories, Featured, and Top Podcasts pages.
 • Fixed episodes in the Inbox displaying author as "unknown" by robustly mapping podcast metadata.
 
