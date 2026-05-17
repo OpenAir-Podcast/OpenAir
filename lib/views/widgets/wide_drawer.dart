@@ -16,6 +16,8 @@ import 'package:openair/views/nav_pages/settings_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/views/player/main_player.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 
 final getSessionProvider = StreamProvider.autoDispose((ref) {
@@ -69,6 +71,25 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
                   onTap: () => widget.onPageSelected(const FeaturedPage()),
                 ),
                 const SizedBox(height: 2),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final isPodcastPlaying =
+                        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+                    return isPodcastPlaying
+                        ? _NavItem(
+                            icon: Icons.play_circle_rounded,
+                            label: Translations.of(context).text('nowPlaying'),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const MainPlayer(),
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink();
+                  },
+                ),
+                if (ref.watch(audioProvider.select((p) => p.isPodcastSelected)))
+                  const SizedBox(height: 2),
                 _CountNavItem(
                   icon: Icons.subscriptions_rounded,
                   label: Translations.of(context).text('subscriptions'),

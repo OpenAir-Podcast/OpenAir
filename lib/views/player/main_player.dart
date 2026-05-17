@@ -158,6 +158,13 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Show Banner',
+            icon: const Icon(Icons.unfold_more_rounded),
+            onPressed: () {
+              ref.read(audioProvider).restoreBanner();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.more_vert_rounded),
             onPressed: () {},
           ),

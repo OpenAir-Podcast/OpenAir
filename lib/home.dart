@@ -83,11 +83,13 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     final isWideScreen = _isWideScreen(context);
     final isPodcastPlaying =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+    final isBannerDismissed =
+        ref.watch(audioProvider.select((p) => p.isBannerDismissed));
     ref.watch(localeProvider); // Ensure rebuild on language change
 
     return isWideScreen
-        ? _buildWideLayout()
-        : _buildNormalLayout(isPodcastPlaying);
+        ? _buildWideLayout(isBannerDismissed)
+        : _buildNormalLayout(isPodcastPlaying, isBannerDismissed);
   }
 
   bool _isWideScreen(BuildContext context) {
@@ -102,7 +104,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
         Platform.isWindows;
   }
 
-  Widget _buildWideLayout() {
+  Widget _buildWideLayout(bool isBannerDismissed) {
     final theme = Theme.of(context);
     final isPodcastPlaying =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
@@ -154,8 +156,8 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
               ],
             ),
             bottomNavigationBar: SizedBox(
-              height: isPodcastPlaying ? bannerAudioPlayerHeight : 0.0,
-              child: isPodcastPlaying
+              height: isPodcastPlaying && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
+              child: isPodcastPlaying && !isBannerDismissed
                   ? const BannerAudioPlayer()
                   : const SizedBox.shrink(),
             ),
@@ -165,13 +167,14 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildNormalLayout(bool isPodcastPlaying) {
+  Widget _buildNormalLayout(bool isPodcastPlaying, bool isBannerDismissed) {
     return _buildMainContent(
       const ListDrawer(),
+      isBannerDismissed,
     );
   }
 
-  Widget _buildMainContent(Widget? drawer) {
+  Widget _buildMainContent(Widget? drawer, bool isBannerDismissed) {
     final isPodcastPlaying =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
 
@@ -211,8 +214,8 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
         ],
       ),
       bottomNavigationBar: SizedBox(
-        height: isPodcastPlaying ? bannerAudioPlayerHeight : 0.0,
-        child: isPodcastPlaying
+        height: isPodcastPlaying && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
+        child: isPodcastPlaying && !isBannerDismissed
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),
       ),

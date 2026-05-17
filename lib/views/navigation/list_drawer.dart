@@ -6,6 +6,7 @@ import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/supabase_provider.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/nav_pages/downloads_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
@@ -16,6 +17,7 @@ import 'package:openair/views/nav_pages/log_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
+import 'package:openair/views/player/main_player.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 
 // Legacy providers kept for backward compatibility
@@ -158,6 +160,28 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                   },
                 ),
                 const Divider(),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final isPodcastPlaying =
+                        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+                    return isPodcastPlaying
+                        ? ListTile(
+                            leading: const Icon(Icons.play_circle_rounded),
+                            title: Text(Translations.of(context).text('nowPlaying')),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const MainPlayer(),
+                                ),
+                              );
+                            },
+                          )
+                        : const SizedBox.shrink();
+                  },
+                ),
+                if (ref.watch(audioProvider.select((p) => p.isPodcastSelected)))
+                  const Divider(),
                 _buildCountTile(
                   context,
                   Icons.subscriptions_rounded,

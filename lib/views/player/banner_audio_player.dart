@@ -152,6 +152,17 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
                           ),
                         ),
                       ),
+                      // Close Button
+                      IconButton(
+                        onPressed: () {
+                          audioState.dismissBanner();
+                        },
+                        icon: Icon(
+                          Icons.close_rounded,
+                          size: 24,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
                     ],
                   ),
                 ),

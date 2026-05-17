@@ -55,6 +55,7 @@ class AudioController extends ChangeNotifier {
   bool isPodcastSelected = false;
   bool onceQueueComplete = false;
   bool isCompleted = false;
+  bool isBannerDismissed = false;
 
   late String podcastTitle;
   late String podcastSubtitle;
@@ -108,6 +109,16 @@ class AudioController extends ChangeNotifier {
     _sleepTimer?.cancel();
     _sleepTimerMinutes = null;
     _remainingSeconds = null;
+    notifyListeners();
+  }
+
+  void dismissBanner() {
+    isBannerDismissed = true;
+    notifyListeners();
+  }
+
+  void restoreBanner() {
+    isBannerDismissed = false;
     notifyListeners();
   }
 
@@ -198,6 +209,7 @@ class AudioController extends ChangeNotifier {
     isPodcastSelected = true;
     onceQueueComplete = false;
     isCompleted = false;
+    isBannerDismissed = false;
 
     try {
       final imageUrl =

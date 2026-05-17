@@ -222,6 +222,7 @@
     "searching": "検索中...",
     "buffering": "バッファリング",
     "playing": "再生中",
+    "nowPlaying": "現在再生中",
     "oopsTryAgainLater": "後ほどもう一度お試しください。",
     "hours": "時間",
     "hour": "時間",
