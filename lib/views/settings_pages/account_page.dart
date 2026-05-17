@@ -11,6 +11,8 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:openair/controllers/subscription_controller.dart';
+import 'package:openair/views/navigation/list_drawer.dart';
 
 class AccountPage extends ConsumerStatefulWidget {
   const AccountPage({super.key});
@@ -535,6 +537,10 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
+                  await ref
+                      .read(subscriptionControllerProvider)
+                      .clearAllSubscriptions();
+                  ref.invalidate(drawerCountsProvider);
                   await supabaseService.client.auth.signOut();
                 },
                 icon: const Icon(Icons.logout),
@@ -595,6 +601,10 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 Navigator.of(dialogContext).pop(); // Dismiss alert dialog
                 setState(() => _isLoading = true);
                 try {
+                  await ref
+                      .read(subscriptionControllerProvider)
+                      .clearAllSubscriptions();
+                  ref.invalidate(drawerCountsProvider);
                   await supabaseService.deleteAccount();
                   if (mounted) {
                     _showSuccess('accountDeletedSuccessfully');

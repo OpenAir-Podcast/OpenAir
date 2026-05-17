@@ -58,9 +58,9 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
     for (final title in _selectedPodcasts) {
       await controller.removeSubscription(title);
     }
-    
+
     if (!mounted) return;
-    
+
     setState(() {
       _selectedPodcasts.clear();
       _isSelectionMode = false;
@@ -224,9 +224,9 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                                     .read(openAirProvider)
                                     .hiveService
                                     .updateSubscriptions();
-                                    
+
                                 if (!mounted) return;
-                                
+
                                 ref.invalidate(subscriptionsWithCountsProvider);
                                 ref.invalidate(subscriptionsProvider);
                               },

@@ -16,6 +16,7 @@ import 'package:openair/views/nav_pages/settings_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/controllers/subscription_controller.dart';
 
 final getSessionProvider = StreamProvider.autoDispose((ref) {
   final supabaseService = ref.watch(supabaseServiceProvider);
@@ -200,11 +201,15 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (currentUser == null) {
                       widget.onPageSelected(const LogIn());
                     } else {
-                      supabaseService.signOut();
+                      await ref
+                          .read(subscriptionControllerProvider)
+                          .clearAllSubscriptions();
+                      ref.invalidate(drawerCountsProvider);
+                      await supabaseService.signOut();
                     }
                   },
                   child: Text(

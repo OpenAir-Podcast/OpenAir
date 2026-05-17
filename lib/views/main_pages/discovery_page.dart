@@ -8,7 +8,6 @@ import 'package:openair/views/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/widgets/discovery_podcast_card_list.dart';
 import 'package:openair/views/widgets/discovery_podcast_card_grid.dart';
 
-
 class DiscoveryPage extends ConsumerStatefulWidget {
   final AsyncValue<List<dynamic>> podcastDataAsyncValue;
   const DiscoveryPage({super.key, required this.podcastDataAsyncValue});

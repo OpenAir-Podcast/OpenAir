@@ -463,6 +463,9 @@ class HiveService {
     final epiBox = await episodeBox;
     await epiBox.clear();
 
+    final persistBox = await persistence;
+    await persistBox.delete('subscriptions_count');
+
     episodesList.clear();
   }
 

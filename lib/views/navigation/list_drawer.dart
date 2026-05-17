@@ -16,6 +16,7 @@ import 'package:openair/views/nav_pages/log_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
+import 'package:openair/controllers/subscription_controller.dart';
 
 // Legacy providers kept for backward compatibility
 final subCountProvider = FutureProvider.autoDispose<String>((ref) async {
@@ -113,7 +114,7 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (session == null) {
                         Navigator.pop(context);
                         Navigator.of(context).push(
@@ -123,7 +124,11 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                         );
                       } else {
                         Navigator.pop(context);
-                        supabaseService.signOut();
+                        await ref
+                            .read(subscriptionControllerProvider)
+                            .clearAllSubscriptions();
+                        ref.invalidate(drawerCountsProvider);
+                        await supabaseService.signOut();
                       }
                     },
                     style: ElevatedButton.styleFrom(

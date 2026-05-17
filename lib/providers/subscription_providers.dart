@@ -43,7 +43,8 @@ final isSubscribedProvider =
 
 // Provider to fetch episodes by podcast URL
 final podcastDataByUrlProvider =
-    FutureProvider.family<Map<String, dynamic>, String>((ref, podcastUrl) async {
+    FutureProvider.family<Map<String, dynamic>, String>(
+        (ref, podcastUrl) async {
   final podcastIndexService = ref.watch(podcastIndexProvider);
   return await podcastIndexService.getEpisodesByFeedUrl(podcastUrl);
 });
