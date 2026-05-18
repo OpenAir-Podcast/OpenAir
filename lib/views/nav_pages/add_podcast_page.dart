@@ -657,10 +657,12 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
+        height: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
+                !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
             ? bannerAudioPlayerHeight
             : 0.0,
-        child: ref.watch(audioProvider.select((p) => p.isPodcastSelected))
+        child: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
+                !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),
       ),

@@ -1,4 +1,8 @@
-What's New in 0.16.14+40 ✨
+What's New in v0.16.15+41 ✨
+
+Bug fixes - banner player consistency
+
+---What's New in v0.16.14+40 ✨
 
 Add ability to close banner player & bug fixes
 
@@ -10,11 +14,7 @@ What's New in v0.16.11 ✨
 • Inbox now populates automatically when syncing for the first time.
 
 ---
-
-What's New in v0.16.10 ✨
-
-🖼️ UI & Layout
-• Filtered out blank/image-less podcasts from the Trending, Categories, Featured, and Top Podcasts pages.
+What's New in v0.16.10 ✨ 🖼️ UI & Layout • Filtered out blank/image-less podcasts from the Trending, Categories, Featured, and Top Podcasts pages.
 • Fixed episodes in the Inbox displaying author as "unknown" by robustly mapping podcast metadata.
 
 ☁️ Cloud Sync & Stability

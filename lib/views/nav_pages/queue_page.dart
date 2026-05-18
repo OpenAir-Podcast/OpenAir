@@ -110,6 +110,9 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     final isPodcastSelected =
         ref.watch(audioProvider.select((p) => p.isPodcastSelected));
 
+    final isBannerDismissed =
+        ref.watch(audioProvider.select((p) => p.isBannerDismissed));
+
     final currentPlayingGuid =
         ref.watch(audioProvider.select((p) => p.currentEpisode?['guid']));
 
@@ -245,8 +248,8 @@ class _QueuePageState extends ConsumerState<QueuePage> {
         },
       ),
       bottomNavigationBar: SizedBox(
-        height: isPodcastSelected ? bannerAudioPlayerHeight : 0.0,
-        child: isPodcastSelected
+        height: isPodcastSelected && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
+        child: isPodcastSelected && !isBannerDismissed
             ? const BannerAudioPlayer()
             : const SizedBox.shrink(),
       ),

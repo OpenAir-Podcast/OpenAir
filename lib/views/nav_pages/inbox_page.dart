@@ -259,8 +259,11 @@ class _InboxPageState extends ConsumerState<InboxPage> {
     final isPodcastSelected = ref.watch(
       audioProvider.select((p) => p.isPodcastSelected),
     );
+    final isBannerDismissed = ref.watch(
+      audioProvider.select((p) => p.isBannerDismissed),
+    );
 
-    if (!isPodcastSelected) return null;
+    if (!isPodcastSelected || isBannerDismissed) return null;
 
     return SizedBox(
       height: bannerAudioPlayerHeight,

@@ -6,7 +6,7 @@ description:
 
 publish_to: "none"
 
-version: 0.16.14+40
+version: 0.16.15+41
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
@@ -18,7 +18,7 @@ dependencies:
     sdk: flutter
 
   media_kit: ^1.2.6
-  media_kit_libs_audio: ^1.0.7 
+  media_kit_libs_audio: ^1.0.7
   just_audio: ^0.10.5
   just_audio_media_kit: ^2.1.0
   audio_service: ^0.18.4

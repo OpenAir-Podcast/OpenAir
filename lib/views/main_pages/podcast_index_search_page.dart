@@ -49,10 +49,10 @@ class PodcastIndexSearchPage extends ConsumerWidget {
               ),
       ),
       bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider).isPodcastSelected
+        height: ref.watch(audioProvider).isPodcastSelected && !ref.watch(audioProvider).isBannerDismissed
             ? bannerAudioPlayerHeight
             : 0.0,
-        child: ref.watch(audioProvider).isPodcastSelected
+        child: ref.watch(audioProvider).isPodcastSelected && !ref.watch(audioProvider).isBannerDismissed
             ? const BannerAudioPlayer()
             : const SizedBox(),
       ),
