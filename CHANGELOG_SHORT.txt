@@ -1,3 +1,9 @@
+What's New in 0.16.14+40 ✨
+
+Add ability to close banner player & bug fixes
+
+---
+
 What's New in v0.16.11 ✨
 
 🔄 Inbox & Sync
