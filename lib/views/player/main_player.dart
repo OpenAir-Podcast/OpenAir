@@ -692,7 +692,13 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
             IconButton(
               icon: const Icon(Icons.share_rounded),
               tooltip: Translations.of(context).text('share'),
-              onPressed: () => ref.watch(openAirProvider).share(),
+              onPressed: () {
+                ref.read(openAirProvider).shareEpisode(
+                      context,
+                      currentEpisode,
+                      podcastTitle,
+                    );
+              },
             ),
           ],
         ),

@@ -7,6 +7,8 @@ import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
+import 'package:openair/providers/openair_provider.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'package:openair/views/main_pages/categories_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
@@ -27,6 +29,7 @@ class Home extends ConsumerStatefulWidget {
 class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   late TabController _tabController;
   String _pageTitle = 'openAir';
+  StreamSubscription? _linkSubscription;
 
   static const _titles = ['openAir', 'trending', 'categories'];
 
@@ -35,6 +38,57 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
+    _initDeepLinks();
+  }
+
+  void _initDeepLinks() {
+    // Check for initial link (when app is opened from a cold start)
+    if (Platform.isAndroid || Platform.isIOS) {
+      getInitialLink().then((String? link) {
+        if (link != null) {
+          _handleDeepLink(link);
+        }
+      });
+
+      // Listen for links when app is already running
+      _linkSubscription = linkStream.listen((String? link) {
+        if (link != null) {
+          _handleDeepLink(link);
+        }
+      }, onError: (err) {
+        debugPrint('Error listening to deep links: $err');
+      });
+    }
+  }
+
+  void _handleDeepLink(String link) {
+    debugPrint('Received deep link in Home: $link');
+    final uri = Uri.parse(link);
+
+    if (uri.scheme == 'openair') {
+      final path = uri.path;
+
+      // Handle episode deep link: openair://episode/{guid}
+      if (path.startsWith('/episode/')) {
+        final guid = Uri.decodeComponent(path.substring('/episode/'.length));
+        debugPrint('Opening episode with guid: $guid');
+        // Use the provider to open the episode
+        ref.read(openAirProvider).openEpisodeByGuid(guid, context);
+      }
+      // Handle podcast deep link: openair://podcast/{feedUrl}
+      else if (path.startsWith('/podcast/')) {
+        final feedUrl = Uri.decodeComponent(path.substring('/podcast/'.length));
+        debugPrint('Opening podcast with feedUrl: $feedUrl');
+        // TODO: Navigate to podcast detail screen
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _onTabChanged() {
