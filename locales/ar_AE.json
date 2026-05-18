@@ -517,5 +517,11 @@
     "syncing": "جارٍ المزامنة...",
     "syncComplete": "اكتملت المزامنة!",
     "syncFailed": "فشلت المزامنة:",
-    "selectAll": "الكل"
+    "selectAll": "الكل",
+    "markAsPlayed": "تحديد كمشغل",
+    "markAsUnplayed": "تحديد كغير مشغل",
+    "episodeDetails": "تفاصيل الحلقة",
+    "removeDownload": "إزالة التنزيل",
+    "removeFromQueue": "إزالة من قائمة الانتظار",
+    "viewPodcast": "عرض البودكاست"
 }

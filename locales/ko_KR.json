@@ -517,5 +517,11 @@
     "syncing": "동기화 중...",
     "syncComplete": "동기화 완료!",
     "syncFailed": "동기화 실패:",
-    "selectAll": "모두 선택"
+    "selectAll": "모두 선택",
+    "markAsPlayed": "재생됨으로 표시",
+    "markAsUnplayed": "재생되지 않음으로 표시",
+    "episodeDetails": "에피소드 세부정보",
+    "removeDownload": "다운로드 제거",
+    "removeFromQueue": "대기열에서 제거",
+    "viewPodcast": "팟캐스트 보기"
 }

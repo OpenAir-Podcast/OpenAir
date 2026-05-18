@@ -517,5 +517,11 @@
     "syncing": "Synchroniseren...",
     "syncComplete": "Synchronisatie voltooid!",
     "syncFailed": "Synchronisatie mislukt:",
-    "selectAll": "Alles selecteren"
+    "selectAll": "Alles selecteren",
+    "markAsPlayed": "Markeer als afgespeeld",
+    "markAsUnplayed": "Markeer als niet afgespeeld",
+    "episodeDetails": "Aflevering details",
+    "removeDownload": "Download verwijderen",
+    "removeFromQueue": "Uit wachtrij verwijderen",
+    "viewPodcast": "Podcast bekijken"
 }

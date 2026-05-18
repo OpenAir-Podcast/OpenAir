@@ -517,5 +517,11 @@
     "unsubscribe": "Unsubscribe",
     "syncing": "Syncing...",
     "syncComplete": "Sync complete!",
-    "syncFailed": "Sync failed:"
+    "syncFailed": "Sync failed:",
+    "markAsPlayed": "Mark as Played",
+    "markAsUnplayed": "Mark as Unplayed",
+    "episodeDetails": "Episode Details",
+    "removeDownload": "Remove Download",
+    "removeFromQueue": "Remove from Queue",
+    "viewPodcast": "View Podcast"
 }

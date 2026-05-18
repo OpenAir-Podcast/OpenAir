@@ -517,5 +517,11 @@
     "syncing": "Synkroniserar...",
     "syncComplete": "Synkronisering klar!",
     "syncFailed": "Synkronisering misslyckades:",
-    "selectAll": "Välj alla"
+    "selectAll": "Välj alla",
+    "markAsPlayed": "Markera som uppspelad",
+    "markAsUnplayed": "Markera som ospelad",
+    "episodeDetails": "Episoddetaljer",
+    "removeDownload": "Ta bort nedladdning",
+    "removeFromQueue": "Ta bort från kö",
+    "viewPodcast": "Visa podcast"
 }

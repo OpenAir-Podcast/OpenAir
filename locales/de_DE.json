@@ -517,5 +517,11 @@
     "syncing": "Synchronisiere...",
     "syncComplete": "Synchronisierung abgeschlossen!",
     "syncFailed": "Synchronisierung fehlgeschlagen:",
-    "unsubscribe": "Abmelden"
+    "unsubscribe": "Abmelden",
+    "markAsPlayed": "Als abgespielt markieren",
+    "markAsUnplayed": "Als nicht abgespielt markieren",
+    "episodeDetails": "Episodendetails",
+    "removeDownload": "Download entfernen",
+    "removeFromQueue": "Aus Warteschlange entfernen",
+    "viewPodcast": "Podcast anzeigen"
 }

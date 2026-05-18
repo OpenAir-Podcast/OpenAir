@@ -517,5 +517,11 @@
     "syncing": "Синхронизация...",
     "syncComplete": "Синхронизация завершена!",
     "syncFailed": "Синхронизация не удалась:",
-    "selectAll": "Выделить все"
+    "selectAll": "Выделить все",
+    "markAsPlayed": "Отметить как воспроизведено",
+    "markAsUnplayed": "Отметить как невоспроизведено",
+    "episodeDetails": "Информация об эпизоде",
+    "removeDownload": "Удалить загрузку",
+    "removeFromQueue": "Удалить из очереди",
+    "viewPodcast": "Просмотреть подкаст"
 }

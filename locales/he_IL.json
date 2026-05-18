@@ -517,5 +517,11 @@
     "syncing": "מסנכרן...",
     "syncComplete": "הסנכרון הושלם!",
     "syncFailed": "הסנכרון נכשל:",
-    "selectAll": "הכל"
+    "selectAll": "הכל",
+    "markAsPlayed": "סימון כנהנה",
+    "markAsUnplayed": "סימון כלא נהנה",
+    "episodeDetails": "פרטי פרק",
+    "removeDownload": "הסר הורדה",
+    "removeFromQueue": "הסר מתור ההמתנה",
+    "viewPodcast": "צפה בפודקאסט"
 }

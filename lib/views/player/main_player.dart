@@ -109,6 +109,233 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     );
   }
 
+  void _showOptionsMenu(
+    BuildContext context,
+    WidgetRef ref,
+    Map<String, dynamic> currentEpisode,
+    dynamic audioState,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Consumer(
+        builder: (context, widgetRef, child) {
+          return FutureBuilder<bool>(
+            future: widgetRef
+                .read(audioProvider)
+                .isAudioDownloaded(currentEpisode['guid']),
+            builder: (context, downloadSnapshot) {
+              final isDownloaded = downloadSnapshot.data ?? false;
+
+              return FutureBuilder<bool>(
+                future: _isEpisodeCompleted(widgetRef, currentEpisode['guid']),
+                builder: (context, completedSnapshot) {
+                  return FutureBuilder<bool>(
+                    future: _isEpisodeQueued(widgetRef, currentEpisode['guid']),
+                    builder: (context, queuedSnapshot) {
+                      final isQueued = queuedSnapshot.data ?? false;
+
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Episode description
+                              ListTile(
+                                leading: const Icon(Icons.description_outlined),
+                                title: Text(Translations.of(context)
+                                    .text('episodeDetails')),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _showEpisodeDescription(
+                                      context, currentEpisode);
+                                },
+                              ),
+                              // Download/Remove
+                              ListTile(
+                                leading: Icon(
+                                  isDownloaded
+                                      ? Icons.download_done_rounded
+                                      : Icons.download_rounded,
+                                ),
+                                title: Text(
+                                  isDownloaded
+                                      ? Translations.of(context)
+                                          .text('removeDownload')
+                                      : Translations.of(context)
+                                          .text('downloadEpisode'),
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  if (isDownloaded) {
+                                    widgetRef
+                                        .read(audioProvider)
+                                        .removeDownload(currentEpisode);
+                                  } else {
+                                    widgetRef
+                                        .read(audioProvider)
+                                        .downloadEpisode(currentEpisode,
+                                            audioState.currentPodcast, context);
+                                  }
+                                },
+                              ),
+                              // Add to queue/Remove from queue
+                              ListTile(
+                                leading: Icon(
+                                  isQueued
+                                      ? Icons.playlist_add_check_rounded
+                                      : Icons.playlist_add_rounded,
+                                ),
+                                title: Text(
+                                  isQueued
+                                      ? Translations.of(context)
+                                          .text('removeFromQueue')
+                                      : Translations.of(context)
+                                          .text('addToQueue'),
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  if (isQueued) {
+                                    widgetRef
+                                        .read(audioProvider)
+                                        .removeFromQueue(
+                                            currentEpisode['guid']);
+                                  } else {
+                                    widgetRef.read(audioProvider).addToQueue(
+                                        currentEpisode,
+                                        audioState.currentPodcast,
+                                        context);
+                                  }
+                                },
+                              ),
+                              // Go to podcast
+                              ListTile(
+                                leading: const Icon(Icons.album_rounded),
+                                title: Text(Translations.of(context)
+                                    .text('viewPodcast')),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  if (audioState.currentPodcast != null) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => EpisodesPage(
+                                          podcast: audioState.currentPodcast!,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Future<bool> _isEpisodeCompleted(WidgetRef ref, String guid) async {
+    final hiveService = ref.read(hiveServiceProvider);
+    final completed = await hiveService.getCompletedEpisodes();
+    return completed.containsKey(guid);
+  }
+
+  Future<bool> _isEpisodeQueued(WidgetRef ref, String guid) async {
+    final hiveService = ref.read(hiveServiceProvider);
+    final queue = await hiveService.getQueue();
+    return queue.containsKey(guid);
+  }
+
+  void _showEpisodeDescription(
+    BuildContext context,
+    Map<String, dynamic> episode,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                episode['title'] ?? 'Episode Details',
+                style: theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                episode['podcastTitle'] ?? episode['author'] ?? 'Unknown',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (episode['datePublished'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'Published: ${_formatDate(episode['datePublished'])}',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                if (episode['duration'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      'Duration: ${episode['duration']} minutes',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                if (episode['description'] != null &&
+                    episode['description'].isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      episode['description'] ?? '',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDate(dynamic dateValue) {
+    try {
+      if (dateValue is int) {
+        final date = DateTime.fromMillisecondsSinceEpoch(dateValue * 1000);
+        return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      } else if (dateValue is String) {
+        return dateValue;
+      }
+    } catch (e) {
+      return 'Unknown date';
+    }
+    return 'Unknown date';
+  }
+
   @override
   Widget build(BuildContext context) {
     final audioState = ref.watch(audioProvider);
@@ -166,7 +393,9 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
           ),
           IconButton(
             icon: const Icon(Icons.more_vert_rounded),
-            onPressed: () {},
+            onPressed: () {
+              _showOptionsMenu(context, ref, currentEpisode, audioState);
+            },
           ),
         ],
       ),

@@ -516,5 +516,11 @@
     "details": "详情",
     "syncing": "同步中...",
     "syncComplete": "同步完成！",
-    "syncFailed": "同步失败："
+    "syncFailed": "同步失败：",
+    "markAsPlayed": "标记为已播放",
+    "markAsUnplayed": "标记为未播放",
+    "episodeDetails": "剧集详情",
+    "removeDownload": "删除下载",
+    "removeFromQueue": "从队列中删除",
+    "viewPodcast": "查看播客"
 }

@@ -110,7 +110,8 @@
     "unsubscribeToPodcast": "Cancelar inscrição no podcast",
     "confirmUnsubscribe": "Confirmar cancelamento",
     "unsubscribeConfirmMsg": "Tem certeza que deseja cancelar {count} podcast(s) selecionado(s)?",
-    "unsubscribe": "Cancelar","subscribeToPodcast": "Inscrever-se no podcast",
+    "unsubscribe": "Cancelar",
+    "subscribeToPodcast": "Inscrever-se no podcast",
     "unsubscribedFrom": "Inscrição cancelada em",
     "subscribedTo": "Inscrito em",
     "topPodcasts": "Podcasts em destaque",
@@ -516,5 +517,11 @@
     "syncing": "A sincronizar...",
     "syncComplete": "Sincronização concluída!",
     "syncFailed": "Sincronização falhou:",
-    "selectAll": "Selecionar tudo"
+    "selectAll": "Selecionar tudo",
+    "markAsPlayed": "Marcar como reproduzido",
+    "markAsUnplayed": "Marcar como não reproduzido",
+    "episodeDetails": "Detalhes do episódio",
+    "removeDownload": "Remover download",
+    "removeFromQueue": "Remover da fila",
+    "viewPodcast": "Ver podcast"
 }

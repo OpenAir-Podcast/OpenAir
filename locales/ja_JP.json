@@ -517,5 +517,11 @@
     "syncing": "同期中...",
     "syncComplete": "同期完了!",
     "syncFailed": "同期失敗:",
-    "selectAll": "全て選択"
+    "selectAll": "全て選択",
+    "markAsPlayed": "再生済みにマーク",
+    "markAsUnplayed": "未再生にマーク",
+    "episodeDetails": "エピソード詳細",
+    "removeDownload": "ダウンロードを削除",
+    "removeFromQueue": "キューから削除",
+    "viewPodcast": "ポッドキャストを表示"
 }
