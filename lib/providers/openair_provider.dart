@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:openair/config/config.dart';
 import 'package:openair/controllers/subscription_controller.dart';
@@ -262,65 +262,15 @@ class OpenAirProvider extends ChangeNotifier {
                   },
                 ),
                 const Divider(height: 24),
-                // Share via Social Media
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Text(
-                    Translations.of(context).text('shareToSocialMedia'),
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                ),
-                // Twitter/X
+                // Share via Native Share Sheet
                 ListTile(
                   leading: const Icon(Icons.share_rounded),
-                  title: Text(Translations.of(context).text('shareOnTwitter')),
+                  title: Text(Translations.of(context).text('shareToSocialMedia')),
                   onTap: () {
-                    _shareToTwitter(
-                      context,
-                      episodeTitle,
-                      podcastTitle,
-                      deepLink,
-                    );
-                  },
-                ),
-                // Facebook
-                ListTile(
-                  leading: const Icon(Icons.share_rounded),
-                  title: Text(Translations.of(context).text('shareOnFacebook')),
-                  onTap: () {
-                    _shareToFacebook(
-                      context,
-                      episodeTitle,
-                      podcastTitle,
-                      deepLink,
-                    );
-                  },
-                ),
-                // WhatsApp
-                ListTile(
-                  leading: const Icon(Icons.share_rounded),
-                  title: Text(Translations.of(context).text('shareOnWhatsApp')),
-                  onTap: () {
-                    _shareToWhatsApp(
-                      context,
-                      episodeTitle,
-                      podcastTitle,
-                      deepLink,
-                    );
-                  },
-                ),
-                // Email
-                ListTile(
-                  leading: const Icon(Icons.email_rounded),
-                  title: Text(Translations.of(context).text('shareViaEmail')),
-                  onTap: () {
-                    _shareViaEmail(
-                      context,
-                      episodeTitle,
-                      podcastTitle,
-                      deepLink,
-                      description,
-                    );
+                    final shareText =
+                        'Check out "$episodeTitle" from $podcastTitle: $deepLink';
+                    Share.share(shareText);
+                    Navigator.pop(context);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -330,100 +280,6 @@ class OpenAirProvider extends ChangeNotifier {
         );
       },
     );
-  }
-
-  Future<void> _shareToTwitter(
-    BuildContext context,
-    String episodeTitle,
-    String podcastTitle,
-    String episodeUrl,
-  ) async {
-    try {
-      final text = Uri.encodeComponent(
-        'Listening to "$episodeTitle" from $podcastTitle\n$episodeUrl',
-      );
-      final url = 'https://twitter.com/intent/tweet?text=$text';
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-      if (context.mounted) Navigator.pop(context);
-    } catch (e) {
-      debugPrint('Error sharing to Twitter: $e');
-    }
-  }
-
-  Future<void> _shareToFacebook(
-    BuildContext context,
-    String episodeTitle,
-    String podcastTitle,
-    String episodeUrl,
-  ) async {
-    try {
-      final url =
-          'https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(episodeUrl)}';
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-      if (context.mounted) Navigator.pop(context);
-    } catch (e) {
-      debugPrint('Error sharing to Facebook: $e');
-    }
-  }
-
-  Future<void> _shareToWhatsApp(
-    BuildContext context,
-    String episodeTitle,
-    String podcastTitle,
-    String episodeUrl,
-  ) async {
-    try {
-      final text = Uri.encodeComponent(
-        'Check out "$episodeTitle" from $podcastTitle: $episodeUrl',
-      );
-      final url = 'whatsapp://send?text=$text';
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('WhatsApp is not installed'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-          Navigator.pop(context);
-        }
-      }
-    } catch (e) {
-      debugPrint('Error sharing to WhatsApp: $e');
-      if (context.mounted) Navigator.pop(context);
-    }
-  }
-
-  Future<void> _shareViaEmail(
-    BuildContext context,
-    String episodeTitle,
-    String podcastTitle,
-    String episodeUrl,
-    String description,
-  ) async {
-    try {
-      final subject = Uri.encodeComponent('Check out: $episodeTitle');
-      final body = Uri.encodeComponent(
-        'I wanted to share this episode with you:\n\n'
-        'Episode: $episodeTitle\n'
-        'Podcast: $podcastTitle\n\n'
-        'Description:\n$description\n\n'
-        'Listen here: $episodeUrl',
-      );
-      final url = 'mailto:?subject=$subject&body=$body';
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url));
-      }
-      if (context.mounted) Navigator.pop(context);
-    } catch (e) {
-      debugPrint('Error sharing via email: $e');
-    }
   }
 
   Future<void> exportPodcastToOpml() async {}
