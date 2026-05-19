@@ -523,5 +523,19 @@
     "episodeDetails": "Информация об эпизоде",
     "removeDownload": "Удалить загрузку",
     "removeFromQueue": "Удалить из очереди",
-    "viewPodcast": "Просмотреть подкаст"
+    "viewPodcast": "Просмотреть подкаст",
+    "shareEpisode": "Поделиться эпизодом",
+    "copyAppLink": "Копировать ссылку на приложение",
+    "copyAppLinkSubtitle": "Открывает этот эпизод в приложении OpenAir",
+    "copyEpisodeLink": "Копировать ссылку на эпизод",
+    "copyEpisodeLinkSubtitle": "Прямая ссылка на аудио эпизода",
+    "appLinkCopied": "Ссылка на приложение скопирована в буфер обмена",
+    "episodeLinkCopied": "Ссылка на эпизод скопирована в буфер обмена",
+    "copyEpisodeDetails": "Копировать детали эпизода",
+    "episodeDetailsCopied": "Детали эпизода скопированы в буфер обмена",
+    "shareToSocialMedia": "Поделиться в социальных сетях",
+    "shareOnTwitter": "Поделиться в Twitter",
+    "shareOnFacebook": "Поделиться в Facebook",
+    "shareOnWhatsApp": "Поделиться в WhatsApp",
+    "shareViaEmail": "Поделиться через email"
 }

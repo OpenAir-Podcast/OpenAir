@@ -523,5 +523,19 @@
     "episodeDetails": "Aflevering details",
     "removeDownload": "Download verwijderen",
     "removeFromQueue": "Uit wachtrij verwijderen",
-    "viewPodcast": "Podcast bekijken"
+    "viewPodcast": "Podcast bekijken",
+    "shareEpisode": "Aflevering delen",
+    "copyAppLink": "App link kopiëren",
+    "copyAppLinkSubtitle": "Deze aflevering openen in de OpenAir-app",
+    "copyEpisodeLink": "Aflevering link kopiëren",
+    "copyEpisodeLinkSubtitle": "Directe link naar de aflevering audio",
+    "appLinkCopied": "App link gekopieerd naar klembord",
+    "episodeLinkCopied": "Aflevering link gekopieerd naar klembord",
+    "copyEpisodeDetails": "Aflevering details kopiëren",
+    "episodeDetailsCopied": "Aflevering details gekopieerd naar klembord",
+    "shareToSocialMedia": "Delen op sociale media",
+    "shareOnTwitter": "Delen op Twitter",
+    "shareOnFacebook": "Delen op Facebook",
+    "shareOnWhatsApp": "Delen op WhatsApp",
+    "shareViaEmail": "Delen via e-mail"
 }

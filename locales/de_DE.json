@@ -523,5 +523,19 @@
     "episodeDetails": "Episodendetails",
     "removeDownload": "Download entfernen",
     "removeFromQueue": "Aus Warteschlange entfernen",
-    "viewPodcast": "Podcast anzeigen"
+    "viewPodcast": "Podcast anzeigen",
+    "shareEpisode": "Episode teilen",
+    "copyAppLink": "App-Link kopieren",
+    "copyAppLinkSubtitle": "Öffnet diese Episode in der OpenAir-App",
+    "copyEpisodeLink": "Episode-Link kopieren",
+    "copyEpisodeLinkSubtitle": "Direktlink zum Episode-Audio",
+    "appLinkCopied": "App-Link in die Zwischenablage kopiert",
+    "episodeLinkCopied": "Episode-Link in die Zwischenablage kopiert",
+    "copyEpisodeDetails": "Episode-Details kopieren",
+    "episodeDetailsCopied": "Episode-Details in die Zwischenablage kopiert",
+    "shareToSocialMedia": "Auf Social Media teilen",
+    "shareOnTwitter": "Auf Twitter teilen",
+    "shareOnFacebook": "Auf Facebook teilen",
+    "shareOnWhatsApp": "Auf WhatsApp teilen",
+    "shareViaEmail": "Per E-Mail teilen"
 }

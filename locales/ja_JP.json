@@ -523,5 +523,19 @@
     "episodeDetails": "エピソード詳細",
     "removeDownload": "ダウンロードを削除",
     "removeFromQueue": "キューから削除",
-    "viewPodcast": "ポッドキャストを表示"
+    "viewPodcast": "ポッドキャストを表示",
+    "shareEpisode": "エピソードを共有",
+    "copyAppLink": "アプリリンクをコピー",
+    "copyAppLinkSubtitle": "このエピソードをOpenAirアプリで開く",
+    "copyEpisodeLink": "エピソードリンクをコピー",
+    "copyEpisodeLinkSubtitle": "エピソードの音声への直接リンク",
+    "appLinkCopied": "アプリリンクをクリップボードにコピーしました",
+    "episodeLinkCopied": "エピソードリンクをクリップボードにコピーしました",
+    "copyEpisodeDetails": "エピソード詳細をコピー",
+    "episodeDetailsCopied": "エピソード詳細をクリップボードにコピーしました",
+    "shareToSocialMedia": "ソーシャルメディアで共有",
+    "shareOnTwitter": "Twitterで共有",
+    "shareOnFacebook": "Facebookで共有",
+    "shareOnWhatsApp": "WhatsAppで共有",
+    "shareViaEmail": "メールで共有"
 }

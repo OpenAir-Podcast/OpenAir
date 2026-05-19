@@ -523,5 +523,19 @@
     "episodeDetails": "פרטי פרק",
     "removeDownload": "הסר הורדה",
     "removeFromQueue": "הסר מתור ההמתנה",
-    "viewPodcast": "צפה בפודקאסט"
+    "viewPodcast": "צפה בפודקאסט",
+    "shareEpisode": "שתף פרק",
+    "copyAppLink": "העתק קישור אפליקציה",
+    "copyAppLinkSubtitle": "פותח את הפרק הזה באפליקציית OpenAir",
+    "copyEpisodeLink": "העתק קישור פרק",
+    "copyEpisodeLinkSubtitle": "קישור ישיר לصوت הפרק",
+    "appLinkCopied": "קישור האפליקציה הועתק ללוח",
+    "episodeLinkCopied": "קישור הפרק הועתק ללוח",
+    "copyEpisodeDetails": "העתק פרטי פרק",
+    "episodeDetailsCopied": "פרטי הפרק הועתקו ללוח",
+    "shareToSocialMedia": "שתף במדיה החברתית",
+    "shareOnTwitter": "שתף בTwitter",
+    "shareOnFacebook": "שתף בFacebook",
+    "shareOnWhatsApp": "שתף בWhatsApp",
+    "shareViaEmail": "שתף בדואר אלקטרוני"
 }

@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -199,23 +200,23 @@ class OpenAirProvider extends ChangeNotifier {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(
-                    'Share Episode',
+                    Translations.of(context).text('shareEpisode'),
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
                 // Copy Deep Link
                 ListTile(
                   leading: const Icon(Icons.link_rounded),
-                  title: const Text('Copy App Link'),
-                  subtitle: const Text('Opens this episode in the OpenAir app'),
+                  title: Text(Translations.of(context).text('copyAppLink')),
+                  subtitle: Text(Translations.of(context).text('copyAppLinkSubtitle')),
                   onTap: () {
                     Clipboard.setData(
                       ClipboardData(text: deepLink),
                     );
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('App link copied to clipboard'),
+                      SnackBar(
+                        content: Text(Translations.of(context).text('appLinkCopied')),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -224,8 +225,8 @@ class OpenAirProvider extends ChangeNotifier {
                 // Copy Episode Link
                 ListTile(
                   leading: const Icon(Icons.link_rounded),
-                  title: const Text('Copy Episode Link'),
-                  subtitle: const Text('Direct link to the episode audio'),
+                  title: Text(Translations.of(context).text('copyEpisodeLink')),
+                  subtitle: Text(Translations.of(context).text('copyEpisodeLinkSubtitle')),
                   onTap: () {
                     if (episodeUrl.isNotEmpty) {
                       Clipboard.setData(
@@ -233,8 +234,8 @@ class OpenAirProvider extends ChangeNotifier {
                       );
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Episode link copied to clipboard'),
+                        SnackBar(
+                          content: Text(Translations.of(context).text('episodeLinkCopied')),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -244,7 +245,7 @@ class OpenAirProvider extends ChangeNotifier {
                 // Copy Episode Details
                 ListTile(
                   leading: const Icon(Icons.info_rounded),
-                  title: const Text('Copy Episode Details'),
+                  title: Text(Translations.of(context).text('copyEpisodeDetails')),
                   onTap: () {
                     final shareText =
                         '$episodeTitle\n\nPodcast: $podcastTitle\n\n$description\n\n$deepLink';
@@ -253,8 +254,8 @@ class OpenAirProvider extends ChangeNotifier {
                     );
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Episode details copied to clipboard'),
+                      SnackBar(
+                        content: Text(Translations.of(context).text('episodeDetailsCopied')),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -265,14 +266,14 @@ class OpenAirProvider extends ChangeNotifier {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: Text(
-                    'Share to Social Media',
+                    Translations.of(context).text('shareToSocialMedia'),
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
                 // Twitter/X
                 ListTile(
                   leading: const Icon(Icons.share_rounded),
-                  title: const Text('Share on Twitter'),
+                  title: Text(Translations.of(context).text('shareOnTwitter')),
                   onTap: () {
                     _shareToTwitter(
                       context,
@@ -285,7 +286,7 @@ class OpenAirProvider extends ChangeNotifier {
                 // Facebook
                 ListTile(
                   leading: const Icon(Icons.share_rounded),
-                  title: const Text('Share on Facebook'),
+                  title: Text(Translations.of(context).text('shareOnFacebook')),
                   onTap: () {
                     _shareToFacebook(
                       context,
@@ -298,7 +299,7 @@ class OpenAirProvider extends ChangeNotifier {
                 // WhatsApp
                 ListTile(
                   leading: const Icon(Icons.share_rounded),
-                  title: const Text('Share on WhatsApp'),
+                  title: Text(Translations.of(context).text('shareOnWhatsApp')),
                   onTap: () {
                     _shareToWhatsApp(
                       context,
@@ -311,7 +312,7 @@ class OpenAirProvider extends ChangeNotifier {
                 // Email
                 ListTile(
                   leading: const Icon(Icons.email_rounded),
-                  title: const Text('Share via Email'),
+                  title: Text(Translations.of(context).text('shareViaEmail')),
                   onTap: () {
                     _shareViaEmail(
                       context,

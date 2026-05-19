@@ -523,5 +523,19 @@
     "episodeDetails": "تفاصيل الحلقة",
     "removeDownload": "إزالة التنزيل",
     "removeFromQueue": "إزالة من قائمة الانتظار",
-    "viewPodcast": "عرض البودكاست"
+    "viewPodcast": "عرض البودكاست",
+    "shareEpisode": "مشاركة الحلقة",
+    "copyAppLink": "نسخ رابط التطبيق",
+    "copyAppLinkSubtitle": "فتح هذه الحلقة في تطبيق OpenAir",
+    "copyEpisodeLink": "نسخ رابط الحلقة",
+    "copyEpisodeLinkSubtitle": "رابط مباشر للصوت",
+    "appLinkCopied": "تم نسخ رابط التطبيق إلى الحافظة",
+    "episodeLinkCopied": "تم نسخ رابط الحلقة إلى الحافظة",
+    "copyEpisodeDetails": "نسخ تفاصيل الحلقة",
+    "episodeDetailsCopied": "تم نسخ تفاصيل الحلقة إلى الحافظة",
+    "shareToSocialMedia": "مشاركة على وسائل التواصل الاجتماعي",
+    "shareOnTwitter": "مشاركة على تويتر",
+    "shareOnFacebook": "مشاركة على فيسبوك",
+    "shareOnWhatsApp": "مشاركة على واتساب",
+    "shareViaEmail": "مشاركة عبر البريد الإلكتروني"
 }

@@ -523,5 +523,19 @@
     "episodeDetails": "에피소드 세부정보",
     "removeDownload": "다운로드 제거",
     "removeFromQueue": "대기열에서 제거",
-    "viewPodcast": "팟캐스트 보기"
+    "viewPodcast": "팟캐스트 보기",
+    "shareEpisode": "에피소드 공유",
+    "copyAppLink": "앱 링크 복사",
+    "copyAppLinkSubtitle": "이 에피소드를 OpenAir 앱에서 열기",
+    "copyEpisodeLink": "에피소드 링크 복사",
+    "copyEpisodeLinkSubtitle": "에피소드 오디오로의 직접 링크",
+    "appLinkCopied": "앱 링크가 클립보드에 복사되었습니다",
+    "episodeLinkCopied": "에피소드 링크가 클립보드에 복사되었습니다",
+    "copyEpisodeDetails": "에피소드 세부정보 복사",
+    "episodeDetailsCopied": "에피소드 세부정보가 클립보드에 복사되었습니다",
+    "shareToSocialMedia": "소셜 미디어로 공유",
+    "shareOnTwitter": "Twitter에서 공유",
+    "shareOnFacebook": "Facebook에서 공유",
+    "shareOnWhatsApp": "WhatsApp에서 공유",
+    "shareViaEmail": "이메일로 공유"
 }

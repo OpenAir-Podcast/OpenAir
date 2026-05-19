@@ -523,5 +523,19 @@
     "episodeDetails": "Detalhes do episódio",
     "removeDownload": "Remover download",
     "removeFromQueue": "Remover da fila",
-    "viewPodcast": "Ver podcast"
+    "viewPodcast": "Ver podcast",
+    "shareEpisode": "Partilhar episódio",
+    "copyAppLink": "Copiar link da aplicação",
+    "copyAppLinkSubtitle": "Abre este episódio na aplicação OpenAir",
+    "copyEpisodeLink": "Copiar link do episódio",
+    "copyEpisodeLinkSubtitle": "Link direto para o áudio do episódio",
+    "appLinkCopied": "Link da aplicação copiado para a área de transferência",
+    "episodeLinkCopied": "Link do episódio copiado para a área de transferência",
+    "copyEpisodeDetails": "Copiar detalhes do episódio",
+    "episodeDetailsCopied": "Detalhes do episódio copiados para a área de transferência",
+    "shareToSocialMedia": "Partilhar nas redes sociais",
+    "shareOnTwitter": "Partilhar no Twitter",
+    "shareOnFacebook": "Partilhar no Facebook",
+    "shareOnWhatsApp": "Partilhar no WhatsApp",
+    "shareViaEmail": "Partilhar via e-mail"
 }

@@ -522,5 +522,19 @@
     "episodeDetails": "剧集详情",
     "removeDownload": "删除下载",
     "removeFromQueue": "从队列中删除",
-    "viewPodcast": "查看播客"
+    "viewPodcast": "查看播客",
+    "shareEpisode": "分享剧集",
+    "copyAppLink": "复制应用链接",
+    "copyAppLinkSubtitle": "在 OpenAir 应用中打开此剧集",
+    "copyEpisodeLink": "复制剧集链接",
+    "copyEpisodeLinkSubtitle": "直接链接到剧集音频",
+    "appLinkCopied": "应用链接已复制到剪贴板",
+    "episodeLinkCopied": "剧集链接已复制到剪贴板",
+    "copyEpisodeDetails": "复制剧集详情",
+    "episodeDetailsCopied": "剧集详情已复制到剪贴板",
+    "shareToSocialMedia": "分享到社交媒体",
+    "shareOnTwitter": "分享到 Twitter",
+    "shareOnFacebook": "分享到 Facebook",
+    "shareOnWhatsApp": "分享到 WhatsApp",
+    "shareViaEmail": "通过电子邮件分享"
 }

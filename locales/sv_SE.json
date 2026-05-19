@@ -523,5 +523,19 @@
     "episodeDetails": "Episoddetaljer",
     "removeDownload": "Ta bort nedladdning",
     "removeFromQueue": "Ta bort från kö",
-    "viewPodcast": "Visa podcast"
+    "viewPodcast": "Visa podcast",
+    "shareEpisode": "Dela episod",  
+    "copyAppLink": "Kopiera app-länk",
+    "copyAppLinkSubtitle": "Öppnar den här episoden i OpenAir-appen",
+    "copyEpisodeLink": "Kopiera episodlänk",
+    "copyEpisodeLinkSubtitle": "Direktlänk till episodens ljud",
+    "appLinkCopied": "App-länk kopierad till urklipp",
+    "episodeLinkCopied": "Episodlänk kopierad till urklipp",
+    "copyEpisodeDetails": "Kopiera episoddetaljer",
+    "episodeDetailsCopied": "Episoddetaljer kopierade till urklipp",
+    "shareToSocialMedia": "Dela på sociala medier",
+    "shareOnTwitter": "Dela på Twitter",
+    "shareOnFacebook": "Dela på Facebook",
+    "shareOnWhatsApp": "Dela på WhatsApp",
+    "shareViaEmail": "Dela via e-post"
 }
