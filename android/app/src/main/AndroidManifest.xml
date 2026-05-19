@@ -72,5 +72,12 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- WhatsApp -->
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <!-- Twitter/X -->
+        <package android:name="com.twitter.android" />
+        <!-- Facebook -->
+        <package android:name="com.facebook.katana" />
     </queries>
 </manifest>

@@ -1,8 +1,16 @@
+What's New in v0.17.0+42 ✨
+
+Adding the ability to share episodes
+
+---
+
 What's New in v0.16.15+41 ✨
 
 Bug fixes - banner player consistency
 
----What's New in v0.16.14+40 ✨
+---
+
+What's New in v0.16.14+40 ✨
 
 Add ability to close banner player & bug fixes
 

@@ -84,5 +84,12 @@
 			</array>
 		</dict>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>whatsapp-w4b</string>
+		<string>twitter</string>
+		<string>fb</string>
+	</array>
 </dict>
 </plist>
