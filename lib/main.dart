@@ -21,7 +21,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:theme_provider/theme_provider.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
 

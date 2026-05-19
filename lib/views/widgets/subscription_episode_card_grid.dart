@@ -459,7 +459,13 @@ class _SubscriptionEpisodeCardGridState
                           // Share Button
                           IconButton(
                             tooltip: Translations.of(context).text('share'),
-                            onPressed: () => ref.watch(openAirProvider).share(),
+                            onPressed: () {
+                              ref.read(openAirProvider).shareEpisode(
+                                    context,
+                                    widget.episodeItem,
+                                    widget.episodeItem['title'],
+                                  );
+                            },
                             icon: const Icon(Icons.share_rounded),
                           ),
                           favoriteListAsync.when(

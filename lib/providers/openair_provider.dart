@@ -19,6 +19,7 @@ import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
+import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 final openAirProvider = ChangeNotifierProvider<OpenAirProvider>(
@@ -424,10 +425,6 @@ class OpenAirProvider extends ChangeNotifier {
     }
   }
 
-  void share() {
-    debugPrint('share button clicked');
-  }
-
   Future<void> exportPodcastToOpml() async {}
 
   Future<void> openEpisodeByGuid(String guid, BuildContext context) async {
@@ -441,7 +438,7 @@ class OpenAirProvider extends ChangeNotifier {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => EpisodeDetail(
-                episodeItem: episode,
+                episodeItem: Map<String, dynamic>.from(episode),
                 podcast: podcast,
               ),
             ),
@@ -470,6 +467,66 @@ class OpenAirProvider extends ChangeNotifier {
         title: const Text('Episode Not Found'),
         content: Text(
           'This episode is not in your local database. You may need to subscribe to the podcast first.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> openPodcastByFeedUrl(String feedUrl, BuildContext context) async {
+    try {
+      // Try to add the podcast by RSS URL
+      final success = await audioController.addPodcastByRssUrl(feedUrl, context);
+      
+      if (success && context.mounted) {
+        // Get the subscriptions to find the newly added podcast
+        final subscriptions = await hiveService.getSubscriptions();
+        final podcast = subscriptions.values.cast<SubscriptionModel>().firstWhere(
+          (sub) => sub.feedUrl == feedUrl,
+          orElse: () => throw Exception('Podcast not found after adding'),
+        );
+
+        // Create a PodcastModel from the subscription
+        final podcastModel = PodcastModel(
+          id: podcast.id,
+          title: podcast.title,
+          author: podcast.author,
+          feedUrl: podcast.feedUrl,
+          imageUrl: podcast.imageUrl,
+          description: podcast.description,
+          artwork: podcast.artwork,
+        );
+
+        // Set as current podcast and navigate to episodes page
+        audioController.currentPodcast = podcastModel;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EpisodesPage(podcast: podcastModel),
+          ),
+        );
+      } else if (context.mounted) {
+        _showPodcastNotFoundDialog(context, feedUrl);
+      }
+    } catch (e) {
+      debugPrint('Error opening podcast by feedUrl: $e');
+      if (context.mounted) {
+        _showPodcastNotFoundDialog(context, feedUrl);
+      }
+    }
+  }
+
+  void _showPodcastNotFoundDialog(BuildContext context, String feedUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Podcast Not Found'),
+        content: Text(
+          'Could not open the podcast. The feed URL may be invalid or the podcast is not available.',
         ),
         actions: [
           TextButton(

@@ -486,7 +486,12 @@ class _EpisodeCardGridState extends ConsumerState<FeedsEpisodeCardGrid> {
 
                           IconButton(
                             tooltip: Translations.of(context).text('share'),
-                            onPressed: () => ref.watch(openAirProvider).share(),
+                            onPressed: () =>
+                                ref.watch(openAirProvider).shareEpisode(
+                                      context,
+                                      widget.episodeItem,
+                                      widget.episodeItem['title'],
+                                    ),
                             icon: const Icon(Icons.share_rounded),
                           ),
                           favoriteListAsync.when(

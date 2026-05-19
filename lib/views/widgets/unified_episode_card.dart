@@ -271,7 +271,13 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           visualDensity: VisualDensity.compact,
-          onPressed: () => ref.watch(openAirProvider).share(),
+          onPressed: () {
+            ref.read(openAirProvider).shareEpisode(
+                  context,
+                  widget.episodeItem,
+                  widget.episodeItem['title'],
+                );
+          },
         ),
       ],
     );

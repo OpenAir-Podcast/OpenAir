@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 
 import 'package:openair/views/main_pages/categories_page.dart';
 import 'package:openair/views/main_pages/featured_page.dart';
@@ -30,6 +31,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   late TabController _tabController;
   String _pageTitle = 'openAir';
   StreamSubscription? _linkSubscription;
+  final AppLinks _appLinks = AppLinks();
 
   static const _titles = ['openAir', 'trending', 'categories'];
 
@@ -44,16 +46,16 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   void _initDeepLinks() {
     // Check for initial link (when app is opened from a cold start)
     if (Platform.isAndroid || Platform.isIOS) {
-      getInitialLink().then((String? link) {
-        if (link != null) {
-          _handleDeepLink(link);
+      _appLinks.getInitialLink().then((Uri? uri) {
+        if (uri != null) {
+          _handleDeepLink(uri);
         }
       });
 
       // Listen for links when app is already running
-      _linkSubscription = linkStream.listen((String? link) {
-        if (link != null) {
-          _handleDeepLink(link);
+      _linkSubscription = _appLinks.uriLinkStream.listen((Uri? uri) {
+        if (uri != null) {
+          _handleDeepLink(uri);
         }
       }, onError: (err) {
         debugPrint('Error listening to deep links: $err');
@@ -61,9 +63,8 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     }
   }
 
-  void _handleDeepLink(String link) {
-    debugPrint('Received deep link in Home: $link');
-    final uri = Uri.parse(link);
+  void _handleDeepLink(Uri uri) {
+    debugPrint('Received deep link in Home: $uri');
 
     if (uri.scheme == 'openair') {
       final path = uri.path;
@@ -79,7 +80,8 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
       else if (path.startsWith('/podcast/')) {
         final feedUrl = Uri.decodeComponent(path.substring('/podcast/'.length));
         debugPrint('Opening podcast with feedUrl: $feedUrl');
-        // TODO: Navigate to podcast detail screen
+        // Use the provider to open the podcast
+        ref.read(openAirProvider).openPodcastByFeedUrl(feedUrl, context);
       }
     }
   }
@@ -124,12 +126,6 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
       return Translations.of(context).text('openAir');
     }
     return Translations.of(context).text(_pageTitle);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
