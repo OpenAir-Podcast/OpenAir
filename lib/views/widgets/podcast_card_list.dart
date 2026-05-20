@@ -73,16 +73,6 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4.0),
-                  Text(
-                    (widget.podcastItem.author?.isNotEmpty == true)
-                        ? widget.podcastItem.author!
-                        : Translations.of(context).text('unknown'),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                 ],
               ),
             ),
