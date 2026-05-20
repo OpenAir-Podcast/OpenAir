@@ -1012,19 +1012,19 @@ class HiveService {
   // Podcast language
   void savePodcastLanguageSettings(Map languageSettings) async {
     final box = await settingsBox;
-    await box.put('language', languageSettings);
+    await box.put('podcastLanguage', languageSettings);
   }
 
   Future<Map<String, dynamic>> getLanguageSettings() async {
     final box = await settingsBox;
-    Map? languageSettings = await box.get('language');
+    Map? languageSettings = await box.get('podcastLanguage');
 
     if (languageSettings == null) {
       languageSettings = {
         'languages': ['en'],
       };
 
-      await box.put('language', languageSettings);
+      await box.put('podcastLanguage', languageSettings);
     }
 
     return languageSettings.cast<String, dynamic>();
