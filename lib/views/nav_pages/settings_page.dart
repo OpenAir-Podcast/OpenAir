@@ -7,6 +7,7 @@ import 'package:openair/views/settings_pages/donate_page.dart';
 import 'package:openair/views/settings_pages/automatic_page.dart';
 import 'package:openair/views/settings_pages/help_and_feedback_page.dart';
 import 'package:openair/views/settings_pages/import_export_page.dart';
+import 'package:openair/views/settings_pages/podcast_selected_languages_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/settings_pages/playback_page.dart';
 import 'package:openair/views/settings_pages/synchronization_page.dart';
@@ -218,6 +219,19 @@ class _SettingsState extends ConsumerState<Settings> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const AutomaticPage(),
+                      ),
+                    );
+                  },
+                  context: context,
+                ),
+                _buildTile(
+                  icon: Icons.language_rounded,
+                  title: Translations.of(context).text('language'),
+                  subtitle: Translations.of(context).text('languageSubtitle'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PodcastSelectedLanguagesPage(),
                       ),
                     );
                   },
