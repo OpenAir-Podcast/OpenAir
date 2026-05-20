@@ -181,7 +181,7 @@ class PodcastIndexProvider {
     String cat = category.replaceAll(' ', '%20').toLowerCase();
 
     String url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=$cat&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
 
@@ -194,7 +194,7 @@ class PodcastIndexProvider {
 
   Future<Map<String, dynamic>> getTrendingPodcasts() async {
     String url =
-        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=en&pretty';
+        'https://api.podcastindex.org/api/1.0/podcasts/trending?max=$max&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref.watch(openAirProvider).hiveService.putTrendingPodcast(response.data);
@@ -202,8 +202,8 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTopPodcasts() async {
-    const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?lang=en&pretty';
+    final url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref.watch(openAirProvider).hiveService.putTopFeaturedPodcast(response.data);
@@ -211,8 +211,8 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getEducationPodcasts() async {
-    const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=education&lang=en&pretty';
+    final url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=education&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref
@@ -223,8 +223,8 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getHealthPodcasts() async {
-    const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=health&lang=en&pretty';
+    final url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=health&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref
@@ -235,8 +235,8 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getTechnologyPodcasts() async {
-    const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=technology&lang=en&pretty';
+    final url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=technology&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref
@@ -247,8 +247,8 @@ class PodcastIndexProvider {
   }
 
   Future<Map<String, dynamic>> getSportsPodcasts() async {
-    const url =
-        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=sports&lang=en&pretty';
+    final url =
+        'https://api.podcastindex.org/api/1.0/recent/feeds?cat=sports&lang=$podcastLanguageConfig&pretty';
 
     final response = await _retry(() => _dio.get(url));
     ref

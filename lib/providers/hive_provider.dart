@@ -426,6 +426,13 @@ class HiveService {
     syncPlaybackPositionConfig =
         synchronizationSettings['syncPlaybackPosition'];
     syncSettingsConfig = synchronizationSettings['syncSettings'];
+
+    Map<String, dynamic>? podcastLanguageSettings =
+        await getPodcastLanguageSettings();
+
+    podcastLanguageConfig = ref
+        .read(openAirProvider)
+        .podcastLanguages(podcastLanguageSettings['languages']);
   }
 
   // Subscription Operations:
@@ -1012,19 +1019,23 @@ class HiveService {
   // Podcast language
   void savePodcastLanguageSettings(Map languageSettings) async {
     final box = await settingsBox;
-    await box.put('podcastLanguage', languageSettings);
+    await box.put('podcastLanguages', languageSettings);
+
+    podcastLanguageConfig = ref
+        .read(openAirProvider)
+        .podcastLanguages(languageSettings['languages']);
   }
 
-  Future<Map<String, dynamic>> getLanguageSettings() async {
+  Future<Map<String, dynamic>> getPodcastLanguageSettings() async {
     final box = await settingsBox;
-    Map? languageSettings = await box.get('podcastLanguage');
+    Map? languageSettings = await box.get('podcastLanguages');
 
     if (languageSettings == null) {
       languageSettings = {
         'languages': ['en'],
       };
 
-      await box.put('podcastLanguage', languageSettings);
+      await box.put('podcastLanguages', languageSettings);
     }
 
     return languageSettings.cast<String, dynamic>();

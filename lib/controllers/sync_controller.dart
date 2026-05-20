@@ -726,7 +726,7 @@ class SyncController extends ChangeNotifier {
           'synchronization': await hiveService.getSynchronizationSettings(),
           'importExport': await hiveService.getImportExportSettings(),
           'notifications': await hiveService.getNotificationsSettings(),
-          'languages': await hiveService.getLanguageSettings(),
+          'podcastLanguages': await hiveService.getPodcastLanguageSettings(),
         };
 
         final remoteResponse = await supabaseService.client
@@ -778,7 +778,7 @@ class SyncController extends ChangeNotifier {
             case 'notifications':
               hiveService.saveNotificationsSettings(decoded);
               break;
-            case 'languages':
+            case 'podcastLanguages':
               hiveService.savePodcastLanguageSettings(decoded);
               break;
           }

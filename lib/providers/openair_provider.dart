@@ -208,7 +208,8 @@ class OpenAirProvider extends ChangeNotifier {
                 ListTile(
                   leading: const Icon(Icons.link_rounded),
                   title: Text(Translations.of(context).text('copyAppLink')),
-                  subtitle: Text(Translations.of(context).text('copyAppLinkSubtitle')),
+                  subtitle: Text(
+                      Translations.of(context).text('copyAppLinkSubtitle')),
                   onTap: () {
                     Clipboard.setData(
                       ClipboardData(text: deepLink),
@@ -216,7 +217,8 @@ class OpenAirProvider extends ChangeNotifier {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(Translations.of(context).text('appLinkCopied')),
+                        content: Text(
+                            Translations.of(context).text('appLinkCopied')),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -226,7 +228,8 @@ class OpenAirProvider extends ChangeNotifier {
                 ListTile(
                   leading: const Icon(Icons.link_rounded),
                   title: Text(Translations.of(context).text('copyEpisodeLink')),
-                  subtitle: Text(Translations.of(context).text('copyEpisodeLinkSubtitle')),
+                  subtitle: Text(
+                      Translations.of(context).text('copyEpisodeLinkSubtitle')),
                   onTap: () {
                     if (episodeUrl.isNotEmpty) {
                       Clipboard.setData(
@@ -235,7 +238,8 @@ class OpenAirProvider extends ChangeNotifier {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(Translations.of(context).text('episodeLinkCopied')),
+                          content: Text(Translations.of(context)
+                              .text('episodeLinkCopied')),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -245,7 +249,8 @@ class OpenAirProvider extends ChangeNotifier {
                 // Copy Episode Details
                 ListTile(
                   leading: const Icon(Icons.info_rounded),
-                  title: Text(Translations.of(context).text('copyEpisodeDetails')),
+                  title:
+                      Text(Translations.of(context).text('copyEpisodeDetails')),
                   onTap: () {
                     final shareText =
                         '$episodeTitle\n\nPodcast: $podcastTitle\n\n$description\n\n$deepLink';
@@ -255,7 +260,8 @@ class OpenAirProvider extends ChangeNotifier {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(Translations.of(context).text('episodeDetailsCopied')),
+                        content: Text(Translations.of(context)
+                            .text('episodeDetailsCopied')),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -265,7 +271,8 @@ class OpenAirProvider extends ChangeNotifier {
                 // Share via Native Share Sheet
                 ListTile(
                   leading: const Icon(Icons.share_rounded),
-                  title: Text(Translations.of(context).text('shareToSocialMedia')),
+                  title:
+                      Text(Translations.of(context).text('shareToSocialMedia')),
                   onTap: () {
                     final shareText =
                         'Check out "$episodeTitle" from $podcastTitle: $deepLink';
@@ -335,18 +342,22 @@ class OpenAirProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> openPodcastByFeedUrl(String feedUrl, BuildContext context) async {
+  Future<void> openPodcastByFeedUrl(
+      String feedUrl, BuildContext context) async {
     try {
       // Try to add the podcast by RSS URL
-      final success = await audioController.addPodcastByRssUrl(feedUrl, context);
-      
+      final success =
+          await audioController.addPodcastByRssUrl(feedUrl, context);
+
       if (success && context.mounted) {
         // Get the subscriptions to find the newly added podcast
         final subscriptions = await hiveService.getSubscriptions();
-        final podcast = subscriptions.values.cast<SubscriptionModel>().firstWhere(
-          (sub) => sub.feedUrl == feedUrl,
-          orElse: () => throw Exception('Podcast not found after adding'),
-        );
+        final podcast = subscriptions.values
+            .cast<SubscriptionModel>()
+            .firstWhere(
+              (sub) => sub.feedUrl == feedUrl,
+              orElse: () => throw Exception('Podcast not found after adding'),
+            );
 
         // Create a PodcastModel from the subscription
         final podcastModel = PodcastModel(
@@ -401,6 +412,19 @@ class OpenAirProvider extends ChangeNotifier {
 
   Future<void> synchronize(BuildContext context) async {
     await syncController.synchronize(context);
+  }
+
+  String podcastLanguages(List<String> languages) {
+    String lang = '';
+
+    for (var i = 0; i < languages.length; i++) {
+      lang += languages[i];
+      if (i < languages.length - 1) {
+        lang += ',';
+      }
+    }
+
+    return lang;
   }
 }
 

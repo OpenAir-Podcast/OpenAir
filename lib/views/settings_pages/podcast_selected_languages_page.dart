@@ -6,7 +6,7 @@ import 'package:openair/providers/openair_provider.dart';
 final FutureProvider<Map?> languageSettingsDataProvider =
     FutureProvider((ref) async {
   final hiveService = ref.watch(openAirProvider).hiveService;
-  return await hiveService.getLanguageSettings();
+  return await hiveService.getPodcastLanguageSettings();
 });
 
 class PodcastSelectedLanguagesPage extends ConsumerStatefulWidget {
@@ -72,7 +72,7 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
     );
   }
 
-  void _saveLanguageSettings(Map languageData, BuildContext context) {
+  void _savePodcastLanguageSettings(Map languageData, BuildContext context) {
     ref
         .watch(openAirProvider)
         .hiveService
@@ -133,9 +133,11 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
                                     } else {
                                       selectedLanguages.add(code);
                                     }
+
                                     settingsData['languages'] =
                                         selectedLanguages;
-                                    _saveLanguageSettings(
+
+                                    _savePodcastLanguageSettings(
                                         settingsData, context);
                                   });
                                 },
@@ -164,9 +166,11 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
                                             } else {
                                               selectedLanguages.remove(code);
                                             }
+
                                             settingsData['languages'] =
                                                 selectedLanguages;
-                                            _saveLanguageSettings(
+
+                                            _savePodcastLanguageSettings(
                                                 settingsData, context);
                                           });
                                         },

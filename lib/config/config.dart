@@ -200,6 +200,8 @@ bool syncHistoryConfig = true;
 bool syncPlaybackPositionConfig = true;
 bool syncSettingsConfig = true;
 
+String podcastLanguageConfig = '';
+
 // Import/Export
 late bool automaticExportDatabaseConfig;
 
