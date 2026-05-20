@@ -191,6 +191,8 @@
     "extraLarge": "Extra groß",
     "language": "Sprache",
     "languageSubtitle": "Sprache für Podcast-Entdeckung und Empfehlungen auswählen",
+    "languageDescription": "Wählen Sie die Podcast-Sprachen aus, die Sie in Ihren Abonnements und Empfehlungen sehen möchten.",
+    "selectLanguages": "Sprachen auswählen",
     "english": "Englisch",
     "spanish": "Spanisch",
     "french": "Französisch",

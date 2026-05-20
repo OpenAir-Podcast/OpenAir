@@ -194,6 +194,8 @@
     "extraLarge": "Extra groot",
     "language": "Taal",
     "languageSubtitle": "Selecteer de taal voor podcastontdekking en aanbevelingen",
+    "languageDescription": "Selecteer de podcasttalen die je wilt zien in je abonnementen en aanbevelingen.",
+    "selectLanguages": "Talen selecteren",
     "english": "Engels",
     "spanish": "Spaans",
     "french": "Frans",

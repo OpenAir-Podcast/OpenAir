@@ -20,19 +20,19 @@ class PodcastSelectedLanguagesPage extends ConsumerStatefulWidget {
 class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
   static const Map<String, String> supportedLanguages = {
     'en': 'English',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'it': 'Italian',
-    'pt': 'Portuguese',
-    'ru': 'Russian',
-    'ja': '日本語 (Japanese)',
-    'zh': '中文 (Chinese)',
-    'ko': '한국어 (Korean)',
-    'nl': 'Dutch',
-    'sv': 'Swedish',
-    'he': 'עברית (Hebrew)',
-    'ar': 'العربية (Arabic)',
+    'es': 'Español',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'it': 'Italiano',
+    'pt': 'Português',
+    'ru': 'Русский',
+    'zh': '中文',
+    'ja': '日本語',
+    'ko': '한국어',
+    'ar': 'العربية ',
+    'he': 'עברית ',
+    'nl': 'Nederlands',
+    'sv': 'Svenska',
   };
 
   Widget _buildCard(Widget child, BuildContext context) {
@@ -73,7 +73,10 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
   }
 
   void _saveLanguageSettings(Map languageData, BuildContext context) {
-    ref.watch(openAirProvider).hiveService.savePodcastLanguageSettings(languageData);
+    ref
+        .watch(openAirProvider)
+        .hiveService
+        .savePodcastLanguageSettings(languageData);
   }
 
   @override
@@ -92,25 +95,13 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
       body: languageSettings.when(
         data: (data) {
           final settingsData = data!;
-          final List<dynamic> selectedLanguages = settingsData['languages'] ?? ['en'];
+          final List<dynamic> selectedLanguages =
+              settingsData['languages'] ?? ['en'];
 
           return ListView(
             children: [
               _buildSectionHeader(
-                  'Select Languages',
-                  context),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Text(
-                  '${selectedLanguages.length} ${selectedLanguages.length == 1 ? 'language' : 'languages'} selected',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5),
-                      ),
-                ),
-              ),
+                  Translations.of(context).text('selectLanguages'), context),
               _buildCard(
                 Column(
                   children: [
@@ -120,8 +111,7 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
                         MapEntry<String, String> languageEntry = entry.value;
                         String code = languageEntry.key;
                         String name = languageEntry.value;
-                        bool isSelected =
-                            selectedLanguages.contains(code);
+                        bool isSelected = selectedLanguages.contains(code);
 
                         return Column(
                           children: [
@@ -145,7 +135,8 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
                                     }
                                     settingsData['languages'] =
                                         selectedLanguages;
-                                    _saveLanguageSettings(settingsData, context);
+                                    _saveLanguageSettings(
+                                        settingsData, context);
                                   });
                                 },
                                 child: Padding(
@@ -196,7 +187,7 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                 child: Text(
-                  'Select the podcast languages you want to see in your subscriptions and recommendations.',
+                  Translations.of(context).text('languageDescription'),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
