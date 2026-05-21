@@ -1,4 +1,4 @@
-What's New in v0.18.0+43 ✨
+What's New in v0.18.0+44 ✨
 
 feat: Ability to select languages for podcast
 
