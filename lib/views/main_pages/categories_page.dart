@@ -376,7 +376,7 @@ class CategoriesPage extends ConsumerWidget {
       MaterialPageRoute(
         builder: (context) => CategoryPage(
           category: category.name,
-          apiKey: category.apiKey,
+          categoryId: category.apiKey,
         ),
       ),
     );

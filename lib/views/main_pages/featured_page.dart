@@ -262,7 +262,7 @@ class PodcastsCard extends ConsumerWidget {
                       } else {
                         return CategoryPage(
                           category: title,
-                          apiKey: apiKey ?? title.toLowerCase(),
+                          categoryId: apiKey ?? title.toLowerCase(),
                         );
                       }
                     },

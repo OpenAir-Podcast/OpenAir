@@ -1328,6 +1328,12 @@ class HiveService {
     return await box.get(category);
   }
 
+  // This method removes a category podcast by its ID.
+  Future<void> removeCategoryPodcastById(String category) async {
+    final box = await categoryBox;
+    await box.delete(category);
+  }
+
   void putCategoryPodcast(String category, Map<String, dynamic> data) async {
     final box = await categoryBox;
     await box.put(category, FetchDataModel.fromJson(data));

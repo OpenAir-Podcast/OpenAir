@@ -6,6 +6,7 @@ import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
@@ -13,32 +14,32 @@ import 'package:openair/views/widgets/podcast_card_grid.dart';
 import 'package:openair/providers/subscription_providers.dart';
 
 final categoryDataProvider = FutureProvider.family
-    .autoDispose<FetchDataModel, String>((ref, apiKey) async {
+    .autoDispose<FetchDataModel, String>((ref, categoryId) async {
   final hiveService = ref.read(openAirProvider).hiveService;
-  final cached = await hiveService.getCategoryPodcast(apiKey);
+  final cached = await hiveService.getCategoryPodcast(categoryId);
 
   if (cached != null) {
     return cached;
   }
 
   final podcastIndexService = ref.read(podcastIndexProvider);
-  final data = await podcastIndexService.getPodcastsByCategory(apiKey);
+  final data = await podcastIndexService.getPodcastsByCategory(categoryId);
   return FetchDataModel.fromJson(data);
 });
 
 class CategoryPage extends ConsumerWidget {
   final String category;
-  final String apiKey;
+  final String categoryId;
 
   const CategoryPage({
     super.key,
     required this.category,
-    required this.apiKey,
+    required this.categoryId,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataAsync = ref.watch(categoryDataProvider(apiKey));
+    final dataAsync = ref.watch(categoryDataProvider(categoryId));
 
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +47,13 @@ class CategoryPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(categoryDataProvider(apiKey)),
+            onPressed: () {
+              ref
+                  .read(hiveServiceProvider)
+                  .removeCategoryPodcastById(categoryId);
+
+              ref.invalidate(categoryDataProvider(categoryId));
+            },
           ),
         ],
       ),
@@ -54,7 +61,7 @@ class CategoryPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _ErrorView(
           error: error.toString(),
-          onRetry: () => ref.invalidate(categoryDataProvider(apiKey)),
+          onRetry: () => ref.invalidate(categoryDataProvider(categoryId)),
         ),
         data: (data) => _buildContent(context, data),
       ),
@@ -106,7 +113,7 @@ class CategoryPage extends ConsumerWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) => _PodcastListTile(
         podcast: validFeeds[index],
-        apiKey: apiKey,
+        apiKey: categoryId,
       ),
     );
   }
