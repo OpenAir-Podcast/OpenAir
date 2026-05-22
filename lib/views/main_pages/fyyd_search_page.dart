@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/views/widgets/fyyd_search_card_grid.dart';
@@ -30,7 +31,7 @@ class FyydSearchPage extends ConsumerWidget {
                   crossAxisSpacing: 4,
                   mainAxisSpacing: 4,
                 ),
-                cacheExtent: cacheExtent,
+                scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                 itemCount: podcasts.length,
                 itemBuilder: (context, index) {
                   debugPrint(podcasts[index].toString());

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_connection.dart';
@@ -250,7 +251,7 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                   body: GridView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: subs.length,
-                    cacheExtent: cacheExtent,
+                    scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 160,

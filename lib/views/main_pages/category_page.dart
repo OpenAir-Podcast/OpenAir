@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -98,7 +99,7 @@ class CategoryPage extends ConsumerWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
         itemCount: validFeeds.length,
         itemBuilder: (context, index) => PodcastCardGrid(
           podcastItem: validFeeds[index],
@@ -108,7 +109,7 @@ class CategoryPage extends ConsumerWidget {
 
     return ListView.separated(
       padding: const EdgeInsets.all(16),
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       itemCount: validFeeds.length,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) => _PodcastListTile(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/empty_favorites.dart';
@@ -61,7 +62,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                         crossAxisSpacing: 4,
                         mainAxisSpacing: 4,
                       ),
-                      cacheExtent: cacheExtent,
+                      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         final episodeData = data.values.elementAt(index);
@@ -86,7 +87,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                       },
                     )
                   : ListView.builder(
-                      cacheExtent: cacheExtent,
+                      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         final episodeData = data.values.elementAt(index);

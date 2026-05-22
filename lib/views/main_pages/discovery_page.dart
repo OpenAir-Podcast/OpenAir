@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_connection.dart';
@@ -104,7 +105,7 @@ class _DiscoveryPageState extends ConsumerState<DiscoveryPage> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListView.builder(
-                      cacheExtent: cacheExtent,
+                      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         return DiscoveryPodcastCardList(

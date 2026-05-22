@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_downloaded_episodes.dart';
@@ -72,7 +73,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
         itemCount: data.length,
         itemBuilder: (context, index) {
           final author = data[index].author.isNotEmpty == true
@@ -92,7 +93,7 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
 
     return ListView.separated(
       padding: const EdgeInsets.all(12),
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: data.length,
       itemBuilder: (context, index) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_connection.dart';
@@ -122,7 +123,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
         itemCount: episodesDataSet.length,
         itemBuilder: (context, index) {
           final episodeItem = episodesDataSet[index];
@@ -159,7 +160,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
 
     return ListView.separated(
       padding: const EdgeInsets.all(12),
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodesDataSet.length,
       itemBuilder: (context, index) {

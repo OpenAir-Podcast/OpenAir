@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -161,7 +162,7 @@ class _SubscriptionsEpisodesPageState
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
         itemCount: episodeCount,
         itemBuilder: (context, index) {
           final author = getAuthor();
@@ -178,7 +179,7 @@ class _SubscriptionsEpisodesPageState
 
     return ListView.separated(
       padding: const EdgeInsets.all(12),
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodeCount,
       itemBuilder: (context, index) {

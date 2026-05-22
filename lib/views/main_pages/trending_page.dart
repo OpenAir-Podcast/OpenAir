@@ -4,6 +4,7 @@ export 'package:openair/views/main_pages/trending_page.dart'
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/translations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -115,7 +116,7 @@ class _TrendingView extends ConsumerWidget {
           crossAxisSpacing: spacing,
           mainAxisSpacing: spacing,
         ),
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
         itemCount: validFeeds.length,
         itemBuilder: (context, index) => PodcastCardGrid(
           podcastItem: validFeeds[index],
@@ -125,7 +126,7 @@ class _TrendingView extends ConsumerWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       itemCount: validFeeds.length,
       itemBuilder: (context, index) => PodcastCardList(
         podcastItem: validFeeds[index],

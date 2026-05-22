@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_history_episodes.dart';
@@ -127,7 +128,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                         crossAxisSpacing: 4,
                         mainAxisSpacing: 4,
                       ),
-                      cacheExtent: cacheExtent,
+                      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
@@ -150,7 +151,7 @@ class _HistoryState extends ConsumerState<HistoryPage> {
                       },
                     )
                   : ListView.builder(
-                      cacheExtent: cacheExtent,
+                      scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
                       itemCount: data.length,
                       itemBuilder: (context, index) {
                         PodcastModel podcastModel = PodcastModel(
