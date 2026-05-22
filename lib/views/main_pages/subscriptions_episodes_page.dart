@@ -102,6 +102,7 @@ class _SubscriptionsEpisodesPageState
               },
               loading: () => const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
+                bottomNavigationBar: ToggleBanner(),
               ),
               error: (_, __) => const Scaffold(
                 body: Center(child: Text('Error loading subscription status')),
@@ -114,6 +115,7 @@ class _SubscriptionsEpisodesPageState
           error: (_, __) => Scaffold(
             appBar: AppBar(title: Text(widget.podcast.title)),
             body: _buildEpisodeList(context, ref, snapshot, null),
+            bottomNavigationBar: ToggleBanner(),
           ),
         );
       },
