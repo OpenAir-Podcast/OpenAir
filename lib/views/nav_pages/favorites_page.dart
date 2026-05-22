@@ -4,11 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/empty_favorites.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
-import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getFavoriteProvider = StreamProvider.autoDispose((ref) async* {
@@ -113,16 +112,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                     ),
             ),
           ),
-          bottomNavigationBar: SizedBox(
-            height: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
-                    !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
-                ? bannerAudioPlayerHeight
-                : 0.0,
-            child: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
-                    !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
-                ? const BannerAudioPlayer()
-                : const SizedBox.shrink(),
-          ),
+          bottomNavigationBar: ToggleBanner(),
         );
       },
       error: (error, stackTrace) {

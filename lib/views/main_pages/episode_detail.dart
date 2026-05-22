@@ -12,9 +12,9 @@ import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EpisodeDetail extends ConsumerStatefulWidget {
@@ -509,16 +509,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
           ),
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider).isPodcastSelected &&
-                !ref.watch(audioProvider).isBannerDismissed
-            ? 75.0
-            : 0.0,
-        child: ref.watch(audioProvider).isPodcastSelected &&
-                !ref.watch(audioProvider).isBannerDismissed
-            ? const BannerAudioPlayer()
-            : const SizedBox(),
-      ),
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 }

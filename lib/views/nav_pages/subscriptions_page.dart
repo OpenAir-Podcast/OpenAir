@@ -5,15 +5,14 @@ import 'package:openair/components/no_connection.dart';
 import 'package:openair/components/no_subscriptions.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
-import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/inbox_page.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 final subscriptionsProvider =
     FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
@@ -274,7 +273,7 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
                       );
                     },
                   ),
-                  bottomNavigationBar: _buildBottomBar(context, ref),
+                  bottomNavigationBar: ToggleBanner(),
                 );
               },
               error: (error, stackTrace) {
@@ -310,22 +309,6 @@ class _SubscriptionsPageState extends ConsumerState<SubscriptionsPage> {
       loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       ),
-    );
-  }
-
-  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
-    final isPodcastSelected = ref.watch(
-      audioProvider.select((p) => p.isPodcastSelected),
-    );
-    final isBannerDismissed = ref.watch(
-      audioProvider.select((p) => p.isBannerDismissed),
-    );
-
-    if (!isPodcastSelected || isBannerDismissed) return null;
-
-    return SizedBox(
-      height: bannerAudioPlayerHeight,
-      child: const BannerAudioPlayer(),
     );
   }
 

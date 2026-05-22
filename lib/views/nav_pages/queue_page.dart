@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
-import 'package:openair/config/config.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/queue_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 // FutureProvider for sorted Queue List
 final sortedProvider = FutureProvider.autoDispose(
@@ -106,12 +105,6 @@ class _QueuePageState extends ConsumerState<QueuePage> {
   @override
   Widget build(BuildContext context) {
     final queueStream = ref.watch(sortedProvider);
-
-    final isPodcastSelected =
-        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
-
-    final isBannerDismissed =
-        ref.watch(audioProvider.select((p) => p.isBannerDismissed));
 
     final currentPlayingGuid =
         ref.watch(audioProvider.select((p) => p.currentEpisode?['guid']));
@@ -247,12 +240,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
           );
         },
       ),
-      bottomNavigationBar: SizedBox(
-        height: isPodcastSelected && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
-        child: isPodcastSelected && !isBannerDismissed
-            ? const BannerAudioPlayer()
-            : const SizedBox.shrink(),
-      ),
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 }

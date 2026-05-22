@@ -16,8 +16,8 @@ import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/main_pages/trending_page.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/wide_drawer.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -156,8 +156,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
 
   Widget _buildWideLayout(bool isBannerDismissed) {
     final theme = Theme.of(context);
-    final isPodcastPlaying =
-        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
+
     return Row(
       children: [
         SizedBox(
@@ -205,12 +204,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
                 CategoriesPage(),
               ],
             ),
-            bottomNavigationBar: SizedBox(
-              height: isPodcastPlaying && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
-              child: isPodcastPlaying && !isBannerDismissed
-                  ? const BannerAudioPlayer()
-                  : const SizedBox.shrink(),
-            ),
+            bottomNavigationBar: ToggleBanner(),
           ),
         ),
       ],
@@ -225,9 +219,6 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
   }
 
   Widget _buildMainContent(Widget? drawer, bool isBannerDismissed) {
-    final isPodcastPlaying =
-        ref.watch(audioProvider.select((p) => p.isPodcastSelected));
-
     return Scaffold(
       drawer: drawer,
       appBar: AppBar(
@@ -263,12 +254,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
           CategoriesPage(),
         ],
       ),
-      bottomNavigationBar: SizedBox(
-        height: isPodcastPlaying && !isBannerDismissed ? bannerAudioPlayerHeight : 0.0,
-        child: isPodcastPlaying && !isBannerDismissed
-            ? const BannerAudioPlayer()
-            : const SizedBox.shrink(),
-      ),
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 

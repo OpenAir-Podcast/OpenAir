@@ -17,9 +17,9 @@ import 'package:openair/views/main_pages/discovery_page.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/main_pages/fyyd_search_page.dart';
 import 'package:openair/views/main_pages/podcast_index_search_page.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/widgets/loading_dialog.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
 
@@ -656,16 +656,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
           ),
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
-                !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
-            ? bannerAudioPlayerHeight
-            : 0.0,
-        child: ref.watch(audioProvider.select((p) => p.isPodcastSelected)) &&
-                !ref.watch(audioProvider.select((p) => p.isBannerDismissed))
-            ? const BannerAudioPlayer()
-            : const SizedBox.shrink(),
-      ),
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 }

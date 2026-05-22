@@ -11,6 +11,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final getSubscribedEpisodesProvider =
@@ -44,6 +45,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
               ),
             ),
             body: const Center(child: NoConnection()),
+            bottomNavigationBar: ToggleBanner(),
           );
         }
 
@@ -71,6 +73,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 ],
               ),
               body: _buildFeedsList(context, episodesDataSet),
+              bottomNavigationBar: ToggleBanner(),
             );
           },
           loading: () => Scaffold(
@@ -85,6 +88,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
                 ref.invalidate(getSubscribedEpisodesProvider);
               },
             ),
+            bottomNavigationBar: ToggleBanner(),
           ),
         );
       },
@@ -99,6 +103,7 @@ class _FeedsPageState extends ConsumerState<FeedsPage> {
             ref.invalidate(getSubscribedEpisodesProvider);
           },
         ),
+        bottomNavigationBar: ToggleBanner(),
       ),
     );
   }

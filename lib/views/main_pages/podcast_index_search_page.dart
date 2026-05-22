@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/fetch_data_model.dart';
-import 'package:openair/providers/audio_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/podcast_index_search_card_list.dart';
 import 'package:openair/views/widgets/podcast_index_search_card_grid.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 class PodcastIndexSearchPage extends ConsumerWidget {
   const PodcastIndexSearchPage({
@@ -48,14 +47,7 @@ class PodcastIndexSearchPage extends ConsumerWidget {
                 ),
               ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: ref.watch(audioProvider).isPodcastSelected && !ref.watch(audioProvider).isBannerDismissed
-            ? bannerAudioPlayerHeight
-            : 0.0,
-        child: ref.watch(audioProvider).isPodcastSelected && !ref.watch(audioProvider).isBannerDismissed
-            ? const BannerAudioPlayer()
-            : const SizedBox(),
-      ),
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 }

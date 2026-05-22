@@ -10,8 +10,8 @@ import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/providers/subscription_providers.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/native/podcast_info.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 final podCastDataByUrlProvider =
@@ -96,7 +96,7 @@ class _SubscriptionsEpisodesPageState
                     ],
                   ),
                   body: _buildEpisodeList(context, ref, snapshot, data),
-                  bottomNavigationBar: _buildBottomBar(context, ref),
+                  bottomNavigationBar: ToggleBanner(),
                 );
               },
               loading: () => const Scaffold(
@@ -192,22 +192,6 @@ class _SubscriptionsEpisodesPageState
           showAuthor: true,
         );
       },
-    );
-  }
-
-  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
-    final isPodcastSelected = ref.watch(
-      audioProvider.select((p) => p.isPodcastSelected),
-    );
-    final isBannerDismissed = ref.watch(
-      audioProvider.select((p) => p.isBannerDismissed),
-    );
-
-    if (!isPodcastSelected || isBannerDismissed) return null;
-
-    return SizedBox(
-      height: bannerAudioPlayerHeight,
-      child: const BannerAudioPlayer(),
     );
   }
 }
