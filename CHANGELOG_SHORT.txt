@@ -1,3 +1,8 @@
+What's New in v0.18.4+48
+
+This update includes various bug fixes and improvements.
+
+---
 What's New in v0.18.3+47
 
 This release includes unification of banner player.

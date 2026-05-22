@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 class NoHistoryEpisodes extends StatelessWidget {
   const NoHistoryEpisodes({
@@ -55,6 +56,7 @@ class NoHistoryEpisodes extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const ToggleBanner(),
     );
   }
 }

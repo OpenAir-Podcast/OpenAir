@@ -4,6 +4,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/services/podcast_index_service.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final podcastDetailsProvider =
@@ -300,6 +301,7 @@ class PodcastInfoPage extends ConsumerWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const ToggleBanner(),
     );
   }
 

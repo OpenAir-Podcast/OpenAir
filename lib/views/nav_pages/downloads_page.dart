@@ -8,10 +8,9 @@ import 'package:openair/components/no_downloaded_episodes.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
-import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/views/player/banner_audio_player.dart';
 import 'package:openair/views/widgets/episode_card_grid.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/unified_episode_card.dart';
 
 class DownloadsPage extends ConsumerStatefulWidget {
@@ -47,15 +46,17 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
             ],
           ),
           body: _buildDownloadsList(context, data),
-          bottomNavigationBar: _buildBottomBar(context, ref),
+          bottomNavigationBar: const ToggleBanner(),
         );
       },
       loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
+        bottomNavigationBar: ToggleBanner(),
       ),
       error: (error, _) => Scaffold(
         appBar: AppBar(title: Text(Translations.of(context).text('downloads'))),
         body: _ErrorView(error: error.toString()),
+        bottomNavigationBar: const ToggleBanner(),
       ),
     );
   }
@@ -109,22 +110,6 @@ class _DownloadsState extends ConsumerState<DownloadsPage> {
           showAuthor: true,
         );
       },
-    );
-  }
-
-  Widget? _buildBottomBar(BuildContext context, WidgetRef ref) {
-    final isPodcastSelected = ref.watch(
-      audioProvider.select((p) => p.isPodcastSelected),
-    );
-    final isBannerDismissed = ref.watch(
-      audioProvider.select((p) => p.isBannerDismissed),
-    );
-
-    if (!isPodcastSelected || isBannerDismissed) return null;
-
-    return SizedBox(
-      height: bannerAudioPlayerHeight,
-      child: const BannerAudioPlayer(),
     );
   }
 }

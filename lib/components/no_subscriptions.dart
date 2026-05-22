@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 class NoSubscriptions extends StatelessWidget {
   const NoSubscriptions({
@@ -58,6 +59,7 @@ class NoSubscriptions extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const ToggleBanner(),
     );
   }
 }

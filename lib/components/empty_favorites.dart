@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 class EmptyFavorites extends StatelessWidget {
   const EmptyFavorites({super.key});
@@ -53,6 +54,7 @@ class EmptyFavorites extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const ToggleBanner(),
     );
   }
 }

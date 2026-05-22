@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
+import 'package:openair/views/widgets/toggle_banner.dart';
 
 class EmptyInbox extends StatelessWidget {
   const EmptyInbox({super.key});
@@ -53,6 +54,7 @@ class EmptyInbox extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: const ToggleBanner(),
     );
   }
 }
