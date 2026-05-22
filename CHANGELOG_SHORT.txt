@@ -1,3 +1,9 @@
+What's New in v0.18.2+46 ✨
+
+This release includes a fix for the account page provider labels being translated incorrectly.
+
+---
+
 What's New in v0.18.1+45 ✨
 
 Fix category refresh not working

@@ -430,7 +430,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                user.email ?? 'No email',
+                user.email ?? Translations.of(context).text("noEmail"),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -443,7 +443,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                     _getProviderIcon(provider),
                     size: 16,
                   ),
-                  label: Text(provider.toUpperCase()),
+                  label: Text(
+                      Translations.of(context).text(provider).toUpperCase()),
                   backgroundColor: colorScheme.secondaryContainer,
                   labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSecondaryContainer,
