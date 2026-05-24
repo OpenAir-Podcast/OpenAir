@@ -84,6 +84,7 @@ class DownloadModel extends HiveObject {
   Map<String, dynamic> toJson() => {
         'guid': guid,
         'image': image,
+        'feedImage': image,
         'title': title,
         'author': author,
         'datePublished': datePublished,

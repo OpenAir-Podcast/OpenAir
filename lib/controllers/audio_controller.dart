@@ -153,13 +153,13 @@ class AudioController extends ChangeNotifier {
     return downloadsDir.path;
   }
 
-  Future<String?> downloadPodcastImage(String imageUrl) async {
-    if (kIsWeb || imageUrl.isEmpty) return null;
-    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-      return null;
-    }
-
+  Future<String?> downloadPodcastImage(String? imageUrl, {Dio? dio}) async {
     try {
+      if (kIsWeb || imageUrl == null || imageUrl.isEmpty) return null;
+      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        return null;
+      }
+
       final downloadsDir = await getDownloadsDirectory();
       final imagesDir = Directory(join(downloadsDir, 'images'));
       if (!await imagesDir.exists()) {
@@ -173,8 +173,8 @@ class AudioController extends ChangeNotifier {
         return imagePath;
       }
 
-      final dio = Dio();
-      await dio.download(imageUrl, imagePath);
+      final downloader = dio ?? Dio();
+      await downloader.download(imageUrl, imagePath);
       return imagePath;
     } catch (e) {
       debugPrint('Error downloading podcast image: $e');
@@ -386,7 +386,14 @@ class AudioController extends ChangeNotifier {
       return;
     }
 
-    final dio = Dio();
+    final dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 60),
+      headers: {
+        'User-Agent':
+            'OpenAir/1.0.0 (Podcast App; +https://github.com/OpenAir-Podcast/OpenAir)',
+      },
+    ));
     final guid = item['guid'] as String;
     final url = item['enclosureUrl'] as String;
     final size = getEpisodeSize(item['enclosureLength']);
@@ -402,7 +409,7 @@ class AudioController extends ChangeNotifier {
       await dio.download(url, savePath);
 
       final imageUrl = item['image'] ?? item['feedImage'];
-      final localImagePath = await downloadPodcastImage(imageUrl);
+      final localImagePath = await downloadPodcastImage(imageUrl, dio: dio);
 
       final downloadModel = DownloadModel(
         guid: guid,

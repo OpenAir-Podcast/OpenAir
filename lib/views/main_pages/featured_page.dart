@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
@@ -135,7 +136,7 @@ class _FeaturedPageState extends ConsumerState<FeaturedPage> {
         return Container(
           color: Theme.of(context).scaffoldBackgroundColor,
           child: ListView(
-            cacheExtent: 1000.0,
+            scrollCacheExtent: ScrollCacheExtent.pixels(1000.0),
             padding: const EdgeInsets.only(bottom: 20),
             children: [
               const SizedBox(height: 8),

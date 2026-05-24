@@ -160,7 +160,7 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               );
             },
             itemCount: sortedQueueList.length,
-            onReorder: (oldIndex, newIndex) async {
+            onReorderItem: (int oldIndex, int newIndex) async {
               try {
                 final hive = ref.read(openAirProvider).hiveService;
                 await hive.reorderQueue(oldIndex, newIndex);
