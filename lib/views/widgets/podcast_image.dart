@@ -22,15 +22,9 @@ Widget podcastImage(String imagePath,
     width: width,
     height: height,
     fit: fit,
-    errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
-      imageUrl: imagePath,
-      width: width,
-      height: height,
-      fit: fit,
-      errorWidget: (_, __, ___) => const Icon(
-        Icons.podcasts,
-        size: 32,
-      ),
+    errorBuilder: (context, error, stackTrace) => const Icon(
+      Icons.podcasts,
+      size: 32,
     ),
   );
 }
