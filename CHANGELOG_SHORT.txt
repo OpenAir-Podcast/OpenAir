@@ -1,9 +1,14 @@
+What's New in v0.18.7+51
+
+Improved visual in the language selection for podcast episodes.
+
+---
+
 What's New in v0.18.6+50
 
 This release includes various bug fixes and improvements.
 
 ---
-
 
 What's New in v0.18.5+49
 
