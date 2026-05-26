@@ -193,6 +193,7 @@
   "large": "Stor",
   "extraLarge": "Extra stor",
   "language": "Språk",
+  "languages": "Språk",
   "languageSubtitle": "Välj språk för podcastupptäckt och rekommendationer",
   "languageDescription": "Välj de podcast-språk du vill se i dina prenumerationer och rekommendationer.",
   "selectLanguages": "Välj språk",

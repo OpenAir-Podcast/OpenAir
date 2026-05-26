@@ -101,7 +101,21 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
           return ListView(
             children: [
               _buildSectionHeader(
-                  Translations.of(context).text('selectLanguages'), context),
+                Translations.of(context).text('selectLanguages'),
+                context,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  '${selectedLanguages.length} ${selectedLanguages.length == 1 ? Translations.of(context).text('language') : Translations.of(context).text('languages')} selected',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
+                      ),
+                ),
+              ),
               _buildCard(
                 Column(
                   children: [
