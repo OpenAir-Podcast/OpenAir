@@ -107,7 +107,7 @@ class LanguagePageState extends ConsumerState<PodcastSelectedLanguagesPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Text(
-                  '${selectedLanguages.length} ${selectedLanguages.length == 1 ? Translations.of(context).text('language') : Translations.of(context).text('languages')} selected',
+                  '${selectedLanguages.length} ${selectedLanguages.length == 1 ? Translations.of(context).text('language') : Translations.of(context).text('languages')} ${Translations.of(context).text('selected')}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
