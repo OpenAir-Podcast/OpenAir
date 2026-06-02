@@ -13,12 +13,21 @@ jobs:
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+      - id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=nightly-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          fi
       - name: Create GitHub Release
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "OpenAir ${{ github.ref_name }}" \
+          gh release create "${{ steps.version.outputs.version }}" \
+            --title "OpenAir ${{ steps.version.outputs.version }}" \
             --notes-file CHANGELOG_SHORT.txt \
             --draft \
             --prerelease
@@ -42,13 +51,13 @@ jobs:
       - run: flutter build linux --release
       - name: Package
         run: |
-          RELEASE_NAME="openair-${{ github.ref_name }}-linux-x64.tar.gz"
+          RELEASE_NAME="openair-${{ needs.create_release.outputs.version }}-linux-x64.tar.gz"
           cd build/linux/x64/release/bundle
           tar -czvf "../../../../../$RELEASE_NAME" .
       - name: Upload
         run: |
-          gh release upload "${{ github.ref_name }}" \
-            "openair-${{ github.ref_name }}-linux-x64.tar.gz"
+          gh release upload "${{ needs.create_release.outputs.version }}" \
+            "openair-${{ needs.create_release.outputs.version }}-linux-x64.tar.gz"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,18 +87,16 @@ jobs:
           mkdir -p AppDir
           cp -r build/linux/x64/release/bundle/* AppDir/
 
-          # Setup basic metadata requirements for linuxdeploy
           echo -e "[Desktop Entry]\nName=OpenAir\nExec=openair\nIcon=openair\nType=Application\nCategories=AudioVideo;Player;" > AppDir/openair.desktop
           touch AppDir/openair.png 
 
-          # FIXED: Added the AppImage extract runtime environment flag to bypass GitHub Actions container constraints
-          export OUTPUT="openair-${{ github.ref_name }}-x86_64.AppImage"
+          export OUTPUT="openair-${{ needs.create_release.outputs.version }}-x86_64.AppImage"
           export APPIMAGE_EXTRACT_AND_RUN=1
           linuxdeploy --appdir AppDir --output appimage
 
       - name: Upload AppImage
         run: |
-          gh release upload "${{ github.ref_name }}" \
+          gh release upload "${{ needs.create_release.outputs.version }}" \
             openair-*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,13 +115,14 @@ jobs:
       - name: Package
         shell: powershell
         run: |
-          $ZipName = "openair-${{ github.ref_name }}-windows-x64.zip"
+          $V = "${{ needs.create_release.outputs.version }}"
+          $ZipName = "openair-$V-windows-x64.zip"
           Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath $ZipName
       - name: Upload
         shell: bash
         run: |
-          gh release upload "${{ github.ref_name }}" \
-            "openair-${{ github.ref_name }}-windows-x64.zip"
+          gh release upload "${{ needs.create_release.outputs.version }}" \
+            "openair-${{ needs.create_release.outputs.version }}-windows-x64.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -152,11 +160,11 @@ jobs:
           flutter build apk --release --android-skip-build-dependency-validation
           flutter build appbundle --release --android-skip-build-dependency-validation
       - name: Rename APK for Clear Branding
-        run: cp build/app/outputs/flutter-apk/app-release.apk openair-${{ github.ref_name }}-android.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk openair-${{ needs.create_release.outputs.version }}-android.apk
       - name: Upload Releases
         run: |
-          gh release upload "${{ github.ref_name }}" \
-            openair-${{ github.ref_name }}-android.apk \
+          gh release upload "${{ needs.create_release.outputs.version }}" \
+            openair-${{ needs.create_release.outputs.version }}-android.apk \
             build/app/outputs/bundle/release/app-release.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
