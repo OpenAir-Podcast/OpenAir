@@ -1,4 +1,0 @@
-{
-  "publish-delay-hours": 3,
-  "skip-arches": ["i386"]
-}

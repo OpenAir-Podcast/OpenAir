@@ -6,7 +6,6 @@
 /flutter-sdk-*.json
 /pubspec-sources.json
 /.flatpak-builder/
-/flatpak_app/
 /build-dir/
 /repo/
 
