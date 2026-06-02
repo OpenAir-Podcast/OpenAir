@@ -25,12 +25,14 @@ jobs:
       - id: version
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            v="${{ github.ref_name }}"
           elif [[ -n "${{ inputs.release_tag }}" ]]; then
-            echo "version=${{ inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+            v="${{ inputs.release_tag }}"
           else
-            echo "version=nightly-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+            v="nightly-${{ github.run_id }}"
           fi
+          v="${v%"${v##*[![:space:]]}"}"
+          echo "version=${v}" >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release
         run: |
           if ! gh release view "${{ steps.version.outputs.version }}" &>/dev/null; then
@@ -169,7 +171,7 @@ jobs:
           flutter build apk --release --android-skip-build-dependency-validation
           flutter build appbundle --release --android-skip-build-dependency-validation
       - name: Rename APK for Clear Branding
-        run: cp build/app/outputs/flutter-apk/app-release.apk openair-${{ needs.create_release.outputs.version }}-android.apk
+        run: cp "build/app/outputs/flutter-apk/app-release.apk" "openair-${{ needs.create_release.outputs.version }}-android.apk"
       - name: Upload Releases
         run: |
           gh release upload "${{ needs.create_release.outputs.version }}" \
