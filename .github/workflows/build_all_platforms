@@ -1,0 +1,151 @@
+name: Flutter Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "OpenAir ${{ github.ref_name }}" \
+            --notes-file CHANGELOG_SHORT.txt \
+            --draft \
+            --prerelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_linux_tarball:
+    needs: create_release
+    name: Linux (tar.gz)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install Linux build deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libgtk-3-dev libwebkit2gtk-4.1-dev libsecret-1-dev libjsoncpp-dev liblzma-dev ninja-build pkg-config
+      - run: flutter pub get
+      - run: flutter build linux --release
+      - name: Package
+        run: |
+          RELEASE_NAME="openair-${{ github.ref_name }}-linux-x64.tar.gz"
+          cd build/linux/x64/release/bundle
+          tar -czvf "../../../../../$RELEASE_NAME" .
+      - name: Upload
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "openair-${{ github.ref_name }}-linux-x64.tar.gz"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_appimage:
+    needs: create_release
+    name: Linux (AppImage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          
+      - name: Install Linux Build & AppImage Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libgtk-3-dev libwebkit2gtk-4.1-dev libsecret-1-dev libjsoncpp-dev liblzma-dev ninja-build pkg-config wget file
+          
+          # Download linuxdeploy and its AppImage plugin
+          sudo wget -Q /usr/local/bin/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          sudo chmod +x /usr/local/bin/linuxdeploy
+          
+      - run: flutter pub get
+      - run: flutter build linux --release
+      
+      - name: Bundle AppImage
+        run: |
+          # Create an AppDir structure out of your compiled bundle
+          mkdir -p AppDir
+          cp -r build/linux/x64/release/bundle/* AppDir/
+          
+          # Setup standard Linux desktop requirements for bundling
+          # If you have custom assets/openair.desktop or snap/gui/openair.desktop, copy them here.
+          # Otherwise, we create a basic fallback structure so linuxdeploy can build successfully:
+          echo -e "[Desktop Entry]\nName=OpenAir\nExec=openair\nIcon=openair\nType=Application\nCategories=AudioVideo;Player;" > AppDir/openair.desktop
+          
+          # Use a default fallback icon if you don't have one specified
+          touch AppDir/openair.png 
+          
+          # Run linuxdeploy to output the finalized self-contained binary file
+          export OUTPUT="openair-${{ github.ref_name }}-x86_64.AppImage"
+          linuxdeploy --appdir AppDir --plugin appimage --output appimage
+          
+      - name: Upload AppImage
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            openair-*.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_windows:
+    needs: create_release
+    name: Windows (zip)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: Package
+        shell: powershell
+        run: |
+          $ZipName = "openair-${{ github.ref_name }}-windows-x64.zip"
+          Compress-Archive -Path build/windows/x64/release/runner/* -DestinationPath $ZipName
+      - name: Upload
+        shell: bash
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "openair-${{ github.ref_name }}-windows-x64.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_android:
+    needs: create_release
+    name: Android (APK & AAB)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: |
+          flutter build apk --release --android-skip-build-dependency-validation
+          flutter build appbundle --release --android-skip-build-dependency-validation
+      - name: Rename APK for Clear Branding
+        run: cp build/app/outputs/flutter-apk/app-release.apk openair-${{ github.ref_name }}-android.apk
+      - name: Upload Releases
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            openair-${{ github.ref_name }}-android.apk \
+            build/app/outputs/bundle/release/app-release.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
