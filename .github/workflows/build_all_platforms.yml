@@ -85,7 +85,7 @@ jobs:
           # FIXED: Added the AppImage extract runtime environment flag to bypass GitHub Actions container constraints
           export OUTPUT="openair-${{ github.ref_name }}-x86_64.AppImage"
           export APPIMAGE_EXTRACT_AND_RUN=1
-          linuxdeploy --appdir AppDir --plugin appimage --output appimage
+          linuxdeploy --appdir AppDir --output appimage
 
       - name: Upload AppImage
         run: |
