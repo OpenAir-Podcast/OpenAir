@@ -5,6 +5,11 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing release tag to upload assets to (leave empty for nightly)"
+        required: false
+        type: string
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*"
@@ -21,16 +26,20 @@ jobs:
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [[ -n "${{ inputs.release_tag }}" ]]; then
+            echo "version=${{ inputs.release_tag }}" >> "$GITHUB_OUTPUT"
           else
             echo "version=nightly-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           fi
       - name: Create GitHub Release
         run: |
-          gh release create "${{ steps.version.outputs.version }}" \
-            --title "OpenAir ${{ steps.version.outputs.version }}" \
-            --notes-file CHANGELOG_SHORT.txt \
-            --draft \
-            --prerelease
+          if ! gh release view "${{ steps.version.outputs.version }}" &>/dev/null; then
+            gh release create "${{ steps.version.outputs.version }}" \
+              --title "OpenAir ${{ steps.version.outputs.version }}" \
+              --notes-file CHANGELOG_SHORT.txt \
+              --draft \
+              --prerelease
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
