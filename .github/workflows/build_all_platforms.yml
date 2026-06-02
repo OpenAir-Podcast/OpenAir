@@ -21,7 +21,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: version
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
@@ -48,7 +48,7 @@ jobs:
     name: Linux (tar.gz)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -75,7 +75,7 @@ jobs:
     name: Linux (AppImage)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -115,7 +115,7 @@ jobs:
     name: Windows (zip)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -140,7 +140,7 @@ jobs:
     name: Android (APK & AAB)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
