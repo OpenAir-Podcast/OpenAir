@@ -1,0 +1,67 @@
+name: openair
+base: core22
+version: "0.18.7+51"
+summary: A free and open-source cross-platform podcast app
+description: |
+  OpenAir is a free and open-source podcast app that empowers you to
+  explore and enjoy the vast world of podcasts.
+
+title: OpenAir
+contact: openairpodapp@gmail.com
+license: Apache-2.0
+website: https://openair-podcast.github.io/openair-website/
+source-code: https://github.com/OpenAir-Podcast/OpenAir
+issues: https://github.com/OpenAir-Podcast/OpenAir/issues
+donation: https://www.paypal.com/ncp/payment/LFM3C2KRXSR5W
+grade: stable
+confinement: strict
+
+apps:
+  openair:
+    command: bin/openair
+    extensions: [gnome]
+    desktop: usr/share/applications/com.openair.podcast.desktop
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - home
+      - removable-media
+      - screen-inhibit-control
+
+parts:
+  openair:
+    source: .
+    plugin: flutter
+    flutter-channel: stable
+    flutter-target: lib/main.dart
+    build-packages:
+      - cmake
+      - clang
+      - ninja-build
+      - pkg-config
+      - libgtk-3-dev
+      - liblzma-dev
+      - libsecret-1-dev
+      - libjsoncpp-dev
+      - libcurl4-openssl-dev
+      - libwebkit2gtk-4.1-dev
+      - libmpv-dev
+    stage-packages:
+      - libgtk-3-0
+      - libpulse0
+      - libsqlite3-0
+      - libsecret-1-0
+      - libjsoncpp25
+      - libcurl4
+      - libwebkit2gtk-4.1-0
+      - libmpv1
+    override-build: |
+      snapcraftctl build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
+      install -Dm644 linux/com.openair.podcast.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
+
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps
+      install -Dm644 assets/icons/com.openair.podcast.svg $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/scalable/apps/com.openair.podcast.svg
+
+      sed -i 's|^Icon=.*|Icon=com.openair.podcast|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/com.openair.podcast.desktop
