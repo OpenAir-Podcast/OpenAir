@@ -1,3 +1,17 @@
+What's New in v0.18.8
+
+We're excited to announce that OpenAir has been approved for production! After lots of hard work, the app is now ready for everyone to use. Here's what's new:
+
+🎉 Production Release
+• OpenAir has been approved and is now available in the app store
+• The app is more stable and reliable than ever
+• Smoother performance across all devices
+
+🛠️ Behind the Scenes
+• Improved how the app gets ready for new updates
+• Better support for different types of devices and computers
+• Various fixes to make sure everything runs smoothly
+
 What's New in v0.18.7+51
 
 Improved visual in the language selection for podcast episodes.
