@@ -1,0 +1,21 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build a release APK"
+  lane :build_apk do
+    sh("flutter", "build", "apk", "--release")
+  end
+
+  desc "Build a release app bundle (AAB)"
+  lane :build_aab do
+    sh("flutter", "build", "appbundle", "--release")
+  end
+
+  desc "Upload metadata to F-Droid"
+  lane :update_metadata do
+    # F-Droid ingests the fastlane/metadata directory directly.
+    # This lane exists as a reminder — metadata lives in fastlane/metadata/.
+    UI.message("Metadata is ready at fastlane/metadata/android/")
+    UI.message("To publish, push to your F-Droid repo or submit to fdroiddata.")
+  end
+end

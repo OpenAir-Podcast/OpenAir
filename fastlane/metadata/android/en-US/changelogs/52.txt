@@ -1,0 +1,6 @@
+🎉 Production Release
+• OpenAir has been approved and is now available in the app store
+• The app is more stable and reliable than ever
+• Smoother performance across all devices
+• Improved how the app gets ready for new updates
+• Better support for different types of devices and computers

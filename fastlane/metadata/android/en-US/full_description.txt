@@ -1,0 +1,10 @@
+OpenAir is a free and open-source cross-platform podcast app that empowers you to explore and enjoy the vast world of podcasts.
+
+Features:
+• Browse and search millions of podcasts
+• Subscribe to your favorite shows
+• Stream or download episodes for offline listening
+• Sync your subscriptions across devices
+• Create playlists and manage your listening queue
+• Dark mode and customizable themes
+• Open podcast standard compliant
