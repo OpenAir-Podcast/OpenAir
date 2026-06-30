@@ -957,70 +957,76 @@ class AudioController extends ChangeNotifier {
 
   void mainPlayerSliderClicked(double sliderValue) => seekTo(sliderValue);
 
+  Timer? _previousButtonTimer;
+
   Future<void> playPreviousEpisode(BuildContext context) async {
-    if (playerPosition > const Duration(seconds: 3)) {
-      await _audioHandler.seek(Duration.zero);
-      playerPosition = Duration.zero;
+    if (_previousButtonTimer?.isActive == true) {
+      _previousButtonTimer!.cancel();
+      _previousButtonTimer = null;
+
+      await _audioHandler.stop();
+      final hiveService = ref.read(hiveServiceProvider);
+      Map queueMap = await hiveService.getQueue();
+
+      if (queueMap.isNotEmpty) {
+        List<Map<String, dynamic>> queueList =
+            queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
+        queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+
+        int currentEpisodeIndex = -1;
+        for (int i = 0; i < queueList.length; i++) {
+          if (queueList[i]['guid'] == currentEpisode!['guid']) {
+            currentEpisodeIndex = i;
+            break;
+          }
+        }
+
+        if (!keepSkippedEpisodesConfig) {
+          await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
+        }
+
+        if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
+          if (navigatePodcastEpisodesConfig) {
+            await _playPreviousFromPodcast(context);
+          }
+          return;
+        }
+
+        await updateCurrentQueueCard(
+          currentEpisode!['guid'],
+          podcastCurrentPositionInMilliseconds,
+          currentPlaybackPositionString,
+          currentPlaybackRemainingTimeString,
+          playerPosition,
+        );
+
+        Map<String, dynamic> previousEpisode =
+            queueList[currentEpisodeIndex - 1];
+        currentEpisode = previousEpisode;
+        currentPodcast = previousEpisode['podcast'];
+
+        if (context.mounted) {
+          await queuePlayButtonClicked(
+            previousEpisode,
+            previousEpisode['playerPosition'],
+            context,
+          );
+        }
+      } else {
+        if (navigatePodcastEpisodesConfig) {
+          await _playPreviousFromPodcast(context);
+        }
+      }
       notifyListeners();
       return;
     }
 
-    final hiveService = ref.read(hiveServiceProvider);
-    Map queueMap = await hiveService.getQueue();
-
-    if (queueMap.isNotEmpty) {
-      List<Map<String, dynamic>> queueList =
-          queueMap.values.map((e) => Map<String, dynamic>.from(e)).toList();
-      queueList.sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
-
-      int currentEpisodeIndex = -1;
-      for (int i = 0; i < queueList.length; i++) {
-        if (queueList[i]['guid'] == currentEpisode!['guid']) {
-          currentEpisodeIndex = i;
-          break;
-        }
-      }
-
-      if (!keepSkippedEpisodesConfig) {
-        await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
-      }
-
-      if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
-        // Not in queue or first in queue, try podcast episodes if enabled
-        if (navigatePodcastEpisodesConfig) {
-          await _playPreviousFromPodcast(context);
-        }
-        return;
-      }
-
-      await updateCurrentQueueCard(
-        currentEpisode!['guid'],
-        podcastCurrentPositionInMilliseconds,
-        currentPlaybackPositionString,
-        currentPlaybackRemainingTimeString,
-        playerPosition,
-      );
-
-      await _audioHandler.stop();
-
-      Map<String, dynamic> previousEpisode = queueList[currentEpisodeIndex - 1];
-      currentEpisode = previousEpisode;
-      currentPodcast = previousEpisode['podcast'];
-
-      if (context.mounted) {
-        await queuePlayButtonClicked(
-          previousEpisode,
-          previousEpisode['playerPosition'],
-          context,
-        );
-      }
-    } else {
-      // No queue, try podcast episodes if enabled
-      if (navigatePodcastEpisodesConfig) {
-        await _playPreviousFromPodcast(context);
-      }
-    }
-    notifyListeners();
+    _previousButtonTimer = Timer(const Duration(milliseconds: 400), () {
+      _previousButtonTimer = null;
+      _audioHandler.seek(Duration.zero);
+      playerPosition = Duration.zero;
+      notifyListeners();
+    });
   }
 
   Future<void> _playPreviousFromPodcast(BuildContext context) async {
