@@ -1,3 +1,12 @@
+What's New in v0.18.12+53
+
+🎯 Auto-Play & Navigation Fixes
+• Fixed auto-play skipping episodes when transitioning to the next track
+• Fixed author showing as "Unknown" when auto-playing or navigating episodes
+• Auto-play now plays newer episodes (chronologically forward)
+• Previous button: single tap restarts episode, double tap goes to previous episode
+• Fixed previous button not navigating to older episodes from API-sourced content
+
 What's New in v0.18.8
 
 We're excited to announce that OpenAir has been approved for production! After lots of hard work, the app is now ready for everyone to use. Here's what's new:
