@@ -73,6 +73,9 @@ class AudioController extends ChangeNotifier {
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
+  BuildContext? _appContext;
+  bool _isAutoPlayingNext = false;
+
   String? currentPodcastTimeRemaining;
 
   List<String> audioSpeedOptions = ['0.5x', '1.0x', '1.25x', '1.5x', '2.0x'];
@@ -804,6 +807,8 @@ class AudioController extends ChangeNotifier {
   Future<void> initAudio(BuildContext context) => initializeAudio(context);
 
   Future<void> initializeAudio(BuildContext context) async {
+    _appContext = context;
+
     // Set up position listener
     _audioHandler.positionStream.listen((Duration position) {
       if (isPlaying == PlayingStatus.buffering) return;
@@ -855,15 +860,24 @@ class AudioController extends ChangeNotifier {
           break;
         case ProcessingState.completed:
           await updateHistoryPlaybackPosition(positionOverride: 0);
-          isPlaying = PlayingStatus.stop;
-          audioState = 'Stop';
-          loadState = 'Detail';
-          isCompleted = true;
+          if (autoplayNextInQueueConfig && _appContext != null) {
+            _isAutoPlayingNext = true;
+            await playNextEpisode(_appContext!);
+          } else {
+            isPlaying = PlayingStatus.stop;
+            audioState = 'Stop';
+            loadState = 'Detail';
+            isCompleted = true;
+          }
           break;
         case ProcessingState.idle:
-          isPlaying = PlayingStatus.stop;
-          audioState = 'Stop';
-          loadState = 'Detail';
+          if (_isAutoPlayingNext) {
+            _isAutoPlayingNext = false;
+          } else {
+            isPlaying = PlayingStatus.stop;
+            audioState = 'Stop';
+            loadState = 'Detail';
+          }
           break;
         default:
           break;
