@@ -958,6 +958,13 @@ class AudioController extends ChangeNotifier {
   void mainPlayerSliderClicked(double sliderValue) => seekTo(sliderValue);
 
   Future<void> playPreviousEpisode(BuildContext context) async {
+    if (playerPosition > const Duration(seconds: 3)) {
+      await _audioHandler.seek(Duration.zero);
+      playerPosition = Duration.zero;
+      notifyListeners();
+      return;
+    }
+
     final hiveService = ref.read(hiveServiceProvider);
     Map queueMap = await hiveService.getQueue();
 
@@ -1030,10 +1037,10 @@ class AudioController extends ChangeNotifier {
     int currentIndex = sortedEpisodes
         .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
 
-    if (currentIndex <= 0) return;
+    if (currentIndex == -1 || currentIndex >= sortedEpisodes.length - 1) return;
 
     await _audioHandler.stop();
-    final previousEpisode = sortedEpisodes[currentIndex - 1];
+    final previousEpisode = sortedEpisodes[currentIndex + 1];
     currentEpisode = previousEpisode;
     currentPodcast = PodcastModel.fromJson(previousEpisode['podcast'] ?? {});
 
