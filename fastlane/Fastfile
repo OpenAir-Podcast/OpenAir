@@ -1,21 +1,132 @@
 default_platform(:android)
 
+def artifact_version
+  lane_context[SharedValues::GIT_TAG_NAME] || "latest"
+end
+
 platform :android do
   desc "Build a release APK"
   lane :build_apk do
     sh("flutter", "build", "apk", "--release")
+    apk = "build/app/outputs/flutter-apk/app-release.apk"
+    FileUtils.cp(apk, "openair-#{artifact_version}-android.apk")
+    UI.success("APK: openair-#{artifact_version}-android.apk")
   end
 
   desc "Build a release app bundle (AAB)"
   lane :build_aab do
     sh("flutter", "build", "appbundle", "--release")
+    UI.success("AAB: build/app/outputs/bundle/release/app-release.aab")
+  end
+
+  desc "Build both APK and AAB"
+  lane :build_all do
+    build_apk
+    build_aab
   end
 
   desc "Upload metadata to F-Droid"
   lane :update_metadata do
-    # F-Droid ingests the fastlane/metadata directory directly.
-    # This lane exists as a reminder — metadata lives in fastlane/metadata/.
     UI.message("Metadata is ready at fastlane/metadata/android/")
     UI.message("To publish, push to your F-Droid repo or submit to fdroiddata.")
   end
+end
+
+platform :linux do
+  desc "Build a release Linux bundle (tar.gz)"
+  lane :build_targz do
+    sh("flutter", "build", "linux", "--release")
+    name = "openair-#{artifact_version}-linux-x64.tar.gz"
+    sh("tar", "-czvf", name, "-C", "build/linux/x64/release/bundle", ".")
+    UI.success("Linux tar.gz: #{name}")
+  end
+
+  desc "Build a Linux AppImage"
+  lane :build_appimage do
+    linuxdeploy = `which linuxdeploy`.strip
+    if linuxdeploy.empty?
+      UI.error("linuxdeploy not found. Install it from https://github.com/linuxdeploy/linuxdeploy")
+      UI.error("  sudo curl -Lo /usr/local/bin/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage")
+      UI.error("  sudo chmod +x /usr/local/bin/linuxdeploy")
+      return
+    end
+    sh("flutter", "build", "linux", "--release")
+    sh("mkdir", "-p", "AppDir")
+    sh("cp", "-r", "build/linux/x64/release/bundle/*", "AppDir/")
+    File.write("AppDir/openair.desktop", <<~DESKTOP)
+      [Desktop Entry]
+      Name=OpenAir
+      Exec=openair
+      Icon=openair
+      Type=Application
+      Categories=AudioVideo;Player;
+    DESKTOP
+    File.write("AppDir/openair.png", "")
+    name = "openair-#{artifact_version}-x86_64.AppImage"
+    ENV["OUTPUT"] = name
+    ENV["APPIMAGE_EXTRACT_AND_RUN"] = "1"
+    sh("linuxdeploy", "--appdir", "AppDir", "--output", "appimage")
+    sh("rm", "-rf", "AppDir")
+    UI.success("AppImage: #{name}")
+  end
+
+  desc "Build both tar.gz and AppImage"
+  lane :build_all do
+    build_targz
+    build_appimage
+  end
+end
+
+platform :windows do
+  desc "Build a release Windows EXE (zip)"
+  lane :build_zip do
+    sh("flutter", "build", "windows", "--release")
+    name = "openair-#{artifact_version}-windows-x64.zip"
+    if RUBY_PLATFORM.include?("mingw")
+      sh("powershell", "-Command",
+        "Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath #{name}")
+    else
+      sh("zip", "-r", name, "build/windows/x64/runner/Release/")
+    end
+    UI.success("Windows zip: #{name}")
+  end
+end
+
+desc "Upload build artifacts to an existing GitHub release"
+lane :github_release do |options|
+  tag = options[:tag]
+  UI.user_error!("Pass `tag:` (e.g. `fastlane github_release tag:v1.2.3`)") unless tag
+
+  assets = Dir.glob("openair-*").select { |f| File.file?(f) }
+  if assets.empty?
+    UI.message("No openair-* artifacts found. Run a build lane first.")
+    return
+  end
+
+  sh("gh", "release", "upload", tag, *assets)
+  UI.success("Uploaded #{assets.length} asset(s) to #{tag}")
+end
+
+desc "Build and upload draught release for current tag"
+lane :draft do |options|
+  tag = options[:tag] || lane_context[SharedValues::GIT_TAG_NAME]
+  UI.user_error!("Pass `tag:` or check out a git tag first") unless tag
+
+  unless `gh release view #{tag} 2>/dev/null`.strip.empty?
+    UI.message("Release #{tag} already exists — skipping create")
+  else
+    sh("gh", "release", "create", tag,
+      "--title", "OpenAir #{tag}",
+      "--draft", "--prerelease",
+      "--notes", "See CHANGELOG_SHORT.txt")
+  end
+
+  if RUBY_PLATFORM.include?("linux")
+    android_build_all
+    linux_build_all
+  elsif RUBY_PLATFORM.include?("mingw")
+    windows_build_zip
+  end
+
+  github_release(tag: tag)
 end
