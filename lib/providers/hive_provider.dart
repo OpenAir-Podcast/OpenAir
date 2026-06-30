@@ -667,7 +667,8 @@ class HiveService {
 
     return allEpisodes.entries.where(
       (element) {
-        return element.value['podcastId'] == podcastId;
+        return element.value['podcastId']?.toString() == podcastId ||
+            element.value['podcast']?['id'].toString() == podcastId;
       },
     );
   }
