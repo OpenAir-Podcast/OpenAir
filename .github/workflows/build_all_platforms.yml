@@ -123,6 +123,8 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build windows --release
+        env:
+          CXXFLAGS: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
       - name: Package
         shell: powershell
         run: |
