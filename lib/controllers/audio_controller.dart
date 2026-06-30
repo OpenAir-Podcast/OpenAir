@@ -957,12 +957,16 @@ class AudioController extends ChangeNotifier {
 
   void mainPlayerSliderClicked(double sliderValue) => seekTo(sliderValue);
 
-  Timer? _previousButtonTimer;
+  DateTime? _lastPreviousTapTime;
 
   Future<void> playPreviousEpisode(BuildContext context) async {
-    if (_previousButtonTimer?.isActive == true) {
-      _previousButtonTimer!.cancel();
-      _previousButtonTimer = null;
+    debugPrint(
+        'Controller: playPreviousEpisode — _lastPreviousTapTime=$_lastPreviousTapTime');
+    final now = DateTime.now();
+    if (_lastPreviousTapTime != null &&
+        now.difference(_lastPreviousTapTime!) <
+            const Duration(milliseconds: 400)) {
+      _lastPreviousTapTime = null;
 
       await _audioHandler.stop();
       final hiveService = ref.read(hiveServiceProvider);
@@ -1021,23 +1025,16 @@ class AudioController extends ChangeNotifier {
       return;
     }
 
-    _previousButtonTimer = Timer(const Duration(milliseconds: 400), () {
-      _previousButtonTimer = null;
-      _audioHandler.seek(Duration.zero);
-      playerPosition = Duration.zero;
-      notifyListeners();
-    });
+    _lastPreviousTapTime = now;
+    await _audioHandler.seek(Duration.zero);
+    playerPosition = Duration.zero;
+    notifyListeners();
   }
 
   Future<void> _playPreviousFromPodcast(BuildContext context) async {
     if (currentPodcast == null || currentEpisode == null) return;
 
-    final hiveService = ref.read(hiveServiceProvider);
-    final episodes =
-        await hiveService.getEpisodesForPodcast(currentPodcast!.id.toString());
-    final sortedEpisodes = episodes
-        .map((e) => Map<String, dynamic>.from(e.value))
-        .toList()
+    final sortedEpisodes = (await _getEpisodesForCurrentPodcast())
       ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
     int currentIndex = sortedEpisodes
@@ -1048,7 +1045,11 @@ class AudioController extends ChangeNotifier {
     await _audioHandler.stop();
     final previousEpisode = sortedEpisodes[currentIndex + 1];
     currentEpisode = previousEpisode;
-    currentPodcast = PodcastModel.fromJson(previousEpisode['podcast'] ?? {});
+    if (previousEpisode['podcast'] != null) {
+      currentPodcast = PodcastModel.fromJson(previousEpisode['podcast'] is Map
+          ? Map<String, dynamic>.from(previousEpisode['podcast'])
+          : {});
+    }
 
     if (context.mounted) {
       await queuePlayButtonClicked(
@@ -1175,7 +1176,8 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> _autoPlayNextFromQueue(BuildContext context) async {
-    debugPrint('_autoPlayNextFromQueue: currentEpisode=null? ${currentEpisode == null}');
+    debugPrint(
+        '_autoPlayNextFromQueue: currentEpisode=null? ${currentEpisode == null}');
 
     if (currentEpisode == null || currentEpisode!.isEmpty) {
       debugPrint('_autoPlayNextFromQueue: no current episode, stopping');
@@ -1212,7 +1214,8 @@ class AudioController extends ChangeNotifier {
         break;
       }
     }
-    debugPrint('_autoPlayNextFromQueue: current episode index in queue: $currentEpisodeIndex');
+    debugPrint(
+        '_autoPlayNextFromQueue: current episode index in queue: $currentEpisodeIndex');
 
     if (!keepSkippedEpisodesConfig) {
       await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
@@ -1315,9 +1318,7 @@ class AudioController extends ChangeNotifier {
     final fromHive =
         await hiveService.getEpisodesForPodcast(currentPodcast!.id.toString());
     if (fromHive.isNotEmpty) {
-      return fromHive
-          .map((e) => Map<String, dynamic>.from(e.value))
-          .toList();
+      return fromHive.map((e) => Map<String, dynamic>.from(e.value)).toList();
     }
 
     final podcastIndexService = ref.read(podcastIndexProvider);
@@ -1340,24 +1341,29 @@ class AudioController extends ChangeNotifier {
     }
 
     final allEpisodes = await _getEpisodesForCurrentPodcast();
-    debugPrint('_playNextFromPodcast: got ${allEpisodes.length} episodes for podcast ${currentPodcast!.id}');
+    debugPrint(
+        '_playNextFromPodcast: got ${allEpisodes.length} episodes for podcast ${currentPodcast!.id}');
 
     final sortedEpisodes = allEpisodes
       ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
-    debugPrint('_playNextFromPodcast: current episode guid = ${currentEpisode!['guid']}');
+    debugPrint(
+        '_playNextFromPodcast: current episode guid = ${currentEpisode!['guid']}');
     int currentIndex = sortedEpisodes
         .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
-    debugPrint('_playNextFromPodcast: currentIndex = $currentIndex / ${sortedEpisodes.length}');
+    debugPrint(
+        '_playNextFromPodcast: currentIndex = $currentIndex / ${sortedEpisodes.length}');
 
     if (currentIndex <= 0) {
-      debugPrint('_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
+      debugPrint(
+          '_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
       return;
     }
 
     await _audioHandler.stop();
     final nextEpisode = sortedEpisodes[currentIndex - 1];
-    debugPrint('_playNextFromPodcast: playing next episode guid=${nextEpisode['guid']} title=${nextEpisode['title']}');
+    debugPrint(
+        '_playNextFromPodcast: playing next episode guid=${nextEpisode['guid']} title=${nextEpisode['title']}');
     currentEpisode = nextEpisode;
     if (nextEpisode['podcast'] != null) {
       currentPodcast = PodcastModel.fromJson(nextEpisode['podcast'] is Map
