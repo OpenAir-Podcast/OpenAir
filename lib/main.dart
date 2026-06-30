@@ -54,7 +54,7 @@ void main() async {
       androidNotificationChannelId: 'com.liquidhive.openair',
       androidNotificationChannelName: 'OpenAir Audio',
       androidNotificationOngoing: true,
-      androidStopForegroundOnPause: false,
+      androidStopForegroundOnPause: true,
     ),
   );
 
