@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -34,13 +35,25 @@ void main() async {
     );
   }
 
+  // Configure audio session for media playback
+  final session = await AudioSession.instance;
+
+  await session.configure(const AudioSessionConfiguration(
+    avAudioSessionCategory: AVAudioSessionCategory.playback,
+    androidAudioAttributes: AndroidAudioAttributes(
+      contentType: AndroidAudioContentType.music,
+      usage: AndroidAudioUsage.media,
+    ),
+    androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+  ));
+
   // Initialize audio service for background playback
   await AudioService.init(
     builder: () => getAudioHandler(),
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.liquidhive.openair',
       androidNotificationChannelName: 'OpenAir Audio',
-      androidNotificationOngoing: false,
+      androidNotificationOngoing: true,
       androidStopForegroundOnPause: false,
     ),
   );
