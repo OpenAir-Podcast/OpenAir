@@ -207,7 +207,7 @@ class AudioController extends ChangeNotifier {
       }
       if (currentEpisode!['author'] == null ||
           currentEpisode!['author'].isEmpty) {
-        currentEpisode!['author'] = currentPodcast!.author ?? 'Unknown';
+        currentEpisode!['author'] = currentPodcast!.author;
       }
     }
     final bool isDownloaded = await isAudioDownloaded(currentEpisode!['guid']);
@@ -604,7 +604,7 @@ class AudioController extends ChangeNotifier {
     hiveService.addToQueue({
       'guid': episode['guid'],
       'title': episode['title'],
-      'author': episode['author'] ?? 'Unknown',
+      'author': episode['author'],
       'image': episode['feedImage'] ?? episode['image'],
       'datePublished': episode['datePublished'],
       'description': episode['description'],
@@ -993,9 +993,8 @@ class AudioController extends ChangeNotifier {
         }
 
         if (currentEpisodeIndex == -1 || currentEpisodeIndex == 0) {
-          if (navigatePodcastEpisodesConfig) {
-            await _playPreviousFromPodcast(context);
-          }
+          _isNavigatingPodcast = false;
+          await _playPreviousFromPodcast(context);
           return;
         }
 
@@ -1010,6 +1009,10 @@ class AudioController extends ChangeNotifier {
         Map<String, dynamic> previousEpisode =
             queueList[currentEpisodeIndex - 1];
         currentEpisode = previousEpisode;
+        if (currentEpisode!['author'] == null ||
+            currentEpisode!['author'].isEmpty) {
+          currentEpisode!['author'] = currentPodcast?.author;
+        }
         currentPodcast = previousEpisode['podcast'];
 
         if (context.mounted) {
@@ -1020,9 +1023,8 @@ class AudioController extends ChangeNotifier {
           );
         }
       } else {
-        if (navigatePodcastEpisodesConfig) {
-          await _playPreviousFromPodcast(context);
-        }
+        _isNavigatingPodcast = false;
+        await _playPreviousFromPodcast(context);
       }
       notifyListeners();
       return;
@@ -1034,32 +1036,49 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isNavigatingPodcast = false;
+
   Future<void> _playPreviousFromPodcast(BuildContext context) async {
-    if (currentPodcast == null || currentEpisode == null) return;
+    if (_isNavigatingPodcast) return;
+    _isNavigatingPodcast = true;
+    debugPrint('_playPreviousFromPodcast: starting');
 
-    final sortedEpisodes = (await _getEpisodesForCurrentPodcast())
-      ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
+    try {
+      if (currentPodcast == null && currentEpisode != null) {
+        await _resolvePodcastFromEpisode(currentEpisode!);
+      }
 
-    int currentIndex = sortedEpisodes
-        .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
+      if (currentPodcast == null || currentEpisode == null) {
+        debugPrint('_playPreviousFromPodcast: null check failed '
+            'podcast=${currentPodcast?.id} episode=${currentEpisode?['guid']}');
+        return;
+      }
 
-    if (currentIndex == -1 || currentIndex >= sortedEpisodes.length - 1) return;
+      final sortedEpisodes = (await _getEpisodesForCurrentPodcast())
+        ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
-    await _audioHandler.stop();
-    final previousEpisode = sortedEpisodes[currentIndex + 1];
-    currentEpisode = previousEpisode;
-    if (previousEpisode['podcast'] != null) {
-      currentPodcast = PodcastModel.fromJson(previousEpisode['podcast'] is Map
-          ? Map<String, dynamic>.from(previousEpisode['podcast'])
-          : {});
-    }
+      int currentIndex = _findEpisodeIndex(currentEpisode, sortedEpisodes);
 
-    if (context.mounted) {
-      await queuePlayButtonClicked(
-        previousEpisode,
-        Duration.zero,
-        context,
-      );
+      if (currentIndex == -1 || currentIndex >= sortedEpisodes.length - 1) {
+        debugPrint(
+            '_playPreviousFromPodcast: no previous episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
+        return;
+      }
+
+      await _audioHandler.stop();
+      final previousEpisode = sortedEpisodes[currentIndex + 1];
+      currentEpisode = previousEpisode;
+      currentEpisode!['author'] = currentPodcast!.author;
+
+      if (context.mounted) {
+        await queuePlayButtonClicked(
+          previousEpisode,
+          Duration.zero,
+          context,
+        );
+      }
+    } finally {
+      _isNavigatingPodcast = false;
     }
   }
 
@@ -1110,7 +1129,7 @@ class AudioController extends ChangeNotifier {
       }
       if (currentEpisode!['author'] == null ||
           currentEpisode!['author'].isEmpty) {
-        currentEpisode!['author'] = currentPodcast!.author ?? 'Unknown';
+        currentEpisode!['author'] = currentPodcast!.author;
       }
     }
     isPodcastSelected = true;
@@ -1250,6 +1269,10 @@ class AudioController extends ChangeNotifier {
 
     final nextEpisodeData = queueList[currentEpisodeIndex + 1];
     currentEpisode = nextEpisodeData;
+    if (currentEpisode!['author'] == null ||
+        currentEpisode!['author'].isEmpty) {
+      currentEpisode!['author'] = currentPodcast?.author;
+    }
     currentPodcast = nextEpisodeData['podcast'];
 
     if (context.mounted) {
@@ -1260,10 +1283,17 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> playNextEpisode(BuildContext context) async {
-    if (currentEpisode == null || currentEpisode!.isEmpty) return;
+    debugPrint('playNextEpisode: currentEpisode=null? ${currentEpisode == null}');
+    if (currentEpisode == null || currentEpisode!.isEmpty) {
+      debugPrint('playNextEpisode: currentEpisode is null or empty, returning');
+      return;
+    }
+
+    debugPrint('playNextEpisode: currentEpisode guid=${currentEpisode!['guid']}');
 
     final hiveService = ref.read(hiveServiceProvider);
     final queueMap = await hiveService.getQueue();
+    debugPrint('playNextEpisode: queue has ${queueMap.length} items');
 
     if (queueMap.isNotEmpty) {
       List<Map<String, dynamic>> queueList =
@@ -1277,6 +1307,7 @@ class AudioController extends ChangeNotifier {
           break;
         }
       }
+      debugPrint('playNextEpisode: currentEpisodeIndex=$currentEpisodeIndex / ${queueList.length}');
 
       if (!keepSkippedEpisodesConfig) {
         await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
@@ -1284,13 +1315,13 @@ class AudioController extends ChangeNotifier {
 
       if (currentEpisodeIndex == -1 ||
           currentEpisodeIndex == queueList.length - 1) {
-        // Not in queue or last in queue, try podcast episodes if enabled
-        if (navigatePodcastEpisodesConfig) {
-          await _playNextFromPodcast(context);
-        }
+        debugPrint('playNextEpisode: at queue boundary, trying podcast episodes');
+        _isNavigatingPodcast = false;
+        await _playNextFromPodcast(context);
         return;
       }
 
+      debugPrint('playNextEpisode: playing next queue item');
       await updateCurrentQueueCard(
         currentEpisode!['guid'],
         podcastCurrentPositionInMilliseconds,
@@ -1303,6 +1334,10 @@ class AudioController extends ChangeNotifier {
 
       final nextEpisodeData = queueList[currentEpisodeIndex + 1];
       currentEpisode = nextEpisodeData;
+      if (currentEpisode!['author'] == null ||
+          currentEpisode!['author'].isEmpty) {
+        currentEpisode!['author'] = currentPodcast?.author;
+      }
       currentPodcast = nextEpisodeData['podcast'];
 
       if (context.mounted) {
@@ -1310,16 +1345,54 @@ class AudioController extends ChangeNotifier {
             nextEpisodeData, nextEpisodeData['playerPosition'], context);
       }
     } else {
-      // No queue, try podcast episodes if enabled
-      if (navigatePodcastEpisodesConfig) {
-        await _playNextFromPodcast(context);
-      }
+      debugPrint('playNextEpisode: no queue, trying podcast episodes');
+      _isNavigatingPodcast = false;
+      await _playNextFromPodcast(context);
     }
 
     notifyListeners();
   }
 
+  int _findEpisodeIndex(
+    Map<String, dynamic>? episode,
+    List<Map<String, dynamic>> sortedEpisodes,
+  ) {
+    if (episode == null) return -1;
+
+    int idx = sortedEpisodes
+        .indexWhere((ep) => ep['guid'] == episode['guid']);
+    if (idx >= 0) return idx;
+
+    idx = sortedEpisodes
+        .indexWhere((ep) => ep['id'] == episode['id']);
+    if (idx >= 0) return idx;
+
+    idx = sortedEpisodes.indexWhere(
+        (ep) => ep['title'] == episode['title']);
+    if (idx >= 0) return idx;
+
+    final currentDate = episode['datePublished'];
+    if (currentDate != null) {
+      idx = sortedEpisodes.indexWhere(
+          (ep) => ep['datePublished'] == currentDate);
+    }
+    return idx;
+  }
+
   Future<List<Map<String, dynamic>>> _getEpisodesForCurrentPodcast() async {
+    final podcastIndexService = ref.read(podcastIndexProvider);
+    final feedUrl = currentPodcast!.feedUrl;
+    if (feedUrl.isNotEmpty) {
+      try {
+        final response =
+            await podcastIndexService.getEpisodesByFeedUrl(feedUrl);
+        final items = response['items'] as List?;
+        if (items != null && items.isNotEmpty) {
+          return items.cast<Map<String, dynamic>>();
+        }
+      } catch (_) {}
+    }
+
     final hiveService = ref.read(hiveServiceProvider);
     final fromHive =
         await hiveService.getEpisodesForPodcast(currentPodcast!.id.toString());
@@ -1327,62 +1400,64 @@ class AudioController extends ChangeNotifier {
       return fromHive.map((e) => Map<String, dynamic>.from(e.value)).toList();
     }
 
-    final podcastIndexService = ref.read(podcastIndexProvider);
-    final feedUrl = currentPodcast!.feedUrl;
-    if (feedUrl.isEmpty) return [];
-
-    final response = await podcastIndexService.getEpisodesByFeedUrl(feedUrl);
-    final items = response['items'] as List?;
-    if (items == null) return [];
-
-    return items.cast<Map<String, dynamic>>();
+    return [];
   }
 
   Future<void> _playNextFromPodcast(BuildContext context) async {
+    if (_isNavigatingPodcast) return;
+    _isNavigatingPodcast = true;
     debugPrint('_playNextFromPodcast: starting');
-    if (currentPodcast == null || currentEpisode == null) {
-      debugPrint('_playNextFromPodcast: null check failed '
-          'podcast=${currentPodcast?.id} episode=${currentEpisode?['guid']}');
-      return;
-    }
 
-    final allEpisodes = await _getEpisodesForCurrentPodcast();
-    debugPrint(
-        '_playNextFromPodcast: got ${allEpisodes.length} episodes for podcast ${currentPodcast!.id}');
+    try {
+      if (currentPodcast == null && currentEpisode != null) {
+        await _resolvePodcastFromEpisode(currentEpisode!);
+      }
 
-    final sortedEpisodes = allEpisodes
-      ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
+      if (currentPodcast == null || currentEpisode == null) {
+        debugPrint('_playNextFromPodcast: null check failed '
+            'podcast=${currentPodcast?.id} episode=${currentEpisode?['guid']}');
+        return;
+      }
 
-    debugPrint(
-        '_playNextFromPodcast: current episode guid = ${currentEpisode!['guid']}');
-    int currentIndex = sortedEpisodes
-        .indexWhere((ep) => ep['guid'] == currentEpisode!['guid']);
-    debugPrint(
-        '_playNextFromPodcast: currentIndex = $currentIndex / ${sortedEpisodes.length}');
-
-    if (currentIndex <= 0) {
+      final allEpisodes = await _getEpisodesForCurrentPodcast();
       debugPrint(
-          '_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
-      return;
-    }
+          '_playNextFromPodcast: got ${allEpisodes.length} episodes for podcast ${currentPodcast!.id}');
 
-    await _audioHandler.stop();
-    final nextEpisode = sortedEpisodes[currentIndex - 1];
-    debugPrint(
-        '_playNextFromPodcast: playing next episode guid=${nextEpisode['guid']} title=${nextEpisode['title']}');
-    currentEpisode = nextEpisode;
-    if (nextEpisode['podcast'] != null) {
-      currentPodcast = PodcastModel.fromJson(nextEpisode['podcast'] is Map
-          ? Map<String, dynamic>.from(nextEpisode['podcast'])
-          : {});
-    }
+      final sortedEpisodes = allEpisodes
+        ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
-    if (context.mounted) {
-      await queuePlayButtonClicked(
-        nextEpisode,
-        Duration.zero,
-        context,
-      );
+      debugPrint(
+          '_playNextFromPodcast: current episode guid = ${currentEpisode!['guid']}');
+      int currentIndex = _findEpisodeIndex(currentEpisode, sortedEpisodes);
+      debugPrint(
+          '_playNextFromPodcast: currentIndex = $currentIndex / ${sortedEpisodes.length}');
+
+      if (currentIndex <= 0) {
+        debugPrint(
+            '_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
+        return;
+      }
+
+      await _audioHandler.stop();
+      final nextEpisode = sortedEpisodes[currentIndex - 1];
+      debugPrint(
+          '_playNextFromPodcast: playing next episode guid=${nextEpisode['guid']} title=${nextEpisode['title']}');
+
+      debugPrint(
+          '_playNextFromPodcast: ${currentPodcast!.author} / ${currentPodcast!.title}');
+
+      currentEpisode = nextEpisode;
+      currentEpisode!['author'] = currentPodcast!.author;
+
+      if (context.mounted) {
+        await queuePlayButtonClicked(
+          nextEpisode,
+          Duration.zero,
+          context,
+        );
+      }
+    } finally {
+      _isNavigatingPodcast = false;
     }
   }
 
@@ -1391,21 +1466,33 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> _resolvePodcastFromEpisode(Map<String, dynamic> episode) async {
+    final podcast =
+        episode['podcast'] is Map ? Map<String, dynamic>.from(episode['podcast']) : null;
     final feedId = episode['podcastId']?.toString() ??
-        episode['feedId']?.toString();
-    if (feedId == null || feedId.isEmpty) return;
+        episode['feedId']?.toString() ??
+        podcast?['id']?.toString();
+    final feedUrl = episode['feedUrl'] as String? ??
+        podcast?['url'] as String?;
+
+    if ((feedId == null || feedId.isEmpty) &&
+        (feedUrl == null || feedUrl.isEmpty)) {
+      return;
+    }
 
     final hiveService = ref.read(hiveServiceProvider);
     final subscriptions = await hiveService.getSubscriptions();
 
     for (final sub in subscriptions.values) {
-      if (sub.id.toString() == feedId) {
+      if (sub.id.toString() == feedId ||
+          (feedUrl != null &&
+              feedUrl.isNotEmpty &&
+              sub.feedUrl == feedUrl)) {
         if (episode['podcastTitle'] == null ||
             episode['podcastTitle'].isEmpty) {
           episode['podcastTitle'] = sub.title;
         }
         if (episode['author'] == null || episode['author'].isEmpty) {
-          episode['author'] = sub.author ?? 'Unknown';
+          episode['author'] = sub.author;
         }
         currentPodcast = PodcastModel(
           id: sub.id,
