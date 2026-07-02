@@ -866,14 +866,20 @@ class AudioController extends ChangeNotifier {
           debugPrint('Controller: completed — '
               'autoplayNextInQueueConfig=$autoplayNextInQueueConfig '
               '_appContext=${_appContext != null}');
-          await updateHistoryPlaybackPosition(positionOverride: 0);
           _isAutoPlayingNext = true;
-          if (_appContext != null) {
-            if (autoplayNextInQueueConfig) {
-              await _autoPlayNextFromQueue(_appContext!);
-            } else {
-              await _playNextFromPodcast(_appContext!);
+          try {
+            await updateHistoryPlaybackPosition(positionOverride: 0);
+            if (_appContext != null) {
+              if (autoplayNextInQueueConfig) {
+                await _autoPlayNextFromQueue(_appContext!);
+              } else {
+                _isNavigatingPodcast = false;
+                await _playNextFromPodcast(_appContext!, stopOnEnd: true);
+              }
             }
+          } catch (e) {
+            debugPrint('Controller: auto-advance error: $e');
+            _isAutoPlayingNext = false;
           }
           break;
         case ProcessingState.idle:
@@ -1039,7 +1045,9 @@ class AudioController extends ChangeNotifier {
   bool _isNavigatingPodcast = false;
 
   Future<void> _playPreviousFromPodcast(BuildContext context) async {
-    if (_isNavigatingPodcast) return;
+    if (_isNavigatingPodcast) {
+      debugPrint('_playPreviousFromPodcast: WARNING re-entrant, resetting');
+    }
     _isNavigatingPodcast = true;
     debugPrint('_playPreviousFromPodcast: starting');
 
@@ -1219,12 +1227,9 @@ class AudioController extends ChangeNotifier {
     debugPrint('_autoPlayNextFromQueue: queue has ${queueMap.length} items');
 
     if (queueMap.isEmpty) {
-      debugPrint('_autoPlayNextFromQueue: queue empty, stopping');
-      await _audioHandler.stop();
-      isPlaying = PlayingStatus.stop;
-      audioState = 'Stop';
-      loadState = 'Detail';
-      isCompleted = true;
+      debugPrint('_autoPlayNextFromQueue: queue empty, falling back to podcast');
+      _isNavigatingPodcast = false;
+      await _playNextFromPodcast(context, stopOnEnd: true);
       return;
     }
 
@@ -1248,12 +1253,9 @@ class AudioController extends ChangeNotifier {
 
     if (currentEpisodeIndex < 0 ||
         currentEpisodeIndex >= queueList.length - 1) {
-      debugPrint('_autoPlayNextFromQueue: no next queue item, stopping');
-      await _audioHandler.stop();
-      isPlaying = PlayingStatus.stop;
-      audioState = 'Stop';
-      loadState = 'Detail';
-      isCompleted = true;
+      debugPrint('_autoPlayNextFromQueue: queue exhausted, falling back to podcast');
+      _isNavigatingPodcast = false;
+      await _playNextFromPodcast(context, stopOnEnd: true);
       return;
     }
 
@@ -1403,8 +1405,11 @@ class AudioController extends ChangeNotifier {
     return [];
   }
 
-  Future<void> _playNextFromPodcast(BuildContext context) async {
-    if (_isNavigatingPodcast) return;
+  Future<void> _playNextFromPodcast(BuildContext context,
+      {bool stopOnEnd = false}) async {
+    if (_isNavigatingPodcast) {
+      debugPrint('_playNextFromPodcast: WARNING re-entrant, resetting');
+    }
     _isNavigatingPodcast = true;
     debugPrint('_playNextFromPodcast: starting');
 
@@ -1435,6 +1440,9 @@ class AudioController extends ChangeNotifier {
       if (currentIndex <= 0) {
         debugPrint(
             '_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
+        if (stopOnEnd) {
+          await _audioHandler.stop();
+        }
         return;
       }
 
