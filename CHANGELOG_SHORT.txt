@@ -1,3 +1,11 @@
+What's New in v0.18.13+55
+
+🎯 Auto-Play & Navigation Fixes (Continued)
+• Fixed auto-advance stopping when queue is empty — now falls back to playing next podcast episode
+• Fixed prev/next buttons and auto-advance getting stuck after re-entrant calls
+• Added error resilience to completion handler to prevent permanent auto-advance lockout
+• Improved re-entrant guard with self-healing reset and try/finally cleanup
+
 What's New in v0.18.12+54
 
 🎯 Auto-Play & Navigation Fixes (Continued)
