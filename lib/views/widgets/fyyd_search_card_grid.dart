@@ -69,6 +69,7 @@ class _FyydSearchCardGridState extends ConsumerState<FyydSearchCardGrid> {
           children: [
             Expanded(
               child: CachedNetworkImage(
+                memCacheWidth: 300,
                 memCacheHeight: 300,
                 imageUrl: podcastMod.imageUrl,
                 fit: BoxFit.cover,

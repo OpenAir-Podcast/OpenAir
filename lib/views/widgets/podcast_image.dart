@@ -10,6 +10,8 @@ Widget podcastImage(String imagePath,
       imageUrl: imagePath,
       width: width,
       height: height,
+      memCacheWidth: width?.round(),
+      memCacheHeight: height?.round(),
       fit: fit,
       errorWidget: (context, url, error) => const Icon(
         Icons.podcasts,

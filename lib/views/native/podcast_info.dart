@@ -85,6 +85,7 @@ class PodcastInfoPage extends ConsumerWidget {
                             child: CachedNetworkImage(
                               width: 140,
                               height: 140,
+                              memCacheWidth: 280,
                               memCacheHeight: 280,
                               imageUrl: podcastInfo['image'],
                               fit: BoxFit.cover,

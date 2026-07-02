@@ -57,6 +57,7 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(16.0)),
                 child: CachedNetworkImage(
+                  memCacheWidth: 300,
                   memCacheHeight: 300,
                   imageUrl: widget.podcastItem.imageUrl,
                   fit: BoxFit.cover,

@@ -59,6 +59,7 @@ class _DiscoveryPodcastCardGridState
           children: [
             Expanded(
               child: CachedNetworkImage(
+                memCacheWidth: 300,
                 memCacheHeight: 300,
                 imageUrl: podcast.imageUrl,
                 fit: BoxFit.cover,

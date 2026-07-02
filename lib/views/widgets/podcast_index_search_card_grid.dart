@@ -49,6 +49,7 @@ class _PodcastIndexSearchCardGridState
           children: [
             Expanded(
               child: CachedNetworkImage(
+                memCacheWidth: 300,
                 memCacheHeight: 300,
                 imageUrl: widget.podcastItem.imageUrl,
                 fit: BoxFit.cover,
