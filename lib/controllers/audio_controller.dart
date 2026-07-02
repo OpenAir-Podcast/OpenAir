@@ -863,9 +863,6 @@ class AudioController extends ChangeNotifier {
           break;
         case ProcessingState.completed:
           if (_isAutoPlayingNext) break;
-          debugPrint('Controller: completed — '
-              'autoplayNextInQueueConfig=$autoplayNextInQueueConfig '
-              '_appContext=${_appContext != null}');
           _isAutoPlayingNext = true;
           try {
             await updateHistoryPlaybackPosition(positionOverride: 0);
@@ -873,12 +870,10 @@ class AudioController extends ChangeNotifier {
               if (autoplayNextInQueueConfig) {
                 await _autoPlayNextFromQueue(_appContext!);
               } else {
-                _isNavigatingPodcast = false;
                 await _playNextFromPodcast(_appContext!, stopOnEnd: true);
               }
             }
-          } catch (e) {
-            debugPrint('Controller: auto-advance error: $e');
+          } catch (_) {
             _isAutoPlayingNext = false;
           }
           break;
@@ -969,8 +964,6 @@ class AudioController extends ChangeNotifier {
   DateTime? _lastPreviousTapTime;
 
   Future<void> playPreviousEpisode(BuildContext context) async {
-    debugPrint(
-        'Controller: playPreviousEpisode — _lastPreviousTapTime=$_lastPreviousTapTime');
     final now = DateTime.now();
     if (_lastPreviousTapTime != null &&
         now.difference(_lastPreviousTapTime!) <
@@ -1045,11 +1038,8 @@ class AudioController extends ChangeNotifier {
   bool _isNavigatingPodcast = false;
 
   Future<void> _playPreviousFromPodcast(BuildContext context) async {
-    if (_isNavigatingPodcast) {
-      debugPrint('_playPreviousFromPodcast: WARNING re-entrant, resetting');
-    }
+    if (_isNavigatingPodcast) return;
     _isNavigatingPodcast = true;
-    debugPrint('_playPreviousFromPodcast: starting');
 
     try {
       if (currentPodcast == null && currentEpisode != null) {
@@ -1057,8 +1047,6 @@ class AudioController extends ChangeNotifier {
       }
 
       if (currentPodcast == null || currentEpisode == null) {
-        debugPrint('_playPreviousFromPodcast: null check failed '
-            'podcast=${currentPodcast?.id} episode=${currentEpisode?['guid']}');
         return;
       }
 
@@ -1068,8 +1056,6 @@ class AudioController extends ChangeNotifier {
       int currentIndex = _findEpisodeIndex(currentEpisode, sortedEpisodes);
 
       if (currentIndex == -1 || currentIndex >= sortedEpisodes.length - 1) {
-        debugPrint(
-            '_playPreviousFromPodcast: no previous episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
         return;
       }
 
@@ -1209,11 +1195,7 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> _autoPlayNextFromQueue(BuildContext context) async {
-    debugPrint(
-        '_autoPlayNextFromQueue: currentEpisode=null? ${currentEpisode == null}');
-
     if (currentEpisode == null || currentEpisode!.isEmpty) {
-      debugPrint('_autoPlayNextFromQueue: no current episode, stopping');
       await _audioHandler.stop();
       isPlaying = PlayingStatus.stop;
       audioState = 'Stop';
@@ -1224,10 +1206,8 @@ class AudioController extends ChangeNotifier {
 
     final hiveService = ref.read(hiveServiceProvider);
     final queueMap = await hiveService.getQueue();
-    debugPrint('_autoPlayNextFromQueue: queue has ${queueMap.length} items');
 
     if (queueMap.isEmpty) {
-      debugPrint('_autoPlayNextFromQueue: queue empty, falling back to podcast');
       _isNavigatingPodcast = false;
       await _playNextFromPodcast(context, stopOnEnd: true);
       return;
@@ -1244,8 +1224,6 @@ class AudioController extends ChangeNotifier {
         break;
       }
     }
-    debugPrint(
-        '_autoPlayNextFromQueue: current episode index in queue: $currentEpisodeIndex');
 
     if (!keepSkippedEpisodesConfig) {
       await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
@@ -1253,7 +1231,6 @@ class AudioController extends ChangeNotifier {
 
     if (currentEpisodeIndex < 0 ||
         currentEpisodeIndex >= queueList.length - 1) {
-      debugPrint('_autoPlayNextFromQueue: queue exhausted, falling back to podcast');
       _isNavigatingPodcast = false;
       await _playNextFromPodcast(context, stopOnEnd: true);
       return;
@@ -1285,17 +1262,10 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> playNextEpisode(BuildContext context) async {
-    debugPrint('playNextEpisode: currentEpisode=null? ${currentEpisode == null}');
-    if (currentEpisode == null || currentEpisode!.isEmpty) {
-      debugPrint('playNextEpisode: currentEpisode is null or empty, returning');
-      return;
-    }
-
-    debugPrint('playNextEpisode: currentEpisode guid=${currentEpisode!['guid']}');
+    if (currentEpisode == null || currentEpisode!.isEmpty) return;
 
     final hiveService = ref.read(hiveServiceProvider);
     final queueMap = await hiveService.getQueue();
-    debugPrint('playNextEpisode: queue has ${queueMap.length} items');
 
     if (queueMap.isNotEmpty) {
       List<Map<String, dynamic>> queueList =
@@ -1309,7 +1279,6 @@ class AudioController extends ChangeNotifier {
           break;
         }
       }
-      debugPrint('playNextEpisode: currentEpisodeIndex=$currentEpisodeIndex / ${queueList.length}');
 
       if (!keepSkippedEpisodesConfig) {
         await hiveService.removeFromQueue(guid: currentEpisode!['guid']);
@@ -1317,13 +1286,11 @@ class AudioController extends ChangeNotifier {
 
       if (currentEpisodeIndex == -1 ||
           currentEpisodeIndex == queueList.length - 1) {
-        debugPrint('playNextEpisode: at queue boundary, trying podcast episodes');
         _isNavigatingPodcast = false;
         await _playNextFromPodcast(context);
         return;
       }
 
-      debugPrint('playNextEpisode: playing next queue item');
       await updateCurrentQueueCard(
         currentEpisode!['guid'],
         podcastCurrentPositionInMilliseconds,
@@ -1347,7 +1314,6 @@ class AudioController extends ChangeNotifier {
             nextEpisodeData, nextEpisodeData['playerPosition'], context);
       }
     } else {
-      debugPrint('playNextEpisode: no queue, trying podcast episodes');
       _isNavigatingPodcast = false;
       await _playNextFromPodcast(context);
     }
@@ -1407,11 +1373,8 @@ class AudioController extends ChangeNotifier {
 
   Future<void> _playNextFromPodcast(BuildContext context,
       {bool stopOnEnd = false}) async {
-    if (_isNavigatingPodcast) {
-      debugPrint('_playNextFromPodcast: WARNING re-entrant, resetting');
-    }
+    if (_isNavigatingPodcast) return;
     _isNavigatingPodcast = true;
-    debugPrint('_playNextFromPodcast: starting');
 
     try {
       if (currentPodcast == null && currentEpisode != null) {
@@ -1419,27 +1382,16 @@ class AudioController extends ChangeNotifier {
       }
 
       if (currentPodcast == null || currentEpisode == null) {
-        debugPrint('_playNextFromPodcast: null check failed '
-            'podcast=${currentPodcast?.id} episode=${currentEpisode?['guid']}');
         return;
       }
 
       final allEpisodes = await _getEpisodesForCurrentPodcast();
-      debugPrint(
-          '_playNextFromPodcast: got ${allEpisodes.length} episodes for podcast ${currentPodcast!.id}');
-
       final sortedEpisodes = allEpisodes
         ..sort((a, b) => b['datePublished'].compareTo(a['datePublished']));
 
-      debugPrint(
-          '_playNextFromPodcast: current episode guid = ${currentEpisode!['guid']}');
       int currentIndex = _findEpisodeIndex(currentEpisode, sortedEpisodes);
-      debugPrint(
-          '_playNextFromPodcast: currentIndex = $currentIndex / ${sortedEpisodes.length}');
 
       if (currentIndex <= 0) {
-        debugPrint(
-            '_playNextFromPodcast: no newer episode (currentIndex=$currentIndex, total=${sortedEpisodes.length})');
         if (stopOnEnd) {
           await _audioHandler.stop();
         }
@@ -1448,11 +1400,6 @@ class AudioController extends ChangeNotifier {
 
       await _audioHandler.stop();
       final nextEpisode = sortedEpisodes[currentIndex - 1];
-      debugPrint(
-          '_playNextFromPodcast: playing next episode guid=${nextEpisode['guid']} title=${nextEpisode['title']}');
-
-      debugPrint(
-          '_playNextFromPodcast: ${currentPodcast!.author} / ${currentPodcast!.title}');
 
       currentEpisode = nextEpisode;
       currentEpisode!['author'] = currentPodcast!.author;
