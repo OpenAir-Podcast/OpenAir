@@ -1,5 +1,5 @@
 🎯 Auto-Play & Navigation Fixes
 • Fixed auto-play skipping episodes
-• Fixed author showing as Unknown
+• Fixed author showing as Unknown everywhere
 • Auto-play now plays newer episodes
 • Previous button: single tap restarts, double tap goes back

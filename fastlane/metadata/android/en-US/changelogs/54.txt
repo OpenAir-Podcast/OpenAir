@@ -1,0 +1,3 @@
+🎯 Author & Navigation Fixes
+• Fixed author showing as Unknown from subscription list
+• Fixed author showing as Unknown on prev/next navigation

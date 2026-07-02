@@ -198,6 +198,9 @@ class AudioController extends ChangeNotifier {
     BuildContext context,
   ) async {
     currentEpisode = episodeItem;
+    if (currentPodcast == null) {
+      await _resolvePodcastFromEpisode(currentEpisode!);
+    }
     if (currentPodcast != null) {
       if (currentEpisode!['podcastTitle'] == null) {
         currentEpisode!['podcastTitle'] = currentPodcast!.title;
@@ -1097,6 +1100,9 @@ class AudioController extends ChangeNotifier {
           ? queueItem['podcast']
           : PodcastModel.fromJson(queueItem['podcast']);
     }
+    if (currentPodcast == null) {
+      await _resolvePodcastFromEpisode(currentEpisode!);
+    }
     if (currentPodcast != null) {
       if (currentEpisode!['podcastTitle'] == null ||
           currentEpisode!['podcastTitle'].isEmpty) {
@@ -1382,5 +1388,36 @@ class AudioController extends ChangeNotifier {
 
   String formatCurrentPlaybackPosition(Duration timeline) {
     return formatPlaybackPosition(timeline);
+  }
+
+  Future<void> _resolvePodcastFromEpisode(Map<String, dynamic> episode) async {
+    final feedId = episode['podcastId']?.toString() ??
+        episode['feedId']?.toString();
+    if (feedId == null || feedId.isEmpty) return;
+
+    final hiveService = ref.read(hiveServiceProvider);
+    final subscriptions = await hiveService.getSubscriptions();
+
+    for (final sub in subscriptions.values) {
+      if (sub.id.toString() == feedId) {
+        if (episode['podcastTitle'] == null ||
+            episode['podcastTitle'].isEmpty) {
+          episode['podcastTitle'] = sub.title;
+        }
+        if (episode['author'] == null || episode['author'].isEmpty) {
+          episode['author'] = sub.author ?? 'Unknown';
+        }
+        currentPodcast = PodcastModel(
+          id: sub.id,
+          feedUrl: sub.feedUrl,
+          title: sub.title,
+          author: sub.author,
+          imageUrl: sub.imageUrl,
+          artwork: sub.artwork,
+          description: sub.description,
+        );
+        return;
+      }
+    }
   }
 }
