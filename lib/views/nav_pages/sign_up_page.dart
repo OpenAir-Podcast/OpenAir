@@ -405,6 +405,67 @@ class _SignUpState extends ConsumerState<SignUp> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              Translations.of(context).text('or'),
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                setState(() => _isLoading = true);
+                                final firebaseService =
+                                    ref.read(firebaseServiceProvider);
+                                try {
+                                  await firebaseService.logInUsingGoogle();
+                                } on FirebaseAuthException catch (e) {
+                                  if (mounted) {
+                                    _showErrorWithMessage(
+                                      'loginFailed',
+                                      e.message ?? 'Unknown error',
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    _showErrorWithMessage(
+                                      'loginFailed',
+                                      e.toString(),
+                                    );
+                                  }
+                                } finally {
+                                  if (mounted) setState(() => _isLoading = false);
+                                }
+                              },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: Image.asset(
+                          Theme.of(context).brightness == Brightness.dark
+                              ? 'assets/images/google-white-logo.png'
+                              : 'assets/images/google-black-logo.png',
+                          height: 24,
+                          width: 24,
+                        ),
+                        label: Text(
+                          Translations.of(context).text('continueWithGoogle'),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       FilledButton(
                         onPressed: _termsAndPrivacyPolicy && !_isLoading

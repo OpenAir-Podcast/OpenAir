@@ -55,9 +55,14 @@ class FirebaseService {
     }
   }
 
-  Future<void> logInUsingGoogle() async {
+  Future<auth.UserCredential> logInUsingGoogle() async {
     try {
-      await auth.FirebaseAuth.instance.signInWithProvider(
+      if (kIsWeb) {
+        return await auth.FirebaseAuth.instance.signInWithPopup(
+          auth.GoogleAuthProvider(),
+        );
+      }
+      return await auth.FirebaseAuth.instance.signInWithProvider(
         auth.GoogleAuthProvider(),
       );
     } on auth.FirebaseAuthException catch (e) {
