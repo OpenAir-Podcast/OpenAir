@@ -1,3 +1,9 @@
+What's New in v0.18.14+56
+
+🎨 Image Handling
+• Lock screen and notification artwork is now resized to 300×300 for improved performance and reduced memory usage
+• Artwork update is non-blocking — playback starts immediately, image resizes in background
+
 What's New in v0.18.13+55
 
 🎯 Auto-Play & Navigation Fixes (Continued)
