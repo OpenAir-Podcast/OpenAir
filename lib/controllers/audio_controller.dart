@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -217,13 +218,14 @@ class AudioController extends ChangeNotifier {
     isCompleted = false;
     isBannerDismissed = false;
 
+    final imageUrl =
+        currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '';
+    final title = currentEpisode!['title'] ?? 'Unknown';
+    final artist = currentEpisode!['author'] ??
+        currentEpisode!['podcastTitle'] ??
+        'Unknown';
+
     try {
-      final imageUrl =
-          currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '';
-      final title = currentEpisode!['title'] ?? 'Unknown';
-      final artist = currentEpisode!['author'] ??
-          currentEpisode!['podcastTitle'] ??
-          'Unknown';
 
       await _audioHandler.setMediaItem(
         id: currentEpisode!['guid'],
@@ -266,6 +268,14 @@ class AudioController extends ChangeNotifier {
       _handlePlaybackError();
     } catch (e) {
       _handlePlaybackError();
+    }
+
+    if (imageUrl.isNotEmpty) {
+      _resizeAndCacheImage(imageUrl).then((localPath) {
+        if (localPath != null) {
+          _audioHandler.updateArtUri(localPath);
+        }
+      });
     }
   }
 
@@ -1418,6 +1428,38 @@ class AudioController extends ChangeNotifier {
 
   String formatCurrentPlaybackPosition(Duration timeline) {
     return formatPlaybackPosition(timeline);
+  }
+
+  Future<String?> _resizeAndCacheImage(String imageUrl,
+      {int size = 300}) async {
+    try {
+      final response = await Dio().get(
+        imageUrl,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      if (response.statusCode != 200) return null;
+      final data = response.data;
+      if (data == null || data is! List<int>) return null;
+      final bytes = Uint8List.fromList(data);
+      final codec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: size,
+        targetHeight: size,
+      );
+      final frame = await codec.getNextFrame();
+      final byteData =
+          await frame.image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return null;
+      final dir = await getTemporaryDirectory();
+      final cacheDir = Directory('${dir.path}/artwork');
+      if (!await cacheDir.exists()) await cacheDir.create();
+      final file = File(
+          '${cacheDir.path}/${imageUrl.hashCode}_${size}x$size.png');
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+      return file.path;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _resolvePodcastFromEpisode(Map<String, dynamic> episode) async {

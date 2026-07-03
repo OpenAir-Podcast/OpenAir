@@ -113,14 +113,32 @@ class OpenAirAudioHandler extends BaseAudioHandler
       title: title,
       artist: artist,
       album: album,
-      artUri: artUri != null &&
-              (artUri.startsWith('http://') || artUri.startsWith('https://'))
-          ? Uri.parse(artUri)
+      artUri: artUri != null && artUri.isNotEmpty
+          ? (artUri.startsWith('http://') || artUri.startsWith('https://')
+              ? Uri.parse(artUri)
+              : Uri.file(artUri))
           : null,
       duration: duration,
     );
     queue.add([mediaItem]);
     this.mediaItem.add(mediaItem);
+  }
+
+  Future<void> updateArtUri(String artUri) async {
+    final newQueue = queue.value;
+    if (newQueue.isNotEmpty) {
+      final oldMediaItem = newQueue[0];
+      final newMediaItem = oldMediaItem.copyWith(
+        artUri: artUri.isNotEmpty
+            ? (artUri.startsWith('http://') || artUri.startsWith('https://')
+                ? Uri.parse(artUri)
+                : Uri.file(artUri))
+            : null,
+      );
+      newQueue[0] = newMediaItem;
+      queue.add(newQueue);
+      mediaItem.add(newMediaItem);
+    }
   }
 
   Future<void> playFromUrl(String url, {Duration? initialPosition}) async {
