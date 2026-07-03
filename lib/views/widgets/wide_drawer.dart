@@ -3,7 +3,8 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
-import 'package:openair/providers/supabase_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:openair/providers/firebase_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/nav_pages/downloads_page.dart';
 import 'package:openair/views/nav_pages/favorites_page.dart';
@@ -21,8 +22,7 @@ import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 
 final getSessionProvider = StreamProvider.autoDispose((ref) {
-  final supabaseService = ref.watch(supabaseServiceProvider);
-  return supabaseService.client.auth.onAuthStateChange;
+  return FirebaseAuth.instance.authStateChanges();
 });
 
 class WideDrawer extends ConsumerStatefulWidget {
@@ -49,14 +49,14 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
     ref.watch(localeProvider);
     final drawerCounts = ref.watch(drawerCountsProvider);
     final session = ref.watch(getSessionProvider);
-    final supabaseService = ref.watch(supabaseServiceProvider);
+    final firebaseService = ref.watch(firebaseServiceProvider);
     final theme = Theme.of(context);
 
     return ColoredBox(
       color: theme.colorScheme.surfaceContainerLow,
       child: Column(
         children: [
-          _buildHeader(theme, session, supabaseService),
+          _buildHeader(theme, session, firebaseService),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Divider(height: 1),
@@ -183,8 +183,8 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
     );
   }
 
-  Widget _buildHeader(
-      ThemeData theme, AsyncValue<dynamic> session, dynamic supabaseService) {
+  Widget _buildHeader(ThemeData theme, AsyncValue<User?> session,
+      dynamic firebaseService) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
       child: Column(
@@ -214,7 +214,7 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
             width: double.infinity,
             child: Builder(
               builder: (context) {
-                final currentUser = supabaseService.client.auth.currentUser;
+                final currentUser = FirebaseAuth.instance.currentUser;
                 return FilledButton.tonal(
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -230,7 +230,7 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
                           .read(subscriptionControllerProvider)
                           .clearAllSubscriptions();
                       ref.invalidate(drawerCountsProvider);
-                      await supabaseService.signOut();
+                      await firebaseService.signOut();
                     }
                   },
                   child: Text(

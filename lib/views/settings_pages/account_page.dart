@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/providers/supabase_provider.dart';
-import 'package:openair/services/supabase_service.dart';
+import 'package:openair/providers/firebase_provider.dart';
+import 'package:openair/services/firebase_service.dart';
 import 'package:openair/views/nav_pages/sign_up_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/components/no_connection.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
@@ -41,10 +41,10 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    final supabaseService = ref.read(supabaseServiceProvider);
+    final firebaseService = ref.read(firebaseServiceProvider);
 
     try {
-      final response = await supabaseService.signIn(
+      final response = await firebaseService.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
@@ -54,8 +54,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       } else if (mounted) {
         _showError('loginFailed');
       }
-    } on AuthException catch (e) {
-      if (mounted) _showErrorWithMessage('loginFailed', e.message);
+    } on FirebaseAuthException catch (e) {
+      if (mounted) _showErrorWithMessage('loginFailed', e.message ?? 'Unknown error');
     } catch (e) {
       debugPrint(e.toString());
     } finally {
@@ -107,7 +107,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    final supabaseService = ref.watch(supabaseServiceProvider);
+    final firebaseService = ref.watch(firebaseServiceProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final getConnectionStatusValue = ref.watch(getConnectionStatusProvider);
@@ -122,8 +122,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
             return const NoConnection();
           }
 
-          return StreamBuilder<AuthState>(
-            stream: supabaseService.client.auth.onAuthStateChange,
+          return StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -177,19 +177,14 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 );
               }
 
-              if (!snapshot.hasData) {
-                return const Center(
-                    child: Text('No authentication data available.'));
-              }
-
-              final user = snapshot.data!.session?.user;
+              final user = snapshot.data;
 
               if (user == null) {
                 return _buildSignInForm(colorScheme, textTheme);
               }
 
               return _buildAccountDetails(
-                  user, supabaseService, colorScheme, textTheme);
+                  user, firebaseService, colorScheme, textTheme);
             },
           );
         },
@@ -398,16 +393,17 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     );
   }
 
-  Widget _buildAccountDetails(User user, SupabaseService supabaseService,
+  Widget _buildAccountDetails(User user, FirebaseService firebaseService,
       ColorScheme colorScheme, TextTheme textTheme) {
-    final provider = user.appMetadata['provider'] as String?;
-    final createdAt =
-        DateFormat.yMMMd().add_jm().format(DateTime.parse(user.createdAt));
-    final lastSignIn = user.lastSignInAt != null
-        ? DateFormat.yMMMd().add_jm().format(DateTime.parse(user.lastSignInAt!))
-        : null;
-    final updatedAt = user.updatedAt != null
-        ? DateFormat.yMMMd().add_jm().format(DateTime.parse(user.updatedAt!))
+    final providerId = user.providerData.isNotEmpty
+        ? user.providerData.first.providerId
+        : 'password';
+    final provider = _getProviderName(providerId);
+    final createdAt = user.metadata.creationTime != null
+        ? DateFormat.yMMMd().add_jm().format(user.metadata.creationTime!)
+        : 'Unknown';
+    final lastSignIn = user.metadata.lastSignInTime != null
+        ? DateFormat.yMMMd().add_jm().format(user.metadata.lastSignInTime!)
         : null;
 
     return SingleChildScrollView(
@@ -436,7 +432,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       fontWeight: FontWeight.w600,
                     ),
               ),
-              if (provider != null) ...[
+              ...[
                 const SizedBox(height: 4),
                 Chip(
                   avatar: Icon(
@@ -465,7 +461,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       _buildInfoTile(
                         icon: Icons.badge_outlined,
                         label: Translations.of(context).text('userID'),
-                        value: user.id,
+                        value: user.uid,
                         colorScheme: colorScheme,
                       ),
                       const Divider(),
@@ -484,15 +480,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                           colorScheme: colorScheme,
                         ),
                       ],
-                      if (updatedAt != null) ...[
-                        const Divider(),
-                        _buildInfoTile(
-                          icon: Icons.update_outlined,
-                          label: Translations.of(context).text('lastUpdate'),
-                          value: updatedAt,
-                          colorScheme: colorScheme,
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -505,7 +492,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         setState(() => _isSyncing = true);
                         try {
                           await ref.read(openAirProvider).synchronize(context);
-                          await supabaseService.client.auth.refreshSession();
                           if (mounted) _showSuccess('syncComplete');
                         } catch (e) {
                           if (mounted) {
@@ -542,7 +528,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       .read(subscriptionControllerProvider)
                       .clearAllSubscriptions();
                   ref.invalidate(drawerCountsProvider);
-                  await supabaseService.client.auth.signOut();
+                  await FirebaseAuth.instance.signOut();
                 },
                 icon: const Icon(Icons.logout),
                 label: Text(Translations.of(context).text('signOut')),
@@ -555,7 +541,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               ),
               const SizedBox(height: 12),
               FilledButton.icon(
-                onPressed: () => _showDeleteAccountDialog(supabaseService),
+                onPressed: () => _showDeleteAccountDialog(firebaseService),
                 icon: const Icon(Icons.delete_forever, color: Colors.white),
                 label: Text(
                   Translations.of(context).text('deleteAccount'),
@@ -577,7 +563,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     );
   }
 
-  Future<void> _showDeleteAccountDialog(SupabaseService supabaseService) async {
+  Future<void> _showDeleteAccountDialog(FirebaseService firebaseService) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -606,7 +592,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       .read(subscriptionControllerProvider)
                       .clearAllSubscriptions();
                   ref.invalidate(drawerCountsProvider);
-                  await supabaseService.deleteAccount();
+                  await firebaseService.deleteAccount();
                   if (mounted) {
                     _showSuccess('accountDeletedSuccessfully');
                   }
@@ -663,6 +649,19 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         ],
       ),
     );
+  }
+
+  String _getProviderName(String providerId) {
+    switch (providerId) {
+      case 'google.com':
+        return 'google';
+      case 'github.com':
+        return 'github';
+      case 'password':
+        return 'email';
+      default:
+        return providerId;
+    }
   }
 
   IconData _getProviderIcon(String provider) {

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:openair/providers/openair_provider.dart';
-import 'package:openair/providers/supabase_provider.dart';
+import 'package:openair/providers/firebase_provider.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/nav_pages/add_podcast_page.dart';
 import 'package:openair/views/nav_pages/downloads_page.dart';
@@ -92,8 +93,8 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
     ref.watch(localeProvider);
     final drawerCounts = ref.watch(drawerCountsProvider);
 
-    final supabaseService = ref.watch(supabaseServiceProvider);
-    final session = supabaseService.client.auth.currentUser;
+    final firebaseService = ref.watch(firebaseServiceProvider);
+    final session = FirebaseAuth.instance.currentUser;
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -130,7 +131,7 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                             .read(subscriptionControllerProvider)
                             .clearAllSubscriptions();
                         ref.invalidate(drawerCountsProvider);
-                        await supabaseService.signOut();
+                        await firebaseService.signOut();
                       }
                     },
                     style: ElevatedButton.styleFrom(

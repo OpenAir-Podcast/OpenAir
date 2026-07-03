@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/providers/supabase_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:openair/providers/firebase_provider.dart';
 import 'package:openair/views/nav_pages/sign_up_page.dart';
 import 'package:openair/views/settings_pages/account_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LogIn extends ConsumerStatefulWidget {
   const LogIn({super.key});
@@ -35,10 +35,10 @@ class _LogInState extends ConsumerState<LogIn> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    final supabaseService = ref.read(supabaseServiceProvider);
+    final firebaseService = ref.read(firebaseServiceProvider);
 
     try {
-      final response = await supabaseService.signIn(
+      final response = await firebaseService.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
@@ -52,8 +52,8 @@ class _LogInState extends ConsumerState<LogIn> {
       } else if (mounted) {
         _showError('loginFailed');
       }
-    } on AuthException catch (e) {
-      if (mounted) _showErrorWithMessage('loginFailed', e.message);
+    } on FirebaseAuthException catch (e) {
+      if (mounted) _showErrorWithMessage('loginFailed', e.message ?? 'Unknown error');
     } catch (e) {
       debugPrint(e.toString());
     } finally {
@@ -241,7 +241,9 @@ class _LogInState extends ConsumerState<LogIn> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // TODO: Add the logic there to handle password reset
+                          },
                           child: Text(
                             Translations.of(context).text('forgotPassword'),
                           ),

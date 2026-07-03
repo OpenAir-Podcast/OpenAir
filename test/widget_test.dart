@@ -3,6 +3,6 @@ import 'package:openair/env.dart';
 
 void main() {
   test('Env class is loadable', () {
-    expect(Env.apiKey, isNotEmpty);
+    expect(Env.podcastIndexApiKey, isNotEmpty);
   });
 }

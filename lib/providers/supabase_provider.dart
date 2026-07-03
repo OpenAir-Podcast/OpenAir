@@ -1,6 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:openair/services/supabase_service.dart';
-
-final supabaseServiceProvider = Provider<SupabaseService>((ref) {
-  return SupabaseService();
-});
+// DEPRECATED: Replaced by firebase_provider.dart
+// Keep file to avoid import errors during migration - will be removed in future
