@@ -16,12 +16,6 @@ final class Env {
   @EnviedField(varName: 'PODCAST_USER_AGENT', obfuscate: true)
   static String podcastUserAgent = _Env.podcastUserAgent;
 
-  @EnviedField(varName: 'NEON_DATABASE_URL', obfuscate: true)
-  static String neonDatabaseUrl = _Env.neonDatabaseUrl;
-
-  @EnviedField(varName: 'GOOGLE_API_KEY', obfuscate: true)
-  static String googleApiKey = _Env.googleApiKey;
-
   @EnviedField(varName: 'OAUTH_CLIENT_ID', obfuscate: true)
   static String oauthClientId = _Env.oauthClientId;
 
@@ -70,35 +64,32 @@ final class Env {
   @EnviedField(varName: 'TERMS_OF_SERVICE', obfuscate: true)
   static String termsOfService = _Env.termsOfService;
 
-  @EnviedField(varName: 'SUPABASE_PROJECT_URL', obfuscate: true)
-  static String supabaseProjectUrl = _Env.supabaseProjectUrl;
+  @EnviedField(varName: 'FIREBASE_API_KEY', obfuscate: true)
+  static String firebaseApiKey = _Env.firebaseApiKey;
 
-  @EnviedField(varName: 'SUPABASE_API_KEY', obfuscate: true)
-  static String supabaseApiKey = _Env.supabaseApiKey;
+  @EnviedField(varName: 'FIREBASE_APP_ID', obfuscate: true)
+  static String firebaseAppId = _Env.firebaseAppId;
 
-  @EnviedField(varName: 'SUPABASE_DATABASE_PASSWORD', obfuscate: true)
-  static String supabaseDatabasePassword = _Env.supabaseDatabasePassword;
+  @EnviedField(varName: 'FIREBASE_MESSAGING_SENDER_ID', obfuscate: true)
+  static String firebaseMessagingSenderId = _Env.firebaseMessagingSenderId;
 
-  @EnviedField(varName: 'SUPABASE_GOOGLE_CLIENT_ID', obfuscate: true)
-  static String supabaseGoogleClientId = _Env.supabaseGoogleClientId;
+  @EnviedField(varName: 'FIREBASE_PROJECT_ID', obfuscate: true)
+  static String firebaseProjectId = _Env.firebaseProjectId;
 
-  @EnviedField(varName: 'SUPABASE_GOOGLE_CLIENT_SECRET', obfuscate: true)
-  static String supabaseGoogleClientSecret = _Env.supabaseGoogleClientSecret;
+  @EnviedField(varName: 'FIREBASE_AUTH_DOMAIN', obfuscate: true)
+  static String firebaseAuthDomain = _Env.firebaseAuthDomain;
 
-  @EnviedField(varName: 'SUPABASE_GOOGLE_CALLBACK', obfuscate: true)
-  static String supabaseGoogleCallback = _Env.supabaseGoogleCallback;
+  @EnviedField(varName: 'FIREBASE_STORAGE_BUCKET', obfuscate: true)
+  static String firebaseStorageBucket = _Env.firebaseStorageBucket;
 
-  @EnviedField(varName: 'SUPABASE_GITHUB_CLIENT_ID', obfuscate: true)
-  static String supabaseGithubClientId = _Env.supabaseGithubClientId;
+  @EnviedField(varName: 'FIREBASE_ANDROID_CLIENT_ID', obfuscate: true)
+  static String firebaseAndroidClientId = _Env.firebaseAndroidClientId;
 
-  @EnviedField(varName: 'SUPABASE_GITHUB_CLIENT_SECRET', obfuscate: true)
-  static String supabaseGithubClientSecret = _Env.supabaseGithubClientSecret;
+  @EnviedField(varName: 'FIREBASE_IOS_CLIENT_ID', obfuscate: true)
+  static String firebaseIosClientId = _Env.firebaseIosClientId;
 
-  @EnviedField(varName: 'SUPABASE_GITHUB_CALLBACK', obfuscate: true)
-  static String supabaseGithubCallback = _Env.supabaseGithubCallback;
-
-  @EnviedField(varName: 'CALLBACK_METHOD', obfuscate: true)
-  static String callbackMethod = _Env.callbackMethod;
+  @EnviedField(varName: 'FIREBASE_IOS_BUNDLE_ID', obfuscate: true)
+  static String firebaseIosBundleId = _Env.firebaseIosBundleId;
 
   @EnviedField(varName: 'APP_UNIQUE_ID', obfuscate: true)
   static String appUniqueId = _Env.appUniqueId;

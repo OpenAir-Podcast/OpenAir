@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:openair/env.dart';
-import 'package:openair/providers/supabase_provider.dart';
+import 'package:openair/providers/firebase_provider.dart';
 import 'package:openair/views/settings_pages/account_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignUp extends ConsumerStatefulWidget {
@@ -30,21 +30,18 @@ class _SignUpState extends ConsumerState<SignUp> {
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
 
-  late final StreamSubscription<AuthState> _authStateSubscription;
+  late final StreamSubscription<User?> _authStateSubscription;
 
   @override
   void initState() {
     super.initState();
     _authStateSubscription =
-        Supabase.instance.client.auth.onAuthStateChange.listen((event) {
-      if (mounted) {
-        final session = event.session;
-        if (session != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const AccountPage()),
-          );
-        }
+        FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (mounted && user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AccountPage()),
+        );
       }
     });
   }
@@ -63,10 +60,10 @@ class _SignUpState extends ConsumerState<SignUp> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    final supabaseService = ref.read(supabaseServiceProvider);
+    final firebaseService = ref.read(firebaseServiceProvider);
 
     try {
-      final response = await supabaseService.signUp(
+      final response = await firebaseService.signUp(
         _emailController.text.trim(),
         _passwordController.text.trim(),
         _usernameController.text.trim(),
@@ -81,8 +78,8 @@ class _SignUpState extends ConsumerState<SignUp> {
       } else if (mounted) {
         _showError('loginFailed');
       }
-    } on AuthException catch (e) {
-      if (mounted) _showErrorWithMessage('loginFailed', e.message);
+    } on FirebaseAuthException catch (e) {
+      if (mounted) _showErrorWithMessage('loginFailed', e.message ?? 'Unknown error');
     } catch (e) {
       debugPrint(e.toString());
     } finally {

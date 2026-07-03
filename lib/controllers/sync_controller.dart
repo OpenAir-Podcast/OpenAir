@@ -11,7 +11,8 @@ import 'package:openair/model/hive_models/history_model.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
-import 'package:openair/providers/supabase_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sqflite/sqflite.dart';
 
 final syncControllerProvider = Provider<SyncController>(
@@ -393,55 +394,62 @@ class SyncController extends ChangeNotifier {
 
   Future<void> synchronize(BuildContext context) async {
     final hiveService = ref.read(hiveServiceProvider);
-    final supabaseService = ref.read(supabaseServiceProvider);
-    final user = supabaseService.client.auth.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+
+    final db = FirebaseFirestore.instance;
 
     int syncCount = 0;
 
-    // 1. Sync Subscriptions (formerly syncFavourites)
+    // 1. Sync Subscriptions
     if (syncFavouritesConfig) {
       try {
         final localSubscriptions = await hiveService.getSubscriptions();
-        final remoteResponse = await supabaseService.client
-            .from('subscriptions')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('subscriptions')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         for (final localSub in localSubscriptions.values) {
-          await supabaseService.client.from('subscriptions').upsert(
-            {
-              'user_id': user.id,
-              'podcast_id': localSub.id,
-              'podcast_url': localSub.feedUrl,
-              'podcast_title': localSub.title,
-              'podcast_author': localSub.author ?? 'Unknown',
-              'podcast_image': localSub.imageUrl,
-              'podcast_artwork': localSub.artwork,
-              'podcast_description': localSub.description,
-              'podcast_episode_count': localSub.episodeCount,
-              'updated_at': DateTime.now().toIso8601String(),
-            },
-            onConflict: 'podcast_id',
-          );
+          await db
+              .collection('users')
+              .doc(user.uid)
+              .collection('subscriptions')
+              .doc(localSub.id.toString())
+              .set({
+            'podcast_id': localSub.id.toString(),
+            'podcast_url': localSub.feedUrl,
+            'podcast_title': localSub.title,
+            'podcast_author': localSub.author ?? 'Unknown',
+            'podcast_image': localSub.imageUrl,
+            'podcast_artwork': localSub.artwork,
+            'podcast_description': localSub.description,
+            'podcast_episode_count': localSub.episodeCount,
+            'updated_at': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
         }
 
         for (final remoteItem in remoteResponse) {
-          final podcastID = remoteItem['podcast_id'];
-          if (podcastID == null) continue;
+          final podcastID = remoteItem['podcast_id'] as String?;
+          final podcastIdInt = int.tryParse(podcastID ?? '');
+          if (podcastIdInt == null) continue;
 
-          if (!localSubscriptions.containsKey(podcastID)) {
+          if (!localSubscriptions.containsKey(podcastIdInt.toString())) {
             try {
               final subscription = SubscriptionModel(
-                id: remoteItem['podcast_id'],
-                feedUrl: remoteItem['podcast_url'],
-                title: remoteItem['podcast_title'],
-                author: remoteItem['podcast_author'],
-                imageUrl: remoteItem['podcast_image'],
-                artwork: remoteItem['podcast_artwork'],
-                description: remoteItem['podcast_description'],
-                episodeCount: remoteItem['podcast_episode_count'],
-                updatedAt: DateTime.parse(remoteItem['updated_at']),
+                id: podcastIdInt,
+                feedUrl: remoteItem['podcast_url'] as String? ?? '',
+                title: remoteItem['podcast_title'] as String? ?? '',
+                author: remoteItem['podcast_author'] as String?,
+                imageUrl: remoteItem['podcast_image'] as String? ?? '',
+                artwork: remoteItem['podcast_artwork'] as String? ?? '',
+                description: remoteItem['podcast_description'] as String? ?? '',
+                episodeCount: remoteItem['podcast_episode_count'] as int? ?? 0,
+                updatedAt: remoteItem['updated_at'] != null
+                    ? DateTime.parse(remoteItem['updated_at'] as String)
+                    : DateTime.now(),
               );
               await hiveService.subscribe(subscription);
             } catch (e) {
@@ -462,36 +470,38 @@ class SyncController extends ChangeNotifier {
     if (syncHistoryConfig) {
       try {
         final history = await hiveService.getHistory();
-        final remoteResponse = await supabaseService.client
-            .from('history')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('history')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         for (final episode in history.values) {
-          await supabaseService.client.from('history').upsert(
-            {
-              'user_id': user.id,
-              'guid': episode.guid,
-              'image': episode.image,
-              'title': episode.title,
-              'author': episode.author,
-              'date_published': episode.datePublished,
-              'description': episode.description,
-              'feed_url': episode.feedUrl,
-              'duration': episode.duration,
-              'size': episode.size,
-              'podcast_id': episode.podcastId,
-              'enclosure_length': episode.enclosureLength,
-              'enclosure_url': episode.enclosureUrl,
-              'play_date': episode.playDate,
-            },
-            onConflict: 'guid',
-          );
+          await db
+              .collection('users')
+              .doc(user.uid)
+              .collection('history')
+              .doc(episode.guid)
+              .set({
+            'guid': episode.guid,
+            'image': episode.image,
+            'title': episode.title,
+            'author': episode.author,
+            'date_published': episode.datePublished,
+            'description': episode.description,
+            'feed_url': episode.feedUrl,
+            'duration': episode.duration,
+            'size': episode.size,
+            'podcast_id': episode.podcastId,
+            'enclosure_length': episode.enclosureLength,
+            'enclosure_url': episode.enclosureUrl,
+            'play_date': episode.playDate,
+          }, SetOptions(merge: true));
         }
 
-        // Download remote history entries missing locally
         for (final remoteItem in remoteResponse) {
-          final guid = remoteItem['guid'];
+          final guid = remoteItem['guid'] as String?;
           if (guid == null) continue;
           if (!history.containsKey(guid)) {
             try {
@@ -534,45 +544,48 @@ class SyncController extends ChangeNotifier {
     if (syncQueueConfig) {
       try {
         final localQueue = await hiveService.getQueue();
-        final remoteResponse = await supabaseService.client
-            .from('queue')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('queue')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         for (final entry in localQueue.entries) {
           final item = Map<String, dynamic>.from(entry.value);
           final podcastJson = item['podcast'] is Map
               ? jsonEncode(item['podcast'])
               : item['podcast'];
-          await supabaseService.client.from('queue').upsert(
-            {
-              'user_id': user.id,
-              'guid': entry.key,
-              'title': item['title'],
-              'author': item['author'],
-              'image': item['image'],
-              'date_published': item['datePublished'],
-              'description': item['description'],
-              'feed_url': item['feedUrl'],
-              'duration': item['duration'],
-              'enclosure_type': item['enclosureType'],
-              'enclosure_length': item['enclosureLength'],
-              'enclosure_url': item['enclosureUrl'],
-              'podcast': podcastJson,
-              'pos': item['pos'],
-              'updated_at': DateTime.now().toIso8601String(),
-            },
-            onConflict: 'guid',
-          );
+          await db
+              .collection('users')
+              .doc(user.uid)
+              .collection('queue')
+              .doc(entry.key)
+              .set({
+            'guid': entry.key,
+            'title': item['title'],
+            'author': item['author'],
+            'image': item['image'],
+            'date_published': item['datePublished'],
+            'description': item['description'],
+            'feed_url': item['feedUrl'],
+            'duration': item['duration'],
+            'enclosure_type': item['enclosureType'],
+            'enclosure_length': item['enclosureLength'],
+            'enclosure_url': item['enclosureUrl'],
+            'podcast': podcastJson,
+            'pos': item['pos'],
+            'updated_at': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
         }
 
         for (final remoteItem in remoteResponse) {
-          final guid = remoteItem['guid'];
+          final guid = remoteItem['guid'] as String?;
           if (guid == null || localQueue.containsKey(guid)) continue;
 
           final item = Map<String, dynamic>.from(remoteItem);
           if (item['podcast'] is String) {
-            item['podcast'] = jsonDecode(item['podcast']);
+            item['podcast'] = jsonDecode(item['podcast'] as String);
           }
           item['datePublished'] = item['date_published'];
           item['feedUrl'] = item['feed_url'];
@@ -592,47 +605,50 @@ class SyncController extends ChangeNotifier {
     if (syncFavouritesConfig) {
       try {
         final localFavorites = await hiveService.getFavoriteEpisodes();
-        final remoteResponse = await supabaseService.client
-            .from('favorites')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('favorites')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         for (final entry in localFavorites.entries) {
           final item = Map<String, dynamic>.from(entry.value);
           final podcastJson = item['podcast'] is Map
               ? jsonEncode(item['podcast'])
               : item['podcast'];
-          await supabaseService.client.from('favorites').upsert(
-            {
-              'user_id': user.id,
-              'guid': entry.key,
-              'title': item['title'],
-              'author': item['author'],
-              'image': item['image'],
-              'date_published': item['datePublished'],
-              'description': item['description'],
-              'feed_url': item['feedUrl'],
-              'duration': item['duration'],
-              'enclosure_type': item['enclosureType'],
-              'enclosure_length': item['enclosureLength'],
-              'enclosure_url': item['enclosureUrl'],
-              'podcast': podcastJson,
-              'updated_at': DateTime.now().toIso8601String(),
-            },
-            onConflict: 'guid',
-          );
+          await db
+              .collection('users')
+              .doc(user.uid)
+              .collection('favorites')
+              .doc(entry.key)
+              .set({
+            'guid': entry.key,
+            'title': item['title'],
+            'author': item['author'],
+            'image': item['image'],
+            'date_published': item['datePublished'],
+            'description': item['description'],
+            'feed_url': item['feedUrl'],
+            'duration': item['duration'],
+            'enclosure_type': item['enclosureType'],
+            'enclosure_length': item['enclosureLength'],
+            'enclosure_url': item['enclosureUrl'],
+            'podcast': podcastJson,
+            'updated_at': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
         }
 
         for (final remoteItem in remoteResponse) {
-          final guid = remoteItem['guid'];
+          final guid = remoteItem['guid'] as String?;
           if (guid == null || localFavorites.containsKey(guid)) continue;
 
           final item = Map<String, dynamic>.from(remoteItem);
           PodcastModel podcast;
           if (item['podcast'] is String) {
-            podcast = PodcastModel.fromJson(jsonDecode(item['podcast']));
+            podcast = PodcastModel.fromJson(jsonDecode(item['podcast'] as String));
           } else if (item['podcast'] is Map) {
-            podcast = PodcastModel.fromJson(item['podcast']);
+            podcast = PodcastModel.fromJson(item['podcast'] as Map<String, dynamic>);
           } else {
             podcast = PodcastModel.fromJson(item);
           }
@@ -651,14 +667,16 @@ class SyncController extends ChangeNotifier {
         final episodeBox =
             await hiveService.collection.openBox<Map>('episodes');
         final localEpisodes = await episodeBox.getAllValues();
-        final remoteResponse = await supabaseService.client
-            .from('episode_positions')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('episode_positions')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         final remotePositions = <String, Map>{};
         for (final item in remoteResponse) {
-          final guid = item['guid'];
+          final guid = item['guid'] as String?;
           if (guid != null) remotePositions[guid] = item;
         }
 
@@ -672,24 +690,25 @@ class SyncController extends ChangeNotifier {
 
           bool shouldUpload = true;
           if (localUpdated != null && remoteUpdated != null) {
-            shouldUpload = DateTime.parse(localUpdated)
-                .isAfter(DateTime.parse(remoteUpdated));
+            shouldUpload = DateTime.parse(localUpdated as String)
+                .isAfter(DateTime.parse(remoteUpdated as String));
           }
 
           if (shouldUpload) {
-            await supabaseService.client.from('episode_positions').upsert(
-              {
-                'user_id': user.id,
-                'guid': entry.key,
-                'position_seconds': position,
-                'updated_at': DateTime.now().toIso8601String(),
-              },
-              onConflict: 'guid',
-            );
+            await db
+                .collection('users')
+                .doc(user.uid)
+                .collection('episode_positions')
+                .doc(entry.key)
+                .set({
+              'guid': entry.key,
+              'position_seconds': position,
+              'updated_at': DateTime.now().toIso8601String(),
+            }, SetOptions(merge: true));
           } else if (remoteItem != null) {
             final remotePosition = remoteItem['position_seconds'];
             if (remotePosition != null &&
-                (position is int && remotePosition > position)) {
+                (position is int && (remotePosition as int) > position)) {
               await hiveService.updateEpisodePosition(
                 entry.key,
                 Duration(seconds: remotePosition),
@@ -699,13 +718,13 @@ class SyncController extends ChangeNotifier {
         }
 
         for (final remoteItem in remoteResponse) {
-          final guid = remoteItem['guid'];
+          final guid = remoteItem['guid'] as String?;
           if (guid == null || localEpisodes.containsKey(guid)) continue;
           final remotePosition = remoteItem['position_seconds'];
           if (remotePosition != null) {
             await hiveService.updateEpisodePosition(
               guid,
-              Duration(seconds: remotePosition),
+              Duration(seconds: remotePosition as int),
             );
           }
         }
@@ -729,33 +748,36 @@ class SyncController extends ChangeNotifier {
           'podcastLanguages': await hiveService.getPodcastLanguageSettings(),
         };
 
-        final remoteResponse = await supabaseService.client
-            .from('settings')
-            .select()
-            .eq('user_id', user.id);
+        final remoteSnapshot = await db
+            .collection('users')
+            .doc(user.uid)
+            .collection('settings')
+            .get();
+        final remoteResponse = remoteSnapshot.docs.map((d) => d.data()).toList();
 
         final remoteSettings = <String, Map>{};
         for (final item in remoteResponse) {
-          final category = item['category'];
+          final category = item['category'] as String?;
           if (category != null) remoteSettings[category] = item;
         }
 
         for (final entry in categories.entries) {
-          await supabaseService.client.from('settings').upsert(
-            {
-              'user_id': user.id,
-              'category': entry.key,
-              'data': jsonEncode(entry.value),
-              'updated_at': DateTime.now().toIso8601String(),
-            },
-            onConflict: 'user_id,category',
-          );
+          await db
+              .collection('users')
+              .doc(user.uid)
+              .collection('settings')
+              .doc(entry.key)
+              .set({
+            'category': entry.key,
+            'data': jsonEncode(entry.value),
+            'updated_at': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
         }
 
         for (final remoteItem in remoteResponse) {
-          final category = remoteItem['category'];
+          final category = remoteItem['category'] as String?;
           if (category == null || categories.containsKey(category)) continue;
-          final data = remoteItem['data'];
+          final data = remoteItem['data'] as String?;
           if (data == null) continue;
 
           final decoded = jsonDecode(data);

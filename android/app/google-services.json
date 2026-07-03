@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927721490543",
+    "project_id": "openair-27cb8",
+    "storage_bucket": "openair-27cb8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927721490543:android:96365fd08c7b9810cc259a",
+        "android_client_info": {
+          "package_name": "com.liquidhive.openair"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAszu2Dac5sSCDNlXPKcXY6u8xfC9AF9tA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

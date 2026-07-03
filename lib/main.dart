@@ -20,7 +20,8 @@ import 'package:openair/services/background_service.dart';
 import 'package:openair/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
@@ -117,10 +118,8 @@ void main() async {
     });
   }
 
-  await Supabase.initialize(
-    url: Env.supabaseProjectUrl,
-    anonKey: Env.supabaseApiKey,
-    debug: false,
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(ProviderScope(child: const MyApp()));

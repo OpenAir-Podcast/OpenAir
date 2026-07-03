@@ -30,7 +30,7 @@ class HistoryModelAdapter extends TypeAdapter<HistoryModel> {
       enclosureLength: (fields[10] as num).toInt(),
       enclosureUrl: fields[11] as String,
       playDate: (fields[12] as num).toInt(),
-      position: fields[13] as int? ?? 0,
+      position: fields[13] == null ? 0 : (fields[13] as num).toInt(),
     );
   }
 

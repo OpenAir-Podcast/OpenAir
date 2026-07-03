@@ -26,13 +26,13 @@ This data remains on your device and is under your control at all times.
 
 ## 3. Authentication and Cloud Sync (Optional)
 
-OpenAir offers an **optional** account system powered by **Supabase** that enables cloud synchronization across your devices.
+OpenAir offers an **optional** account system powered by **Firebase** that enables cloud synchronization across your devices.
 
 ### Account Creation
 
 If you choose to create an account, you may sign up using **email and password**.
 
-The following information is stored by Supabase when you create an account:
+The following information is stored by Firebase when you create an account:
 
 * Your email address
 * A username of your choice
@@ -40,7 +40,7 @@ The following information is stored by Supabase when you create an account:
 
 ### Cloud Sync Data
 
-If you enable cloud synchronization, the following data is synced to Supabase and associated with your account:
+If you enable cloud synchronization, the following data is synced to Firebase and associated with your account:
 
 * **Subscribed podcasts** (feed URLs and metadata)
 * **Listening history** (episodes you have listened to)
@@ -65,15 +65,15 @@ OpenAir relies on the following third-party services to provide its core functio
 
 * **Fyyd API (Optional):** For additional podcast discovery, the App may optionally fetch podcast information from the Fyyd API. Similar to PodcastIndex, when you use features that utilize Fyyd, your requests are sent to the Fyyd API. We do not control the data collected by Fyyd. Please refer to the [Fyyd Privacy Policy](https://fyyd.de/privacy) for more information on their data practices.
 
-* **Supabase:** If you choose to create an account and enable cloud sync, Supabase acts as our authentication provider and database backend. Your account information and synced data are stored on Supabase's infrastructure. Please refer to the [Supabase Privacy Policy](https://supabase.com/privacy) for more information on their data practices.
+* **Firebase:** If you choose to create an account and enable cloud sync, Firebase acts as our authentication provider and database backend. Your account information and synced data are stored on Firebase's infrastructure. Please refer to the [Firebase Privacy Policy](https://firebase.google.com/support/privacy) for more information on their data practices.
 
 ## 5. Data Security
 
 We take the security of your data seriously:
 
-* All network communications with Supabase and podcast APIs are encrypted using TLS/HTTPS.
-* Authentication is handled securely by Supabase using industry-standard protocols (JWT).
-* Passwords are never stored by us; they are handled entirely by Supabase's authentication system.
+* All network communications with Firebase and podcast APIs are encrypted using TLS/HTTPS.
+* Authentication is handled securely by Firebase using industry-standard protocols.
+* Passwords are never stored by us; they are handled entirely by Firebase's authentication system.
 * Your locally stored data is not encrypted at rest by the App, as it resides solely on your device and is not accessible to other applications under standard platform security controls.
 
 ## 6. Changes to This Privacy Policy
