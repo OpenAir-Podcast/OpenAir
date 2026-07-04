@@ -61,16 +61,16 @@ class _LogInState extends ConsumerState<LogIn> {
     }
   }
 
-  void _showPasswordResetDialog() {
-    showDialog(
+  Future<void> _showPasswordResetDialog() async {
+    final emailController = TextEditingController();
+    final email = await showDialog<String>(
       context: context,
-      builder: (ctx) {
-        final emailController = TextEditingController();
-        return AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: Text(Translations.of(context).text('resetPassword')),
         content: TextFormField(
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
+          autofocus: true,
           decoration: InputDecoration(
             labelText: Translations.of(context).text('email'),
             hintText: Translations.of(context).text('enterYourEmailToResetPassword'),
@@ -82,32 +82,28 @@ class _LogInState extends ConsumerState<LogIn> {
             child: Text(Translations.of(context).text('cancel')),
           ),
           FilledButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final email = emailController.text.trim();
-              if (email.isEmpty) return;
-              setState(() => _isLoading = true);
-              try {
-                await ref.read(firebaseServiceProvider)
-                    .sendPasswordResetEmail(email);
-                if (mounted) _showSuccess('passwordResetEmailSent');
-              } on FirebaseAuthException catch (e) {
-                if (mounted) {
-                  _showErrorWithMessage(
-                    'errorSendingPasswordResetEmail',
-                    e.message ?? 'Unknown error',
-                  );
-                }
-              } finally {
-                if (mounted) setState(() => _isLoading = false);
-              }
-            },
+            onPressed: () => Navigator.pop(ctx, emailController.text.trim()),
             child: Text(Translations.of(context).text('resetPassword')),
           ),
         ],
-      );
-      },
+      ),
     );
+
+    if (email == null || email.isEmpty) return;
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(firebaseServiceProvider).sendPasswordResetEmail(email);
+      if (mounted) _showSuccess('passwordResetEmailSent');
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        _showErrorWithMessage(
+          'errorSendingPasswordResetEmail',
+          e.message ?? 'Unknown error',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _showSuccess(String key) {

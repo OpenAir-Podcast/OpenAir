@@ -400,10 +400,10 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         : 'password';
     final provider = _getProviderName(providerId);
     final createdAt = user.metadata.creationTime != null
-        ? DateFormat.yMMMd().add_jm().format(user.metadata.creationTime!)
+        ? DateFormat.yMMMd().add_jm().format(user.metadata.creationTime!.toLocal())
         : 'Unknown';
     final lastSignIn = user.metadata.lastSignInTime != null
-        ? DateFormat.yMMMd().add_jm().format(user.metadata.lastSignInTime!)
+        ? DateFormat.yMMMd().add_jm().format(user.metadata.lastSignInTime!.toLocal())
         : null;
 
     return SingleChildScrollView(
