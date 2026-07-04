@@ -28,6 +28,7 @@ class FirebaseService {
         password: password,
       );
       await credential.user?.updateDisplayName(username);
+      await credential.user?.sendEmailVerification();
       return credential;
     } on auth.FirebaseAuthException catch (e) {
       debugPrint('Sign-up error: ${e.message}');
@@ -71,6 +72,15 @@ class FirebaseService {
     } catch (e) {
       debugPrint('An unexpected error occurred during Google sign-in: $e');
       throw Exception('Google sign-in failed: $e');
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await auth.FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on auth.FirebaseAuthException catch (e) {
+      debugPrint('Password reset error: ${e.message}');
+      rethrow;
     }
   }
 

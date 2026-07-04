@@ -70,11 +70,8 @@ class _SignUpState extends ConsumerState<SignUp> {
       );
 
       if (response.user != null && mounted) {
+        await FirebaseAuth.instance.signOut();
         _showSuccess('checkYourEmail');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AccountPage()),
-        );
       } else if (mounted) {
         _showError('loginFailed');
       }

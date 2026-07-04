@@ -61,6 +61,55 @@ class _LogInState extends ConsumerState<LogIn> {
     }
   }
 
+  void _showPasswordResetDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final emailController = TextEditingController();
+        return AlertDialog(
+        title: Text(Translations.of(context).text('resetPassword')),
+        content: TextFormField(
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            labelText: Translations.of(context).text('email'),
+            hintText: Translations.of(context).text('enterYourEmailToResetPassword'),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(Translations.of(context).text('cancel')),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final email = emailController.text.trim();
+              if (email.isEmpty) return;
+              setState(() => _isLoading = true);
+              try {
+                await ref.read(firebaseServiceProvider)
+                    .sendPasswordResetEmail(email);
+                if (mounted) _showSuccess('passwordResetEmailSent');
+              } on FirebaseAuthException catch (e) {
+                if (mounted) {
+                  _showErrorWithMessage(
+                    'errorSendingPasswordResetEmail',
+                    e.message ?? 'Unknown error',
+                  );
+                }
+              } finally {
+                if (mounted) setState(() => _isLoading = false);
+              }
+            },
+            child: Text(Translations.of(context).text('resetPassword')),
+          ),
+        ],
+      );
+      },
+    );
+  }
+
   void _showSuccess(String key) {
     final msg = Translations.of(context).text(key);
     if (!Platform.isAndroid && !Platform.isIOS) {
@@ -241,9 +290,7 @@ class _LogInState extends ConsumerState<LogIn> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            // TODO: Add the logic there to handle password reset
-                          },
+                          onPressed: _isLoading ? null : _showPasswordResetDialog,
                           child: Text(
                             Translations.of(context).text('forgotPassword'),
                           ),
