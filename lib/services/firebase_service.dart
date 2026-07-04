@@ -1,5 +1,8 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
   auth.User? get user => auth.FirebaseAuth.instance.currentUser;
@@ -71,6 +74,17 @@ class FirebaseService {
       case 'google.com':
         if (kIsWeb) {
           await user.reauthenticateWithPopup(auth.GoogleAuthProvider());
+        } else if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+          final googleUser = await GoogleSignIn().signIn();
+          if (googleUser == null) {
+            throw Exception('Google re-authentication cancelled');
+          }
+          final googleAuth = await googleUser.authentication;
+          final credential = auth.GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          await user.reauthenticateWithCredential(credential);
         } else {
           await user.reauthenticateWithProvider(auth.GoogleAuthProvider());
         }
@@ -104,6 +118,18 @@ class FirebaseService {
         return await auth.FirebaseAuth.instance.signInWithPopup(
           auth.GoogleAuthProvider(),
         );
+      }
+      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+        final googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) {
+          throw Exception('Google sign-in cancelled');
+        }
+        final googleAuth = await googleUser.authentication;
+        final credential = auth.GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        return await auth.FirebaseAuth.instance.signInWithCredential(credential);
       }
       return await auth.FirebaseAuth.instance.signInWithProvider(
         auth.GoogleAuthProvider(),
