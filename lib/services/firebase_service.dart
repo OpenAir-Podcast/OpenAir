@@ -43,6 +43,48 @@ class FirebaseService {
     return auth.FirebaseAuth.instance.signOut();
   }
 
+  Future<void> reauthenticate(String email, String password) async {
+    final user = auth.FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('No user logged in');
+    final credential = auth.EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  String? getAuthProvider() {
+    final user = auth.FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    final providers = user.providerData.map((p) => p.providerId).toList();
+    if (providers.contains('password')) return 'password';
+    if (providers.contains('google.com')) return 'google.com';
+    if (providers.contains('github.com')) return 'github.com';
+    return providers.isNotEmpty ? providers.first : null;
+  }
+
+  Future<void> reauthenticateWithProvider(String providerId) async {
+    final user = auth.FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('No user logged in');
+
+    switch (providerId) {
+      case 'google.com':
+        if (kIsWeb) {
+          await user.reauthenticateWithPopup(auth.GoogleAuthProvider());
+        } else {
+          await user.reauthenticateWithProvider(auth.GoogleAuthProvider());
+        }
+      case 'github.com':
+        if (kIsWeb) {
+          await user.reauthenticateWithPopup(auth.GithubAuthProvider());
+        } else {
+          await user.reauthenticateWithProvider(auth.GithubAuthProvider());
+        }
+      default:
+        throw Exception('Unsupported auth provider: $providerId');
+    }
+  }
+
   Future<void> deleteAccount() async {
     try {
       final user = auth.FirebaseAuth.instance.currentUser;
@@ -52,7 +94,7 @@ class FirebaseService {
       await signOut();
     } catch (e) {
       debugPrint('An error occurred during account deletion: $e');
-      throw Exception('Account deletion failed: $e');
+      rethrow;
     }
   }
 

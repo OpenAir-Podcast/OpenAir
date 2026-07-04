@@ -564,20 +564,103 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   }
 
   Future<void> _showDeleteAccountDialog(FirebaseService firebaseService) async {
+    final provider = firebaseService.getAuthProvider();
+    final passwordController = TextEditingController();
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+
+    Future<void> performDelete() async {
+      setState(() => _isLoading = true);
+      try {
+        await ref
+            .read(subscriptionControllerProvider)
+            .clearAllSubscriptions();
+        ref.invalidate(drawerCountsProvider);
+        await firebaseService.deleteAccount();
+        if (mounted) _showSuccess('accountDeletedSuccessfully');
+      } catch (e) {
+        if (mounted) {
+          _showErrorWithMessage('errorDeletingAccount', e.toString());
+        }
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
+
+    Future<void> handleDelete() async {
+      try {
+        if (provider == 'password') {
+          final password = passwordController.text.trim();
+          if (password.isEmpty) return;
+          await firebaseService.reauthenticate(userEmail, password);
+        } else if (provider != null) {
+          Navigator.of(context).pop();
+          await firebaseService.reauthenticateWithProvider(provider);
+        }
+        await performDelete();
+      } catch (e) {
+        if (mounted) {
+          _showErrorWithMessage('errorDeletingAccount', e.toString());
+        }
+      }
+    }
+
+    if (provider == 'password') {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: Text(Translations.of(context).text('deleteAccount')),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(Translations.of(context).text('deleteAccountConfirmation')),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: Translations.of(context).text('password'),
+                    hintText: Translations.of(context).text('typeYourPassword'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(Translations.of(context).text('cancel')),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+              ),
+              TextButton(
+                child: Text(
+                  Translations.of(context).text('delete'),
+                  style: const TextStyle(color: Colors.red),
+                ),
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  await handleDelete();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text(Translations.of(context).text('deleteAccount')),
-          content:
-              Text(Translations.of(context).text('deleteAccountConfirmation')),
+          content: Text(Translations.of(context).text('deleteAccountConfirmation')),
           actions: <Widget>[
             TextButton(
               child: Text(Translations.of(context).text('cancel')),
-              onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-              },
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
               child: Text(
@@ -585,26 +668,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 style: const TextStyle(color: Colors.red),
               ),
               onPressed: () async {
-                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
-                setState(() => _isLoading = true);
-                try {
-                  await ref
-                      .read(subscriptionControllerProvider)
-                      .clearAllSubscriptions();
-                  ref.invalidate(drawerCountsProvider);
-                  await firebaseService.deleteAccount();
-                  if (mounted) {
-                    _showSuccess('accountDeletedSuccessfully');
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    _showErrorWithMessage('errorDeletingAccount', e.toString());
-                  }
-                } finally {
-                  if (mounted) {
-                    setState(() => _isLoading = false);
-                  }
-                }
+                Navigator.of(dialogContext).pop();
+                await handleDelete();
               },
             ),
           ],
