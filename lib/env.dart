@@ -13,6 +13,7 @@ final class Env {
   @EnviedField(varName: 'PODCAST_USER_AGENT', obfuscate: true)
   static String podcastUserAgent = _Env.podcastUserAgent;
 
+
   @EnviedField(varName: 'FYYD_ACCESS_TOKEN', obfuscate: true)
   static String fyydAccessToken = _Env.fyydAccessToken;
 
@@ -39,4 +40,5 @@ final class Env {
 
   @EnviedField(varName: 'TERMS_OF_SERVICE', obfuscate: true)
   static String termsOfService = _Env.termsOfService;
+
 }
