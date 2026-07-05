@@ -32,6 +32,8 @@ class PodcastIndexProvider {
 
   PodcastIndexProvider(this.ref) {
     _dio = Dio();
+    debugPrint('PODCAST_INDEX_API_KEY: [$podcastIndexApi]');
+    debugPrint('PODCAST_INDEX_API_SECRET: [$podcastIndexSecret]');
   }
 
   Future<String> _getUserAgent() async {
@@ -96,7 +98,8 @@ class PodcastIndexProvider {
         final ua = await _getUserAgent();
         _generateHeaders(ua);
         return await requestFactory();
-      } on DioException catch (e) {
+    } on DioException catch (e) {
+        debugPrint('DioError type=${e.type} error=${e.error} message=${e.message} response=${e.response}');
         if (e.response?.statusCode == 429) {
           final retryAfter = e.response?.headers.value('retry-after');
           final seconds = int.tryParse(retryAfter ?? '') ?? 5;
