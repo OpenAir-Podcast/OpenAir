@@ -1,3 +1,11 @@
+What's New in v0.18.15+57
+
+• Migrated cloud sync from Supabase to Firebase for better reliability
+• Fixed export/import buttons crashing on Android and iOS
+• Google Sign-In now shows the account picker every time
+• You can now sign in with Google directly from the Account page
+• Various import/export error handling improvements
+
 What's New in v0.18.14+56
 
 🎨 Image Handling
