@@ -114,12 +114,14 @@ class FirebaseService {
 
   Future<auth.UserCredential> logInUsingGoogle() async {
     try {
+      final googleProvider = auth.GoogleAuthProvider()
+        ..setCustomParameters({'prompt': 'select_account'});
+
       if (kIsWeb) {
-        return await auth.FirebaseAuth.instance.signInWithPopup(
-          auth.GoogleAuthProvider(),
-        );
+        return await auth.FirebaseAuth.instance.signInWithPopup(googleProvider);
       }
       if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+        await GoogleSignIn().signOut();
         final googleUser = await GoogleSignIn().signIn();
         if (googleUser == null) {
           throw Exception('Google sign-in cancelled');
@@ -131,9 +133,7 @@ class FirebaseService {
         );
         return await auth.FirebaseAuth.instance.signInWithCredential(credential);
       }
-      return await auth.FirebaseAuth.instance.signInWithProvider(
-        auth.GoogleAuthProvider(),
-      );
+      return await auth.FirebaseAuth.instance.signInWithProvider(googleProvider);
     } on auth.FirebaseAuthException catch (e) {
       debugPrint('Google sign-in error: ${e.message}');
       rethrow;
