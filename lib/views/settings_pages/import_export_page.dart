@@ -212,21 +212,27 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
-
-    String? outputFile = await FilePicker.saveFile(
-        dialogTitle: dialogTitle,
-        fileName: fileName,
-        type: FileType.custom,
-        allowedExtensions: ['db'],
-        initialDirectory: getOpenAirPath);
-
-    if (outputFile == null || !mounted) return;
+    final tempFile = File('${appDocDir.path}/temp_export_$date.db');
 
     try {
-      await ref.read(openAirProvider).exportToDb(outputFile);
+      await ref.read(openAirProvider).exportToDb(tempFile.path);
+      final bytes = await tempFile.readAsBytes();
+
+      String? outputFile = await FilePicker.saveFile(
+        dialogTitle: dialogTitle,
+        fileName: fileName,
+        bytes: bytes,
+        type: FileType.custom,
+        allowedExtensions: ['db'],
+        initialDirectory: getOpenAirPath,
+      );
+
+      if (outputFile == null || !mounted) return;
       if (mounted) _showNotification(exportSuccessMsg);
     } catch (e) {
       if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);
+    } finally {
+      if (await tempFile.exists()) await tempFile.delete();
     }
   }
 
@@ -259,23 +265,28 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String getOpenAirPath = '${appDocDir.path}/OpenAir';
-
-    String? outputFile = await FilePicker.saveFile(
-      dialogTitle: dialogTitle,
-      fileName: fileName,
-      type: FileType.custom,
-      allowedExtensions: ['opml', 'xml'],
-      initialDirectory: getOpenAirPath,
-    );
-
-    if (outputFile == null || !mounted) return;
+    final tempFile = File('${appDocDir.path}/temp_export_$date.opml');
 
     try {
       final hiveService = ref.read(openAirProvider).hiveService;
-      await hiveService.exportOpml(outputFile);
+      await hiveService.exportOpml(tempFile.path);
+      final bytes = await tempFile.readAsBytes();
+
+      String? outputFile = await FilePicker.saveFile(
+        dialogTitle: dialogTitle,
+        fileName: fileName,
+        bytes: bytes,
+        type: FileType.custom,
+        allowedExtensions: ['opml', 'xml'],
+        initialDirectory: getOpenAirPath,
+      );
+
+      if (outputFile == null || !mounted) return;
       if (mounted) _showNotification(exportSuccessMsg);
     } catch (e) {
       if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);
+    } finally {
+      if (await tempFile.exists()) await tempFile.delete();
     }
   }
 
