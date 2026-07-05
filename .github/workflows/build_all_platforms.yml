@@ -125,6 +125,7 @@ jobs:
       - run: flutter build windows --release
         env:
           CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
+          CMAKE_POLICY_VERSION_MINIMUM: "3.5"
       - name: Package
         shell: powershell
         run: |
