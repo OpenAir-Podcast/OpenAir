@@ -422,6 +422,7 @@
   "databaseImportedRestartApp": "データベースをインポートしました。アプリを再起動してください。",
   "databaseExported": "データベースをエクスポートしました。アプリを再起動してください。",
   "databaseExportFailed": "データベースのエクスポートに失敗しました。",
+  "databaseImportFailed": "データベースのインポートに失敗しました。",
   "opmlImportedRestartApp": "OPMLをインポートしました。アプリを再起動してください。",
   "opmlExported": "OPMLをエクスポートしました。",
   "opmlExportFailed": "OPMLのエクスポートに失敗しました。",

@@ -420,6 +420,7 @@
   "databaseImportedRestartApp": "Base de datos importada. Reinicia la aplicación.",
   "databaseExported": "Base de datos exportada. Reinicia la aplicación.",
   "databaseExportFailed": "La exportación de la base de datos falló.",
+  "databaseImportFailed": "La importación de la base de datos falló.",
   "opmlImportedRestartApp": "OPML importado. Reinicia la aplicación.",
   "opmlExported": "OPML exportado.",
   "opmlExportFailed": "La exportación de OPML falló.",

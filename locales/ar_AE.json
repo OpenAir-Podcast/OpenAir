@@ -423,6 +423,7 @@
   "databaseImportedRestartApp": "تم استيراد قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
   "databaseExported": "تم تصدير قاعدة البيانات. يرجى إعادة تشغيل التطبيق.",
   "databaseExportFailed": "فشل تصدير قاعدة البيانات.",
+  "databaseImportFailed": "فشل استيراد قاعدة البيانات.",
   "opmlImportedRestartApp": "تم استيراد OPML. يرجى إعادة تشغيل التطبيق.",
   "opmlExported": "تم تصدير OPML.",
   "opmlExportFailed": "فشل تصدير OPML.",

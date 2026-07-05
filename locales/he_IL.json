@@ -423,6 +423,7 @@
   "databaseImportedRestartApp": "מסד הנתונים יובא. אנא הפעל מחדש את האפליקציה.",
   "databaseExported": "מסד הנתונים יוצא. אנא הפעל מחדש את האפליקציה.",
   "databaseExportFailed": "ייצוא מסד הנתונים נכשל.",
+  "databaseImportFailed": "ייבוא מסד הנתונים נכשל.",
   "opmlImportedRestartApp": "OPML יובא. אנא הפעל מחדש את האפליקציה.",
   "opmlExported": "OPML יוצא.",
   "opmlExportFailed": "ייצוא OPML נכשל.",

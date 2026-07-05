@@ -423,6 +423,7 @@
   "databaseImportedRestartApp": "Banco de dados importado. Reinicie o aplicativo.",
   "databaseExported": "Banco de dados exportado. Reinicie o aplicativo.",
   "databaseExportFailed": "Exportação da base de dados falhou.",
+  "databaseImportFailed": "Importação da base de dados falhou.",
   "opmlImportedRestartApp": "OPML importado. Reinicie o aplicativo.",
   "opmlExported": "OPML exportado.",
   "opmlExportFailed": "Exportação OPML falhou.",

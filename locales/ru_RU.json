@@ -423,6 +423,7 @@
   "databaseImportedRestartApp": "База данных импортирована. Перезапустите приложение.",
   "databaseExported": "База данных экспортирована. Перезапустите приложение.",
   "databaseExportFailed": "Экспорт базы данных не удался.",
+  "databaseImportFailed": "Импорт базы данных не удался.",
   "opmlImportedRestartApp": "OPML импортирован. Перезапустите приложение.",
   "opmlExported": "OPML экспортирован.",
   "opmlExportFailed": "Экспорт OPML не удался.",

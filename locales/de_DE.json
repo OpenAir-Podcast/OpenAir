@@ -420,6 +420,7 @@
   "databaseImportedRestartApp": "Datenbank importiert. Bitte starten Sie die App neu.",
   "databaseExported": "Datenbank exportiert. Bitte starten Sie die App neu.",
   "databaseExportFailed": "Datenbankexport fehlgeschlagen.",
+  "databaseImportFailed": "Datenbankimport fehlgeschlagen.",
   "opmlImportedRestartApp": "OPML importiert. Bitte starten Sie die App neu.",
   "opmlExported": "OPML exportiert.",
   "opmlExportFailed": "OPML-Export fehlgeschlagen.",

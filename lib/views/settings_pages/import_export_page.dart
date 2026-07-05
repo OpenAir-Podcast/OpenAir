@@ -185,6 +185,8 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     final dialogTitle = Translations.of(context).text('importDatabase');
     final successMsg =
         Translations.of(context).text('databaseImportedRestartApp');
+    final failedMsg =
+        Translations.of(context).text('databaseImportFailed');
 
     FilePickerResult? result = await FilePicker.pickFiles(
       dialogTitle: dialogTitle,
@@ -194,11 +196,12 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
     if (result == null || !mounted) return;
 
-    File file = File(result.files.single.path!);
-    await ref.read(openAirProvider).importFromDb(file);
-
-    if (mounted) {
-      _showNotification(successMsg);
+    try {
+      File file = File(result.files.single.path!);
+      await ref.read(openAirProvider).importFromDb(file);
+      if (mounted) _showNotification(successMsg);
+    } catch (e) {
+      if (mounted) _showNotification('$failedMsg: $e', isError: true);
     }
   }
 

@@ -423,6 +423,7 @@
   "databaseImportedRestartApp": "Databas importerad. Starta om appen.",
   "databaseExported": "Databas exporterad. Starta om appen.",
   "databaseExportFailed": "Export av databas misslyckades.",
+  "databaseImportFailed": "Import av databas misslyckades.",
   "opmlImportedRestartApp": "OPML importerad. Starta om appen.",
   "opmlExported": "OPML exporterad.",
   "opmlExportFailed": "Export av OPML misslyckades.",

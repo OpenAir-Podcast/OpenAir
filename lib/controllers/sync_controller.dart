@@ -274,122 +274,129 @@ class SyncController extends ChangeNotifier {
 
   Future<void> importDatabase(File file) async {
     final database = await openDatabase(file.path, version: 1);
-    final hiveService = ref.read(hiveServiceProvider);
+    try {
+      final hiveService = ref.read(hiveServiceProvider);
 
-    final subscriptionsMaps = await database.query('subscriptions');
-    for (var subMap in subscriptionsMaps) {
-      final mutableSubMap = Map<String, dynamic>.from(subMap);
-      final subscription = SubscriptionModel.fromJson(mutableSubMap);
-      await hiveService.subscribe(subscription);
-    }
-
-    final queueMaps = await database.query('queue');
-    for (var queueMap in queueMaps) {
-      final item = Map<String, dynamic>.from(queueMap);
-      if (item['podcast'] != null) {
-        item['podcast'] = PodcastModel.fromJson(jsonDecode(item['podcast']));
+      final subscriptionsMaps = await database.query('subscriptions');
+      for (var subMap in subscriptionsMaps) {
+        final mutableSubMap = Map<String, dynamic>.from(subMap);
+        final subscription = SubscriptionModel.fromJson(mutableSubMap);
+        await hiveService.subscribe(subscription);
       }
-      if (item['playerPosition'] != null) {
-        item['playerPosition'] = Duration(milliseconds: item['playerPosition']);
+
+      final queueMaps = await database.query('queue');
+      for (var queueMap in queueMaps) {
+        final item = Map<String, dynamic>.from(queueMap);
+        if (item['podcast'] != null) {
+          item['podcast'] = PodcastModel.fromJson(jsonDecode(item['podcast']));
+        }
+        if (item['playerPosition'] != null) {
+          item['playerPosition'] = Duration(milliseconds: item['playerPosition']);
+        }
+        await hiveService.addToQueue(item);
       }
-      await hiveService.addToQueue(item);
-    }
 
-    final historyMaps = await database.query('history');
-    for (var historyMap in historyMaps) {
-      final mutableHistoryMap = Map<String, dynamic>.from(historyMap);
-      final history = HistoryModel.fromJson(mutableHistoryMap);
-      await hiveService.addToHistory(history);
-    }
-
-    final downloadsMaps = await database.query('downloads');
-    for (var downloadMap in downloadsMaps) {
-      final mutableDownloadMap = Map<String, dynamic>.from(downloadMap);
-      mutableDownloadMap['duration'] =
-          Duration(milliseconds: mutableDownloadMap['duration'] as int);
-      mutableDownloadMap['downloadDate'] = DateTime.fromMillisecondsSinceEpoch(
-          mutableDownloadMap['downloadDate'] as int);
-      await hiveService
-          .addToDownloads(DownloadModel.fromJson(mutableDownloadMap));
-    }
-
-    final favoritesMaps = await database.query('favorites');
-    for (var favoriteMap in favoritesMaps) {
-      final item = Map<String, dynamic>.from(favoriteMap);
-      if (item['podcast'] != null) {
-        final podcast =
-            PodcastModel.fromJson(jsonDecode(item['podcast'] as String));
-        item['podcast'] = podcast;
-        hiveService.addEpisodeToFavorite(item, podcast);
+      final historyMaps = await database.query('history');
+      for (var historyMap in historyMaps) {
+        final mutableHistoryMap = Map<String, dynamic>.from(historyMap);
+        final history = HistoryModel.fromJson(mutableHistoryMap);
+        await hiveService.addToHistory(history);
       }
+
+      final downloadsMaps = await database.query('downloads');
+      for (var downloadMap in downloadsMaps) {
+        final mutableDownloadMap = Map<String, dynamic>.from(downloadMap);
+        mutableDownloadMap['duration'] =
+            Duration(milliseconds: mutableDownloadMap['duration'] as int);
+        mutableDownloadMap['downloadDate'] = DateTime.fromMillisecondsSinceEpoch(
+            mutableDownloadMap['downloadDate'] as int);
+        await hiveService
+            .addToDownloads(DownloadModel.fromJson(mutableDownloadMap));
+      }
+
+      final favoritesMaps = await database.query('favorites');
+      for (var favoriteMap in favoritesMaps) {
+        final item = Map<String, dynamic>.from(favoriteMap);
+        if (item['podcast'] != null) {
+          final podcast =
+              PodcastModel.fromJson(jsonDecode(item['podcast'] as String));
+          item['podcast'] = podcast;
+          await hiveService.addEpisodeToFavorite(item, podcast);
+        }
+      }
+
+      final feedMaps = await database.query('feed');
+      for (var feedMap in feedMaps) {
+        await hiveService
+            .addToFeed(FeedModel.fromJson(Map<String, dynamic>.from(feedMap)));
+      }
+
+      final settingsMaps = await database.query('settings');
+      if (settingsMaps.isNotEmpty) {
+        final settings = settingsMaps.first;
+        final userInterfaceSettings =
+            jsonDecode(settings['user_interface'] as String);
+        final playbackSettings = jsonDecode(settings['playback'] as String);
+        final automaticSettings = jsonDecode(settings['automatic'] as String);
+        final synchronizationSettings =
+            jsonDecode(settings['synchronization'] as String);
+        final importExportSettings =
+            jsonDecode(settings['import_export'] as String);
+        final notificationsSettings =
+            jsonDecode(settings['notifications'] as String);
+
+        hiveService.saveUserInterfaceSettings(userInterfaceSettings);
+        hiveService.savePlaybackSettings(playbackSettings);
+        hiveService.saveAutomaticSettings(automaticSettings);
+        hiveService.saveSynchronizationSettings(synchronizationSettings);
+        hiveService.saveImportExportSettings(importExportSettings);
+        hiveService.saveNotificationsSettings(notificationsSettings);
+
+        fontSizeConfig = userInterfaceSettings['fontSizeFactor'].toString();
+        languageConfig = userInterfaceSettings['language'];
+        localeConfig = userInterfaceSettings['locale'];
+
+        fastForwardIntervalConfig = playbackSettings['fastForwardInterval'];
+        rewindIntervalConfig = playbackSettings['rewindInterval'];
+        playbackSpeedConfig = playbackSettings['playbackSpeed'];
+        enqueuePositionConfig = playbackSettings['enqueuePosition'];
+        enqueueDownloadedConfig = playbackSettings['enqueueDownloaded'];
+        autoplayNextInQueueConfig = playbackSettings['continuePlayback'];
+        smartMarkAsCompletionConfig = playbackSettings['smartMarkAsCompleted'];
+        keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
+
+        refreshPodcastsConfig = automaticSettings['refreshPodcasts'];
+        downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
+        downloadQueuedEpisodesConfig =
+            automaticSettings['downloadQueuedEpisodes'];
+        downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
+        deletePlayedEpisodesConfig = automaticSettings['deletePlayedEpisodes'];
+        keepFavouriteEpisodesConfig = automaticSettings['keepFavouriteEpisodes'];
+
+        syncFavouritesConfig = synchronizationSettings['syncFavourites'];
+        syncQueueConfig = synchronizationSettings['syncQueue'];
+        syncHistoryConfig = synchronizationSettings['syncHistory'];
+        syncPlaybackPositionConfig =
+            synchronizationSettings['syncPlaybackPosition'];
+        syncSettingsConfig = synchronizationSettings['syncSettings'];
+
+        automaticExportDatabaseConfig = importExportSettings['autoBackup'];
+
+        receiveNotificationsForNewEpisodesConfig =
+            notificationsSettings['receiveNotificationsForNewEpisodes'];
+        receiveNotificationsWhenDownloadConfig =
+            notificationsSettings['receiveNotificationsWhenDownloading'];
+        receiveNotificationsWhenPlayConfig =
+            notificationsSettings['receiveNotificationsWhenPlaying'];
+      }
+
+      debugPrint('Database imported from ${file.path}');
+    } catch (e) {
+      debugPrint('Database import failed: $e');
+      rethrow;
+    } finally {
+      await database.close();
     }
-
-    final feedMaps = await database.query('feed');
-    for (var feedMap in feedMaps) {
-      await hiveService
-          .addToFeed(FeedModel.fromJson(Map<String, dynamic>.from(feedMap)));
-    }
-
-    final settingsMaps = await database.query('settings');
-    if (settingsMaps.isNotEmpty) {
-      final settings = settingsMaps.first;
-      final userInterfaceSettings =
-          jsonDecode(settings['user_interface'] as String);
-      final playbackSettings = jsonDecode(settings['playback'] as String);
-      final automaticSettings = jsonDecode(settings['automatic'] as String);
-      final synchronizationSettings =
-          jsonDecode(settings['synchronization'] as String);
-      final importExportSettings =
-          jsonDecode(settings['import_export'] as String);
-      final notificationsSettings =
-          jsonDecode(settings['notifications'] as String);
-
-      hiveService.saveUserInterfaceSettings(userInterfaceSettings);
-      hiveService.savePlaybackSettings(playbackSettings);
-      hiveService.saveAutomaticSettings(automaticSettings);
-      hiveService.saveSynchronizationSettings(synchronizationSettings);
-      hiveService.saveImportExportSettings(importExportSettings);
-      hiveService.saveNotificationsSettings(notificationsSettings);
-
-      fontSizeConfig = userInterfaceSettings['fontSizeFactor'].toString();
-      languageConfig = userInterfaceSettings['language'];
-      localeConfig = userInterfaceSettings['locale'];
-
-      fastForwardIntervalConfig = playbackSettings['fastForwardInterval'];
-      rewindIntervalConfig = playbackSettings['rewindInterval'];
-      playbackSpeedConfig = playbackSettings['playbackSpeed'];
-      enqueuePositionConfig = playbackSettings['enqueuePosition'];
-      enqueueDownloadedConfig = playbackSettings['enqueueDownloaded'];
-      autoplayNextInQueueConfig = playbackSettings['continuePlayback'];
-      smartMarkAsCompletionConfig = playbackSettings['smartMarkAsCompleted'];
-      keepSkippedEpisodesConfig = playbackSettings['keepSkippedEpisodes'];
-
-      refreshPodcastsConfig = automaticSettings['refreshPodcasts'];
-      downloadNewEpisodesConfig = automaticSettings['downloadNewEpisodes'];
-      downloadQueuedEpisodesConfig =
-          automaticSettings['downloadQueuedEpisodes'];
-      downloadEpisodeLimitConfig = automaticSettings['downloadEpisodeLimit'];
-      deletePlayedEpisodesConfig = automaticSettings['deletePlayedEpisodes'];
-      keepFavouriteEpisodesConfig = automaticSettings['keepFavouriteEpisodes'];
-
-      syncFavouritesConfig = synchronizationSettings['syncFavourites'];
-      syncQueueConfig = synchronizationSettings['syncQueue'];
-      syncHistoryConfig = synchronizationSettings['syncHistory'];
-      syncPlaybackPositionConfig =
-          synchronizationSettings['syncPlaybackPosition'];
-      syncSettingsConfig = synchronizationSettings['syncSettings'];
-
-      automaticExportDatabaseConfig = importExportSettings['autoBackup'];
-
-      receiveNotificationsForNewEpisodesConfig =
-          notificationsSettings['receiveNotificationsForNewEpisodes'];
-      receiveNotificationsWhenDownloadConfig =
-          notificationsSettings['receiveNotificationsWhenDownloading'];
-      receiveNotificationsWhenPlayConfig =
-          notificationsSettings['receiveNotificationsWhenPlaying'];
-    }
-
-    debugPrint('Database imported from ${file.path}');
   }
 
   Future<void> synchronize(BuildContext context) async {
