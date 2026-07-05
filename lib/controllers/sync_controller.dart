@@ -100,7 +100,7 @@ class SyncController extends ChangeNotifier {
           datePublished INTEGER,
           description TEXT,
           feedUrl TEXT,
-          duration TEXT,
+          duration INTEGER,
           size TEXT,
           podcastId TEXT,
           enclosureLength INTEGER,
@@ -291,7 +291,11 @@ class SyncController extends ChangeNotifier {
           item['podcast'] = PodcastModel.fromJson(jsonDecode(item['podcast']));
         }
         if (item['playerPosition'] != null) {
-          item['playerPosition'] = Duration(milliseconds: item['playerPosition']);
+          final pos = item['playerPosition'];
+          if (pos is String) {
+            item['playerPosition'] = int.tryParse(pos) ?? 0;
+          }
+          item['playerPosition'] = Duration(milliseconds: item['playerPosition'] as int);
         }
         await hiveService.addToQueue(item);
       }
@@ -299,6 +303,10 @@ class SyncController extends ChangeNotifier {
       final historyMaps = await database.query('history');
       for (var historyMap in historyMaps) {
         final mutableHistoryMap = Map<String, dynamic>.from(historyMap);
+        if (mutableHistoryMap['duration'] is String) {
+          mutableHistoryMap['duration'] =
+              int.tryParse(mutableHistoryMap['duration'] as String) ?? 0;
+        }
         final history = HistoryModel.fromJson(mutableHistoryMap);
         await hiveService.addToHistory(history);
       }
@@ -306,8 +314,14 @@ class SyncController extends ChangeNotifier {
       final downloadsMaps = await database.query('downloads');
       for (var downloadMap in downloadsMaps) {
         final mutableDownloadMap = Map<String, dynamic>.from(downloadMap);
-        mutableDownloadMap['duration'] =
-            Duration(milliseconds: mutableDownloadMap['duration'] as int);
+        if (mutableDownloadMap['duration'] is String) {
+          mutableDownloadMap['duration'] =
+              int.tryParse(mutableDownloadMap['duration'] as String) ?? 0;
+        }
+        if (mutableDownloadMap['downloadDate'] is String) {
+          mutableDownloadMap['downloadDate'] =
+              int.tryParse(mutableDownloadMap['downloadDate'] as String) ?? 0;
+        }
         mutableDownloadMap['downloadDate'] = DateTime.fromMillisecondsSinceEpoch(
             mutableDownloadMap['downloadDate'] as int);
         await hiveService
