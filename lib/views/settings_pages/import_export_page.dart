@@ -206,6 +206,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     if (!mounted) return;
     final dialogTitle = Translations.of(context).text('exportDatabase');
     final exportSuccessMsg = Translations.of(context).text('databaseExported');
+    final exportFailedMsg = Translations.of(context).text('databaseExportFailed');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.db';
 
@@ -221,8 +222,12 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
     if (outputFile == null || !mounted) return;
 
-    ref.read(openAirProvider).exportToDb(outputFile);
-    _showNotification(exportSuccessMsg);
+    try {
+      await ref.read(openAirProvider).exportToDb(outputFile);
+      if (mounted) _showNotification(exportSuccessMsg);
+    } catch (e) {
+      if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);
+    }
   }
 
   Future<void> _importOpml() async {
@@ -248,6 +253,7 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     if (!mounted) return;
     final dialogTitle = Translations.of(context).text('exportOpml');
     final exportSuccessMsg = Translations.of(context).text('opmlExported');
+    final exportFailedMsg = Translations.of(context).text('opmlExportFailed');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.opml';
 
@@ -264,9 +270,13 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
     if (outputFile == null || !mounted) return;
 
-    final hiveService = ref.read(openAirProvider).hiveService;
-    await hiveService.exportOpml(outputFile);
-    _showNotification(exportSuccessMsg);
+    try {
+      final hiveService = ref.read(openAirProvider).hiveService;
+      await hiveService.exportOpml(outputFile);
+      if (mounted) _showNotification(exportSuccessMsg);
+    } catch (e) {
+      if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);
+    }
   }
 
   void _showRssUrlDialog() {
