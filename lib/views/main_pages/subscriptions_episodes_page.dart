@@ -47,84 +47,64 @@ class _SubscriptionsEpisodesPageState
         ref.watch(getPodcastInfoByTitleProvider(widget.podcast.title));
     final isSubscribedAsync =
         ref.watch(isSubscribedProvider(widget.podcast.title));
+    final isSubscribed = isSubscribedAsync.asData?.value ?? false;
 
-    return podCastDataAsync.when(
-      loading: () => Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
+    return Scaffold(
+      appBar: AppBar(
+        title: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.55),
+          child: Text(
+            widget.podcast.title,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: isSubscribed
+                ? Translations.of(context).text('unsubscribeToPodCast')
+                : Translations.of(context).text('subscribeToPodCast'),
+            onPressed: () => _toggleSubscription(context, ref),
+            icon: Icon(
+              isSubscribed ? Icons.remove_circle_outline : Icons.add_circle_outline,
+              color: isSubscribed
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
+          ),
+          IconButton(
+            tooltip:
+                Translations.of(context).text('podCastDetails'),
+            onPressed: () {
+              final data = podCastDataInfoAsync.asData?.value;
+              if (data == null) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PodcastInfoPage(podcastInfo: data),
+                ),
+              );
+            },
+            icon: const Icon(Icons.info_outline_rounded, size: 30),
+          ),
+        ],
       ),
-      error: (error, stackTrace) => Scaffold(
-        appBar: AppBar(title: Text(widget.podcast.title)),
-        body: _ErrorView(
+      body: podCastDataAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => _ErrorView(
           error: error.toString(),
           podCastFeedUrl: podCastUrl,
         ),
+        data: (snapshot) {
+          return podCastDataInfoAsync.when(
+            data: (data) => _buildEpisodeList(context, ref, snapshot, data),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => _buildEpisodeList(context, ref, snapshot, null),
+          );
+        },
       ),
-      data: (snapshot) {
-        return podCastDataInfoAsync.when(
-          data: (data) {
-            return isSubscribedAsync.when(
-              data: (isSubscribed) {
-                return Scaffold(
-                  appBar: AppBar(
-                    title: ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.55),
-                      child: Text(
-                        widget.podcast.title,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    actions: [
-                      IconButton(
-                        tooltip:
-                            Translations.of(context).text('podCastDetails'),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PodcastInfoPage(podcastInfo: data),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.info_outline_rounded, size: 30),
-                      ),
-                    ],
-                  ),
-                  body: Column(
-                    children: [
-                      _SubscribeBanner(
-                        podcast: widget.podcast,
-                        isSubscribed: isSubscribed,
-                      ),
-                      Expanded(
-                        child: _buildEpisodeList(context, ref, snapshot, data),
-                      ),
-                    ],
-                  ),
-                  bottomNavigationBar: ToggleBanner(),
-                );
-              },
-              loading: () => const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-                bottomNavigationBar: ToggleBanner(),
-              ),
-              error: (_, __) => const Scaffold(
-                body: Center(child: Text('Error loading subscription status')),
-              ),
-            );
-          },
-          loading: () => const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          ),
-          error: (_, __) => Scaffold(
-            appBar: AppBar(title: Text(widget.podcast.title)),
-            body: _buildEpisodeList(context, ref, snapshot, null),
-            bottomNavigationBar: ToggleBanner(),
-          ),
-        );
-      },
+      bottomNavigationBar: ToggleBanner(),
     );
   }
 
@@ -203,72 +183,22 @@ class _SubscriptionsEpisodesPageState
       },
     );
   }
-}
-
-class _SubscribeBanner extends ConsumerWidget {
-  const _SubscribeBanner({
-    required this.podcast,
-    required this.isSubscribed,
-  });
-
-  final PodcastModel podcast;
-  final bool isSubscribed;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isSub = isSubscribed;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isSub
-            ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3)
-            : Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
-          ),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: isSub
-                  ? Theme.of(context).colorScheme.error
-                  : Theme.of(context).colorScheme.primary,
-              foregroundColor: isSub
-                  ? Theme.of(context).colorScheme.onError
-                  : Theme.of(context).colorScheme.onPrimary,
-            ),
-            onPressed: () => _toggleSubscription(context, ref),
-            icon: Icon(isSub ? Icons.remove_circle_outline : Icons.add_circle_outline),
-            label: Text(
-              isSub
-                  ? Translations.of(context).text('unsubscribe')
-                  : Translations.of(context).text('subscribe'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _toggleSubscription(BuildContext context, WidgetRef ref) async {
     final audioController = ref.read(audioProvider);
+    final isSubscribed = ref.read(isSubscribedProvider(widget.podcast.title)).asData?.value ?? false;
 
     if (isSubscribed) {
-      await audioController.unsubscribe(podcast);
+      await audioController.unsubscribe(widget.podcast);
     } else {
-      await audioController.subscribe(podcast, context);
+      await audioController.subscribe(widget.podcast, context);
     }
 
-    ref.invalidate(isSubscribedProvider(podcast.title));
+    ref.invalidate(isSubscribedProvider(widget.podcast.title));
 
     final msg = isSubscribed
-        ? '${Translations.of(context).text('unsubscribedFrom')} ${podcast.title}'
-        : '${Translations.of(context).text('subscribedTo')} ${podcast.title}';
+        ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
+        : '${Translations.of(context).text('subscribedTo')} ${widget.podcast.title}';
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
