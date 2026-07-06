@@ -1,11 +1,36 @@
 import 'dart:io' show Platform;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
   auth.User? get user => auth.FirebaseAuth.instance.currentUser;
+
+  Future<void> deleteUserData() async {
+    final user = auth.FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final db = FirebaseFirestore.instance;
+    final collections = [
+      'subscriptions',
+      'history',
+      'queue',
+      'favorites',
+      'episode_positions',
+      'settings',
+    ];
+    for (final collection in collections) {
+      final snapshot = await db
+          .collection('users')
+          .doc(user.uid)
+          .collection(collection)
+          .get();
+      for (final doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
+    }
+  }
 
   Future<auth.UserCredential> signIn(String email, String password) async {
     try {

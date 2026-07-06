@@ -656,6 +656,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
             .read(subscriptionControllerProvider)
             .clearAllSubscriptions();
         ref.invalidate(drawerCountsProvider);
+        await firebaseService.deleteUserData();
         await firebaseService.deleteAccount();
         if (mounted) _showSuccess('accountDeletedSuccessfully');
       } catch (e) {
