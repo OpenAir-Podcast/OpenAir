@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "אישור ביטול",
   "unsubscribeConfirmMsg": "האם אתה בטוח שברצונך לבטל את המנוי של {count} פודקאסטים שנבחרו?",
   "unsubscribe": "בטל מנוי",
+  "subscribe": "הירשם",
   "subscribeToPodcast": "הירשם לפודקאסט",
   "unsubscribedFrom": "בוטל המנוי ל",
   "subscribedTo": "נרשמת ל",

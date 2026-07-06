@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "購読解除の確認",
   "unsubscribeConfirmMsg": "{count}個の選択されたポッドキャストの購読を解除しますか？",
   "unsubscribe": "購読解除",
+  "subscribe": "購読",
   "subscribeToPodcast": "ポッドキャストを購読",
   "unsubscribedFrom": "購読を解除しました:",
   "subscribedTo": "購読しました:",

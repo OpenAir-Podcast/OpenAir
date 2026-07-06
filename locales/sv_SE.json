@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "Bekräfta avprenumeration",
   "unsubscribeConfirmMsg": "Är du säker på att du vill avprenumerera {count} valda podcast(s)?",
   "unsubscribe": "Avprenumerera",
+  "subscribe": "Prenumerera",
   "subscribeToPodcast": "Prenumerera på podcast",
   "unsubscribedFrom": "Prenumeration uppsagd från",
   "subscribedTo": "Prenumererar på",

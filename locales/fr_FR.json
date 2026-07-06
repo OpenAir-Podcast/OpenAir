@@ -527,6 +527,7 @@
   "syncComplete": "Synchronisation terminée !",
   "syncFailed": "Synchronisation échouée :",
   "unsubscribe": "Se désabonner",
+  "subscribe": "S'abonner",
   "markAsPlayed": "Marquer comme lu",
   "markAsUnplayed": "Marquer comme non lu",
   "episodeDetails": "Détails de l'épisode",

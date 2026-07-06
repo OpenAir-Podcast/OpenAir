@@ -90,13 +90,19 @@ class _SubscriptionsEpisodesPageState
                         },
                         icon: const Icon(Icons.info_outline_rounded, size: 30),
                       ),
-                      _SubscribeButton(
+                    ],
+                  ),
+                  body: Column(
+                    children: [
+                      _SubscribeBanner(
                         podcast: widget.podcast,
                         isSubscribed: isSubscribed,
                       ),
+                      Expanded(
+                        child: _buildEpisodeList(context, ref, snapshot, data),
+                      ),
                     ],
                   ),
-                  body: _buildEpisodeList(context, ref, snapshot, data),
                   bottomNavigationBar: ToggleBanner(),
                 );
               },
@@ -199,8 +205,8 @@ class _SubscriptionsEpisodesPageState
   }
 }
 
-class _SubscribeButton extends ConsumerWidget {
-  const _SubscribeButton({
+class _SubscribeBanner extends ConsumerWidget {
+  const _SubscribeBanner({
     required this.podcast,
     required this.isSubscribed,
   });
@@ -210,12 +216,42 @@ class _SubscribeButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      tooltip: isSubscribed
-          ? Translations.of(context).text('unsubscribeToPodCast')
-          : Translations.of(context).text('subscribeToPodCast'),
-      onPressed: () => _toggleSubscription(context, ref),
-      icon: Icon(isSubscribed ? Icons.check : Icons.add),
+    final isSub = isSubscribed;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isSub
+            ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3)
+            : Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: isSub
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.primary,
+              foregroundColor: isSub
+                  ? Theme.of(context).colorScheme.onError
+                  : Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: () => _toggleSubscription(context, ref),
+            icon: Icon(isSub ? Icons.remove_circle_outline : Icons.add_circle_outline),
+            label: Text(
+              isSub
+                  ? Translations.of(context).text('unsubscribe')
+                  : Translations.of(context).text('subscribe'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -228,7 +264,6 @@ class _SubscribeButton extends ConsumerWidget {
       await audioController.subscribe(podcast, context);
     }
 
-    // Invalidate the provider to refresh the UI
     ref.invalidate(isSubscribedProvider(podcast.title));
 
     final msg = isSubscribed

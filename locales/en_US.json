@@ -524,6 +524,7 @@
   "confirmUnsubscribe": "Confirm Unsubscribe",
   "unsubscribeConfirmMsg": "Are you sure you want to unsubscribe from {count} selected podcast(s)?",
   "unsubscribe": "Unsubscribe",
+  "subscribe": "Subscribe",
   "syncing": "Syncing...",
   "syncComplete": "Sync complete!",
   "syncFailed": "Sync failed:",

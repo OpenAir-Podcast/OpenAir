@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "Confirmar cancelamento",
   "unsubscribeConfirmMsg": "Tem certeza que deseja cancelar {count} podcast(s) selecionado(s)?",
   "unsubscribe": "Cancelar",
+  "subscribe": "Inscrever-se",
   "subscribeToPodcast": "Inscrever-se no podcast",
   "unsubscribedFrom": "Inscrição cancelada em",
   "subscribedTo": "Inscrito em",

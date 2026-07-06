@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "Bevestig afmelden",
   "unsubscribeConfirmMsg": "Weet u zeker dat u {count} geselecteerde podcast(s) wilt afmelden?",
   "unsubscribe": "Afmelden",
+  "subscribe": "Abonneren",
   "subscribeToPodcast": "Abonneren op podcast",
   "unsubscribedFrom": "Abonnement opgezegd op",
   "subscribedTo": "Geabonneerd op",

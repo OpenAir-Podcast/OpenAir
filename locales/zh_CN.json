@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "确认取消订阅",
   "unsubscribeConfirmMsg": "您确定要取消订阅 {count} 个选中的播客吗？",
   "unsubscribe": "取消订阅",
+  "subscribe": "订阅",
   "subscribeToPodcast": "订阅播客",
   "unsubscribedFrom": "已取消订阅",
   "subscribedTo": "已订阅",

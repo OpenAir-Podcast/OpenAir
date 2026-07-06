@@ -111,6 +111,7 @@
   "confirmUnsubscribe": "Подтвердить отписку",
   "unsubscribeConfirmMsg": "Вы уверены, что хотите отписаться от {count} выбранных подкаст(ов)?",
   "unsubscribe": "Отписаться",
+  "subscribe": "Подписаться",
   "subscribeToPodcast": "Подписаться на подкаст",
   "unsubscribedFrom": "Отписался от",
   "subscribedTo": "Подписался на",
