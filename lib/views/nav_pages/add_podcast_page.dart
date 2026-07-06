@@ -164,7 +164,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     );
   }
 
-  void _showPodcastIndexDialog() {
+  void _showFyydDialog() {
     final controller = TextEditingController();
 
     showDialog(
@@ -178,33 +178,47 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.search_rounded,
+              Icons.cloud_rounded,
               color: Theme.of(dialogContext).colorScheme.onPrimaryContainer,
               size: 28,
             ),
           ),
           title: Text(
-            Translations.of(dialogContext).text('searchPodcastIndex'),
+            Translations.of(dialogContext).text('searchPodcastFyyd'),
           ),
           content: SizedBox(
             width: MediaQuery.of(dialogContext).size.width * 0.85,
-            child: TextField(
-              maxLength: 256,
-              autofocus: true,
-              controller: controller,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                icon: Icon(
-                  Icons.title_rounded,
-                  color: Theme.of(dialogContext).colorScheme.primary,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  Translations.of(dialogContext).text('discoveryPoweredByFyyd'),
+                  style: Theme.of(dialogContext).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+                  ),
                 ),
-                labelText: Translations.of(dialogContext).text('title'),
-                suffix: IconButton(
-                  onPressed: controller.clear,
-                  icon: const Icon(Icons.clear_rounded),
+                const SizedBox(height: 16),
+                TextField(
+                  maxLength: 256,
+                  autofocus: true,
+                  controller: controller,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: Theme.of(dialogContext).colorScheme.primary,
+                    ),
+                    hintText: Translations.of(dialogContext).text('searchFor'),
+                    labelText: Translations.of(dialogContext).text('title'),
+                    suffix: IconButton(
+                      onPressed: controller.clear,
+                      icon: const Icon(Icons.clear_rounded),
+                    ),
+                  ),
+                  onSubmitted: (value) => _searchFyydPodcasts(value),
                 ),
-              ),
-              onSubmitted: (value) => _searchPodcastIndex(value, dialogContext),
+              ],
             ),
           ),
           actions: [
@@ -214,7 +228,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
             ),
             FilledButton(
               onPressed: () =>
-                  _searchPodcastIndex(controller.text.trim(), dialogContext),
+                  _searchFyydPodcasts(controller.text.trim()),
               child: Text(Translations.of(dialogContext).text('search')),
             ),
           ],
@@ -223,16 +237,14 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     );
   }
 
-  void _searchPodcastIndex(String query, BuildContext dialogContext) async {
-    if (query.isEmpty) return;
+  void _searchPodcastIndex(String query) async {
+    if (query.trim().isEmpty) return;
 
-    if (dialogContext.mounted) Navigator.pop(dialogContext);
-
-    final pageContext = context;
+    final dialogContext = context;
     showDialog(
-      context: pageContext,
+      context: dialogContext,
       barrierDismissible: false,
-      builder: (loadingContext) => const LoadingDialog(),
+      builder: (context) => const LoadingDialog(),
     );
 
     try {
@@ -240,9 +252,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
           await ref.read(podcastIndexProvider).searchPodcasts(query);
       final podcasts = FetchDataModel.fromJson(podcast);
 
-      if (pageContext.mounted) {
-        Navigator.pop(pageContext);
-        Navigator.of(pageContext).push(
+      if (dialogContext.mounted) {
+        Navigator.pop(dialogContext);
+        Navigator.of(dialogContext).push(
           MaterialPageRoute(
             builder: (context) => PodcastIndexSearchPage(
               podcasts: podcasts,
@@ -253,8 +265,8 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
       }
     } catch (e) {
       debugPrint('Failed to search Podcast Index: $e');
-      if (pageContext.mounted) {
-        Navigator.pop(pageContext);
+      if (dialogContext.mounted) {
+        Navigator.pop(dialogContext);
       }
     }
   }
@@ -416,7 +428,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     Icons.search_rounded,
                     color: colorScheme.primary,
                   ),
-                  hintText: Translations.of(context).text('searchPodcastFyyd'),
+                  hintText: Translations.of(context).text('searchPodcastIndex'),
                   suffixIcon: IconButton(
                     onPressed: _searchController.clear,
                     icon: const Icon(Icons.clear_rounded),
@@ -430,7 +442,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     vertical: 12,
                   ),
                 ),
-                onSubmitted: _searchFyydPodcasts,
+                onSubmitted: _searchPodcastIndex,
               ),
               const SizedBox(height: 24),
 
@@ -640,9 +652,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
               const SizedBox(height: 12),
               _buildActionCard(
                 icon: Icons.search_rounded,
-                title: Translations.of(context).text('searchPodcastIndex'),
+                title: Translations.of(context).text('searchPodcastFyyd'),
                 subtitle: Translations.of(context).text('search'),
-                onTap: _showPodcastIndexDialog,
+                onTap: _showFyydDialog,
               ),
               const SizedBox(height: 12),
               _buildActionCard(
