@@ -24,7 +24,7 @@ class PodcastCardGrid extends ConsumerStatefulWidget {
 }
 
 class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
-  bool once = false;
+  bool isSubscribed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -113,26 +113,36 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                       if (!snapshot.hasData) {
                         return const SizedBox(
                             width: 48,
-                            height: 48); // Placeholder size for icon button
+                            height: 48);
                       } else if (snapshot.hasError) {
                         return const SizedBox(width: 48, height: 48);
                       }
 
+                      isSubscribed = snapshot.data!;
+
                       return IconButton(
-                        tooltip: snapshot.data!
+                        tooltip: isSubscribed
                             ? Translations.of(context)
                                 .text('unsubscribeToPodcast')
                             : Translations.of(context)
                                 .text('subscribeToPodcast'),
                         onPressed: () async {
-                          snapshot.data!
-                              ? await ref
-                                  .read(audioProvider)
-                                  .unsubscribe(widget.podcastItem)
-                              : await ref.read(audioProvider).subscribe(
-                                    widget.podcastItem,
-                                    context,
-                                  );
+                          final wasSubscribed = isSubscribed;
+
+                          if (wasSubscribed) {
+                            await ref
+                                .read(audioProvider)
+                                .unsubscribe(widget.podcastItem);
+                          } else {
+                            await ref.read(audioProvider).subscribe(
+                                  widget.podcastItem,
+                                  context,
+                                );
+                          }
+
+                          setState(() {
+                            isSubscribed = !wasSubscribed;
+                          });
 
                           if (context.mounted) {
                             if (!Platform.isAndroid && !Platform.isIOS) {
@@ -140,7 +150,7 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                                   .read(notificationServiceProvider)
                                   .showNotification(
                                     'OpenAir ${Translations.of(context).text('notification')}',
-                                    snapshot.data!
+                                    wasSubscribed
                                         ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
                                         : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                                   );
@@ -148,7 +158,7 @@ class _PodcastCardSGridtate extends ConsumerState<PodcastCardGrid> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    snapshot.data!
+                                    wasSubscribed
                                         ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
                                         : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                                   ),

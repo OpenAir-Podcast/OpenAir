@@ -24,7 +24,7 @@ class PodcastCardList extends ConsumerStatefulWidget {
 }
 
 class _PodcastCardListState extends ConsumerState<PodcastCardList> {
-  bool once = false;
+  bool isSubscribed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -88,25 +88,35 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                   return const SizedBox.shrink();
                 }
 
+                isSubscribed = snapshot.data!;
+
                 return IconButton(
-                  tooltip: snapshot.data!
+                  tooltip: isSubscribed
                       ? Translations.of(context).text('unsubscribeToPodcast')
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
-                    snapshot.data!
-                        ? await ref
-                            .read(audioProvider)
-                            .unsubscribe(widget.podcastItem)
-                        : await ref.read(audioProvider).subscribe(
-                              widget.podcastItem,
-                              context,
-                            );
+                    final wasSubscribed = isSubscribed;
+
+                    if (wasSubscribed) {
+                      await ref
+                          .read(audioProvider)
+                          .unsubscribe(widget.podcastItem);
+                    } else {
+                      await ref.read(audioProvider).subscribe(
+                            widget.podcastItem,
+                            context,
+                          );
+                    }
+
+                    setState(() {
+                      isSubscribed = !wasSubscribed;
+                    });
 
                     if (context.mounted) {
                       if (!Platform.isAndroid && !Platform.isIOS) {
                         ref.read(notificationServiceProvider).showNotification(
                               'OpenAir ${Translations.of(context).text('notification')}',
-                              snapshot.data!
+                              wasSubscribed
                                   ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
                                   : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                             );
@@ -114,7 +124,7 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              snapshot.data!
+                              wasSubscribed
                                   ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcastItem.title}'
                                   : '${Translations.of(context).text('subscribedTo')} ${widget.podcastItem.title}',
                             ),
@@ -126,7 +136,7 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                     ref.invalidate(
                         podcastDataByUrlProvider(widget.podcastItem.feedUrl));
                   },
-                  icon: snapshot.data!
+                  icon: isSubscribed
                       ? const Icon(Icons.check)
                       : const Icon(Icons.add),
                 );
