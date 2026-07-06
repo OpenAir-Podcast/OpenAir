@@ -503,7 +503,7 @@ class SyncController extends ChangeNotifier {
               .collection('users')
               .doc(user.uid)
               .collection('history')
-              .doc(episode.guid)
+              .doc(episode.guid.replaceAll('/', '_'))
               .set({
             'guid': episode.guid,
             'image': episode.image,
