@@ -440,6 +440,7 @@
   "userID": "用户ID",
   "accountCreated": "账户已创建",
   "lastSignIn": "上次登录",
+  "lastSync": "上次同步",
   "lastUpdate": "上次更新",
   "sync": "同步",
   "loginSuccess": "登录成功",

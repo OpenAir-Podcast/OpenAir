@@ -440,6 +440,7 @@
   "userID": "Användar-ID",
   "accountCreated": "Konto skapat",
   "lastSignIn": "Senaste inloggning",
+  "lastSync": "Senaste synkronisering",
   "lastUpdate": "Senaste uppdatering",
   "sync": "Synkronisera",
   "loginSuccess": "Inloggning lyckades",

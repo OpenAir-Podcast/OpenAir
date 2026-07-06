@@ -440,6 +440,7 @@
   "userID": "מזהה משתמש",
   "accountCreated": "החשבון נוצר",
   "lastSignIn": "כניסה אחרונה",
+  "lastSync": "סנכרון אחרון",
   "lastUpdate": "עדכון אחרון",
   "sync": "סנכרן",
   "loginSuccess": "ההתחברות הצליחה",

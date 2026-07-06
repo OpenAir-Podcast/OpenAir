@@ -835,6 +835,8 @@ class SyncController extends ChangeNotifier {
 
     await hiveService.populateInbox();
 
+    await hiveService.saveLastSyncTimestamp(DateTime.now());
+
     debugPrint('Synchronization complete — $syncCount categories synced');
   }
 }

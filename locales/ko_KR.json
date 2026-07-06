@@ -440,6 +440,7 @@
   "userID": "사용자 ID",
   "accountCreated": "계정 생성됨",
   "lastSignIn": "마지막 로그인",
+  "lastSync": "마지막 동기화",
   "lastUpdate": "마지막 업데이트",
   "sync": "동기화",
   "loginSuccess": "로그인 성공",

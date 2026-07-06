@@ -437,6 +437,7 @@
   "userID": "ID de usuario",
   "accountCreated": "Cuenta creada",
   "lastSignIn": "Último inicio de sesión",
+  "lastSync": "Última sincronización",
   "lastUpdate": "Última actualización",
   "sync": "Sincronizar",
   "loginSuccess": "Inicio de sesión exitoso",

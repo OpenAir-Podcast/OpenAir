@@ -440,6 +440,7 @@
   "userID": "Gebruikers-ID",
   "accountCreated": "Account aangemaakt",
   "lastSignIn": "Laatste aanmelding",
+  "lastSync": "Laatste synchronisatie",
   "lastUpdate": "Laatste update",
   "sync": "Synchroniseren",
   "loginSuccess": "Inloggen succesvol",

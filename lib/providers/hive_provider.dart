@@ -1246,6 +1246,20 @@ class HiveService {
     return totalNewEpisodes.toString();
   }
 
+  Future<void> saveLastSyncTimestamp(DateTime time) async {
+    final box = await persistence;
+    await box.put('last_sync_at', {'timestamp': time.toIso8601String()});
+  }
+
+  Future<DateTime?> getLastSyncTimestamp() async {
+    final box = await persistence;
+    final Map? data = await box.get('last_sync_at');
+    if (data != null && data.containsKey('timestamp')) {
+      return DateTime.tryParse(data['timestamp'] as String);
+    }
+    return null;
+  }
+
   Future<int> getNewEpisodesCount() async {
     final box = await persistence;
     final Map? countData = await box.get('subscriptions_count');

@@ -12,6 +12,7 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/components/no_connection.dart';
 import 'package:intl/intl.dart';
 import 'package:openair/controllers/subscription_controller.dart';
+import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 
 class AccountPage extends ConsumerStatefulWidget {
@@ -29,6 +30,25 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   bool _isSyncing = false;
+  String? _lastSyncAt;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLastSyncTimestamp();
+  }
+
+  Future<void> _loadLastSyncTimestamp() async {
+    final hiveService = ref.read(hiveServiceProvider);
+    final timestamp = await hiveService.getLastSyncTimestamp();
+    if (mounted) {
+      setState(() {
+        _lastSyncAt = timestamp != null
+            ? DateFormat.yMMMd().add_jm().format(timestamp.toLocal())
+            : null;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -543,6 +563,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         setState(() => _isSyncing = true);
                         try {
                           await ref.read(openAirProvider).synchronize(context);
+                          await _loadLastSyncTimestamp();
                           if (mounted) _showSuccess('syncComplete');
                         } catch (e) {
                           if (mounted) {
@@ -572,6 +593,23 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ),
                 ),
               ),
+              if (_lastSyncAt != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.schedule, size: 14, color: colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${Translations.of(context).text('lastSync')}: $_lastSyncAt',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {

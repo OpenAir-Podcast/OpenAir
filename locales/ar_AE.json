@@ -440,6 +440,7 @@
   "userID": "معرف المستخدم",
   "accountCreated": "تم إنشاء الحساب",
   "lastSignIn": "آخر تسجيل دخول",
+  "lastSync": "آخر مزامنة",
   "lastUpdate": "آخر تحديث",
   "sync": "مزامنة",
   "loginSuccess": "تم تسجيل الدخول بنجاح",

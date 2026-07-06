@@ -439,6 +439,7 @@
   "userID": "ユーザーID",
   "accountCreated": "アカウント作成日",
   "lastSignIn": "最終サインイン",
+  "lastSync": "最終同期",
   "lastUpdate": "最終更新",
   "sync": "同期",
   "loginSuccess": "ログイン成功",

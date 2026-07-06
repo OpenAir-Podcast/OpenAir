@@ -440,6 +440,7 @@
   "userID": "ID do usuário",
   "accountCreated": "Conta criada",
   "lastSignIn": "Último login",
+  "lastSync": "Última sincronização",
   "lastUpdate": "Última atualização",
   "sync": "Sincronizar",
   "loginSuccess": "Login bem-sucedido",
