@@ -1,3 +1,14 @@
+What's New in v0.18.16+61
+
+• You can now unsubscribe directly from the podcast's episode page
+• Subscriptions list refreshes automatically when you go back
+• Fixed app crash when tapping the Sync button
+• Fixed sync error for some podcasts with special characters
+• Deleting your account now also removes all your cloud data
+• Searching for podcasts now uses Podcast Index by default
+• Added "Last Sync" info on the Account page
+• Improved design of podcast add and search dialogs
+
 What's New in v0.18.15+57
 
 • Migrated cloud sync from Supabase to Firebase for better reliability
