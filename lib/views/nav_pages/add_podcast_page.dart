@@ -106,6 +106,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(dialogContext).size.width * 0.9,
+          ),
           icon: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -202,6 +205,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+          ),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(dialogContext).size.width * 0.9,
           ),
           icon: Container(
             padding: const EdgeInsets.all(12),
@@ -319,6 +325,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+          ),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(dialogContext).size.width * 0.9,
           ),
           icon: Container(
             padding: const EdgeInsets.all(12),

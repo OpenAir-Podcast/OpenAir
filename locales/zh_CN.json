@@ -125,7 +125,7 @@
   "searchPodcastFyyd": "搜索播客 (fyyd)",
   "noPodcastsFound": "未找到播客。",
   "failedToFindPodcasts": "查找播客失败。",
-  "discoveryPoweredByFyyd": "发现功能由 fyyd 提供支持",
+  "discoveryPoweredByFyyd": "Powered by fyyd",
   "discoverMore": "发现更多",
   "addPodcastByRssUrl": "通过 RSS URL 添加播客",
   "rssUrl": "RSS 地址",

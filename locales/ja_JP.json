@@ -125,7 +125,7 @@
   "searchPodcastFyyd": "ポッドキャストを検索 (fyyd)",
   "noPodcastsFound": "ポッドキャストが見つかりませんでした。",
   "failedToFindPodcasts": "ポッドキャストの検索に失敗しました。",
-  "discoveryPoweredByFyyd": "発見は fyyd によって提供されています",
+  "discoveryPoweredByFyyd": "Powered by fyyd",
   "discoverMore": "もっと見つける",
   "addPodcastByRssUrl": "RSS URL でポッドキャストを追加",
   "rssUrl": "RSS URL",
