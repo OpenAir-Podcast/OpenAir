@@ -227,9 +227,9 @@ class _SubscribeButton extends ConsumerWidget {
     final audioController = ref.read(audioProvider);
 
     if (isSubscribed) {
-      audioController.unsubscribe(podcast);
+      await audioController.unsubscribe(podcast);
     } else {
-      audioController.subscribe(podcast, context);
+      await audioController.subscribe(podcast, context);
     }
 
     // Invalidate the provider to refresh the UI

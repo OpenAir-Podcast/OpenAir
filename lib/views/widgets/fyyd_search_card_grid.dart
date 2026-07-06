@@ -126,8 +126,10 @@ class _FyydSearchCardGridState extends ConsumerState<FyydSearchCardGrid> {
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
-                        ? ref.read(audioProvider).unsubscribe(podcastMod)
-                        : ref.read(audioProvider).subscribe(
+                        ? await ref
+                            .read(audioProvider)
+                            .unsubscribe(podcastMod)
+                        : await ref.read(audioProvider).subscribe(
                               podcastMod,
                               context,
                             );

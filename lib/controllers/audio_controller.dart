@@ -915,12 +915,12 @@ class AudioController extends ChangeNotifier {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-  void subscribe(PodcastModel podcast, BuildContext context) {
-    subscribeToPodcast(podcast, context);
+  Future<void> subscribe(PodcastModel podcast, BuildContext context) async {
+    await subscribeToPodcast(podcast, context);
   }
 
-  void unsubscribe(PodcastModel podcast) {
-    unsubscribeFromPodcast(podcast);
+  Future<void> unsubscribe(PodcastModel podcast) async {
+    await unsubscribeFromPodcast(podcast);
   }
 
   Future<bool> importPodcastFromOpml(BuildContext context) async {

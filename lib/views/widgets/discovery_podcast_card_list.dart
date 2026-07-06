@@ -145,8 +145,10 @@ class _DiscoveryPodcastCardListState
                           : Translations.of(context).text('subscribeToPodcast'),
                       onPressed: () async {
                         snapshot.data!
-                            ? ref.read(audioProvider).unsubscribe(podcast)
-                            : ref.read(audioProvider).subscribe(
+                            ? await ref
+                                .read(audioProvider)
+                                .unsubscribe(podcast)
+                            : await ref.read(audioProvider).subscribe(
                                   podcast,
                                   context,
                                 );

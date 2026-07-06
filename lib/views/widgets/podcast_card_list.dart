@@ -94,10 +94,10 @@ class _PodcastCardListState extends ConsumerState<PodcastCardList> {
                       : Translations.of(context).text('subscribeToPodcast'),
                   onPressed: () async {
                     snapshot.data!
-                        ? ref
+                        ? await ref
                             .read(audioProvider)
                             .unsubscribe(widget.podcastItem)
-                        : ref.read(audioProvider).subscribe(
+                        : await ref.read(audioProvider).subscribe(
                               widget.podcastItem,
                               context,
                             );

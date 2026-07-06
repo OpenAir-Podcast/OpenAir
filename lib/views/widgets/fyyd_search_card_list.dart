@@ -167,13 +167,13 @@ class _FyydSearchCardListState extends ConsumerState<FyydSearchCardList> {
                         );
 
                         if (snapshot.data!) {
-                          ref.read(audioProvider).unsubscribe(podcastModel);
+                          await ref.read(audioProvider).unsubscribe(podcastModel);
                           setState(() {
                             isSub = false;
                           });
                         } else {
                           if (context.mounted) {
-                            ref.read(audioProvider).subscribe(
+                            await ref.read(audioProvider).subscribe(
                                   podcastModel,
                                   context,
                                 );

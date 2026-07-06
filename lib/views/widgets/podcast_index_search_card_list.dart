@@ -134,14 +134,14 @@ class _PodcastIndexSearchCardListState
                           : 'Subscribe to podcast',
                       onPressed: () async {
                         if (snapshot.data!) {
-                          ref
+                          await ref
                               .read(audioProvider)
                               .unsubscribe(widget.podcastItem);
                           setState(() {
                             isSub = false;
                           });
                         } else {
-                          ref.read(audioProvider).subscribe(
+                          await ref.read(audioProvider).subscribe(
                                 widget.podcastItem,
                                 context,
                               );

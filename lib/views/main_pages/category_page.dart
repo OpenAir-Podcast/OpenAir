@@ -198,9 +198,9 @@ class _PodcastListTile extends ConsumerWidget {
                       ),
                       onPressed: () async {
                         if (isSubscribed) {
-                          ref.read(audioProvider).unsubscribe(podcast);
+                          await ref.read(audioProvider).unsubscribe(podcast);
                         } else {
-                          ref.read(audioProvider).subscribe(podcast, context);
+                          await ref.read(audioProvider).subscribe(podcast, context);
                         }
                         ref.invalidate(categoryDataProvider(apiKey));
                         ref.invalidate(isSubscribedProvider(podcast.title));
