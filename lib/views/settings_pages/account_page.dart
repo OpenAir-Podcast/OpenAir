@@ -551,6 +551,15 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                           colorScheme: colorScheme,
                         ),
                       ],
+                      if (_lastSyncAt != null) ...[
+                        const Divider(),
+                        _buildInfoTile(
+                          icon: Icons.schedule,
+                          label: Translations.of(context).text('lastSync'),
+                          value: _lastSyncAt!,
+                          colorScheme: colorScheme,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -593,23 +602,6 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ),
                 ),
               ),
-              if (_lastSyncAt != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.schedule, size: 14, color: colorScheme.onSurfaceVariant),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${Translations.of(context).text('lastSync')}: $_lastSyncAt',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
