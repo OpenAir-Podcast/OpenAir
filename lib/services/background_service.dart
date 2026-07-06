@@ -89,7 +89,7 @@ void callbackDispatcher() {
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('ic_launcher');
+          AndroidInitializationSettings('notification_icon');
 
       const DarwinInitializationSettings initializationSettingsDarwin =
           DarwinInitializationSettings();
