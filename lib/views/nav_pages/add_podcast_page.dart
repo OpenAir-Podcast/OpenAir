@@ -99,41 +99,67 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     showDialog(
       context: context,
       builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = theme.colorScheme;
+
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           icon: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(dialogContext).colorScheme.primaryContainer,
+              color: colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.rss_feed_rounded,
-              color: Theme.of(dialogContext).colorScheme.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
               size: 28,
             ),
           ),
           title: Text(
             Translations.of(dialogContext).text('addPodcastByRssUrl'),
+            textAlign: TextAlign.center,
           ),
-          content: SizedBox(
-            width: MediaQuery.of(dialogContext).size.width * 0.85,
-            child: TextField(
-              maxLength: 256,
-              autofocus: true,
-              controller: controller,
-              keyboardType: TextInputType.url,
-              decoration: InputDecoration(
-                icon: Icon(
-                  Icons.link_rounded,
-                  color: Theme.of(dialogContext).colorScheme.primary,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                Translations.of(dialogContext).text('rssFeed'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-                labelText: Translations.of(dialogContext).text('rssUrl'),
-                suffix: IconButton(
-                  onPressed: controller.clear,
-                  icon: const Icon(Icons.clear_rounded),
-                ),
+                textAlign: TextAlign.center,
               ),
-            ),
+              const SizedBox(height: 20),
+              TextField(
+                maxLength: 256,
+                autofocus: true,
+                controller: controller,
+                keyboardType: TextInputType.url,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.link_rounded,
+                    color: colorScheme.primary,
+                  ),
+                  hintText: Translations.of(dialogContext).text('rssUrl'),
+                  filled: true,
+                  fillColor: colorScheme.surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: controller.text.isNotEmpty
+                      ? IconButton(
+                          onPressed: controller.clear,
+                          icon: const Icon(Icons.clear_rounded),
+                        )
+                      : null,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -170,56 +196,68 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
     showDialog(
       context: context,
       builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = theme.colorScheme;
+
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           icon: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(dialogContext).colorScheme.primaryContainer,
+              color: colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.cloud_rounded,
-              color: Theme.of(dialogContext).colorScheme.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
               size: 28,
             ),
           ),
           title: Text(
             Translations.of(dialogContext).text('searchPodcastFyyd'),
+            textAlign: TextAlign.center,
           ),
-          content: SizedBox(
-            width: MediaQuery.of(dialogContext).size.width * 0.85,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  Translations.of(dialogContext).text('discoveryPoweredByFyyd'),
-                  style: Theme.of(dialogContext).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
-                  ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                Translations.of(dialogContext).text('discoveryPoweredByFyyd'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  maxLength: 256,
-                  autofocus: true,
-                  controller: controller,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    icon: Icon(
-                      Icons.search_rounded,
-                      color: Theme.of(dialogContext).colorScheme.primary,
-                    ),
-                    hintText: Translations.of(dialogContext).text('searchFor'),
-                    labelText: Translations.of(dialogContext).text('title'),
-                    suffix: IconButton(
-                      onPressed: controller.clear,
-                      icon: const Icon(Icons.clear_rounded),
-                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                maxLength: 256,
+                autofocus: true,
+                controller: controller,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: colorScheme.primary,
                   ),
-                  onSubmitted: (value) => _searchFyydPodcasts(value),
+                  hintText: Translations.of(dialogContext).text('searchFor'),
+                  filled: true,
+                  fillColor: colorScheme.surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: controller.text.isNotEmpty
+                      ? IconButton(
+                          onPressed: controller.clear,
+                          icon: const Icon(Icons.clear_rounded),
+                        )
+                      : null,
                 ),
-              ],
-            ),
+                onChanged: (_) => setState(() {}),
+                onSubmitted: (value) => _searchFyydPodcasts(value),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -279,6 +317,9 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
         final colorScheme = theme.colorScheme;
 
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           icon: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -299,17 +340,21 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
             success
                 ? Translations.of(dialogContext).text('subscribed')
                 : Translations.of(dialogContext).text('oopsAnErrorOccurred'),
+            textAlign: TextAlign.center,
           ),
           content: Text(
             success
                 ? Translations.of(dialogContext)
                     .text('importedPodcastsFromOpml')
                 : Translations.of(dialogContext).text('errorAddingPodcast'),
+            textAlign: TextAlign.center,
           ),
           actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(Translations.of(dialogContext).text('ok')),
+            Center(
+              child: FilledButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(Translations.of(dialogContext).text('ok')),
+              ),
             ),
           ],
         );
