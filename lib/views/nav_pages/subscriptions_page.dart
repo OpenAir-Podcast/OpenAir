@@ -15,14 +15,6 @@ import 'package:openair/views/widgets/subscription_card.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
 
-final subscriptionsProvider =
-    FutureProvider.autoDispose<Map<String, SubscriptionModel>>((ref) async {
-  // Watch the hiveService to trigger refetch when it changes
-  final hiveService = ref.watch(hiveServiceProvider);
-  // This forces the provider to refetch when subscriptions change
-  return await hiveService.getSubscriptions();
-});
-
 class SubscriptionsPage extends ConsumerStatefulWidget {
   const SubscriptionsPage({super.key});
 

@@ -195,6 +195,8 @@ class _SubscriptionsEpisodesPageState
     }
 
     ref.invalidate(isSubscribedProvider(widget.podcast.title));
+    ref.invalidate(subscriptionsProvider);
+    ref.invalidate(subscriptionsWithCountsProvider);
 
     final msg = isSubscribed
         ? '${Translations.of(context).text('unsubscribedFrom')} ${widget.podcast.title}'
