@@ -18,6 +18,7 @@ import 'package:openair/views/nav_pages/log_in_page.dart';
 import 'package:openair/views/nav_pages/subscriptions_page.dart';
 import 'package:openair/views/nav_pages/feeds_page.dart';
 import 'package:openair/views/nav_pages/settings_page.dart';
+import 'package:openair/views/settings_pages/account_page.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 
@@ -108,12 +109,22 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 8.0,
                 children: [
-                  ClipOval(
-                    child: Image.asset(
-                      'assets/icons/icon.png',
-                      width: circleSize,
-                      height: circleSize,
-                      fit: BoxFit.cover,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AccountPage(),
+                        ),
+                      );
+                    },
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/icons/icon.png',
+                        width: circleSize,
+                        height: circleSize,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   ElevatedButton(
