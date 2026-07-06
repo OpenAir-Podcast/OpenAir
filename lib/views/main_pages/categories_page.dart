@@ -288,6 +288,10 @@ List<Category> getCategories(BuildContext context) => [
           icon: Icons.sports_basketball_rounded,
           apiKey: 'sports'),
       Category(
+          name: Translations.of(context).text('technology'),
+          icon: Icons.computer_rounded,
+          apiKey: 'technology'),
+      Category(
           name: Translations.of(context).text('standUp'),
           icon: Icons.mic_rounded,
           apiKey: 'stand-up'),
