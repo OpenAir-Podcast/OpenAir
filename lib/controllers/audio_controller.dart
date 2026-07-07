@@ -644,6 +644,9 @@ class AudioController extends ChangeNotifier {
       'enclosureType': episode['enclosureType'] ?? 'audio/mpeg',
       'enclosureLength': episode['enclosureLength'],
       'enclosureUrl': episode['enclosureUrl'],
+      'chaptersUrl': episode['chaptersUrl'],
+      'transcriptUrl': episode['transcriptUrl'],
+      'fundingUrl': episode['funding'],
       'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': 0.0,
@@ -691,9 +694,13 @@ class AudioController extends ChangeNotifier {
         'size': getEpisodeSize(episodes['items'][i]['enclosureLength']),
         'enclosureLength': episodes['items'][i]['enclosureLength'],
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
-        'chaptersUrl': episodes['items'][i]['chapters'],
-        'transcriptUrl': episodes['items'][i]['transcript'],
-        'fundingUrl': episodes['items'][i]['funding'],
+        'chaptersUrl': episodes['items'][i]['chaptersUrl'],
+        'transcriptUrl': episodes['items'][i]['transcriptUrl'],
+        'fundingUrl': episodes['items'][i]['funding'] is List
+            ? ((episodes['items'][i]['funding'] as List).isNotEmpty
+                ? (episodes['items'][i]['funding'] as List).first['url']
+                : null)
+            : null,
         'podcast': {
           'id': podcast.id,
           'title': podcast.title,
@@ -1389,7 +1396,14 @@ class AudioController extends ChangeNotifier {
             await podcastIndexService.getEpisodesByFeedUrl(feedUrl);
         final items = response['items'] as List?;
         if (items != null && items.isNotEmpty) {
-          return items.cast<Map<String, dynamic>>();
+          return (items).map((e) {
+            final map = Map<String, dynamic>.from(e as Map);
+            final funding = map['funding'];
+            map['fundingUrl'] = (funding is List && funding.isNotEmpty)
+                ? funding.first['url']
+                : null;
+            return map;
+          }).toList();
         }
       } catch (_) {}
     }

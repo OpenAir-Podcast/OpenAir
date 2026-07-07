@@ -297,6 +297,23 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
               }
             },
           ),
+        // Funding button
+        if (widget.episodeItem['fundingUrl'] != null &&
+            (widget.episodeItem['fundingUrl'] as String).isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.favorite_border_rounded, size: 18),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Support',
+            onPressed: () async {
+              final url = widget.episodeItem['fundingUrl'] as String;
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
       ],
     );
   }
