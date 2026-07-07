@@ -384,6 +384,11 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void seekToPosition(Duration position) {
+    _audioHandler.seek(position);
+    notifyListeners();
+  }
+
   String formatPlaybackPosition(Duration timeline) {
     final int hours = timeline.inHours;
     final int minutes = timeline.inMinutes % 60;
@@ -646,7 +651,13 @@ class AudioController extends ChangeNotifier {
       'enclosureUrl': episode['enclosureUrl'],
       'chaptersUrl': episode['chaptersUrl'],
       'transcriptUrl': episode['transcriptUrl'],
-      'fundingUrl': episode['funding'],
+      'fundingUrl': episode['funding'] is List
+          ? ((episode['funding'] as List).isNotEmpty
+              ? (episode['funding'] as List).first['url']
+              : null)
+          : (episode['fundingUrl'] as String?),
+      'persons': episode['persons'],
+      'soundbites': episode['soundbites'],
       'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': 0.0,
@@ -701,6 +712,8 @@ class AudioController extends ChangeNotifier {
                 ? (episodes['items'][i]['funding'] as List).first['url']
                 : null)
             : null,
+        'persons': episodes['items'][i]['persons'],
+        'soundbites': episodes['items'][i]['soundbites'],
         'podcast': {
           'id': podcast.id,
           'title': podcast.title,
@@ -1402,6 +1415,8 @@ class AudioController extends ChangeNotifier {
             map['fundingUrl'] = (funding is List && funding.isNotEmpty)
                 ? funding.first['url']
                 : null;
+            map['persons'] = map['persons'];
+            map['soundbites'] = map['soundbites'];
             return map;
           }).toList();
         }

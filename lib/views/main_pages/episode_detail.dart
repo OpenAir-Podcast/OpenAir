@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:openair/model/person_model.dart';
+import 'package:openair/model/soundbite_model.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +37,44 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 }
 
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
+  List<Person> _persons = [];
+  List<Soundbite> _soundbites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _parseMetadata();
+  }
+
+  void _parseMetadata() {
+    final item = widget.episodeItem;
+    if (item != null) {
+      final rawPersons = item['persons'];
+      if (rawPersons is List) {
+        _persons = rawPersons
+            .map((e) => Person.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawSoundbites = item['soundbites'];
+      if (rawSoundbites is List) {
+        _soundbites = rawSoundbites
+            .map((e) => Soundbite.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+    }
+  }
+
+  String _formatDuration(int seconds) {
+    final d = Duration(seconds: seconds);
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    final s = d.inSeconds.remainder(60);
+    if (h > 0) {
+      return '${h}h ${m.toString().padLeft(2, '0')}m';
+    }
+    return '${m}m ${s.toString().padLeft(2, '0')}s';
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
@@ -509,6 +550,141 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                   ],
                 ),
               ),
+              // People section
+              if (_persons.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.people_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'People',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _persons.map((person) {
+                      return ListTile(
+                        dense: true,
+                        leading: person.img != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CachedNetworkImage(
+                                  imageUrl: person.img!,
+                                  width: 36,
+                                  height: 36,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => CircleAvatar(
+                                    child: Icon(Icons.person_outlined, size: 20),
+                                  ),
+                                ),
+                              )
+                            : CircleAvatar(
+                                child: Icon(Icons.person_outlined, size: 20),
+                              ),
+                        title: Text(person.name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: person.role != null
+                            ? Text(person.role!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: Colors.grey))
+                            : null,
+                        onTap: person.href != null
+                            ? () async {
+                                if (await canLaunchUrl(
+                                    Uri.parse(person.href!))) {
+                                  await launchUrl(Uri.parse(person.href!),
+                                      mode:
+                                          LaunchMode.externalApplication);
+                                }
+                              }
+                            : null,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+              // Soundbites section
+              if (_soundbites.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.timeline_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Highlights',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _soundbites.map((sb) {
+                      final formattedStart = _formatDuration(sb.startTime);
+                      return ListTile(
+                        dense: true,
+                        leading: CircleAvatar(
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.1),
+                          child: Icon(Icons.play_arrow_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20),
+                        ),
+                        title: Text(sb.title ?? 'Highlight',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: Text(formattedStart,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Colors.grey)),
+                        onTap: () {
+                          final audio = ref.read(audioProvider);
+                          audio.seekToPosition(
+                              Duration(seconds: sb.startTime));
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
               // Episode Description
               SingleChildScrollView(
                 child: Html(
