@@ -792,16 +792,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                 ),
               ],
               // Episode Description
-              SingleChildScrollView(
-                child: Html(
-                  data: widget.episodeItem!['description'],
-                  onLinkTap: (url, attributes, element) async {
-                    await launchUrl(Uri.parse(url!));
-                  },
+              Html(
+                data: widget.episodeItem!['description'],
+                onLinkTap: (url, attributes, element) async {
+                  await launchUrl(Uri.parse(url!));
+                },
                   style: {
                     "body": Style(
-                      maxLines: 4,
-                      textOverflow: TextOverflow.ellipsis,
                       margin: Margins.zero,
                       fontSize: FontSize(
                         Theme.of(context).textTheme.bodyMedium?.fontSize ??
@@ -810,9 +807,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   },
-                ),
               ),
-            ],
+              ],
           ),
         ),
       ),
