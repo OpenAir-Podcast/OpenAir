@@ -1,3 +1,18 @@
+What's New in v0.19.0+62
+
+📖 Podcasting 2.0 Tag Support
+• You can now see chapter markers and navigate between chapters while listening
+• Transcript buttons appear on episodes that have them
+• Support buttons link directly to the podcast's funding page
+• Episode details show hosts and guests with their roles
+• Highlight clips with timestamps are shown on episode pages
+• Bitcoin/Lightning payment badges appear on podcast info pages
+• Season and episode numbers are displayed where available
+• Episode comments via social links are shown when present
+• Alternative audio/video formats are indicated with badges
+• Podcast recommendations (podroll) are shown on info pages
+• Trailer episodes are listed on podcast info pages
+
 What's New in v0.18.16+61
 
 • You can now unsubscribe directly from the podcast's episode page
