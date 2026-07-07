@@ -523,6 +523,10 @@ class HiveService {
                   'artwork': subscription.artwork,
                   'description': subscription.description,
                 };
+                final funding = episode['funding'];
+                episode['fundingUrl'] = (funding is List && funding.isNotEmpty)
+                    ? funding.first['url']
+                    : null;
 
                 await episodeBox.put(guid, episode);
 
@@ -586,6 +590,10 @@ class HiveService {
                 'artwork': subscription.artwork,
                 'description': subscription.description,
               };
+              final funding = episode['funding'];
+              episode['fundingUrl'] = (funding is List && funding.isNotEmpty)
+                  ? funding.first['url']
+                  : null;
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
 
