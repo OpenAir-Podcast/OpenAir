@@ -527,6 +527,8 @@ class HiveService {
                 episode['fundingUrl'] = (funding is List && funding.isNotEmpty)
                     ? funding.first['url']
                     : null;
+                episode['persons'] = episode['persons'];
+                episode['soundbites'] = episode['soundbites'];
 
                 await episodeBox.put(guid, episode);
 
@@ -594,6 +596,8 @@ class HiveService {
               episode['fundingUrl'] = (funding is List && funding.isNotEmpty)
                   ? funding.first['url']
                   : null;
+              episode['persons'] = episode['persons'];
+              episode['soundbites'] = episode['soundbites'];
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
 

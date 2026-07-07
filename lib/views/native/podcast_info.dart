@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/model/person_model.dart';
+import 'package:openair/model/value_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,6 +19,26 @@ class PodcastInfoPage extends ConsumerWidget {
   const PodcastInfoPage({super.key, required this.podcastInfo});
 
   final Map podcastInfo;
+
+  List<Person> get _persons {
+    final raw = podcastInfo['persons'];
+    if (raw is List) {
+      return raw
+          .map((e) => Person.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Value> get _values {
+    final raw = podcastInfo['value'];
+    if (raw is List) {
+      return raw
+          .map((e) => Value.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -217,6 +239,119 @@ class PodcastInfoPage extends ConsumerWidget {
                     style: theme.textTheme.bodyMedium?.copyWith(
                       height: 1.6,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // People section
+              if (_persons.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.people_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'People',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _persons.map((person) {
+                      return ListTile(
+                        leading: person.img != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CachedNetworkImage(
+                                  imageUrl: person.img!,
+                                  width: 36,
+                                  height: 36,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => CircleAvatar(
+                                    child: Icon(Icons.person_outlined, size: 20),
+                                  ),
+                                ),
+                              )
+                            : CircleAvatar(
+                                child: Icon(Icons.person_outlined, size: 20),
+                              ),
+                        title: Text(person.name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: person.role != null
+                            ? Text(person.role!,
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey))
+                            : null,
+                        onTap: person.href != null
+                            ? () async {
+                                if (await canLaunchUrl(
+                                    Uri.parse(person.href!))) {
+                                  await launchUrl(Uri.parse(person.href!),
+                                      mode:
+                                          LaunchMode.externalApplication);
+                                }
+                              }
+                            : null,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Value section
+              if (_values.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.bolt_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Value',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _values.map((v) {
+                      return Chip(
+                        avatar: const Icon(Icons.bolt, size: 16,
+                            color: Color(0xFFF7931A)),
+                        label: Text(v.displayName),
+                        backgroundColor: const Color(0xFFF7931A)
+                            .withValues(alpha: 0.1),
+                        side: BorderSide.none,
+                      );
+                    }).toList(),
                   ),
                 ),
                 const SizedBox(height: 32),
