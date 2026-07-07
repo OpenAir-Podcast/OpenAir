@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'dart:ui';
 
+import 'package:openair/model/chapters_model.dart';
+import 'package:openair/providers/chapters_provider.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
 
 import 'package:flutter/material.dart';
@@ -448,6 +450,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     AsyncValue<Map<String, SubscriptionModel>> subsAsync,
     AsyncValue favoriteListAsync,
   ) {
+    final chapters = ref.watch(chaptersProvider);
     final isWide = !Platform.isAndroid && !Platform.isIOS ||
         wideScreenMinWidth < MediaQuery.sizeOf(context).width;
 
@@ -566,6 +569,55 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
           ],
         ),
         const SizedBox(height: 24),
+        // Current Chapter Name
+        chapters?.let((it) {
+          final current = it.chapterAt(
+            audioState.playerPosition.inSeconds,
+          );
+          return current != null
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    current.title,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              : const SizedBox.shrink();
+        }) ?? const SizedBox.shrink(),
+        const SizedBox(height: 8),
+        // Chapter Markers Bar
+        chapters?.let((it) {
+          if (it.chapters.isEmpty) return const SizedBox.shrink();
+          return _ChapterMarkersBar(
+            chapters: it.chapters,
+            totalDuration: audioState.playerTotalDuration,
+            currentPosition: audioState.playerPosition,
+          );
+        }) ?? const SizedBox.shrink(),
+        const SizedBox(height: 8),
+        // Chapter List
+        chapters?.let((it) {
+          if (it.chapters.isEmpty) return const SizedBox.shrink();
+          return _ChapterList(
+            chapters: it.chapters,
+            currentPosition: audioState.playerPosition,
+            onSeek: (seconds) {
+              final totalMs = audioState.playerTotalDuration.inMilliseconds;
+              if (totalMs > 0) {
+                audioState.seekTo(
+                  (seconds * 1000) / totalMs,
+                );
+              }
+            },
+          );
+        }) ?? const SizedBox.shrink(),
+        const SizedBox(height: 16),
         // Main Controls
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -725,5 +777,207 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
       onPressed: onTap,
       color: Theme.of(context).colorScheme.onSurfaceVariant,
     );
+  }
+}
+
+extension _LetExtension<T extends Object> on T? {
+  R? let<R>(R Function(T) block) {
+    final self = this;
+    return self == null ? null : block(self);
+  }
+}
+
+class _ChapterMarkersBar extends StatelessWidget {
+  final List<Chapter> chapters;
+  final Duration totalDuration;
+  final Duration currentPosition;
+
+  const _ChapterMarkersBar({
+    required this.chapters,
+    required this.totalDuration,
+    required this.currentPosition,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final totalMs = totalDuration.inMilliseconds;
+    if (totalMs <= 0) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final currentMs = currentPosition.inMilliseconds;
+    final progress = (currentMs / totalMs).clamp(0.0, 1.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const dotSize = 10.0;
+          const dotPad = dotSize / 2;
+          final trackWidth = constraints.maxWidth - dotSize;
+          final trackLeft = dotPad;
+
+          return SizedBox(
+            height: dotSize + 4,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Background track
+                Positioned(
+                  left: trackLeft,
+                  right: dotPad,
+                  top: (dotSize + 4 - 4) / 2,
+                  child: Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                // Filled track
+                Positioned(
+                  left: trackLeft,
+                  top: (dotSize + 4 - 4) / 2,
+                  child: Container(
+                    width: trackWidth * progress,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                // Chapter marker dots
+                for (final ch in chapters)
+                  Positioned(
+                    left: (ch.start * 1000 / totalMs) * trackWidth + dotPad - dotSize / 2,
+                    top: 1,
+                    child: Container(
+                      width: dotSize,
+                      height: dotSize,
+                      decoration: BoxDecoration(
+                        color: ch.start * 1000 <= currentMs
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ChapterList extends StatelessWidget {
+  final List<Chapter> chapters;
+  final Duration currentPosition;
+  final ValueChanged<int> onSeek;
+
+  const _ChapterList({
+    required this.chapters,
+    required this.currentPosition,
+    required this.onSeek,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currentMs = currentPosition.inMilliseconds;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 160),
+      child: ListView.separated(
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: chapters.length,
+        separatorBuilder: (_, __) => Container(
+          height: 1,
+          margin: const EdgeInsets.only(left: 16),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+        ),
+        itemBuilder: (context, index) {
+          final ch = chapters[index];
+          final nextStart =
+              index < chapters.length - 1 ? chapters[index + 1].start * 1000 : double.infinity;
+          final isCurrent = ch.start * 1000 <= currentMs && nextStart > currentMs;
+          final chSeconds = ch.start;
+
+          return InkWell(
+            onTap: () => onSeek(chSeconds),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    isCurrent ? Icons.play_arrow_rounded : Icons.circle_outlined,
+                    size: 16,
+                    color: isCurrent
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatTime(chSeconds),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                      color: isCurrent
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      ch.title,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: isCurrent ? FontWeight.w600 : FontWeight.normal,
+                        color: isCurrent
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (ch.image != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          ch.image!,
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _formatTime(int seconds) {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    if (h > 0) {
+      return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    }
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 }

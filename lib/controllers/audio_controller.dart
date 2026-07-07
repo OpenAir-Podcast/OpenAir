@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/model/chapters_model.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
@@ -52,6 +53,8 @@ class AudioController extends ChangeNotifier {
   PodcastModel? currentPodcast;
   Map<String, dynamic>? currentEpisode;
   Map<String, dynamic>? nextEpisode;
+  ChaptersData? _currentChapters;
+  ChaptersData? get currentChapters => _currentChapters;
 
   bool isPodcastSelected = false;
   bool onceQueueComplete = false;
@@ -264,6 +267,8 @@ class AudioController extends ChangeNotifier {
       await addToHistory(currentEpisode!, currentPodcast,
           author: currentEpisode!['author']);
       notifyListeners();
+
+      _fetchChapters(currentEpisode);
     } on TimeoutException {
       _handlePlaybackError();
     } catch (e) {
@@ -284,6 +289,21 @@ class AudioController extends ChangeNotifier {
     audioState = 'Stop';
     loadState = 'Detail';
     notifyListeners();
+  }
+
+  Future<void> _fetchChapters(Map<String, dynamic>? episode) async {
+    final url = episode?['chaptersUrl'] as String?;
+    if (url == null || url.isEmpty) {
+      _currentChapters = null;
+      return;
+    }
+    try {
+      final response = await Dio().get(url);
+      _currentChapters = ChaptersData.fromJson(response.data);
+      notifyListeners();
+    } catch (_) {
+      _currentChapters = null;
+    }
   }
 
   Future<void> resumePlayback() async {
@@ -671,6 +691,9 @@ class AudioController extends ChangeNotifier {
         'size': getEpisodeSize(episodes['items'][i]['enclosureLength']),
         'enclosureLength': episodes['items'][i]['enclosureLength'],
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
+        'chaptersUrl': episodes['items'][i]['chapters'],
+        'transcriptUrl': episodes['items'][i]['transcript'],
+        'fundingUrl': episodes['items'][i]['funding'],
         'podcast': {
           'id': podcast.id,
           'title': podcast.title,

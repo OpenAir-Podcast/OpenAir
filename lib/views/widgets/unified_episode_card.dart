@@ -9,6 +9,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UnifiedEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
@@ -279,6 +280,23 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                 );
           },
         ),
+        // Transcript button
+        if (widget.episodeItem['transcriptUrl'] != null &&
+            (widget.episodeItem['transcriptUrl'] as String).isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.description_outlined, size: 18),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Transcript',
+            onPressed: () async {
+              final url = widget.episodeItem['transcriptUrl'] as String;
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
       ],
     );
   }

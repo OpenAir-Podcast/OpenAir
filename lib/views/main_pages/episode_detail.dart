@@ -478,6 +478,34 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       },
                       icon: const Icon(Icons.share_rounded),
                     ),
+                    // Transcript Button
+                    if (widget.episodeItem?['transcriptUrl'] != null &&
+                        (widget.episodeItem!['transcriptUrl'] as String).isNotEmpty)
+                      IconButton(
+                        tooltip: 'Transcript',
+                        onPressed: () async {
+                          final url = widget.episodeItem!['transcriptUrl'] as String;
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url),
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.description_outlined),
+                      ),
+                    // Funding Button
+                    if (widget.episodeItem?['fundingUrl'] != null &&
+                        (widget.episodeItem!['fundingUrl'] as String).isNotEmpty)
+                      IconButton(
+                        tooltip: 'Support',
+                        onPressed: () async {
+                          final url = widget.episodeItem!['fundingUrl'] as String;
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url),
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.favorite_border_rounded),
+                      ),
                   ],
                 ),
               ),
