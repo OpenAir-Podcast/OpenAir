@@ -4,6 +4,8 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
 import 'package:openair/model/person_model.dart';
+import 'package:openair/model/podroll_model.dart';
+import 'package:openair/model/trailer_model.dart';
 import 'package:openair/model/value_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
@@ -35,6 +37,26 @@ class PodcastInfoPage extends ConsumerWidget {
     if (raw is List) {
       return raw
           .map((e) => Value.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<PodrollEntry> get _podroll {
+    final raw = podcastInfo['podroll'];
+    if (raw is List) {
+      return raw
+          .map((e) => PodrollEntry.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Trailer> get _trailers {
+    final raw = podcastInfo['trailers'];
+    if (raw is List) {
+      return raw
+          .map((e) => Trailer.fromJson(Map<String, dynamic>.from(e)))
           .toList();
     }
     return [];
@@ -350,6 +372,135 @@ class PodcastInfoPage extends ConsumerWidget {
                         backgroundColor: const Color(0xFFF7931A)
                             .withValues(alpha: 0.1),
                         side: BorderSide.none,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Podroll section
+              if (_podroll.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.rss_feed_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Recommendations',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _podroll.map((entry) {
+                      return ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: entry.imageUrl ?? '',
+                            width: 44,
+                            height: 44,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => Container(
+                              width: 44,
+                              height: 44,
+                              color: cardImageShadow,
+                              child:
+                                  const Icon(Icons.podcasts, size: 24),
+                            ),
+                          ),
+                        ),
+                        title: Text(entry.title ?? 'Unknown',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: entry.author != null
+                            ? Text(entry.author!,
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey))
+                            : null,
+                        onTap: entry.feedUrl != null
+                            ? () async {
+                                if (await canLaunchUrl(
+                                    Uri.parse(entry.feedUrl!))) {
+                                  await launchUrl(
+                                      Uri.parse(entry.feedUrl!),
+                                      mode: LaunchMode
+                                          .externalApplication);
+                                }
+                              }
+                            : null,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Trailers section
+              if (_trailers.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.movie_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Trailers',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _trailers.map((t) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: colorScheme.primary
+                              .withValues(alpha: 0.1),
+                          child: Icon(Icons.play_arrow_rounded,
+                              color: colorScheme.primary),
+                        ),
+                        title: Text(t.display ?? 'Trailer',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: t.season != null
+                            ? Text('Season ${t.season}',
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey))
+                            : null,
+                        onTap: t.url != null
+                            ? () async {
+                                if (await canLaunchUrl(
+                                    Uri.parse(t.url!))) {
+                                  await launchUrl(Uri.parse(t.url!),
+                                      mode: LaunchMode
+                                          .externalApplication);
+                                }
+                              }
+                            : null,
                       );
                     }).toList(),
                   ),

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:openair/model/alternate_enclosure_model.dart';
 import 'package:openair/model/person_model.dart';
+import 'package:openair/model/social_interact_model.dart';
 import 'package:openair/model/soundbite_model.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:flutter/foundation.dart';
@@ -39,6 +41,8 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   List<Person> _persons = [];
   List<Soundbite> _soundbites = [];
+  List<SocialInteract> _socialInteracts = [];
+  List<AlternateEnclosure> _alternateEnclosures = [];
 
   @override
   void initState() {
@@ -61,6 +65,19 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
             .map((e) => Soundbite.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
+      final rawSocial = item['socialInteract'];
+      if (rawSocial is List) {
+        _socialInteracts = rawSocial
+            .map((e) => SocialInteract.fromJson(Map<String, dynamic>.from(e)))
+            .where((s) => s.isSupported)
+            .toList();
+      }
+      final rawAltEnc = item['alternateEnclosure'];
+      if (rawAltEnc is List) {
+        _alternateEnclosures = rawAltEnc
+            .map((e) => AlternateEnclosure.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
     }
   }
 
@@ -73,6 +90,55 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
       return '${h}h ${m.toString().padLeft(2, '0')}m';
     }
     return '${m}m ${s.toString().padLeft(2, '0')}s';
+  }
+
+  Widget _buildSeasonEpisodeBadge() {
+    final season = widget.episodeItem!['season'];
+    final episodeNum = widget.episodeItem!['episode'];
+    final label = StringBuffer();
+    if (season != null) label.write('S${(season as num).toInt().toString().padLeft(2, '0')}');
+    if (episodeNum != null) label.write('E${(episodeNum as num).toInt().toString().padLeft(2, '0')}');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label.toString(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildSocialInteractButton(SocialInteract si) {
+    IconData icon;
+    switch (si.protocol) {
+      case 'activitypub':
+        icon = Icons.forum_outlined;
+        break;
+      case 'twitter':
+        icon = Icons.alternate_email_outlined;
+        break;
+      default:
+        icon = Icons.comment_outlined;
+    }
+    return IconButton(
+      icon: Icon(icon, size: 18),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      visualDensity: VisualDensity.compact,
+      tooltip: si.displayLabel,
+      onPressed: () async {
+        if (si.uri != null && await canLaunchUrl(Uri.parse(si.uri!))) {
+          await launchUrl(Uri.parse(si.uri!),
+              mode: LaunchMode.externalApplication);
+        }
+      },
+    );
   }
 
   @override
@@ -142,6 +208,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
+                        // Season/Episode
+                        if (widget.episodeItem!['season'] != null ||
+                            widget.episodeItem!['episode'] != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: _buildSeasonEpisodeBadge(),
+                          ),
                         // Author
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
@@ -547,9 +620,42 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         },
                         icon: const Icon(Icons.favorite_border_rounded),
                       ),
+                    // SocialInteract buttons
+                    ..._socialInteracts.map(
+                        (si) => _buildSocialInteractButton(si)),
                   ],
                 ),
               ),
+              // Alternate Enclosure badges
+              if (_alternateEnclosures.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _alternateEnclosures.map((ae) {
+                      return Chip(
+                        avatar: Icon(
+                          ae.isVideo
+                              ? Icons.videocam_outlined
+                              : Icons.headphones_outlined,
+                          size: 16,
+                        ),
+                        label: Text(ae.formatLabel,
+                            style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize:
+                            MaterialTapTargetSize.shrinkWrap,
+                        side: BorderSide.none,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
               // People section
               if (_persons.isNotEmpty) ...[
                 const SizedBox(height: 16),

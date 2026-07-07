@@ -529,6 +529,10 @@ class HiveService {
                     : null;
                 episode['persons'] = episode['persons'];
                 episode['soundbites'] = episode['soundbites'];
+                episode['season'] = episode['season'];
+                episode['episode'] = episode['episode'];
+                episode['socialInteract'] = episode['socialInteract'];
+                episode['alternateEnclosure'] = episode['alternateEnclosure'];
 
                 await episodeBox.put(guid, episode);
 
@@ -598,6 +602,10 @@ class HiveService {
                   : null;
               episode['persons'] = episode['persons'];
               episode['soundbites'] = episode['soundbites'];
+              episode['season'] = episode['season'];
+              episode['episode'] = episode['episode'];
+              episode['socialInteract'] = episode['socialInteract'];
+              episode['alternateEnclosure'] = episode['alternateEnclosure'];
               await episodeBox.put(guid, episode);
               await feedBox.put(guid, FeedModel(guid: guid));
 

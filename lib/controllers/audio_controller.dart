@@ -724,6 +724,10 @@ class AudioController extends ChangeNotifier {
           : (episode['fundingUrl'] as String?),
       'persons': episode['persons'],
       'soundbites': episode['soundbites'],
+      'season': episode['season'],
+      'episode': episode['episode'],
+      'socialInteract': episode['socialInteract'],
+      'alternateEnclosure': episode['alternateEnclosure'],
       'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': 0.0,
@@ -782,6 +786,10 @@ class AudioController extends ChangeNotifier {
             : null,
         'persons': episodes['items'][i]['persons'],
         'soundbites': episodes['items'][i]['soundbites'],
+        'season': episodes['items'][i]['season'],
+        'episode': episodes['items'][i]['episode'],
+        'socialInteract': episodes['items'][i]['socialInteract'],
+        'alternateEnclosure': episodes['items'][i]['alternateEnclosure'],
         'podcast': {
           'id': podcast.id,
           'title': podcast.title,
@@ -1765,6 +1773,10 @@ class AudioController extends ChangeNotifier {
                 : null;
             map['persons'] = map['persons'];
             map['soundbites'] = map['soundbites'];
+            map['season'] = map['season'];
+            map['episode'] = map['episode'];
+            map['socialInteract'] = map['socialInteract'];
+            map['alternateEnclosure'] = map['alternateEnclosure'];
             return map;
           }).toList();
         }
