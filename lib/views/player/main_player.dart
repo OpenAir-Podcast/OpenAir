@@ -306,7 +306,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
-                      episode['description'] ?? '',
+                      _stripHtml(episode['description'] ?? ''),
                       style: theme.textTheme.bodyMedium,
                     ),
                   ),
@@ -336,6 +336,16 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
       return 'Unknown date';
     }
     return 'Unknown date';
+  }
+
+  String _stripHtml(String html) {
+    return html
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .trim();
   }
 
   @override
