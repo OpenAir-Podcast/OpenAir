@@ -40,6 +40,7 @@ class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
 class _SubscriptionsEpisodesPageState
     extends ConsumerState<SubscriptionsEpisodesPage> {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _currentEpisodeKey = GlobalKey();
 
   @override
   void dispose() {
@@ -59,14 +60,31 @@ class _SubscriptionsEpisodesPageState
       final item = items[i];
       if (item is Map && item['guid'] == currentGuid) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final offset = i * 100.0;
-          if (_scrollController.hasClients &&
-              offset < _scrollController.position.maxScrollExtent) {
+          if (!_scrollController.hasClients) return;
+          final isInView = _currentEpisodeKey.currentContext != null;
+          if (isInView) {
+            Scrollable.ensureVisible(
+              _currentEpisodeKey.currentContext!,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              alignment: 0.3,
+            );
+          } else {
             _scrollController.animateTo(
-              offset,
+              (i * 260.0).clamp(0.0, _scrollController.position.maxScrollExtent),
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
             );
+            Future.delayed(const Duration(milliseconds: 350), () {
+              if (_currentEpisodeKey.currentContext != null && mounted) {
+                Scrollable.ensureVisible(
+                  _currentEpisodeKey.currentContext!,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  alignment: 0.3,
+                );
+              }
+            });
           }
         });
         return;
@@ -205,6 +223,9 @@ class _SubscriptionsEpisodesPageState
       _scrollToCurrentEpisode(snapshot);
     });
 
+    final audioState = ref.read(audioProvider);
+    final currentGuid = audioState.currentEpisode?['guid'] as String?;
+
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       controller: _scrollController,
@@ -213,11 +234,14 @@ class _SubscriptionsEpisodesPageState
       itemCount: episodeCount,
       itemBuilder: (context, index) {
         final author = getAuthor();
+        final item = snapshot['items'][index];
+        final isCurrent = currentGuid != null && item['guid'] == currentGuid;
 
         return UnifiedEpisodeCard(
-          episodeItem: snapshot['items'][index],
+          key: isCurrent ? _currentEpisodeKey : null,
+          episodeItem: item,
           podcast: widget.podcast,
-          title: snapshot['items'][index]['title'],
+          title: item['title'],
           author: author,
           showAuthor: true,
         );
