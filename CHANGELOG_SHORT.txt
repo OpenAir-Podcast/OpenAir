@@ -1,3 +1,11 @@
+What's New in v0.18.17+62
+
+• If you close the app mid-episode, it will resume right where you left off next time you open it
+• Your listening position is now saved every 15 seconds and when you switch away from the app
+• The episode currently playing is now highlighted with a "Now Playing" badge
+• When you open a podcast, the episode list automatically scrolls to the one you're listening to
+• Fixed the Now Playing badge not updating when using the previous/next buttons
+
 What's New in v0.18.16+61
 
 • You can now unsubscribe directly from the podcast's episode page
