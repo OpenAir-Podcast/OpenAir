@@ -87,6 +87,8 @@ class AudioController extends ChangeNotifier {
   int? _sleepTimerMinutes;
   int? _remainingSeconds;
 
+  Timer? _positionSaveTimer;
+
   int? get sleepTimerMinutes => _sleepTimerMinutes;
   int? get remainingSeconds => _remainingSeconds;
   bool get isSleepTimerActive => _sleepTimerMinutes != null;
@@ -114,6 +116,41 @@ class AudioController extends ChangeNotifier {
     _sleepTimerMinutes = null;
     _remainingSeconds = null;
     notifyListeners();
+  }
+
+  void _startPositionAutoSave() {
+    _positionSaveTimer?.cancel();
+    _positionSaveTimer = Timer.periodic(const Duration(seconds: 15), (_) async {
+      if (isPlaying != PlayingStatus.playing) return;
+      await updateHistoryPlaybackPosition();
+      await _savePlayerState();
+    });
+  }
+
+  void _stopPositionAutoSave() {
+    _positionSaveTimer?.cancel();
+    _positionSaveTimer = null;
+  }
+
+  Future<void> savePlayerState() async {
+    await _savePlayerState();
+  }
+
+  Future<void> _savePlayerState() async {
+    if (currentEpisode == null) return;
+    final hiveService = ref.read(hiveServiceProvider);
+    await hiveService.saveLastPlayedEpisode({
+      'guid': currentEpisode!['guid'],
+      'title': currentEpisode!['title'],
+      'podcastTitle': currentEpisode!['podcastTitle'],
+      'author': currentEpisode!['author'],
+      'image': currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '',
+      'feedUrl': currentEpisode!['feedUrl'],
+      'enclosureUrl': currentEpisode!['enclosureUrl'],
+      'datePublished': currentEpisode!['datePublished'],
+      'duration': currentEpisode!['duration'],
+      'position': playerPosition.inMilliseconds,
+    });
   }
 
   void dismissBanner() {
@@ -263,6 +300,8 @@ class AudioController extends ChangeNotifier {
 
       await addToHistory(currentEpisode!, currentPodcast,
           author: currentEpisode!['author']);
+      _startPositionAutoSave();
+      await _savePlayerState();
       notifyListeners();
     } on TimeoutException {
       _handlePlaybackError();
@@ -280,6 +319,7 @@ class AudioController extends ChangeNotifier {
   }
 
   void _handlePlaybackError() {
+    _stopPositionAutoSave();
     isPlaying = PlayingStatus.stop;
     audioState = 'Stop';
     loadState = 'Detail';
@@ -302,6 +342,7 @@ class AudioController extends ChangeNotifier {
     } else {
       await _audioHandler.play();
     }
+    _startPositionAutoSave();
     audioState = 'Play';
     loadState = 'Play';
     isPlaying = PlayingStatus.playing;
@@ -321,6 +362,8 @@ class AudioController extends ChangeNotifier {
 
   Future<void> pausePlayback() async {
     await updateHistoryPlaybackPosition();
+    _stopPositionAutoSave();
+    await _savePlayerState();
     await _audioHandler.pause();
     audioState = 'Pause';
     loadState = 'Detail';
@@ -874,8 +917,10 @@ class AudioController extends ChangeNotifier {
         case ProcessingState.completed:
           if (_isAutoPlayingNext) break;
           _isAutoPlayingNext = true;
+          _stopPositionAutoSave();
           try {
             await updateHistoryPlaybackPosition(positionOverride: 0);
+            await _savePlayerState();
             if (_appContext != null) {
               if (autoplayNextInQueueConfig) {
                 await _autoPlayNextFromQueue(_appContext!);
@@ -901,6 +946,74 @@ class AudioController extends ChangeNotifier {
       }
       notifyListeners();
     });
+
+    _restoreLastPlayedEpisode();
+  }
+
+  Future<void> _restoreLastPlayedEpisode() async {
+    final hiveService = ref.read(hiveServiceProvider);
+    final saved = await hiveService.getLastPlayedEpisode();
+    if (saved == null) return;
+
+    final guid = saved['guid'] as String?;
+    final position = saved['position'] as int?;
+    if (guid == null || position == null || position <= 0) return;
+
+    final historyEntry = await hiveService.getHistoryEntry(guid);
+    final episodeBox = await hiveService.episodeBox;
+    final storedEpisode = await episodeBox.get(guid);
+
+    if (historyEntry == null && storedEpisode == null) {
+      await hiveService.clearLastPlayedEpisode();
+      return;
+    }
+
+    currentEpisode = storedEpisode != null
+        ? Map<String, dynamic>.from(storedEpisode)
+        : {
+            'guid': guid,
+            'title': saved['title'],
+            'podcastTitle': saved['podcastTitle'],
+            'author': saved['author'],
+            'image': saved['image'],
+            'feedUrl': saved['feedUrl'],
+            'enclosureUrl': saved['enclosureUrl'],
+            'datePublished': saved['datePublished'],
+            'duration': saved['duration'],
+          };
+
+    if (currentEpisode!['podcastTitle'] == null ||
+        currentEpisode!['podcastTitle'].isEmpty) {
+      currentEpisode!['podcastTitle'] = saved['podcastTitle'];
+    }
+    if (currentEpisode!['author'] == null ||
+        currentEpisode!['author'].isEmpty) {
+      currentEpisode!['author'] = saved['author'];
+    }
+
+    await _resolvePodcastFromEpisode(currentEpisode!);
+
+    playerPosition = Duration(milliseconds: position);
+    isPlaying = PlayingStatus.paused;
+    audioState = 'Pause';
+    loadState = 'Detail';
+    isPodcastSelected = true;
+
+    final imageUrl =
+        saved['image'] as String? ?? currentEpisode!['image'] as String? ?? '';
+    final title = currentEpisode!['title'] as String? ?? 'Unknown';
+    final artist = currentEpisode!['author'] as String? ??
+        currentEpisode!['podcastTitle'] as String? ??
+        'Unknown';
+    await _audioHandler.setMediaItem(
+      id: guid,
+      title: title,
+      artist: artist,
+      album: currentEpisode!['podcastTitle'] as String? ?? '',
+      artUri: imageUrl,
+    );
+
+    notifyListeners();
   }
 
   Future<void> playerPlayButtonClicked(

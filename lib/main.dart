@@ -423,6 +423,17 @@ class _AppHomeState extends ConsumerState<_AppHome>
     }
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      final audio = ref.read(audioProvider);
+      audio.updateHistoryPlaybackPosition();
+      audio.savePlayerState();
+    }
+  }
+
   void _applySystemTheme() {
     if (!mounted || themeModeConfig != 'System') return;
 

@@ -1295,6 +1295,25 @@ class HiveService {
     return keys.length;
   }
 
+  Future<void> saveLastPlayedEpisode(Map<String, dynamic> state) async {
+    final box = await persistence;
+    await box.put('last_played_episode', state);
+  }
+
+  Future<Map<String, dynamic>?> getLastPlayedEpisode() async {
+    final box = await persistence;
+    final data = await box.get('last_played_episode');
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return null;
+  }
+
+  Future<void> clearLastPlayedEpisode() async {
+    final box = await persistence;
+    await box.delete('last_played_episode');
+  }
+
   Future<int> getAccumulatedEpisodes() async {
     final box = await subscriptionBox;
     final Map<String, SubscriptionModel> allEpisodes = await box.getAllValues();
