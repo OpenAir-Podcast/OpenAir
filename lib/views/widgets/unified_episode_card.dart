@@ -34,8 +34,11 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   late bool isQueued;
   late bool isFavorite;
 
-  bool get _isCurrentEpisode =>
-      ref.watch(audioProvider).currentEpisode == widget.episodeItem;
+  bool get _isCurrentEpisode {
+    final current = ref.watch(audioProvider).currentEpisode;
+    if (current == null) return false;
+    return current['guid'] == widget.episodeItem['guid'];
+  }
 
   String _formatDuration(int? seconds) {
     if (seconds == null || seconds <= 0) return '';
