@@ -39,6 +39,41 @@ class SubscriptionsEpisodesPage extends ConsumerStatefulWidget {
 
 class _SubscriptionsEpisodesPageState
     extends ConsumerState<SubscriptionsEpisodesPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentEpisode(Map snapshot) {
+    final audioState = ref.read(audioProvider);
+    final currentGuid = audioState.currentEpisode?['guid'] as String?;
+    if (currentGuid == null) return;
+
+    final items = snapshot['items'] as List?;
+    if (items == null) return;
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      if (item is Map && item['guid'] == currentGuid) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final offset = i * 100.0;
+          if (_scrollController.hasClients &&
+              offset < _scrollController.position.maxScrollExtent) {
+            _scrollController.animateTo(
+              offset,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
+        return;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final podCastUrl = widget.podcast.feedUrl;
@@ -144,6 +179,7 @@ class _SubscriptionsEpisodesPageState
     if (isWide) {
       return GridView.builder(
         padding: const EdgeInsets.all(16),
+        controller: _scrollController,
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 300.0,
           mainAxisExtent: 312.0,
@@ -165,8 +201,13 @@ class _SubscriptionsEpisodesPageState
       );
     }
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentEpisode(snapshot);
+    });
+
     return ListView.separated(
       padding: const EdgeInsets.all(12),
+      controller: _scrollController,
       scrollCacheExtent: ScrollCacheExtent.pixels(cacheExtent),
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: episodeCount,

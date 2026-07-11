@@ -34,6 +34,9 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   late bool isQueued;
   late bool isFavorite;
 
+  bool get _isCurrentEpisode =>
+      ref.watch(audioProvider).currentEpisode == widget.episodeItem;
+
   String _formatDuration(int? seconds) {
     if (seconds == null || seconds <= 0) return '';
     final duration = Duration(seconds: seconds);
@@ -87,21 +90,22 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
         ),
         child: Padding(
           // Added padding for better spacing
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize
-                .min, // Prevents Column from trying to take infinite height
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // Align to top
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      color: theme.cardColor,
-                      child: podcastImage(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  color: theme.cardColor,
+                  child: Stack(
+                    children: [
+                      podcastImage(
                         widget.episodeItem['feedImage'] ??
                             widget.episodeItem['image'] ??
                             widget.podcast.imageUrl,
@@ -109,9 +113,28 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                         height: 72,
                         fit: BoxFit.cover,
                       ),
-                    ),
+                      if (_isCurrentEpisode)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: const BorderRadius.only(
+                                bottomRight: Radius.circular(6),
+                              ),
+                            ),
+                            child: Icon(Icons.play_arrow,
+                                size: 14, color: Colors.white),
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
+                ),
+              ),
+              const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,36 +242,61 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
   }
 
   Widget _buildPlayButton(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          elevation: 1,
-          backgroundColor:
-              ref.watch(audioProvider).currentEpisode == widget.episodeItem
+    final isCurrent = _isCurrentEpisode;
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              elevation: 1,
+              backgroundColor: isCurrent
                   ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).colorScheme.secondary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          minimumSize: const Size.fromHeight(36),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              minimumSize: const Size.fromHeight(36),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            onPressed: () {
+              if (ref.read(audioProvider).currentEpisode != widget.episodeItem) {
+                ref
+                    .read(audioProvider.notifier)
+                    .playerPlayButtonClicked(widget.episodeItem, context);
+                ref.read(audioProvider).currentEpisode!['author'] =
+                    widget.author ?? widget.podcast.author ?? '';
+              }
+            },
+            child: PlayButtonWidget(
+              episodeItem: widget.episodeItem,
+            ),
           ),
         ),
-        onPressed: () {
-          if (ref.read(audioProvider).currentEpisode != widget.episodeItem) {
-            ref
-                .read(audioProvider.notifier)
-                .playerPlayButtonClicked(widget.episodeItem, context);
-            ref.read(audioProvider).currentEpisode!['author'] =
-                widget.author ?? widget.podcast.author ?? '';
-          }
-        },
-        child: PlayButtonWidget(
-          episodeItem: widget.episodeItem,
-        ),
-      ),
+        if (isCurrent) ...[
+          const SizedBox(height: 4),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: () {
+                ref.read(audioProvider.notifier).playNextFromPodcast(context);
+              },
+              icon: const Icon(Icons.skip_next, size: 16),
+              label: Text(
+                Translations.of(context).text('playNext'),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                minimumSize: const Size.fromHeight(28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

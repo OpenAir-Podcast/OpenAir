@@ -1539,6 +1539,10 @@ class AudioController extends ChangeNotifier {
     }
   }
 
+  Future<void> playNextFromPodcast(BuildContext context) async {
+    await _playNextFromPodcast(context);
+  }
+
   String formatCurrentPlaybackPosition(Duration timeline) {
     return formatPlaybackPosition(timeline);
   }
