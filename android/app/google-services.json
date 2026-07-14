@@ -1,65 +1,34 @@
 {
   "project_info": {
-    "project_number": "927721490543",
-    "project_id": "openair-27cb8",
-    "storage_bucket": "openair-27cb8.firebasestorage.app"
+    "project_number": "74452436250",
+    "project_id": "openairplayer",
+    "storage_bucket": "openairplayer.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:927721490543:android:96365fd08c7b9810cc259a",
+        "mobilesdk_app_id": "1:74452436250:android:9b15a2b095558b1501d8a3",
         "android_client_info": {
           "package_name": "com.liquidhive.openair"
         }
       },
       "oauth_client": [
         {
-          "client_id": "927721490543-244bcgfuehaa1jl5e5ajl9d07jvsdcfn.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.liquidhive.openair",
-            "certificate_hash": "c6792d5d888d2314cb195bf598922224dfbc59bf"
-          }
-        },
-        {
-          "client_id": "927721490543-dle5deusma94r2o6357u5os7mgfe0s78.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.liquidhive.openair",
-            "certificate_hash": "9284bfe72ab2168c47de2b4c56ffa5aed20d9605"
-          }
-        },
-        {
-          "client_id": "927721490543-m75junc7pa2nldkt0b92bahergq3cfkf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.liquidhive.openair",
-            "certificate_hash": "1bde47480bd9431eaf652c76a8fa03ec0041bd20"
-          }
-        },
-        {
-          "client_id": "927721490543-r20d8pt0mrntugpql4i4nngj88qavh6t.apps.googleusercontent.com",
+          "client_id": "74452436250-ieqed6v9480uh3vtsbvv35ebrc49ptrb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAszu2Dac5sSCDNlXPKcXY6u8xfC9AF9tA"
+          "current_key": "AIzaSyBt_Hx2GOZ8reLOiNb8uUt-c6_dbizPDNg"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "927721490543-r20d8pt0mrntugpql4i4nngj88qavh6t.apps.googleusercontent.com",
+              "client_id": "74452436250-ieqed6v9480uh3vtsbvv35ebrc49ptrb.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "927721490543-pmi593d03t8hbj9lraaksuacsb4vaser.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.openair.podcast"
-              }
             }
           ]
         }
