@@ -29,6 +29,13 @@
             {
               "client_id": "74452436250-ieqed6v9480uh3vtsbvv35ebrc49ptrb.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "74452436250-dmhli3joiq8kjttn3fi3evb0lr48bvbj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.liquidhive.openair"
+              }
             }
           ]
         }
