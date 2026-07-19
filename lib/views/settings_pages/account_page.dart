@@ -31,6 +31,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   bool _isLoading = false;
   bool _isSyncing = false;
   String? _lastSyncAt;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -478,6 +480,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         : null;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: const EdgeInsets.all(24.0),
       child: Center(
         child: ConstrainedBox(
