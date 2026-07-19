@@ -1,3 +1,9 @@
+What's New in v0.18.18+66
+
+Miscellaneous bug fixes and stability improvements.
+
+---
+
 What's New in v0.18.17+62
 
 • If you close the app mid-episode, it will resume right where you left off next time you open it
