@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "74452436250-b19e657lrrocm3p0pg4mfuefq2i630q7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.liquidhive.openair",
+            "certificate_hash": "1bde47480bd9431eaf652c76a8fa03ec0041bd20"
+          }
+        },
+        {
           "client_id": "74452436250-ieqed6v9480uh3vtsbvv35ebrc49ptrb.apps.googleusercontent.com",
           "client_type": 3
         }
