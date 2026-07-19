@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
@@ -415,6 +416,7 @@ class SyncController extends ChangeNotifier {
 
   Future<void> synchronize(BuildContext context) async {
     final hiveService = ref.read(hiveServiceProvider);
+    if (!FirebaseConfig.isAvailable) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 

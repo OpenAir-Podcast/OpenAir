@@ -12,6 +12,7 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/settings_pages/playback_page.dart';
 import 'package:openair/views/settings_pages/synchronization_page.dart';
 import 'package:openair/views/settings_pages/user_interface_page.dart';
+import 'package:openair/config/firebase_config.dart';
 
 class Settings extends ConsumerStatefulWidget {
   final Function() functionBuild;
@@ -154,23 +155,25 @@ class _SettingsState extends ConsumerState<Settings> {
           _buildCard(
             Column(
               children: [
-                _buildTile(
-                  icon: Icons.account_circle_rounded,
-                  title: Translations.of(context).text('account'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AccountPage(),
-                      ),
-                    );
-                  },
-                  context: context,
-                ),
-                Divider(
-                    height: 1,
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: 0.15)),
+                if (FirebaseConfig.isAvailable)
+                  _buildTile(
+                    icon: Icons.account_circle_rounded,
+                    title: Translations.of(context).text('account'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountPage(),
+                        ),
+                      );
+                    },
+                    context: context,
+                  ),
+                if (FirebaseConfig.isAvailable)
+                  Divider(
+                      height: 1,
+                      color:
+                          Theme.of(context).dividerColor.withValues(alpha: 0.15)),
                 _buildTile(
                   icon: Icons.display_settings_rounded,
                   title: Translations.of(context).text('userInterface'),
@@ -245,24 +248,26 @@ class _SettingsState extends ConsumerState<Settings> {
           _buildCard(
             Column(
               children: [
-                _buildTile(
-                  icon: Icons.cloud_download_outlined,
-                  title: Translations.of(context).text('synchronization'),
-                  subtitle:
-                      Translations.of(context).text('synchronizationSubtitle'),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SynchronizationPage(),
-                      ),
-                    );
-                  },
-                  context: context,
-                ),
-                Divider(
-                    height: 1,
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: 0.15)),
+                if (FirebaseConfig.isAvailable) ...[
+                  _buildTile(
+                    icon: Icons.cloud_download_outlined,
+                    title: Translations.of(context).text('synchronization'),
+                    subtitle:
+                        Translations.of(context).text('synchronizationSubtitle'),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SynchronizationPage(),
+                        ),
+                      );
+                    },
+                    context: context,
+                  ),
+                  Divider(
+                      height: 1,
+                      color:
+                          Theme.of(context).dividerColor.withValues(alpha: 0.15)),
+                ],
                 _buildTile(
                   icon: Icons.sd_card_rounded,
                   title: Translations.of(context).text('importExport'),

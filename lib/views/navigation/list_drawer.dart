@@ -2,6 +2,7 @@ import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:openair/model/drawer_counts.dart';
 import 'package:openair/providers/locale_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -110,14 +111,16 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                 spacing: 8.0,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AccountPage(),
-                        ),
-                      );
-                    },
+                    onTap: FirebaseConfig.isAvailable
+                        ? () {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const AccountPage(),
+                              ),
+                            );
+                          }
+                        : null,
                     child: ClipOval(
                       child: Image.asset(
                         'assets/icons/icon.png',
@@ -127,34 +130,35 @@ class _ListDrawerState extends ConsumerState<ListDrawer> {
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (session == null) {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const LogIn(),
-                          ),
-                        );
-                      } else {
-                        Navigator.pop(context);
-                        await ref
-                            .read(subscriptionControllerProvider)
-                            .clearAllSubscriptions();
-                        ref.invalidate(drawerCountsProvider);
-                        await firebaseService.signOut();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
+                  if (FirebaseConfig.isAvailable)
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (session == null) {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const LogIn(),
+                            ),
+                          );
+                        } else {
+                          Navigator.pop(context);
+                          await ref
+                              .read(subscriptionControllerProvider)
+                              .clearAllSubscriptions();
+                          ref.invalidate(drawerCountsProvider);
+                          await firebaseService.signOut();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      child: Text(
+                        session == null
+                            ? Translations.of(context).text('login')
+                            : Translations.of(context).text('logout'),
+                      ),
                     ),
-                    child: Text(
-                      session == null
-                          ? Translations.of(context).text('login')
-                          : Translations.of(context).text('logout'),
-                    ),
-                  ),
                 ],
               ),
             ),

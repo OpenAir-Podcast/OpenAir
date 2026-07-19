@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/providers/firebase_provider.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:openair/services/firebase_service.dart';
 import 'package:openair/views/nav_pages/sign_up_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
@@ -153,7 +154,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       appBar: AppBar(
         title: Text(Translations.of(context).text('account')),
       ),
-      body: getConnectionStatusValue.when(
+      body: !FirebaseConfig.isAvailable
+          ? const SizedBox.shrink()
+          : getConnectionStatusValue.when(
         data: (connectionData) {
           if (connectionData == false) {
             return const NoConnection();

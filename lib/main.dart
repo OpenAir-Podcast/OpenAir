@@ -22,6 +22,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
@@ -118,9 +119,15 @@ void main() async {
     });
   }
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseConfig.isAvailable = true;
+  } catch (e) {
+    debugPrint('Firebase not available: $e');
+    FirebaseConfig.isAvailable = false;
+  }
 
   runApp(ProviderScope(child: const MyApp()));
 }

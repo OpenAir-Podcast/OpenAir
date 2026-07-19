@@ -19,9 +19,13 @@ import 'package:openair/views/main_pages/featured_page.dart';
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:openair/providers/audio_provider.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:openair/controllers/subscription_controller.dart';
 
-final getSessionProvider = StreamProvider.autoDispose((ref) {
+final getSessionProvider = StreamProvider.autoDispose<User?>((ref) {
+  if (!FirebaseConfig.isAvailable) {
+    return const Stream.empty();
+  }
   return FirebaseAuth.instance.authStateChanges();
 });
 
@@ -210,38 +214,39 @@ class _WideDrawerState extends ConsumerState<WideDrawer> {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: Builder(
-              builder: (context) {
-                final currentUser = FirebaseAuth.instance.currentUser;
-                return FilledButton.tonal(
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+          if (FirebaseConfig.isAvailable)
+            SizedBox(
+              width: double.infinity,
+              child: Builder(
+                builder: (context) {
+                  final currentUser = FirebaseAuth.instance.currentUser;
+                  return FilledButton.tonal(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  ),
-                  onPressed: () async {
-                    if (currentUser == null) {
-                      widget.onPageSelected(const LogIn());
-                    } else {
-                      await ref
-                          .read(subscriptionControllerProvider)
-                          .clearAllSubscriptions();
-                      ref.invalidate(drawerCountsProvider);
-                      await firebaseService.signOut();
-                    }
-                  },
-                  child: Text(
-                    currentUser == null
-                        ? Translations.of(context).text('signIn')
-                        : Translations.of(context).text('logout'),
-                  ),
-                );
-              },
+                    onPressed: () async {
+                      if (currentUser == null) {
+                        widget.onPageSelected(const LogIn());
+                      } else {
+                        await ref
+                            .read(subscriptionControllerProvider)
+                            .clearAllSubscriptions();
+                        ref.invalidate(drawerCountsProvider);
+                        await firebaseService.signOut();
+                      }
+                    },
+                    child: Text(
+                      currentUser == null
+                          ? Translations.of(context).text('signIn')
+                          : Translations.of(context).text('logout'),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

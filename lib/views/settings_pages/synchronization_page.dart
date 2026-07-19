@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/config/firebase_config.dart';
 import 'package:openair/providers/openair_provider.dart';
 
 final FutureProvider<Map?> synchronizationSettingsDataProvider =
@@ -106,7 +107,9 @@ class SynchronizationPageState extends ConsumerState<SynchronizationPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: synchronization.when(
+      body: !FirebaseConfig.isAvailable
+          ? const SizedBox.shrink()
+          : synchronization.when(
         data: (data) {
           final syncData = data!;
 
