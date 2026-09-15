@@ -1,4 +1,4 @@
-What's New in v0.18.21+71
+What's New in v0.18.21+72
 
 • Fixed a crash on launch that could prevent the app from opening on some devices
 • Fixed Android Auto reliability: podcasts now show up as folders you can browse into, episodes play reliably from the car, and the media library refreshes automatically
