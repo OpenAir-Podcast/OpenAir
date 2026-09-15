@@ -1,3 +1,10 @@
+What's New in v0.18.21+71
+
+• Fixed Android Auto reliability: podcasts now show up as folders you can browse into, episodes play reliably from the car, and the media library refreshes automatically
+• Hardened media browsing and playback against errors so they can no longer crash the app
+
+---
+
 What's New in v0.18.20+70
 
 • Android Auto: the next/previous track buttons now move between episodes instead of doing nothing

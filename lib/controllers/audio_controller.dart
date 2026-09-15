@@ -373,18 +373,18 @@ class AudioController extends ChangeNotifier {
   }
 
   void rewind() {
-    if (playerPosition.inSeconds - int.parse(rewindIntervalConfig) > 0) {
-      _audioHandler.seek(Duration(
-          seconds: playerPosition.inSeconds - int.parse(rewindIntervalConfig)));
+    final interval = int.tryParse(rewindIntervalConfig) ?? 15;
+    if (playerPosition.inSeconds - interval > 0) {
+      _audioHandler
+          .seek(Duration(seconds: playerPosition.inSeconds - interval));
     }
   }
 
   void fastForward() {
-    if (playerPosition.inSeconds + int.parse(fastForwardIntervalConfig) <
-        playerTotalDuration.inSeconds) {
-      _audioHandler.seek(Duration(
-          seconds:
-              playerPosition.inSeconds + int.parse(fastForwardIntervalConfig)));
+    final interval = int.tryParse(fastForwardIntervalConfig) ?? 15;
+    if (playerPosition.inSeconds + interval < playerTotalDuration.inSeconds) {
+      _audioHandler
+          .seek(Duration(seconds: playerPosition.inSeconds + interval));
     }
   }
 
@@ -986,6 +986,9 @@ class AudioController extends ChangeNotifier {
                 ? subscription.artwork
                 : subscription.imageUrl),
         duration: null,
+        // Podcasts are browsable folders, not playable tracks. Without this
+        // flag Android Auto treats them as songs instead of folders to open.
+        playable: false,
       ));
       episodesByPodcast[podcastId] = [];
     }
@@ -1022,6 +1025,7 @@ class AudioController extends ChangeNotifier {
             : null,
         artUri: _parseArtUri(image),
         duration: _parseEpisodeDuration(episode['duration']),
+        playable: true,
       );
 
       (episodesByPodcast[podcastId] ??= []).add(item);

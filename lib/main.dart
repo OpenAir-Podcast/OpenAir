@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -29,6 +30,13 @@ import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Prevent uncaught errors from terminating the app (e.g. during a
+  // background media session or Android Auto browse/playback).
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('Unhandled platform error: $error\n$stack');
+    return true;
+  };
 
   // Initialize background task worker
   if (Platform.isAndroid || Platform.isIOS) {
