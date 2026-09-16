@@ -11,6 +11,14 @@ app-id: io.github.openair_podcast.openair
 runtime: org.gnome.Platform
 runtime-version: "50"
 sdk: org.gnome.Sdk
+
+# Flutter 3.44's linux build hardcodes CC/CXX to clang/clang++ (see
+# flutter_tools/lib/src/linux/build_linux.dart). The GNOME SDK does not ship
+# clang, so provide LLVM through the freedesktop sdk-extension (same approach
+# GNOME Builder uses). Installed automatically by Flatpak mirrors/CI.
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm19
+
 command: OpenAir
 
 finish-args:
@@ -39,6 +47,10 @@ cleanup:
 modules:
   - name: OpenAir
     buildsystem: simple
+    build-options:
+      append-path: /var/lib/flutter/bin:/usr/lib/sdk/llvm19/bin
+      env:
+        PUB_CACHE: /run/build/OpenAir/.pub-cache
     build-commands:
       - flutter build linux --release --no-pub
       - install -Dm755 build/linux/x64/release/bundle/OpenAir /app/bin/OpenAir
