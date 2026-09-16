@@ -13,20 +13,23 @@ offline manifest by [flatpak-flutter](https://github.com/TheAppgineer/flatpak-fl
 | `io.github.openair_podcast.openair.png` | 512x512 app icon. |
 | `flathub.json` | Flathub submission options (currently x86_64 only). |
 | `io.github.openair_podcast.openair.yml` | **Generated** offline manifest (gitignored). |
-| `pubspec-sources.json` | **Generated** pinned pub/flutter sources (gitignored). |
+| `generated/` | **Generated** pinned pub sources + Flutter SDK module (gitignored). |
 
 ## 1. Generate the offline manifest
 
 ```sh
 pip install -r https://raw.githubusercontent.com/TheAppgineer/flatpak-flutter/main/requirements.txt
 git clone https://github.com/TheAppgineer/flatpak-flutter
-cd /path/to/OpenAir
-python3 ../flatpak-flutter/flatpak-flutter.py flatpak/flatpak-flutter.yml
+cd /path/to/OpenAir/flatpak
+python3 ~/flatpak-flutter/flatpak-flutter.py flatpak-flutter.yml
 ```
 
-This writes `flatpak/io.github.openair_podcast.openair.yml` and `flatpak/pubspec-sources.json`.
-It also picks up foreign-code patches (e.g. the `sqlite3` package's offline
-build patch) from flatpak-flutter's registry based on `pubspec.lock`.
+This writes `io.github.openair_podcast.openair.yml` and the `generated/`
+directory (which holds the pinned pub sources as `generated/sources/pubspec.json`
+and the Flutter SDK module) into the **current working directory** — so run it
+from `flatpak/`. It also picks up foreign-code patches (e.g. the `sqlite3`
+package's offline build patch) from flatpak-flutter's registry based on
+`pubspec.lock`.
 
 > The `tag:` in the Flutter `sources` entry must match a Flutter release tag.
 > Bump it together with the SDK used in CI. Pre-generated SDK modules exist for
@@ -37,7 +40,7 @@ build patch) from flatpak-flutter's registry based on `pubspec.lock`.
 ```sh
 flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable  # only if Rust deps appear
 flatpak-builder --repo=repo --force-clean --sandbox --user --install \
-  --install-deps-from=flathub build flatpak/io.github.openair_podcast.openair.yml
+  --install-deps-from=flathub build io.github.openair_podcast.openair.yml
 flatpak run io.github.openair_podcast.openair
 ```
 
@@ -47,7 +50,7 @@ flatpak run io.github.openair_podcast.openair
    adding a `io.github.openair_podcast.openair` submission (use the `new-pr` template).
 2. Flathub creates a `flathub/io.github.openair_podcast.openair` repo. Add the files from
    this directory **including the generated** `io.github.openair_podcast.openair.yml` and
-   `pubspec-sources.json`.
+   `generated/`.
 3. Flathub CI builds it. Fix up `finish-args`/runtime as requested by reviewers.
 
 ### Generative AI policy
@@ -65,6 +68,6 @@ Flathub's [Application ID rules](https://docs.flathub.org/docs/for-app-authors/r
 
 - `flathub.json` is limited to `x86_64` because the bundled media libraries may
   not build on `aarch64`. Remove the restriction once arm64 is verified.
-- Re-run step 1 and refresh `io.github.openair_podcast.openair.yml` + `pubspec-sources.json`
+- Re-run step 1 and refresh `io.github.openair_podcast.openair.yml` + `generated/`
   whenever dependencies or the Flutter version change.
 - Keep `io.github.openair_podcast.openair.metainfo.xml` `<releases>` in sync with each release.
