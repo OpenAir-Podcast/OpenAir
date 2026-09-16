@@ -8,6 +8,7 @@ community repository, [`microsoft/winget-pkgs`](https://github.com/microsoft/win
 | `OpenAir-Podcast.OpenAir.yaml` | Version manifest. |
 | `OpenAir-Podcast.OpenAir.locale.en-US.yaml` | Default-locale metadata. |
 | `OpenAir-Podcast.OpenAir.installer.yaml` | Installer (portable zip) manifest. |
+| `fill_hash.sh` | Fills `InstallerSha256` from the published GitHub release asset. |
 
 The Windows release asset is a self-contained zip
 (`openair-<tag>-windows-x64.zip`) containing `OpenAir.exe`, its DLLs, `data/`
@@ -30,10 +31,11 @@ Without `WINGET_TOKEN` the job is skipped.
 
 ## Manual submission
 
-1. Download the Windows zip and compute its hash:
-   `sha256sum openair-<tag>-windows-x64.zip`
-2. Put the hash into `InstallerSha256` (all zeros is a placeholder) and update
-   `PackageVersion` / `InstallerUrl` in the installer manifest.
+1. Once the release is published, fill in the real hash:
+   `packaging/winget/fill_hash.sh` (downloads the asset and rewrites
+   `InstallerSha256` — all zeros is a placeholder).
+2. Update `PackageVersion` / `InstallerUrl` in the installer manifest if the
+   version changed.
 3. Validate and submit with [`wingetcreate`](https://github.com/microsoft/winget-create):
 
    ```powershell
