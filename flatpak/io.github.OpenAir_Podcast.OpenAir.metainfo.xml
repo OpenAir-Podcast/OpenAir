@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.openair.podcast</id>
+  <id>io.github.OpenAir_Podcast.OpenAir</id>
   <name>OpenAir</name>
   <summary>A free and open-source podcast player</summary>
-  <developer id="com.openair.podcast">
+  <developer id="io.github.OpenAir_Podcast">
     <name>OpenAir</name>
   </developer>
 
@@ -29,7 +29,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">com.openair.podcast.desktop</launchable>
+  <launchable type="desktop-id">io.github.OpenAir_Podcast.OpenAir.desktop</launchable>
 
   <url type="homepage">https://github.com/OpenAir-Podcast/OpenAir</url>
   <url type="bugtracker">https://github.com/OpenAir-Podcast/OpenAir/issues</url>

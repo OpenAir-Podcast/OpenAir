@@ -3,11 +3,11 @@
 # This is NOT directly consumable by flatpak-builder: Flutter apps cannot resolve
 # their pub.dev dependencies inside the sandboxed, network-less Flathub build.
 # Run flatpak-flutter on this file to produce the offline manifest
-# (`com.openair.podcast.yml`) plus `pubspec-sources.json`.
+# (`io.github.OpenAir_Podcast.OpenAir.yml`) plus `pubspec-sources.json`.
 #
 # See flatpak/README.md for the exact commands.
 
-app-id: com.openair.podcast
+app-id: io.github.OpenAir_Podcast.OpenAir
 runtime: org.gnome.Platform
 runtime-version: "48"
 sdk: org.gnome.Sdk
@@ -40,18 +40,18 @@ modules:
       - install -Dm755 build/linux/x64/release/bundle/OpenAir /app/bin/OpenAir
       - cp -r build/linux/x64/release/bundle/data /app/bin/data
       - cp -r build/linux/x64/release/bundle/lib /app/bin/lib
-      - install -Dm644 com.openair.podcast.desktop /app/share/applications/com.openair.podcast.desktop
-      - install -Dm644 com.openair.podcast.metainfo.xml /app/share/metainfo/com.openair.podcast.metainfo.xml
-      - install -Dm644 com.openair.podcast.png /app/share/icons/hicolor/512x512/apps/com.openair.podcast.png
+      - install -Dm644 io.github.OpenAir_Podcast.OpenAir.desktop /app/share/applications/io.github.OpenAir_Podcast.OpenAir.desktop
+      - install -Dm644 io.github.OpenAir_Podcast.OpenAir.metainfo.xml /app/share/metainfo/io.github.OpenAir_Podcast.OpenAir.metainfo.xml
+      - install -Dm644 io.github.OpenAir_Podcast.OpenAir.png /app/share/icons/hicolor/512x512/apps/io.github.OpenAir_Podcast.OpenAir.png
     sources:
       - type: git
         url: https://github.com/OpenAir-Podcast/OpenAir.git
       - type: file
-        path: com.openair.podcast.desktop
+        path: io.github.OpenAir_Podcast.OpenAir.desktop
       - type: file
-        path: com.openair.podcast.metainfo.xml
+        path: io.github.OpenAir_Podcast.OpenAir.metainfo.xml
       - type: file
-        path: com.openair.podcast.png
+        path: io.github.OpenAir_Podcast.OpenAir.png
       - type: git
         url: https://github.com/flutter/flutter.git
         tag: 3.44.4
