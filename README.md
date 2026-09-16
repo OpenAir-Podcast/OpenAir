@@ -129,3 +129,13 @@ OpenAir is proudly developed and maintained by its contributors—who are enthus
 <img width="1332" height="819" alt="Screenshot_20251110_192037" src="https://github.com/user-attachments/assets/d100e77d-d552-42f3-8def-23e1c4da8bd9" />
 <img width="1332" height="819" alt="Screenshot_20251110_192157" src="https://github.com/user-attachments/assets/4c582617-b14b-4c7b-80b6-42ec9bc51bca" />
 <img width="1332" height="819" alt="Screenshot_20251110_192221" src="https://github.com/user-attachments/assets/b32b655e-cc1b-4536-96bb-a352433b57c4" />
+
+**Desktop status.** Linux and Windows builds ship from CI on every tag; macOS
+builds are also included after the `0.18.21+73` release. Browse, search,
+subscribe, stream, and download all work on desktop out of the box. Sign-in and
+cloud sync are **not yet available** on desktop: `lib/firebase_options.dart`
+currently only covers Android, iOS and web. To enable Firebase on macOS add a
+macOS app in the Firebase console and re-run `flutterfire configure
+--platforms=macos` (Windows/Linux are not supported by Firebase Auth). See
+`flatpak/README.md` and `packaging/winget/README.md` for packaging details.
+

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.openair.podcast</id>
+  <name>OpenAir</name>
+  <summary>A free and open-source podcast player</summary>
+  <developer id="com.openair.podcast">
+    <name>OpenAir</name>
+  </developer>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+
+  <description>
+    <p>
+      OpenAir is a free and open-source cross-platform podcast app that empowers
+      you to explore and enjoy the vast world of podcasts. Search, subscribe,
+      stream and download episodes, build your own playlists and keep your
+      library in sync.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Search millions of podcasts</li>
+      <li>Subscribe and get new episodes automatically</li>
+      <li>Stream or download for offline listening</li>
+      <li>Variable playback speed and skip silence</li>
+      <li>Create custom playlists</li>
+      <li>Light and dark themes</li>
+      <li>Import and export OPML</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">com.openair.podcast.desktop</launchable>
+
+  <url type="homepage">https://github.com/OpenAir-Podcast/OpenAir</url>
+  <url type="bugtracker">https://github.com/OpenAir-Podcast/OpenAir/issues</url>
+  <url type="vcs">https://github.com/OpenAir-Podcast/OpenAir</url>
+  <url type="donation">https://github.com/sponsors/OpenAir-Podcast</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Discover and play podcasts</caption>
+      <image type="source">https://raw.githubusercontent.com/OpenAir-Podcast/OpenAir/main/assets/screenshots/desktop/Screenshot_20251110_192037.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Browse episodes</caption>
+      <image type="source">https://raw.githubusercontent.com/OpenAir-Podcast/OpenAir/main/assets/screenshots/desktop/Screenshot_20251110_192157.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Your library</caption>
+      <image type="source">https://raw.githubusercontent.com/OpenAir-Podcast/OpenAir/main/assets/screenshots/desktop/Screenshot_20251110_192221.png</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="0.18.21" date="2026-09-16">
+      <description>
+        <p>Desktop support (Linux, Windows, macOS), listening stats and a long-press context menu.</p>
+      </description>
+    </release>
+  </releases>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+    <category>Player</category>
+  </categories>
+
+  <keywords>
+    <keyword>podcast</keyword>
+    <keyword>player</keyword>
+    <keyword>rss</keyword>
+    <keyword>audio</keyword>
+  </keywords>
+
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+
+  <provides>
+    <binary>OpenAir</binary>
+  </provides>
+</component>

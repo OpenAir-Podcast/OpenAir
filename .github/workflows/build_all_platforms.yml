@@ -152,6 +152,9 @@ jobs:
     needs: create_release
     name: Windows (zip)
     runs-on: windows-latest
+    env:
+      WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
     steps:
       - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
@@ -184,6 +187,18 @@ jobs:
         env:
           CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
           CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+      - name: Sign binaries (optional)
+        if: env.WINDOWS_CERTIFICATE_BASE64 != ''
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP "cert.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_BASE64))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object FullName -Descending | Select-Object -First 1 -ExpandProperty FullName
+          Get-ChildItem -Path "build/windows/x64/runner/Release" -Recurse -Include *.exe,*.dll | ForEach-Object {
+            & $signtool sign /fd SHA256 /f $pfx /p $env:WINDOWS_CERTIFICATE_PASSWORD `
+              /tr http://timestamp.digicert.com /td SHA256 $_.FullName
+          }
       - name: Package
         shell: powershell
         run: |
@@ -195,6 +210,95 @@ jobs:
         run: |
           gh release upload "${{ needs.create_release.outputs.version }}" \
             "openair-${{ needs.create_release.outputs.version }}-windows-x64.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_macos:
+    needs: create_release
+    name: macOS (dmg)
+    runs-on: macos-latest
+    # Optional code signing + notarization. Leave the secrets unset to ship an
+    # unsigned (ad-hoc) build; set them all to ship a Gatekeeper-friendly one.
+    env:
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - name: Regenerate env.g.dart from secrets
+        shell: bash
+        run: |
+          cat > .env <<'EOF'
+          PODCAST_INDEX_API_KEY="${{ secrets.PODCAST_INDEX_API_KEY }}"
+          PODCAST_INDEX_API_SECRET="${{ secrets.PODCAST_INDEX_API_SECRET }}"
+          PODCAST_USER_AGENT="${{ secrets.PODCAST_USER_AGENT }}"
+          FYYD_ACCESS_TOKEN="${{ secrets.FYYD_ACCESS_TOKEN }}"
+          PAYPAL_URL="${{ secrets.PAYPAL_URL }}"
+          DONATE_WITH_KOFI_URL="${{ secrets.DONATE_WITH_KOFI_URL }}"
+          DISCORD_URL="${{ secrets.DISCORD_URL }}"
+          URL_GITHUB_ISSUES="${{ secrets.URL_GITHUB_ISSUES }}"
+          URL_GITHUB_DISCUSSION="${{ secrets.URL_GITHUB_DISCUSSION }}"
+          PRIVACY_POLICY="${{ secrets.PRIVACY_POLICY }}"
+          URL_GITHUB="${{ secrets.URL_GITHUB }}"
+          TERMS_OF_SERVICE="${{ secrets.TERMS_OF_SERVICE }}"
+          EOF
+          dart run build_runner build --delete-conflicting-outputs
+      - name: Import signing certificate (optional)
+        if: env.MACOS_CERTIFICATE != ''
+        shell: bash
+        run: |
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security import certificate.p12 -k build.keychain \
+            -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" build.keychain
+      - run: flutter build macos --release
+      - name: Sign .app (optional)
+        if: env.MACOS_CERTIFICATE != ''
+        shell: bash
+        run: |
+          codesign --force --deep --options runtime \
+            --sign "$MACOS_SIGN_IDENTITY" \
+            --entitlements macos/Runner/Release.entitlements \
+            "build/macos/Build/Products/Release/OpenAir.app"
+      - name: Package (.dmg)
+        shell: bash
+        run: |
+          V="${{ needs.create_release.outputs.version }}"
+          DMG="openair-$V-macos-x64.dmg"
+          mkdir -p dist/dmg
+          cp -R "build/macos/Build/Products/Release/OpenAir.app" dist/dmg/
+          ln -s /Applications dist/dmg/Applications
+          hdiutil create -volname "OpenAir" -srcfolder dist/dmg -ov -format UDZO "$DMG"
+          if [[ -n "$MACOS_CERTIFICATE" ]]; then
+            codesign --force --sign "$MACOS_SIGN_IDENTITY" "$DMG"
+          fi
+          echo "DMG=$DMG" >> "$GITHUB_ENV"
+      - name: Notarize (optional)
+        if: env.APPLE_ID != ''
+        shell: bash
+        run: |
+          xcrun notarytool submit "$DMG" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          xcrun stapler staple "$DMG"
+      - name: Upload
+        shell: bash
+        run: |
+          gh release upload "${{ needs.create_release.outputs.version }}" "$DMG"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -258,3 +362,20 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  winget:
+    needs: [create_release, build_windows]
+    name: winget (Windows package manager)
+    runs-on: ubuntu-latest
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+    steps:
+      - name: Publish to winget
+        if: env.WINGET_TOKEN != ''
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: OpenAir-Podcast.OpenAir
+          installers-regex: 'windows-x64\.zip$'
+          token: ${{ secrets.WINGET_TOKEN }}
+          release-tag: ${{ needs.create_release.outputs.version }}
+

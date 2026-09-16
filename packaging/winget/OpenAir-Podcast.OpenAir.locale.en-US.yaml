@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: OpenAir-Podcast.OpenAir
+PackageVersion: 0.18.21
+PackageLocale: en-US
+Publisher: OpenAir-Podcast
+PublisherUrl: https://github.com/OpenAir-Podcast
+PublisherSupportUrl: https://github.com/OpenAir-Podcast/OpenAir/issues
+Author: OpenAir
+PackageName: OpenAir
+PackageUrl: https://github.com/OpenAir-Podcast/OpenAir
+License: Apache-2.0
+LicenseUrl: https://github.com/OpenAir-Podcast/OpenAir/blob/main/LICENSE
+Copyright: Copyright (c) OpenAir contributors
+ShortDescription: A free and open-source cross-platform podcast player.
+Description: |-
+  OpenAir is a free and open-source cross-platform podcast app that empowers you
+  to explore and enjoy the vast world of podcasts. Search, subscribe, stream and
+  download episodes, build playlists and keep your library in sync.
+Moniker: openair
+Tags:
+  - podcast
+  - audio
+  - player
+  - rss
+ReleaseNotesUrl: https://github.com/OpenAir-Podcast/OpenAir/releases/tag/v0.18.21%2B73
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
