@@ -32,9 +32,10 @@ Without `WINGET_TOKEN` the job is skipped.
 
 1. Download the Windows zip and compute its hash:
    `sha256sum openair-<tag>-windows-x64.zip`
-2. Put the hash into `InstallerSha256` and update `PackageVersion` /
-   `InstallerUrl` in the installer manifest.
+2. Put the hash into `InstallerSha256` (all zeros is a placeholder) and update
+   `PackageVersion` / `InstallerUrl` in the installer manifest.
 3. Validate and submit with [`wingetcreate`](https://github.com/microsoft/winget-create):
+
    ```powershell
    wingetcreate validate packaging/winget
    wingetcreate submit packaging/winget
