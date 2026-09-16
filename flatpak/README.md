@@ -8,11 +8,11 @@ offline manifest by [flatpak-flutter](https://github.com/TheAppgineer/flatpak-fl
 | File | Purpose |
 | --- | --- |
 | `flatpak-flutter.yml` | Editable template manifest (input to flatpak-flutter). |
-| `io.github.OpenAir_Podcast.OpenAir.metainfo.xml` | AppStream metadata required by Flathub. |
-| `io.github.OpenAir_Podcast.OpenAir.desktop` | Desktop entry, installed as-is. |
-| `io.github.OpenAir_Podcast.OpenAir.png` | 512x512 app icon. |
+| `io.github.openair_podcast.openair.metainfo.xml` | AppStream metadata required by Flathub. |
+| `io.github.openair_podcast.openair.desktop` | Desktop entry, installed as-is. |
+| `io.github.openair_podcast.openair.png` | 512x512 app icon. |
 | `flathub.json` | Flathub submission options (currently x86_64 only). |
-| `io.github.OpenAir_Podcast.OpenAir.yml` | **Generated** offline manifest (gitignored). |
+| `io.github.openair_podcast.openair.yml` | **Generated** offline manifest (gitignored). |
 | `pubspec-sources.json` | **Generated** pinned pub/flutter sources (gitignored). |
 
 ## 1. Generate the offline manifest
@@ -24,7 +24,7 @@ cd /path/to/OpenAir
 python3 ../flatpak-flutter/flatpak-flutter.py flatpak/flatpak-flutter.yml
 ```
 
-This writes `flatpak/io.github.OpenAir_Podcast.OpenAir.yml` and `flatpak/pubspec-sources.json`.
+This writes `flatpak/io.github.openair_podcast.openair.yml` and `flatpak/pubspec-sources.json`.
 It also picks up foreign-code patches (e.g. the `sqlite3` package's offline
 build patch) from flatpak-flutter's registry based on `pubspec.lock`.
 
@@ -37,16 +37,16 @@ build patch) from flatpak-flutter's registry based on `pubspec.lock`.
 ```sh
 flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable  # only if Rust deps appear
 flatpak-builder --repo=repo --force-clean --sandbox --user --install \
-  --install-deps-from=flathub build flatpak/io.github.OpenAir_Podcast.OpenAir.yml
-flatpak run io.github.OpenAir_Podcast.OpenAir
+  --install-deps-from=flathub build flatpak/io.github.openair_podcast.openair.yml
+flatpak run io.github.openair_podcast.openair
 ```
 
 ## 3. Submit to Flathub
 
 1. Fork [`flathub/flathub`](https://github.com/flathub/flathub) and open a PR
-   adding a `io.github.OpenAir_Podcast.OpenAir` submission (use the `new-pr` template).
-2. Flathub creates a `flathub/io.github.OpenAir_Podcast.OpenAir` repo. Add the files from
-   this directory **including the generated** `io.github.OpenAir_Podcast.OpenAir.yml` and
+   adding a `io.github.openair_podcast.openair` submission (use the `new-pr` template).
+2. Flathub creates a `flathub/io.github.openair_podcast.openair` repo. Add the files from
+   this directory **including the generated** `io.github.openair_podcast.openair.yml` and
    `pubspec-sources.json`.
 3. Flathub CI builds it. Fix up `finish-args`/runtime as requested by reviewers.
 
@@ -57,7 +57,7 @@ from opening or replying on submissions. OpenAir was developed with AI
 assistance, so include `flatpak/GENAI_DISCLOSURE.md` (edit the percentage as
 appropriate) in the PR, and open it as a human with a human-written description.
 
-The Flathub app-id is `io.github.OpenAir_Podcast.OpenAir` because the project
+The Flathub app-id is `io.github.openair_podcast.openair` because the project
 is hosted on GitHub and does not control an `openair.podcast` domain (required by
 Flathub's [Application ID rules](https://docs.flathub.org/docs/for-app-authors/requirements#application-id)).
 
@@ -65,6 +65,6 @@ Flathub's [Application ID rules](https://docs.flathub.org/docs/for-app-authors/r
 
 - `flathub.json` is limited to `x86_64` because the bundled media libraries may
   not build on `aarch64`. Remove the restriction once arm64 is verified.
-- Re-run step 1 and refresh `io.github.OpenAir_Podcast.OpenAir.yml` + `pubspec-sources.json`
+- Re-run step 1 and refresh `io.github.openair_podcast.openair.yml` + `pubspec-sources.json`
   whenever dependencies or the Flutter version change.
-- Keep `io.github.OpenAir_Podcast.OpenAir.metainfo.xml` `<releases>` in sync with each release.
+- Keep `io.github.openair_podcast.openair.metainfo.xml` `<releases>` in sync with each release.

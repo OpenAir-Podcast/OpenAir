@@ -14,7 +14,7 @@ application and its Flathub packaging.
   lifetime.
 - **Flathub packaging**: the Flatpak template manifest
   (`flatpak/flatpak-flutter.yml`), AppStream metadata
-  (`flatpak/io.github.OpenAir_Podcast.OpenAir.metainfo.xml`), desktop entry, and `flathub.json`
+  (`flatpak/io.github.openair_podcast.openair.metainfo.xml`), desktop entry, and `flathub.json`
   in this submission were generated with AI assistance and reviewed by the
   maintainer before inclusion.
 - **CI configuration**: `.github/workflows/build_all_platforms.yml`

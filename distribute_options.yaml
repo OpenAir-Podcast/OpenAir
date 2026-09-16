@@ -38,7 +38,7 @@ variables:
 
   TERMS_OF_SERVICE_URL: "https://github.com/OpenAir-Podcast/OpenAir/blob/main/terms_of_service.md"
 
-  APP_UNIQUE_ID: "io.github.OpenAir_Podcast.OpenAir"
+  APP_UNIQUE_ID: "io.github.openair_podcast.openair"
   APP_GUID: ${APP_GUID}
 
 output: dist/
@@ -70,7 +70,7 @@ releases:
             app_name: OpenAir
             executable_name: OpenAir
             icon: assets/icons/icon.png
-            desktop_entry: linux/io.github.OpenAir_Podcast.OpenAir.desktop
+            desktop_entry: linux/io.github.openair_podcast.openair.desktop
           build_args:
             dart-define:
               APP_ENV: dev

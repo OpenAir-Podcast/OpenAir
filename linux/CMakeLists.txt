@@ -7,7 +7,7 @@ project(runner LANGUAGES CXX)
 set(BINARY_NAME "OpenAir")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "io.github.OpenAir_Podcast.OpenAir")
+set(APPLICATION_ID "io.github.openair_podcast.openair")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -137,6 +137,16 @@ set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")
 install(DIRECTORY "${NATIVE_ASSETS_DIR}"
    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
    COMPONENT Runtime)
+
+# Install the desktop entry, AppStream metadata, and icon to the standard XDG
+# locations (used by Flathub, AppImage, and plain `make install`).
+install(FILES "${CMAKE_SOURCE_DIR}/io.github.openair_podcast.openair.desktop"
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications")
+install(FILES "${CMAKE_SOURCE_DIR}/io.github.openair_podcast.openair.metainfo.xml"
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo")
+install(FILES "${CMAKE_SOURCE_DIR}/app_icon.png"
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/512x512/apps"
+  RENAME "io.github.openair_podcast.openair.png")
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.
