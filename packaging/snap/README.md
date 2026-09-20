@@ -40,10 +40,13 @@ openair
 ## 3. Snap Store Submission
 
 1. Register your snap name on the Snap Store:
+
    ```bash
    snapcraft register openair
    ```
+
 2. Upload the built `.snap` package to the stable channel:
+
    ```bash
    snapcraft upload --release=stable openair_0.18.21_amd64.snap
    ```
