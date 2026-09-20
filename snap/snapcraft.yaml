@@ -1,0 +1,42 @@
+name: openair
+title: OpenAir
+version: '0.18.21'
+summary: Breathe Life into Your Podcast Journey
+description: |
+  OpenAir is a free and open-source cross-platform podcast app built with Flutter,
+  empowering you to explore and enjoy the vast world of podcasts.
+
+license: MIT
+contact: https://github.com/OpenAir-Podcast/OpenAir/issues
+issues: https://github.com/OpenAir-Podcast/OpenAir/issues
+website: https://github.com/OpenAir-Podcast/OpenAir
+source-code: https://github.com/OpenAir-Podcast/OpenAir
+
+base: core24
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+
+apps:
+  openair:
+    command: OpenAir
+    extensions: [gnome]
+    plugs:
+      - audio-playback
+      - network
+      - network-status
+      - home
+    desktop: share/applications/io.github.openair_podcast.openair.desktop
+
+parts:
+  openair:
+    plugin: dump
+    source: build/linux/x64/release/bundle
+    stage-packages:
+      - libmpv2
+      - libsqlite3-0
+      - libsecret-1-0
+      - libjsoncpp25
+      - libwebkit2gtk-4.1-0

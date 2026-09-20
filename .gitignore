@@ -67,6 +67,9 @@ app.*.map.json
 .build-cache
 
 *.snap
+parts/
+prime/
+stage/
 *.AppImage
 *zsync
 

@@ -74,3 +74,16 @@ releases:
           build_args:
             dart-define:
               APP_ENV: dev
+
+      - name: release-dev-linux-snap
+        package:
+          platform: linux
+          target: snap
+          make_args:
+            app_name: OpenAir
+            executable_name: OpenAir
+            icon: assets/icons/icon.png
+            desktop_entry: linux/io.github.openair_podcast.openair.desktop
+          build_args:
+            dart-define:
+              APP_ENV: dev
