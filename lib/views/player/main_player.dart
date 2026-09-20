@@ -350,7 +350,30 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     final favoriteListAsync = ref.watch(getFavoriteProvider);
 
     if (currentEpisode == null || currentEpisode.isEmpty) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 32),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                Translations.of(context).text('loading') ?? 'Loading...',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     String getPodcastTitle(Map<String, dynamic> episode,

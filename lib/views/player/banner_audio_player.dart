@@ -59,12 +59,14 @@ class BannerAudioPlayerState extends ConsumerState<BannerAudioPlayer> {
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MainPlayer(),
-            ),
-          );
+          if (currentEpisode != null && currentEpisode.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MainPlayer(),
+              ),
+            );
+          }
         },
         child: Container(
           decoration: BoxDecoration(
