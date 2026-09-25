@@ -133,11 +133,12 @@ jobs:
 
       - name: Bundle AppImage
         run: |
-          mkdir -p AppDir
-          cp -r build/linux/x64/release/bundle/* AppDir/
+          mkdir -p AppDir/usr/bin
+          cp -r build/linux/x64/release/bundle/* AppDir/usr/bin/
 
-          install -Dm644 linux/io.github.openair_podcast.openair.desktop AppDir/openair.desktop
-          install -Dm644 linux/app_icon.png AppDir/io.github.openair_podcast.openair.png
+          mkdir -p AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/512x512/apps
+          install -Dm644 linux/io.github.openair_podcast.openair.desktop AppDir/usr/share/applications/
+          install -Dm644 linux/app_icon.png AppDir/usr/share/icons/hicolor/512x512/apps/io.github.openair_podcast.openair.png
 
           export OUTPUT="openair-${{ needs.create_release.outputs.version }}-x86_64.AppImage"
           export APPIMAGE_EXTRACT_AND_RUN=1
