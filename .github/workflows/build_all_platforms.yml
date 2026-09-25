@@ -107,8 +107,6 @@ jobs:
 
           sudo curl -Lo /usr/local/bin/linuxdeploy "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
           sudo chmod +x /usr/local/bin/linuxdeploy
-          sudo curl -Lo /usr/local/bin/linuxdeploy-plugin-gtk "https://github.com/linuxdeploy/linuxdeploy-plugin-gtk/releases/download/continuous/linuxdeploy-plugin-gtk-x86_64.AppImage"
-          sudo chmod +x /usr/local/bin/linuxdeploy-plugin-gtk
           sudo curl -Lo /usr/local/bin/appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
           sudo chmod +x /usr/local/bin/appimagetool
 
@@ -143,7 +141,7 @@ jobs:
 
           export OUTPUT="openair-${{ needs.create_release.outputs.version }}-x86_64.AppImage"
           export APPIMAGE_EXTRACT_AND_RUN=1
-          linuxdeploy --appdir AppDir --plugin gtk --output appimage
+          linuxdeploy --appdir AppDir --output appimage
 
       - name: Upload AppImage
         run: |
@@ -281,10 +279,12 @@ jobs:
         run: |
           V="${{ needs.create_release.outputs.version }}"
           DMG="openair-$V-macos-arm64.dmg"
-          mkdir -p dist/dmg
-          cp -R "build/macos/Build/Products/Release/OpenAir.app" dist/dmg/
-          ln -s /Applications dist/dmg/Applications
-          hdiutil create -volname "OpenAir" -srcfolder dist/dmg -ov -format UDZO "$DMG"
+          STAGE="$RUNNER_TEMP/dmg"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE"
+          cp -R "build/macos/Build/Products/Release/OpenAir.app" "$STAGE/"
+          ln -s /Applications "$STAGE/Applications"
+          hdiutil create -volname "OpenAir" -srcfolder "$STAGE" -ov -format UDZO "$DMG"
           if [[ -n "$MACOS_CERTIFICATE" ]]; then
             codesign --force --sign "$MACOS_SIGN_IDENTITY" "$DMG"
           fi
