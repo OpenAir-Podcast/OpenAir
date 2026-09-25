@@ -348,6 +348,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     final currentEpisode = audioState.currentEpisode;
     final subsAsync = ref.watch(subscriptionsProvider);
     final favoriteListAsync = ref.watch(getFavoriteProvider);
+    final theme = Theme.of(context);
 
     if (currentEpisode == null || currentEpisode.isEmpty) {
       return Scaffold(
@@ -400,8 +401,6 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
     }
 
     final podcastTitle = getPodcastTitle(currentEpisode, subsAsync);
-
-    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
