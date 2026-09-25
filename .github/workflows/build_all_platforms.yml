@@ -370,7 +370,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish_release:
-    needs: [build_linux_tarball, build_appimage, build_windows, build_macos, build_android]
+    needs: [create_release, build_linux_tarball, build_appimage, build_windows, build_macos, build_android]
     name: Publish Release
     runs-on: ubuntu-latest
     steps:
