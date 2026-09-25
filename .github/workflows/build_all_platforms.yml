@@ -85,7 +85,7 @@ jobs:
           tar -czvf "../../../../../$RELEASE_NAME" .
       - name: Upload
         run: |
-          gh release upload "${{ needs.create_release.outputs.version }}" \
+          gh release upload --clobber "${{ needs.create_release.outputs.version }}" \
             "openair-${{ needs.create_release.outputs.version }}-linux-x64.tar.gz"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,7 +145,7 @@ jobs:
 
       - name: Upload AppImage
         run: |
-          gh release upload "${{ needs.create_release.outputs.version }}" \
+          gh release upload --clobber "${{ needs.create_release.outputs.version }}" \
             openair-*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -210,7 +210,7 @@ jobs:
       - name: Upload
         shell: bash
         run: |
-          gh release upload "${{ needs.create_release.outputs.version }}" \
+          gh release upload --clobber "${{ needs.create_release.outputs.version }}" \
             "openair-${{ needs.create_release.outputs.version }}-windows-x64.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -302,7 +302,7 @@ jobs:
       - name: Upload
         shell: bash
         run: |
-          gh release upload "${{ needs.create_release.outputs.version }}" "$DMG"
+          gh release upload --clobber "${{ needs.create_release.outputs.version }}" "$DMG"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -363,7 +363,7 @@ jobs:
           cp "build/app/outputs/bundle/release/app-release.aab" "openair-${{ needs.create_release.outputs.version }}-android.aab"
       - name: Upload Releases
         run: |
-          gh release upload "${{ needs.create_release.outputs.version }}" \
+          gh release upload --clobber "${{ needs.create_release.outputs.version }}" \
             openair-${{ needs.create_release.outputs.version }}-android.apk \
             openair-${{ needs.create_release.outputs.version }}-android.aab
         env:
