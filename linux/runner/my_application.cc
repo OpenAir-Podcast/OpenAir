@@ -58,10 +58,6 @@ static void my_application_activate(GApplication* application) {
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(project, self->dart_entrypoint_arguments);
 
-  // Disable Impeller on Linux: it is the default as of Flutter 3.47 and
-  // currently renders a black window on several Mesa/Wayland setups.
-  fl_dart_project_set_enable_impeller(project, FALSE);
-
   FlView* view = fl_view_new(project);
   GdkRGBA background_color;
   // Background defaults to black, override it here if necessary, e.g. #00000000 for transparent.
