@@ -961,82 +961,97 @@ class AudioController extends ChangeNotifier {
 
     // Push the local media library to the audio handler so Android Auto and
     // assistant voice commands can browse and play subscribed content.
-    syncMediaLibrary();
+    // Awaited deliberately: this is also what releases the browse gate, and a
+    // cold start from the head unit has nothing to show until it completes.
+    await syncMediaLibrary();
   }
 
   Future<void> syncMediaLibrary() async {
     final hiveService = ref.read(hiveServiceProvider);
 
-    final subscriptionsMap = await hiveService.getSubscriptions();
-    final allEpisodes = await hiveService.getEpisodes();
+    try {
+      final subscriptionsMap = await hiveService.getSubscriptions();
+      final allEpisodes = await hiveService.getEpisodes();
 
-    final podcasts = <MediaItem>[];
-    final episodesByPodcast = <String, List<MediaItem>>{};
-    final urlsByGuid = <String, String>{};
+      final podcasts = <MediaItem>[];
+      final episodesByPodcast = <String, List<MediaItem>>{};
+      final urlsByGuid = <String, String>{};
 
-    for (final subscription in subscriptionsMap.values) {
-      final podcastId = subscription.id.toString();
-      podcasts.add(MediaItem(
-        id: podcastId,
-        title: subscription.title,
-        artist: subscription.author,
-        album: null,
-        artUri: _parseArtUri(
-            subscription.artwork.isNotEmpty
-                ? subscription.artwork
-                : subscription.imageUrl),
-        duration: null,
-        // Podcasts are browsable folders, not playable tracks. Without this
-        // flag Android Auto treats them as songs instead of folders to open.
-        playable: false,
-      ));
-      episodesByPodcast[podcastId] = [];
-    }
-
-    for (final episode in allEpisodes) {
-      final podcastId =
-          ((episode['podcast'] as Map?)?['id'] ?? episode['podcastId'])
-              ?.toString();
-      final guid = episode['guid']?.toString();
-      final url = episode['enclosureUrl']?.toString() ?? '';
-      if (podcastId == null ||
-          podcastId.isEmpty ||
-          guid == null ||
-          guid.isEmpty ||
-          url.isEmpty) {
-        continue;
+      for (final subscription in subscriptionsMap.values) {
+        final podcastId = subscription.id.toString();
+        podcasts.add(MediaItem(
+          id: podcastId,
+          title: subscription.title,
+          artist: subscription.author,
+          album: null,
+          artUri: _parseArtUri(subscription.artwork.isNotEmpty
+              ? subscription.artwork
+              : subscription.imageUrl),
+          duration: null,
+          // Podcasts are browsable folders, not playable tracks. Without this
+          // flag Android Auto treats them as songs instead of folders to open.
+          playable: false,
+        ));
+        episodesByPodcast[podcastId] = [];
       }
 
-      final podcastTitle =
-          ((episode['podcast'] as Map?)?['title'] ?? episode['podcastTitle'])
-              ?.toString();
-      final author = episode['author']?.toString();
-      final title = episode['title']?.toString() ?? 'Unknown';
-      final image = episode['image']?.toString() ??
-          episode['feedImage']?.toString() ??
-          '';
+      for (final episode in allEpisodes) {
+        final podcastId =
+            ((episode['podcast'] as Map?)?['id'] ?? episode['podcastId'])
+                ?.toString();
+        final guid = episode['guid']?.toString();
+        final url = episode['enclosureUrl']?.toString() ?? '';
+        if (podcastId == null ||
+            podcastId.isEmpty ||
+            guid == null ||
+            guid.isEmpty ||
+            url.isEmpty) {
+          continue;
+        }
 
-      final item = MediaItem(
-        id: guid,
-        title: title,
-        artist: (author != null && author.isNotEmpty) ? author : podcastTitle,
-        album: (podcastTitle != null && podcastTitle.isNotEmpty)
-            ? podcastTitle
-            : null,
-        artUri: _parseArtUri(image),
-        duration: _parseEpisodeDuration(episode['duration']),
-        playable: true,
+        final podcastTitle =
+            ((episode['podcast'] as Map?)?['title'] ?? episode['podcastTitle'])
+                ?.toString();
+        final author = episode['author']?.toString();
+        final title = episode['title']?.toString() ?? 'Unknown';
+        final image = episode['image']?.toString() ??
+            episode['feedImage']?.toString() ??
+            '';
+
+        final item = MediaItem(
+          id: guid,
+          title: title,
+          artist: (author != null && author.isNotEmpty) ? author : podcastTitle,
+          album: (podcastTitle != null && podcastTitle.isNotEmpty)
+              ? podcastTitle
+              : null,
+          artUri: _parseArtUri(image),
+          duration: _parseEpisodeDuration(episode['duration']),
+          playable: true,
+          // The handler sorts by this to answer open-ended "play something"
+          // voice actions in the car with the newest episodes.
+          extras: {'publishedAt': _parsePublishedAt(episode['datePublished'])},
+        );
+
+        (episodesByPodcast[podcastId] ??= []).add(item);
+        urlsByGuid[guid] = url;
+      }
+
+      _audioHandler.updateMediaLibrary(
+        podcasts: podcasts,
+        episodesByPodcast: episodesByPodcast,
+        urlsByGuid: urlsByGuid,
       );
-
-      (episodesByPodcast[podcastId] ??= []).add(item);
-      urlsByGuid[guid] = url;
+    } catch (e) {
+      // The library sync reads from Hive and can fail during startup.
+      // Handing the browse tree an empty root beats leaving the car waiting
+      // on a tree that will never arrive.
+      debugPrint('syncMediaLibrary error: $e');
+    } finally {
+      // Release Android Auto even when the sync failed, so the head unit
+      // shows an empty library instead of spinning forever.
+      _audioHandler.markLibraryReady();
     }
-
-    _audioHandler.updateMediaLibrary(
-      podcasts: podcasts,
-      episodesByPodcast: episodesByPodcast,
-      urlsByGuid: urlsByGuid,
-    );
   }
 
   Uri? _parseArtUri(String? url) {
@@ -1067,6 +1082,20 @@ class AudioController extends ChangeNotifier {
     }
     final seconds = int.tryParse(parts[0]);
     return seconds != null ? Duration(seconds: seconds) : null;
+  }
+
+  /// Publish timestamps arrive as epoch seconds, but synced data has been seen
+  /// in milliseconds and ISO strings too. Normalise to milliseconds so
+  /// relative ordering holds regardless of which form is stored.
+  int _parsePublishedAt(dynamic raw) {
+    if (raw == null) return 0;
+    if (raw is int) {
+      return raw.abs() < 100000000000 ? raw * 1000 : raw;
+    }
+    if (raw is double) return raw.round();
+    return int.tryParse(raw.toString()) ??
+        DateTime.tryParse(raw.toString())?.millisecondsSinceEpoch ??
+        0;
   }
 
   Future<void> _restoreLastPlayedEpisode() async {

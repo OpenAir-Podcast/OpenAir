@@ -40,11 +40,20 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="openair"/>
             </intent-filter>
+            <!-- Required by Android Auto: car voice actions ("Play <podcast>")
+                 are routed to the media session's onPlayFromSearch callback,
+                 but the head unit only offers the app if this filter is
+                 declared. Playback itself is handled by the service below. -->
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <service
             android:name="com.ryanheise.audioservice.AudioService"
             android:foregroundServiceType="mediaPlayback"
-            android:exported="true">
+            android:exported="true"
+            android:icon="@mipmap/launcher_icon">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.browse.MediaBrowserService" />

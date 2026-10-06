@@ -67,6 +67,19 @@ void main() async {
       androidStopForegroundOnPause: true,
       artDownscaleWidth: 512,
       artDownscaleHeight: 512,
+      // Defaults to 'mipmap/ic_launcher', a full-colour raster. Notification
+      // small icons are tinted with one colour and keep only the alpha channel,
+      // so that renders as a blank blob in the shade and in the car UI.
+      androidNotificationIcon: 'drawable/ic_notification',
+      // Tells Android Auto this is a browsable, not a play-only, app. Without
+      // it the head unit only offers "Play", which is what the Play Store
+      // rejection was about.
+      androidBrowsableRootExtras: {
+        'android.supportedMediaInterfaces': [
+          'android.media.browse.MediaBrowser'
+        ],
+        'android.media.BROWSABLE': true,
+      },
     ),
   );
 
@@ -77,12 +90,20 @@ void main() async {
     systemNavigationBarColor: Colors.transparent,
   ));
 
-  // Request notification permission for Android 13+
+  // Notification permission for Android 13+ is requested after the first frame
+  // rather than here. A cold start straight into a car browse used to sit behind
+  // this system dialog, which is a long time to show nothing.
   if (Platform.isAndroid) {
-    final status = await Permission.notification.status;
-    if (!status.isGranted) {
-      await Permission.notification.request();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final status = await Permission.notification.status;
+        if (!status.isGranted) {
+          await Permission.notification.request();
+        }
+      } catch (e) {
+        debugPrint('Notification permission request failed: $e');
+      }
+    });
   }
 
   // Load saved language BEFORE setting up Translations

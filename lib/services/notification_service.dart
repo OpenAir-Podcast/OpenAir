@@ -21,8 +21,11 @@ class NotificationService extends ChangeNotifier {
   Future<void> init(BuildContext context) async {
     this.context = context;
 
+    // 'ic_notification' is the monochrome variant. Notification small icons are
+    // tinted with a single colour and only the alpha channel survives, so the
+    // full-colour launcher artwork renders as a blank blob.
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('notification_icon');
+        AndroidInitializationSettings('ic_notification');
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings();
