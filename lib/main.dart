@@ -90,20 +90,13 @@ void main() async {
     systemNavigationBarColor: Colors.transparent,
   ));
 
-  // Notification permission for Android 13+ is requested after the first frame
-  // rather than here. A cold start straight into a car browse used to sit behind
-  // this system dialog, which is a long time to show nothing.
+  // Notification permission for Android 13+ is only requested while the phone
+  // app is actually in the foreground (resumed). A cold start straight into an
+  // Android Auto session runs the app in a headless engine with no resumed
+  // activity, so a prompt would otherwise land on the phone screen behind the
+  // wheel (car quality guideline VI-1).
   if (Platform.isAndroid) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        final status = await Permission.notification.status;
-        if (!status.isGranted) {
-          await Permission.notification.request();
-        }
-      } catch (e) {
-        debugPrint('Notification permission request failed: $e');
-      }
-    });
+    WidgetsBinding.instance.addObserver(_NotificationPermissionObserver());
   }
 
   // Load saved language BEFORE setting up Translations
@@ -632,5 +625,32 @@ class _AppHomeState extends ConsumerState<_AppHome>
         ),
       ),
     );
+  }
+}
+
+/// Requests the Android 13+ notification permission only while the phone app is
+/// the foreground activity. When the app is started headless by a car
+/// (audio_service's background engine) the lifecycle never reaches 'resumed',
+/// so drivers are never asked to look at the phone to act on the prompt.
+class _NotificationPermissionObserver with WidgetsBindingObserver {
+  bool _requested = false;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || _requested) return;
+    _requested = true;
+    WidgetsBinding.instance.removeObserver(this);
+    _requestNotificationPermission();
+  }
+}
+
+Future<void> _requestNotificationPermission() async {
+  try {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  } catch (e) {
+    debugPrint('Notification permission request failed: $e');
   }
 }

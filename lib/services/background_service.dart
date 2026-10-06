@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:openair/env.dart';
 import 'package:workmanager/workmanager.dart';
@@ -12,6 +14,13 @@ import 'package:crypto/crypto.dart';
 
 const String refreshSubscriptionsTask = "refreshSubscriptionsTask";
 const String dailyRefreshTask = "dailyRefreshTask";
+
+/// Notification.FLAG_LOCAL_ONLY from the Android API. Local-only notifications
+/// are suppressed on companion screens such as Android Auto, so the new-episode
+/// alert stays on the phone and never interrupts driving (car quality guideline
+/// IN-1). flutter_local_notifications has no setLocalOnly(), but its
+/// `additionalFlags` are OR'd straight into the built notification's flags.
+const int _androidNotificationFlagLocalOnly = 0x0400;
 
 class BackgroundPodcastService {
   final Dio _dio = Dio();
@@ -171,7 +180,7 @@ void callbackDispatcher() {
               '$newEpisodesCount new episodes from ${podcastNewEpisodes.length} podcasts';
         }
 
-        const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        final AndroidNotificationDetails androidPlatformChannelSpecifics =
             AndroidNotificationDetails(
           'openair_background_channel',
           'OpenAir Background Updates',
@@ -179,6 +188,9 @@ void callbackDispatcher() {
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
+          additionalFlags: Int32List.fromList(
+            [_androidNotificationFlagLocalOnly],
+          ),
         );
 
         const DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -188,7 +200,7 @@ void callbackDispatcher() {
           presentSound: true,
         );
 
-        const NotificationDetails platformChannelSpecifics =
+        final NotificationDetails platformChannelSpecifics =
             NotificationDetails(
           android: androidPlatformChannelSpecifics,
           iOS: iOSPlatformChannelSpecifics,
