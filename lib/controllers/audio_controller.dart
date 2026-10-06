@@ -32,6 +32,7 @@ import 'package:opml/opml.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webfeed_plus/domain/rss_feed.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final audioControllerProvider = ChangeNotifierProvider<AudioController>(
   (ref) => AudioController(ref),
@@ -117,6 +118,25 @@ class AudioController extends ChangeNotifier {
     _sleepTimerMinutes = null;
     _remainingSeconds = null;
     notifyListeners();
+  }
+
+  bool _batteryExemptionRequested = false;
+
+  /// Samsung and other OEMs put backgrounded apps to sleep a few minutes after
+  /// minimize, killing the foreground service and stopping playback. Asking for
+  /// the battery-optimization exemption ("Unrestricted") the first time an
+  /// episode is played keeps the process alive and streaming in the background.
+  Future<void> _requestBatteryExemptionIfNeeded() async {
+    if (_batteryExemptionRequested || !Platform.isAndroid) return;
+    _batteryExemptionRequested = true;
+    try {
+      final status = await Permission.ignoreBatteryOptimizations.status;
+      if (status.isGranted) return;
+      final result = await Permission.ignoreBatteryOptimizations.request();
+      debugPrint('Battery optimization exemption: ${result.isGranted}');
+    } catch (e) {
+      debugPrint('Battery optimization exemption request failed: $e');
+    }
   }
 
   void _startPositionAutoSave() {
@@ -236,6 +256,7 @@ class AudioController extends ChangeNotifier {
     Map<String, dynamic> episodeItem,
     BuildContext context,
   ) async {
+    unawaited(_requestBatteryExemptionIfNeeded());
     currentEpisode = episodeItem;
     if (currentPodcast == null) {
       await _resolvePodcastFromEpisode(currentEpisode!);
@@ -264,7 +285,6 @@ class AudioController extends ChangeNotifier {
         'Unknown';
 
     try {
-
       await _audioHandler.setMediaItem(
         id: currentEpisode!['guid'],
         title: title,
@@ -1600,22 +1620,19 @@ class AudioController extends ChangeNotifier {
   ) {
     if (episode == null) return -1;
 
-    int idx = sortedEpisodes
-        .indexWhere((ep) => ep['guid'] == episode['guid']);
+    int idx = sortedEpisodes.indexWhere((ep) => ep['guid'] == episode['guid']);
     if (idx >= 0) return idx;
 
-    idx = sortedEpisodes
-        .indexWhere((ep) => ep['id'] == episode['id']);
+    idx = sortedEpisodes.indexWhere((ep) => ep['id'] == episode['id']);
     if (idx >= 0) return idx;
 
-    idx = sortedEpisodes.indexWhere(
-        (ep) => ep['title'] == episode['title']);
+    idx = sortedEpisodes.indexWhere((ep) => ep['title'] == episode['title']);
     if (idx >= 0) return idx;
 
     final currentDate = episode['datePublished'];
     if (currentDate != null) {
-      idx = sortedEpisodes.indexWhere(
-          (ep) => ep['datePublished'] == currentDate);
+      idx =
+          sortedEpisodes.indexWhere((ep) => ep['datePublished'] == currentDate);
     }
     return idx;
   }
@@ -1717,8 +1734,8 @@ class AudioController extends ChangeNotifier {
       final dir = await getTemporaryDirectory();
       final cacheDir = Directory('${dir.path}/artwork');
       if (!await cacheDir.exists()) await cacheDir.create();
-      final file = File(
-          '${cacheDir.path}/${imageUrl.hashCode}_${size}x$size.png');
+      final file =
+          File('${cacheDir.path}/${imageUrl.hashCode}_${size}x$size.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
       return file.path;
     } catch (_) {
@@ -1727,13 +1744,13 @@ class AudioController extends ChangeNotifier {
   }
 
   Future<void> _resolvePodcastFromEpisode(Map<String, dynamic> episode) async {
-    final podcast =
-        episode['podcast'] is Map ? Map<String, dynamic>.from(episode['podcast']) : null;
+    final podcast = episode['podcast'] is Map
+        ? Map<String, dynamic>.from(episode['podcast'])
+        : null;
     final feedId = episode['podcastId']?.toString() ??
         episode['feedId']?.toString() ??
         podcast?['id']?.toString();
-    final feedUrl = episode['feedUrl'] as String? ??
-        podcast?['url'] as String?;
+    final feedUrl = episode['feedUrl'] as String? ?? podcast?['url'] as String?;
 
     if ((feedId == null || feedId.isEmpty) &&
         (feedUrl == null || feedUrl.isEmpty)) {
@@ -1745,9 +1762,7 @@ class AudioController extends ChangeNotifier {
 
     for (final sub in subscriptions.values) {
       if (sub.id.toString() == feedId ||
-          (feedUrl != null &&
-              feedUrl.isNotEmpty &&
-              sub.feedUrl == feedUrl)) {
+          (feedUrl != null && feedUrl.isNotEmpty && sub.feedUrl == feedUrl)) {
         if (episode['podcastTitle'] == null ||
             episode['podcastTitle'].isEmpty) {
           episode['podcastTitle'] = sub.title;
