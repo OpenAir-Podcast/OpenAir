@@ -17,7 +17,7 @@ sdk: org.gnome.Sdk
 # clang, so provide LLVM through the freedesktop sdk-extension (same approach
 # GNOME Builder uses). Installed automatically by Flatpak mirrors/CI.
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm19
+  - org.freedesktop.Sdk.Extension.llvm20
 
 command: OpenAir
 
@@ -48,10 +48,12 @@ modules:
   - name: OpenAir
     buildsystem: simple
     build-options:
-      append-path: /var/lib/flutter/bin:/usr/lib/sdk/llvm19/bin
+      append-path: /var/lib/flutter/bin:/usr/lib/sdk/llvm20/bin
       env:
         PUB_CACHE: /run/build/OpenAir/.pub-cache
     build-commands:
+      - flutter pub get --offline
+      - flutter pub run build_runner build --delete-conflicting-outputs
       - flutter build linux --release --no-pub
       - install -Dm755 build/linux/x64/release/bundle/OpenAir /app/bin/OpenAir
       - cp -r build/linux/x64/release/bundle/data /app/bin/data
@@ -63,6 +65,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/OpenAir-Podcast/OpenAir.git
+      - type: file
+        path: .env
       - type: file
         path: io.github.openair_podcast.openair.desktop
       - type: file
