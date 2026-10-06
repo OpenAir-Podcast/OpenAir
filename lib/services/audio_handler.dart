@@ -236,7 +236,10 @@ class OpenAirAudioHandler extends BaseAudioHandler
     if (_libraryReady.isCompleted) return;
     // Never leave a car browse request hanging: if the library never arrives
     // the head unit gets an empty tree, which is better than an endless spinner.
-    _libraryReadyTimer ??= Timer(const Duration(seconds: 20), () {
+    // Capped at 8s so cold-start content lands inside the 10s car-quality
+    // content-load window (DR-3). A late library still refreshes the head unit
+    // via _notifyChildrenChanged().
+    _libraryReadyTimer ??= Timer(const Duration(seconds: 8), () {
       debugPrint('AudioHandler: media library was not ready in time');
       markLibraryReady();
     });
