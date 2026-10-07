@@ -1,11 +1,6 @@
 What's New in v0.18.25+75
 
 • Fixed background audio playback stopping on Samsung/Android 15 by requesting battery optimization exemption
-• Restructured Android Auto browse tree: Current, Queue, Downloads, and More (Episodes, Subscriptions) folders
-• Hardened notification permissions: no prompt while driving (headless car engine)
-• Local-only notifications for new episodes so they don't appear on Android Auto
-• Removed Android Auto projection support due to Play Store policy rejection (MediaBrowserService deprecated)
-• Improved media browser reliability with 8s browse gate cap for car content-load rule
 
 ---
 
