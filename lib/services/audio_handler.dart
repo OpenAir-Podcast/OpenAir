@@ -218,6 +218,21 @@ class OpenAirAudioHandler extends BaseAudioHandler
   final List<MediaItem> _episodesByRecency = [];
   final Map<String, String> _urlsByGuid = {};
 
+  /// The user's queue and downloaded episodes, pushed from the UI layer so the
+  /// head unit can browse them. Items keep their episode id so a tap resolves
+  /// back through [playFromMediaId].
+  List<MediaItem> _queue = [];
+  List<MediaItem> _downloads = [];
+
+  // Folder ids of the browsable tree exposed to the head unit.
+  static const String _rootId = 'root';
+  static const String _currentFolderId = 'current';
+  static const String _queueFolderId = 'queue';
+  static const String _downloadsFolderId = 'downloads';
+  static const String _moreFolderId = 'more';
+  static const String _episodesFolderId = 'episodes';
+  static const String _subscriptionsFolderId = 'subscriptions';
+
   // The head unit can bind to our MediaBrowserService before the Flutter UI has
   // finished loading subscriptions, so getChildren() parks on this completer
   // instead of answering with an empty tree and showing a blank browser.
@@ -294,6 +309,16 @@ class OpenAirAudioHandler extends BaseAudioHandler
     _notifyChildrenChanged();
   }
 
+  void updateBrowseQueue(List<MediaItem> queue) {
+    _queue = queue;
+    _notifyChildrenChanged();
+  }
+
+  void updateDownloads(List<MediaItem> downloads) {
+    _downloads = downloads;
+    _notifyChildrenChanged();
+  }
+
   /// Orders episodes newest first using the publish date that the media library
   /// sync stashes in [MediaItem.extras].
   static int _byRecency(MediaItem a, MediaItem b) {
@@ -312,8 +337,26 @@ class OpenAirAudioHandler extends BaseAudioHandler
       [Map<String, dynamic>? options]) async {
     try {
       await _awaitLibraryReady();
-      if (parentMediaId.isEmpty || parentMediaId == 'root') {
-        return _podcasts;
+      switch (parentMediaId) {
+        case '':
+        case _rootId:
+          return _rootItems();
+        case _currentFolderId:
+          final current = mediaItem.value;
+          return current == null ? [] : [current];
+        case _queueFolderId:
+          return _queue;
+        case _downloadsFolderId:
+          return _downloads;
+        case _moreFolderId:
+          return [
+            _folder(_episodesFolderId, 'Episodes'),
+            _folder(_subscriptionsFolderId, 'Subscriptions'),
+          ];
+        case _episodesFolderId:
+          return _episodesByRecency.take(200).toList();
+        case _subscriptionsFolderId:
+          return _podcasts;
       }
       return _episodesByPodcastId[parentMediaId] ?? [];
     } catch (e) {
@@ -321,6 +364,18 @@ class OpenAirAudioHandler extends BaseAudioHandler
       return [];
     }
   }
+
+  /// A browsable folder in the head-unit tree. `playable: false` is what makes
+  /// Android Auto render it as a folder to open rather than a song to queue.
+  MediaItem _folder(String id, String title) =>
+      MediaItem(id: id, title: title, playable: false);
+
+  List<MediaItem> _rootItems() => [
+        _folder(_currentFolderId, 'Current'),
+        _folder(_queueFolderId, 'Queue'),
+        _folder(_downloadsFolderId, 'Downloads'),
+        _folder(_moreFolderId, 'More'),
+      ];
 
   @override
   Future<List<MediaItem>> search(String query,
@@ -426,19 +481,31 @@ class OpenAirAudioHandler extends BaseAudioHandler
       [Map<String, dynamic>? extras]) async {
     try {
       await _awaitLibraryReady();
-      final episodes = _episodesByPodcastId[mediaId];
-      if (episodes != null && episodes.isNotEmpty) {
-        await _playFromLibraryItem(episodes.first);
+      // A podcast folder id starts a playable episode from that podcast.
+      final podcastEpisodes = _episodesByPodcastId[mediaId];
+      if (podcastEpisodes != null && podcastEpisodes.isNotEmpty) {
+        await _playFromLibraryItem(podcastEpisodes.first);
         return;
       }
 
-      final episode = _episodesById[mediaId];
+      // Otherwise the id is an episode from the library, the queue, or the
+      // downloads list.
+      final episode = _episodesById[mediaId] ??
+          _firstById(mediaId, _queue) ??
+          _firstById(mediaId, _downloads);
       if (episode != null) {
         await _playFromLibraryItem(episode);
       }
     } catch (e) {
       debugPrint('AudioHandler: playFromMediaId error for $mediaId: $e');
     }
+  }
+
+  MediaItem? _firstById(String id, List<MediaItem> items) {
+    for (final item in items) {
+      if (item.id == id) return item;
+    }
+    return null;
   }
 
   @override
@@ -471,7 +538,7 @@ class OpenAirAudioHandler extends BaseAudioHandler
           ? podcastEpisodes.first
           : episode;
 
-      final url = _urlsByGuid[target.id];
+      final url = _urlFor(target);
       if (url == null || url.isEmpty) {
         debugPrint('AudioHandler: No URL known for ${target.id}');
         _reportError('This episode is not available offline');
@@ -489,6 +556,17 @@ class OpenAirAudioHandler extends BaseAudioHandler
     } catch (e) {
       debugPrint('AudioHandler: _playFromLibraryItem error: $e');
     }
+  }
+
+  /// The stream URL for an item: the library's url registry first, then the
+  /// url stashed in [MediaItem.extras] for queue and download items that may
+  /// not be present in the episode library.
+  String? _urlFor(MediaItem item) {
+    final registered = _urlsByGuid[item.id];
+    if (registered != null && registered.isNotEmpty) return registered;
+    final stashed = item.extras?['url'];
+    if (stashed is String && stashed.isNotEmpty) return stashed;
+    return null;
   }
 
   Future<void> playFromFile(String filePath,

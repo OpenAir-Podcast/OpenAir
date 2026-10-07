@@ -512,6 +512,7 @@ class AudioController extends ChangeNotifier {
       ref.invalidate(getDownloadsProvider);
       ref.invalidate(downloadsCountProvider);
       ref.invalidate(getDownloadsProvider);
+      unawaited(_syncDownloadsToLibrary());
     } catch (e) {
       debugPrint('Error downloading ${item['title']}: $e');
       final filename = '${item['guid']}.mp3';
@@ -535,6 +536,7 @@ class AudioController extends ChangeNotifier {
       final hiveService = ref.read(hiveServiceProvider);
       await hiveService.deleteDownload(guid);
       notifyListeners();
+      unawaited(_syncDownloadsToLibrary());
     } catch (e) {
       debugPrint('Error removing download for ${item['title']}: $e');
     }
@@ -702,6 +704,7 @@ class AudioController extends ChangeNotifier {
 
     ref.invalidate(getQueueProvider);
     notifyListeners();
+    unawaited(_syncQueueToLibrary());
   }
 
   Future<void> removeFromQueue(String guid) async {
@@ -710,6 +713,7 @@ class AudioController extends ChangeNotifier {
     ref.invalidate(sortedProvider);
     ref.invalidate(getQueueProvider);
     notifyListeners();
+    unawaited(_syncQueueToLibrary());
   }
 
   Future<void> addPodcastEpisodes(
@@ -1029,29 +1033,7 @@ class AudioController extends ChangeNotifier {
           continue;
         }
 
-        final podcastTitle =
-            ((episode['podcast'] as Map?)?['title'] ?? episode['podcastTitle'])
-                ?.toString();
-        final author = episode['author']?.toString();
-        final title = episode['title']?.toString() ?? 'Unknown';
-        final image = episode['image']?.toString() ??
-            episode['feedImage']?.toString() ??
-            '';
-
-        final item = MediaItem(
-          id: guid,
-          title: title,
-          artist: (author != null && author.isNotEmpty) ? author : podcastTitle,
-          album: (podcastTitle != null && podcastTitle.isNotEmpty)
-              ? podcastTitle
-              : null,
-          artUri: _parseArtUri(image),
-          duration: _parseEpisodeDuration(episode['duration']),
-          playable: true,
-          // The handler sorts by this to answer open-ended "play something"
-          // voice actions in the car with the newest episodes.
-          extras: {'publishedAt': _parsePublishedAt(episode['datePublished'])},
-        );
+        final item = _mapEpisodeToMediaItem(episode);
 
         (episodesByPodcast[podcastId] ??= []).add(item);
         urlsByGuid[guid] = url;
@@ -1062,6 +1044,8 @@ class AudioController extends ChangeNotifier {
         episodesByPodcast: episodesByPodcast,
         urlsByGuid: urlsByGuid,
       );
+      await _syncQueueToLibrary();
+      await _syncDownloadsToLibrary();
     } catch (e) {
       // The library sync reads from Hive and can fail during startup.
       // Handing the browse tree an empty root beats leaving the car waiting
@@ -1071,6 +1055,90 @@ class AudioController extends ChangeNotifier {
       // Release Android Auto even when the sync failed, so the head unit
       // shows an empty library instead of spinning forever.
       _audioHandler.markLibraryReady();
+    }
+  }
+
+  MediaItem _mapEpisodeToMediaItem(Map<dynamic, dynamic> episode) {
+    final podcastTitle =
+        ((episode['podcast'] as Map?)?['title'] ?? episode['podcastTitle'])
+            ?.toString();
+    final author = episode['author']?.toString();
+    final title = episode['title']?.toString() ?? 'Unknown';
+    final image =
+        episode['image']?.toString() ?? episode['feedImage']?.toString() ?? '';
+    return MediaItem(
+      id: episode['guid'].toString(),
+      title: title,
+      artist: (author != null && author.isNotEmpty) ? author : podcastTitle,
+      album: (podcastTitle != null && podcastTitle.isNotEmpty)
+          ? podcastTitle
+          : null,
+      artUri: _parseArtUri(image),
+      duration: _parseEpisodeDuration(episode['duration']),
+      playable: true,
+      // The handler sorts by this to answer open-ended "play something"
+      // voice actions and carries the stream URL so queue/download items that
+      // are not in the episode library can still be played from the car.
+      extras: {
+        'publishedAt': _parsePublishedAt(episode['datePublished']),
+        'url': episode['enclosureUrl']?.toString(),
+      },
+    );
+  }
+
+  /// Pushes the user's queue (in play order) to the media browser so the car
+  /// can show it under the Queue folder.
+  Future<void> _syncQueueToLibrary() async {
+    try {
+      final hiveService = ref.read(hiveServiceProvider);
+      final queue = await hiveService.getQueue();
+      final entries = queue.values
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList()
+        ..sort(
+          (a, b) => ((a['pos'] ?? 0) as num).compareTo((b['pos'] ?? 0) as num),
+        );
+      final items = <MediaItem>[];
+      for (final entry in entries) {
+        final guid = entry['guid']?.toString();
+        final url = entry['enclosureUrl']?.toString();
+        if (guid == null || guid.isEmpty || url == null || url.isEmpty) {
+          continue;
+        }
+        items.add(_mapEpisodeToMediaItem(entry));
+      }
+      _audioHandler.updateBrowseQueue(items);
+    } catch (e) {
+      debugPrint('_syncQueueToLibrary error: $e');
+    }
+  }
+
+  /// Pushes downloaded episodes to the media browser (Downloads folder).
+  Future<void> _syncDownloadsToLibrary() async {
+    try {
+      final hiveService = ref.read(hiveServiceProvider);
+      final downloads = await hiveService.getSortedDownloads();
+      final items = <MediaItem>[];
+      for (final download in downloads) {
+        items.add(MediaItem(
+          id: download.guid,
+          title: download.title,
+          artist: download.author.isNotEmpty ? download.author : null,
+          album: null,
+          artUri: _parseArtUri(download.image),
+          duration: download.duration > 0
+              ? Duration(seconds: download.duration)
+              : null,
+          playable: true,
+          extras: {
+            'publishedAt': download.datePublished,
+            'url': download.enclosureUrl,
+          },
+        ));
+      }
+      _audioHandler.updateDownloads(items);
+    } catch (e) {
+      debugPrint('_syncDownloadsToLibrary error: $e');
     }
   }
 
