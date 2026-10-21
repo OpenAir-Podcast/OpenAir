@@ -1,3 +1,9 @@
+What's New in v0.18.26+76
+
+• Added an optional prompt asking you to rate OpenAir on Google Play
+
+---
+
 What's New in v0.18.25+75
 
 • Fixed background audio playback stopping on Samsung/Android 15 by requesting battery optimization exemption
