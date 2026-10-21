@@ -552,5 +552,8 @@
   "shareOnFacebook": "Dela på Facebook",
   "shareOnWhatsApp": "Dela på WhatsApp",
   "shareViaEmail": "Dela via e-post",
-  "selected": "valda"
+  "selected": "valda",
+  "ratePromptTitle": "Betygsätt OpenAir",
+  "ratePromptMessage": "Din betygsättning hjälper nya lyssnare att hitta OpenAir. Det tar bara några sekunder att betygsätta appen på Google Play.",
+  "rateOnPlayStore": "Google Play"
 }

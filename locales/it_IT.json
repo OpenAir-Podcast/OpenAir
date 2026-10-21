@@ -552,5 +552,8 @@
   "shareOnFacebook": "Condividi su Facebook",
   "shareOnWhatsApp": "Condividi su WhatsApp",
   "shareViaEmail": "Condividi via email",
-  "selected": "selezionato"
+  "selected": "selezionato",
+  "ratePromptTitle": "Valuta OpenAir",
+  "ratePromptMessage": "La tua valutazione aiuta nuovi ascoltatori a scoprire OpenAir. Valutare l'app su Google Play richiede solo pochi secondi.",
+  "rateOnPlayStore": "Google Play"
 }

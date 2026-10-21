@@ -18,6 +18,7 @@ import 'package:openair/views/nav_pages/add_podcast_page.dart';
 
 import 'package:openair/views/navigation/list_drawer.dart';
 import 'package:openair/views/widgets/donation_prompt.dart';
+import 'package:openair/views/widgets/rate_prompt.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:openair/views/widgets/wide_drawer.dart';
 
@@ -44,6 +45,7 @@ class _HomeState extends ConsumerState<Home> with TickerProviderStateMixin {
     _initDeepLinks();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       DonationPrompt.maybeShow(context);
+      RatePrompt.maybeShow(context);
     });
   }
 

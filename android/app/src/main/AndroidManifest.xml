@@ -83,5 +83,7 @@
         <package android:name="com.twitter.android" />
         <!-- Facebook -->
         <package android:name="com.facebook.katana" />
+        <!-- Google Play, used by the "rate the app" prompt -->
+        <package android:name="com.android.vending" />
     </queries>
 </manifest>

@@ -552,5 +552,8 @@
   "shareOnFacebook": "Delen op Facebook",
   "shareOnWhatsApp": "Delen op WhatsApp",
   "shareViaEmail": "Delen via e-mail",
-  "selected": "geselecteerd"
+  "selected": "geselecteerd",
+  "ratePromptTitle": "Beoordeel OpenAir",
+  "ratePromptMessage": "Je beoordeling helpt nieuwe luisteraars OpenAir te ontdekken. De app beoordelen op Google Play kost maar een paar seconden.",
+  "rateOnPlayStore": "Google Play"
 }

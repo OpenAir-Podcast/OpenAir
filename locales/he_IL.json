@@ -552,5 +552,8 @@
   "shareOnFacebook": "שתף בFacebook",
   "shareOnWhatsApp": "שתף בWhatsApp",
   "shareViaEmail": "שתף בדואר אלקטרוני",
-  "selected": "נבחר"
+  "selected": "נבחר",
+  "ratePromptTitle": "דרגו את OpenAir",
+  "ratePromptMessage": "הדירוג שלך עוזר למאזינים חדשים לגלות את OpenAir. דירוג האפליקציה ב-Google Play לוקח רק כמה שניות.",
+  "rateOnPlayStore": "Google Play"
 }

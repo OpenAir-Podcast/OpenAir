@@ -551,5 +551,8 @@
   "shareOnFacebook": "分享到 Facebook",
   "shareOnWhatsApp": "分享到 WhatsApp",
   "shareViaEmail": "通过电子邮件分享",
-  "selected": "已选择"
+  "selected": "已选择",
+  "ratePromptTitle": "为 OpenAir 评分",
+  "ratePromptMessage": "你的评价可以帮助更多新听众发现 OpenAir。在 Google Play 上评价只需几秒钟。",
+  "rateOnPlayStore": "Google Play"
 }
