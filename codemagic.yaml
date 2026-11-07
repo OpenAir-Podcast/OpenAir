@@ -26,6 +26,12 @@ workflows:
         script: flutter pub get
       - name: Generate code
         script: dart run build_runner build --delete-conflicting-outputs
+      - name: Set up Android signing
+        script: |
+          echo "storeFile=$CM_KEYSTORE_PATH" > android/key.properties
+          echo "storePassword=$CM_KEYSTORE_PASSWORD" >> android/key.properties
+          echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
+          echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
       - name: Build Android AAB (release)
         script: flutter build appbundle --release
     artifacts:
