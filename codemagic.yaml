@@ -7,8 +7,24 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
+      - name: Create .env
+        script: |
+          cat > .env <<EOF
+          PODCAST_INDEX_API_KEY=${PODCAST_INDEX_API_KEY:-dummy}
+          PODCAST_INDEX_API_SECRET=${PODCAST_INDEX_API_SECRET:-dummy}
+          PODCAST_USER_AGENT=${PODCAST_USER_AGENT:-OpenAir/1.0}
+          FYYD_ACCESS_TOKEN=${FYYD_ACCESS_TOKEN:-dummy}
+          PAYPAL_URL=${PAYPAL_URL:-https://example.com}
+          DONATE_WITH_KOFI_URL=${DONATE_WITH_KOFI_URL:-https://example.com}
+          DISCORD_URL=${DISCORD_URL:-https://example.com}
+          URL_GITHUB_ISSUES=${URL_GITHUB_ISSUES:-https://example.com}
+          URL_GITHUB_DISCUSSION=${URL_GITHUB_DISCUSSION:-https://example.com}
+          URL_GITHUB=${URL_GITHUB:-https://example.com}
+          PRIVACY_POLICY=${PRIVACY_POLICY:-https://example.com}
+          TERMS_OF_SERVICE=${TERMS_OF_SERVICE:-https://example.com}
+          EOF
       - name: Generate code
-        script: dart run build_runner build --delete-conflicting-outputs
+        script: dart run build_runner build
       - name: Run tests
         script: flutter test
       - name: Build Android APK (debug)
@@ -24,8 +40,24 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
+      - name: Create .env
+        script: |
+          cat > .env <<EOF
+          PODCAST_INDEX_API_KEY=${PODCAST_INDEX_API_KEY:-dummy}
+          PODCAST_INDEX_API_SECRET=${PODCAST_INDEX_API_SECRET:-dummy}
+          PODCAST_USER_AGENT=${PODCAST_USER_AGENT:-OpenAir/1.0}
+          FYYD_ACCESS_TOKEN=${FYYD_ACCESS_TOKEN:-dummy}
+          PAYPAL_URL=${PAYPAL_URL:-https://example.com}
+          DONATE_WITH_KOFI_URL=${DONATE_WITH_KOFI_URL:-https://example.com}
+          DISCORD_URL=${DISCORD_URL:-https://example.com}
+          URL_GITHUB_ISSUES=${URL_GITHUB_ISSUES:-https://example.com}
+          URL_GITHUB_DISCUSSION=${URL_GITHUB_DISCUSSION:-https://example.com}
+          URL_GITHUB=${URL_GITHUB:-https://example.com}
+          PRIVACY_POLICY=${PRIVACY_POLICY:-https://example.com}
+          TERMS_OF_SERVICE=${TERMS_OF_SERVICE:-https://example.com}
+          EOF
       - name: Generate code
-        script: dart run build_runner build --delete-conflicting-outputs
+        script: dart run build_runner build
       - name: Set up Android signing
         script: |
           echo "storeFile=$CM_KEYSTORE_PATH" > android/key.properties
@@ -48,8 +80,24 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
+      - name: Create .env
+        script: |
+          cat > .env <<EOF
+          PODCAST_INDEX_API_KEY=${PODCAST_INDEX_API_KEY:-dummy}
+          PODCAST_INDEX_API_SECRET=${PODCAST_INDEX_API_SECRET:-dummy}
+          PODCAST_USER_AGENT=${PODCAST_USER_AGENT:-OpenAir/1.0}
+          FYYD_ACCESS_TOKEN=${FYYD_ACCESS_TOKEN:-dummy}
+          PAYPAL_URL=${PAYPAL_URL:-https://example.com}
+          DONATE_WITH_KOFI_URL=${DONATE_WITH_KOFI_URL:-https://example.com}
+          DISCORD_URL=${DISCORD_URL:-https://example.com}
+          URL_GITHUB_ISSUES=${URL_GITHUB_ISSUES:-https://example.com}
+          URL_GITHUB_DISCUSSION=${URL_GITHUB_DISCUSSION:-https://example.com}
+          URL_GITHUB=${URL_GITHUB:-https://example.com}
+          PRIVACY_POLICY=${PRIVACY_POLICY:-https://example.com}
+          TERMS_OF_SERVICE=${TERMS_OF_SERVICE:-https://example.com}
+          EOF
       - name: Generate code
-        script: dart run build_runner build --delete-conflicting-outputs
+        script: dart run build_runner build
       - name: Install CocoaPods
         script: cd ios && pod install
       - name: Build iOS
@@ -65,8 +113,24 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
+      - name: Create .env
+        script: |
+          cat > .env <<EOF
+          PODCAST_INDEX_API_KEY=${PODCAST_INDEX_API_KEY:-dummy}
+          PODCAST_INDEX_API_SECRET=${PODCAST_INDEX_API_SECRET:-dummy}
+          PODCAST_USER_AGENT=${PODCAST_USER_AGENT:-OpenAir/1.0}
+          FYYD_ACCESS_TOKEN=${FYYD_ACCESS_TOKEN:-dummy}
+          PAYPAL_URL=${PAYPAL_URL:-https://example.com}
+          DONATE_WITH_KOFI_URL=${DONATE_WITH_KOFI_URL:-https://example.com}
+          DISCORD_URL=${DISCORD_URL:-https://example.com}
+          URL_GITHUB_ISSUES=${URL_GITHUB_ISSUES:-https://example.com}
+          URL_GITHUB_DISCUSSION=${URL_GITHUB_DISCUSSION:-https://example.com}
+          URL_GITHUB=${URL_GITHUB:-https://example.com}
+          PRIVACY_POLICY=${PRIVACY_POLICY:-https://example.com}
+          TERMS_OF_SERVICE=${TERMS_OF_SERVICE:-https://example.com}
+          EOF
       - name: Generate code
-        script: dart run build_runner build --delete-conflicting-outputs
+        script: dart run build_runner build
       - name: Build Web
         script: flutter build web --release
     artifacts:
