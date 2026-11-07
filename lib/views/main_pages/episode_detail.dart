@@ -1,5 +1,10 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:openair/model/alternate_enclosure_model.dart';
+import 'package:openair/model/person_model.dart';
+import 'package:openair/model/social_interact_model.dart';
+import 'package:openair/model/soundbite_model.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +39,108 @@ class EpisodeDetail extends ConsumerStatefulWidget {
 }
 
 class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
+  List<Person> _persons = [];
+  List<Soundbite> _soundbites = [];
+  List<SocialInteract> _socialInteracts = [];
+  List<AlternateEnclosure> _alternateEnclosures = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _parseMetadata();
+  }
+
+  void _parseMetadata() {
+    final item = widget.episodeItem;
+    if (item != null) {
+      final rawPersons = item['persons'];
+      if (rawPersons is List) {
+        _persons = rawPersons
+            .map((e) => Person.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawSoundbites = item['soundbites'];
+      if (rawSoundbites is List) {
+        _soundbites = rawSoundbites
+            .map((e) => Soundbite.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawSocial = item['socialInteract'];
+      if (rawSocial is List) {
+        _socialInteracts = rawSocial
+            .map((e) => SocialInteract.fromJson(Map<String, dynamic>.from(e)))
+            .where((s) => s.isSupported)
+            .toList();
+      }
+      final rawAltEnc = item['alternateEnclosure'];
+      if (rawAltEnc is List) {
+        _alternateEnclosures = rawAltEnc
+            .map((e) => AlternateEnclosure.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+    }
+  }
+
+  String _formatDuration(int seconds) {
+    final d = Duration(seconds: seconds);
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    final s = d.inSeconds.remainder(60);
+    if (h > 0) {
+      return '${h}h ${m.toString().padLeft(2, '0')}m';
+    }
+    return '${m}m ${s.toString().padLeft(2, '0')}s';
+  }
+
+  Widget _buildSeasonEpisodeBadge() {
+    final season = widget.episodeItem!['season'];
+    final episodeNum = widget.episodeItem!['episode'];
+    final label = StringBuffer();
+    if (season != null) label.write('S${(season as num).toInt().toString().padLeft(2, '0')}');
+    if (episodeNum != null) label.write('E${(episodeNum as num).toInt().toString().padLeft(2, '0')}');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label.toString(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildSocialInteractButton(SocialInteract si) {
+    IconData icon;
+    switch (si.protocol) {
+      case 'activitypub':
+        icon = Icons.forum_outlined;
+        break;
+      case 'twitter':
+        icon = Icons.alternate_email_outlined;
+        break;
+      default:
+        icon = Icons.comment_outlined;
+    }
+    return IconButton(
+      icon: Icon(icon, size: 18),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      visualDensity: VisualDensity.compact,
+      tooltip: si.displayLabel,
+      onPressed: () async {
+        if (si.uri != null && await canLaunchUrl(Uri.parse(si.uri!))) {
+          await launchUrl(Uri.parse(si.uri!),
+              mode: LaunchMode.externalApplication);
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<Map> queueListAsync = ref.watch(getQueueProvider);
@@ -101,6 +208,13 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                             maxLines: 2,
                           ),
                         ),
+                        // Season/Episode
+                        if (widget.episodeItem!['season'] != null ||
+                            widget.episodeItem!['episode'] != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: _buildSeasonEpisodeBadge(),
+                          ),
                         // Author
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 140.0,
@@ -478,20 +592,213 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       },
                       icon: const Icon(Icons.share_rounded),
                     ),
+                    // Transcript Button
+                    if (widget.episodeItem?['transcriptUrl'] != null &&
+                        (widget.episodeItem!['transcriptUrl'] as String).isNotEmpty)
+                      IconButton(
+                        tooltip: 'Transcript',
+                        onPressed: () async {
+                          final url = widget.episodeItem!['transcriptUrl'] as String;
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url),
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.description_outlined),
+                      ),
+                    // Funding Button
+                    if (widget.episodeItem?['fundingUrl'] != null &&
+                        (widget.episodeItem!['fundingUrl'] as String).isNotEmpty)
+                      IconButton(
+                        tooltip: 'Support',
+                        onPressed: () async {
+                          final url = widget.episodeItem!['fundingUrl'] as String;
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url),
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        icon: const Icon(Icons.favorite_border_rounded),
+                      ),
+                    // SocialInteract buttons
+                    ..._socialInteracts.map(
+                        (si) => _buildSocialInteractButton(si)),
                   ],
                 ),
               ),
+              // Alternate Enclosure badges
+              if (_alternateEnclosures.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _alternateEnclosures.map((ae) {
+                      return Chip(
+                        avatar: Icon(
+                          ae.isVideo
+                              ? Icons.videocam_outlined
+                              : Icons.headphones_outlined,
+                          size: 16,
+                        ),
+                        label: Text(ae.formatLabel,
+                            style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize:
+                            MaterialTapTargetSize.shrinkWrap,
+                        side: BorderSide.none,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .secondaryContainer,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+              // People section
+              if (_persons.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.people_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'People',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _persons.map((person) {
+                      return ListTile(
+                        dense: true,
+                        leading: person.img != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CachedNetworkImage(
+                                  imageUrl: person.img!,
+                                  width: 36,
+                                  height: 36,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => CircleAvatar(
+                                    child: Icon(Icons.person_outlined, size: 20),
+                                  ),
+                                ),
+                              )
+                            : CircleAvatar(
+                                child: Icon(Icons.person_outlined, size: 20),
+                              ),
+                        title: Text(person.name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: person.role != null
+                            ? Text(person.role!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: Colors.grey))
+                            : null,
+                        onTap: person.href != null
+                            ? () async {
+                                if (await canLaunchUrl(
+                                    Uri.parse(person.href!))) {
+                                  await launchUrl(Uri.parse(person.href!),
+                                      mode:
+                                          LaunchMode.externalApplication);
+                                }
+                              }
+                            : null,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+              // Soundbites section
+              if (_soundbites.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.timeline_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Highlights',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _soundbites.map((sb) {
+                      final formattedStart = _formatDuration(sb.startTime);
+                      return ListTile(
+                        dense: true,
+                        leading: CircleAvatar(
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.1),
+                          child: Icon(Icons.play_arrow_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20),
+                        ),
+                        title: Text(sb.title ?? 'Highlight',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500)),
+                        subtitle: Text(formattedStart,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Colors.grey)),
+                        onTap: () {
+                          final audio = ref.read(audioProvider);
+                          audio.seekToPosition(
+                              Duration(seconds: sb.startTime));
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
               // Episode Description
-              SingleChildScrollView(
-                child: Html(
-                  data: widget.episodeItem!['description'],
-                  onLinkTap: (url, attributes, element) async {
-                    await launchUrl(Uri.parse(url!));
-                  },
+              Html(
+                data: widget.episodeItem!['description'],
+                onLinkTap: (url, attributes, element) async {
+                  await launchUrl(Uri.parse(url!));
+                },
                   style: {
                     "body": Style(
-                      maxLines: 4,
-                      textOverflow: TextOverflow.ellipsis,
                       margin: Margins.zero,
                       fontSize: FontSize(
                         Theme.of(context).textTheme.bodyMedium?.fontSize ??
@@ -500,9 +807,8 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                       color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   },
-                ),
               ),
-            ],
+              ],
           ),
         ),
       ),

@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:openair/config/config.dart';
+import 'package:openair/model/chapters_model.dart';
 import 'package:openair/model/hive_models/download_model.dart';
 import 'package:openair/model/hive_models/feed_model.dart';
 import 'package:openair/model/hive_models/history_model.dart';
@@ -54,6 +55,8 @@ class AudioController extends ChangeNotifier {
   PodcastModel? currentPodcast;
   Map<String, dynamic>? currentEpisode;
   Map<String, dynamic>? nextEpisode;
+  ChaptersData? _currentChapters;
+  ChaptersData? get currentChapters => _currentChapters;
 
   bool isPodcastSelected = false;
   bool onceQueueComplete = false;
@@ -324,6 +327,8 @@ class AudioController extends ChangeNotifier {
       _startPositionAutoSave();
       await _savePlayerState();
       notifyListeners();
+
+      _fetchChapters(currentEpisode);
     } on TimeoutException {
       _handlePlaybackError();
     } catch (e) {
@@ -345,6 +350,21 @@ class AudioController extends ChangeNotifier {
     audioState = 'Stop';
     loadState = 'Detail';
     notifyListeners();
+  }
+
+  Future<void> _fetchChapters(Map<String, dynamic>? episode) async {
+    final url = episode?['chaptersUrl'] as String?;
+    if (url == null || url.isEmpty) {
+      _currentChapters = null;
+      return;
+    }
+    try {
+      final response = await Dio().get(url);
+      _currentChapters = ChaptersData.fromJson(response.data);
+      notifyListeners();
+    } catch (_) {
+      _currentChapters = null;
+    }
   }
 
   Future<void> resumePlayback() async {
@@ -425,6 +445,11 @@ class AudioController extends ChangeNotifier {
                 playerTotalDuration.inMilliseconds)
             .clamp(0.0, 1.0);
     _audioHandler.seek(duration);
+    notifyListeners();
+  }
+
+  void seekToPosition(Duration position) {
+    _audioHandler.seek(position);
     notifyListeners();
   }
 
@@ -690,6 +715,19 @@ class AudioController extends ChangeNotifier {
       'enclosureType': episode['enclosureType'] ?? 'audio/mpeg',
       'enclosureLength': episode['enclosureLength'],
       'enclosureUrl': episode['enclosureUrl'],
+      'chaptersUrl': episode['chaptersUrl'],
+      'transcriptUrl': episode['transcriptUrl'],
+      'fundingUrl': episode['funding'] is List
+          ? ((episode['funding'] as List).isNotEmpty
+              ? (episode['funding'] as List).first['url']
+              : null)
+          : (episode['fundingUrl'] as String?),
+      'persons': episode['persons'],
+      'soundbites': episode['soundbites'],
+      'season': episode['season'],
+      'episode': episode['episode'],
+      'socialInteract': episode['socialInteract'],
+      'alternateEnclosure': episode['alternateEnclosure'],
       'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': 0.0,
@@ -739,6 +777,19 @@ class AudioController extends ChangeNotifier {
         'size': getEpisodeSize(episodes['items'][i]['enclosureLength']),
         'enclosureLength': episodes['items'][i]['enclosureLength'],
         'enclosureUrl': episodes['items'][i]['enclosureUrl'],
+        'chaptersUrl': episodes['items'][i]['chaptersUrl'],
+        'transcriptUrl': episodes['items'][i]['transcriptUrl'],
+        'fundingUrl': episodes['items'][i]['funding'] is List
+            ? ((episodes['items'][i]['funding'] as List).isNotEmpty
+                ? (episodes['items'][i]['funding'] as List).first['url']
+                : null)
+            : null,
+        'persons': episodes['items'][i]['persons'],
+        'soundbites': episodes['items'][i]['soundbites'],
+        'season': episodes['items'][i]['season'],
+        'episode': episodes['items'][i]['episode'],
+        'socialInteract': episodes['items'][i]['socialInteract'],
+        'alternateEnclosure': episodes['items'][i]['alternateEnclosure'],
         'podcast': {
           'id': podcast.id,
           'title': podcast.title,
@@ -1714,7 +1765,20 @@ class AudioController extends ChangeNotifier {
             await podcastIndexService.getEpisodesByFeedUrl(feedUrl);
         final items = response['items'] as List?;
         if (items != null && items.isNotEmpty) {
-          return items.cast<Map<String, dynamic>>();
+          return (items).map((e) {
+            final map = Map<String, dynamic>.from(e as Map);
+            final funding = map['funding'];
+            map['fundingUrl'] = (funding is List && funding.isNotEmpty)
+                ? funding.first['url']
+                : null;
+            map['persons'] = map['persons'];
+            map['soundbites'] = map['soundbites'];
+            map['season'] = map['season'];
+            map['episode'] = map['episode'];
+            map['socialInteract'] = map['socialInteract'];
+            map['alternateEnclosure'] = map['alternateEnclosure'];
+            return map;
+          }).toList();
         }
       } catch (_) {}
     }

@@ -9,6 +9,7 @@ import 'package:openair/providers/openair_provider.dart';
 import 'package:openair/views/main_pages/episode_detail.dart';
 import 'package:openair/views/widgets/play_button_widget.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UnifiedEpisodeCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> episodeItem;
@@ -159,6 +160,9 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                             runSpacing: 4,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
+                              if (widget.episodeItem['season'] != null ||
+                                  widget.episodeItem['episode'] != null)
+                                _buildSeasonEpisodeBadge(),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -305,7 +309,65 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
                 );
           },
         ),
+        // Transcript button
+        if (widget.episodeItem['transcriptUrl'] != null &&
+            (widget.episodeItem['transcriptUrl'] as String).isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.description_outlined, size: 18),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Transcript',
+            onPressed: () async {
+              final url = widget.episodeItem['transcriptUrl'] as String;
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+        // Funding button
+        if (widget.episodeItem['fundingUrl'] != null &&
+            (widget.episodeItem['fundingUrl'] as String).isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.favorite_border_rounded, size: 18),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Support',
+            onPressed: () async {
+              final url = widget.episodeItem['fundingUrl'] as String;
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
       ],
+    );
+  }
+
+  Widget _buildSeasonEpisodeBadge() {
+    final season = widget.episodeItem['season'];
+    final episodeNum = widget.episodeItem['episode'];
+    if (season == null && episodeNum == null) return const SizedBox.shrink();
+    final label = StringBuffer();
+    if (season != null) label.write('S${(season as num).toInt().toString().padLeft(2, '0')}');
+    if (episodeNum != null) label.write('E${(episodeNum as num).toInt().toString().padLeft(2, '0')}');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label.toString(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: 10,
+            ),
+      ),
     );
   }
 
