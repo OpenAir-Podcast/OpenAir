@@ -7,6 +7,7 @@ import 'package:openair/model/person_model.dart';
 import 'package:openair/model/podroll_model.dart';
 import 'package:openair/model/trailer_model.dart';
 import 'package:openair/model/value_model.dart';
+import 'package:openair/model/podcast_namespace_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -57,6 +58,117 @@ class PodcastInfoPage extends ConsumerWidget {
     if (raw is List) {
       return raw
           .map((e) => Trailer.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  bool get _locked {
+    final raw = podcastInfo['locked'];
+    if (raw is bool) return raw;
+    if (raw is int) return raw == 1;
+    return false;
+  }
+
+  String? get _lockOwner => podcastInfo['lockOwner']?.toString();
+
+  String? get _podcastGuid => podcastInfo['podcastGuid']?.toString();
+
+  List<Location> get _locations {
+    final raw = podcastInfo['locations'];
+    if (raw is List) {
+      return raw
+          .map((e) => Location.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<PodcastPlatformId> get _podcastIds {
+    final raw = podcastInfo['podcastIds'];
+    if (raw is List) {
+      return raw
+          .map((e) => PodcastPlatformId.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<RemoteItem> get _remoteItems {
+    final raw = podcastInfo['remoteItems'];
+    if (raw is List) {
+      return raw
+          .map((e) => RemoteItem.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<LiveItemInfo> get _liveItems {
+    final raw = podcastInfo['liveItems'];
+    if (raw is List) {
+      return raw
+          .map((e) => LiveItemInfo.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<ContentLink> get _contentLinks {
+    final raw = podcastInfo['contentLinks'];
+    if (raw is List) {
+      return raw
+          .map((e) => ContentLink.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Block> get _blocks {
+    final raw = podcastInfo['blocks'];
+    if (raw is List) {
+      return raw
+          .map((e) => Block.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  UpdateFrequency? get _updateFrequency {
+    final raw = podcastInfo['updateFrequency'];
+    if (raw is Map) {
+      return UpdateFrequency.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+
+  License? get _license {
+    final raw = podcastInfo['license'];
+    if (raw is Map) {
+      return License.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+
+  bool get _podping {
+    final raw = podcastInfo['podping'];
+    if (raw is bool) return raw;
+    return false;
+  }
+
+  List<Txt> get _txts {
+    final raw = podcastInfo['txts'];
+    if (raw is List) {
+      return raw.map((e) => Txt.fromJson(Map<String, dynamic>.from(e))).toList();
+    }
+    return [];
+  }
+
+  List<Credit> get _credits {
+    final raw = podcastInfo['credits'];
+    if (raw is List) {
+      return raw
+          .map((e) => Credit.fromJson(Map<String, dynamic>.from(e)))
           .toList();
     }
     return [];
@@ -503,6 +615,486 @@ class PodcastInfoPage extends ConsumerWidget {
                             : null,
                       );
                     }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Locked section
+              if (_locked || _lockOwner != null) ...[
+                Row(
+                  children: [
+                    Icon(Icons.lock_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Locked',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    _locked
+                        ? 'Yes${_lockOwner != null ? ' (owner: $_lockOwner)' : ''}'
+                        : 'No',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Podcast GUID section
+              if (_podcastGuid != null && _podcastGuid!.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.fingerprint_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Podcast GUID',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: SelectableText(
+                    _podcastGuid!,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Locations section
+              if (_locations.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Locations',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _locations
+                        .map((l) => ListTile(
+                              title: Text(l.display),
+                              subtitle: Text([
+                                if (l.country != null) l.country,
+                                if (l.geo != null) l.geo,
+                              ].join(' • ')),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Platform IDs section
+              if (_podcastIds.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.badge_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Platform IDs',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _podcastIds
+                        .map((p) => ListTile(
+                              title: Text(p.platform),
+                              subtitle: Text(p.id),
+                              trailing: p.url != null
+                                  ? IconButton(
+                                      icon: const Icon(Icons.open_in_new),
+                                      onPressed: () async {
+                                        if (await canLaunchUrl(
+                                            Uri.parse(p.url!))) {
+                                          await launchUrl(Uri.parse(p.url!),
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        }
+                                      },
+                                    )
+                                  : null,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Content Links section
+              if (_contentLinks.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.link_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Content Links',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _contentLinks
+                        .map((c) => ListTile(
+                              title: Text(c.display ?? c.href),
+                              onTap: () async {
+                                if (await canLaunchUrl(Uri.parse(c.href))) {
+                                  await launchUrl(Uri.parse(c.href),
+                                      mode: LaunchMode.externalApplication);
+                                }
+                              },
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Remote Items section
+              if (_remoteItems.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.rss_feed_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Remote Items',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _remoteItems
+                        .map((r) => ListTile(
+                              title: Text(r.title ?? r.feedUrl ?? 'Remote'),
+                              subtitle: r.medium != null ? Text(r.medium!) : null,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Live Items section
+              if (_liveItems.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.live_tv_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Live Items',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _liveItems
+                        .map((l) => ListTile(
+                              title: Text(l.title ?? 'Live'),
+                              subtitle: Text(l.status ?? ''),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Blocks section
+              if (_blocks.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.block_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Blocks',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _blocks
+                        .map((b) => Text(
+                              '${b.id ?? 'global'}: ${b.value ? 'blocked' : 'allowed'}'))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Update Frequency section
+              if (_updateFrequency != null) ...[
+                Row(
+                  children: [
+                    Icon(Icons.update_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Update Frequency',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(_updateFrequency!.display),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // License section
+              if (_license != null) ...[
+                Row(
+                  children: [
+                    Icon(Icons.verified_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'License',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(_license!.value),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Podping section
+              if (_podping) ...[
+                Row(
+                  children: [
+                    Icon(Icons.notifications_active_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Podping',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: const Text('Uses Podping notifications'),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Txts section
+              if (_txts.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.text_snippet_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Txt',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _txts
+                        .map((t) => ListTile(
+                              title: Text(t.value),
+                              subtitle: t.purpose != null ? Text(t.purpose!) : null,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Credits section
+              if (_credits.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.people_alt_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Credits',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _credits
+                        .map((c) => ListTile(
+                              title: Text(c.value),
+                              subtitle: c.role != null ? Text(c.role!) : null,
+                            ))
+                        .toList(),
                   ),
                 ),
                 const SizedBox(height: 32),

@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:openair/config/config.dart';
 import 'dart:io';
 import 'package:openair/providers/openair_provider.dart';
+import 'package:openair/services/podcast_namespace_service.dart';
 
 final podcastIndexProvider = Provider(
   (ref) => PodcastIndexProvider(ref),
@@ -131,7 +132,32 @@ class PodcastIndexProvider {
         'https://api.podcastindex.org/api/1.0/episodes/byfeedurl?url=$cat&pretty';
 
     final response = await _retry(() => _dio.get(url));
-    return response.data;
+    final data = response.data as Map<String, dynamic>;
+
+    // Enrich with Podcasting 2.0 namespace tags parsed directly from the
+    // feed, since Podcast Index only exposes a subset of them.
+    try {
+      final parsed = await PodcastNamespaceParser().parseFeed(podcastFeedUrl);
+      final items = parsed['items'] as Map<String, dynamic>? ?? {};
+      final apiItems = data['items'];
+      if (apiItems is List) {
+        for (final raw in apiItems) {
+          if (raw is Map<String, dynamic>) {
+            final guid = raw['guid']?.toString();
+            if (guid != null && items.containsKey(guid)) {
+              final ns = items[guid] as Map<String, dynamic>;
+              ns.forEach((k, v) {
+                raw.putIfAbsent(k, () => v);
+              });
+            }
+          }
+        }
+      }
+      // Expose feed-level namespace data for callers that want it.
+      data['namespace'] = parsed['feed'];
+    } catch (_) {}
+
+    return data;
   }
 
   Future<int> getPodcastEpisodeCountByPodcastId(int podcastId) async {
@@ -309,11 +335,24 @@ class PodcastIndexProvider {
 
     final response = await _retry(() => _dio.get(fullUrl));
 
-    hiveService.putPodcastInfo(
-        response.data['feeds'][0]['title'], response.data['feeds'][0]);
+    final feed = response.data['feeds'][0] as Map<String, dynamic>;
+
+    // Enrich with Podcasting 2.0 namespace tags parsed directly from feed.
+    try {
+      final feedUrl = feed['url']?.toString() ?? '';
+      if (feedUrl.isNotEmpty) {
+        final parsed = await PodcastNamespaceParser().parseFeed(feedUrl);
+        final ns = parsed['feed'] as Map<String, dynamic>? ?? {};
+        ns.forEach((k, v) {
+          feed.putIfAbsent(k, () => v);
+        });
+      }
+    } catch (_) {}
+
+    hiveService.putPodcastInfo(feed['title'], feed);
 
     await hiveService.putSearchCache(title, response.data);
 
-    return response.data['feeds'][0];
+    return feed;
   }
 }

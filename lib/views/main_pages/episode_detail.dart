@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:openair/model/alternate_enclosure_model.dart';
 import 'package:openair/model/person_model.dart';
+import 'package:openair/model/podcast_namespace_model.dart';
 import 'package:openair/model/social_interact_model.dart';
 import 'package:openair/model/soundbite_model.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
@@ -43,6 +44,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   List<Soundbite> _soundbites = [];
   List<SocialInteract> _socialInteracts = [];
   List<AlternateEnclosure> _alternateEnclosures = [];
+  List<Location> _locations = [];
+  List<ContentLink> _contentLinks = [];
+  License? _license;
+  List<Txt> _txts = [];
+  List<Block> _blocks = [];
+  List<Credit> _credits = [];
 
   @override
   void initState() {
@@ -76,6 +83,40 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
       if (rawAltEnc is List) {
         _alternateEnclosures = rawAltEnc
             .map((e) => AlternateEnclosure.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawLocations = item['locations'];
+      if (rawLocations is List) {
+        _locations = rawLocations
+            .map((e) => Location.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawContentLinks = item['contentLinks'];
+      if (rawContentLinks is List) {
+        _contentLinks = rawContentLinks
+            .map((e) => ContentLink.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawLicense = item['license'];
+      if (rawLicense is Map) {
+        _license = License.fromJson(Map<String, dynamic>.from(rawLicense));
+      }
+      final rawTxts = item['txts'];
+      if (rawTxts is List) {
+        _txts = rawTxts
+            .map((e) => Txt.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawBlocks = item['blocks'];
+      if (rawBlocks is List) {
+        _blocks = rawBlocks
+            .map((e) => Block.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawCredits = item['credits'];
+      if (rawCredits is List) {
+        _credits = rawCredits
+            .map((e) => Credit.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
     }
@@ -788,6 +829,246 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         },
                       );
                     }).toList(),
+                  ),
+                ),
+              ],
+              // Locations section
+              if (_locations.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Locations',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _locations
+                        .map((l) => ListTile(
+                              dense: true,
+                              title: Text(l.display),
+                              subtitle: Text([
+                                if (l.country != null) l.country,
+                                if (l.geo != null) l.geo,
+                              ].join(' • ')),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+              // Content Links section
+              if (_contentLinks.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.link_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Content Links',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _contentLinks
+                        .map((c) => ListTile(
+                              dense: true,
+                              title: Text(c.display ?? c.href),
+                              onTap: () async {
+                                if (await canLaunchUrl(Uri.parse(c.href))) {
+                                  await launchUrl(Uri.parse(c.href),
+                                      mode: LaunchMode.externalApplication);
+                                }
+                              },
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+              // License section
+              if (_license != null) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.verified_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'License',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(_license!.value),
+                ),
+              ],
+              // Txt section
+              if (_txts.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.text_snippet_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Txt',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _txts
+                        .map((t) => ListTile(
+                              dense: true,
+                              title: Text(t.value),
+                              subtitle: t.purpose != null ? Text(t.purpose!) : null,
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+              // Blocks section
+              if (_blocks.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.block_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Blocks',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _blocks
+                        .map((b) => Text(
+                              '${b.id ?? 'global'}: ${b.value ? 'blocked' : 'allowed'}'))
+                        .toList(),
+                  ),
+                ),
+              ],
+              // Credits section
+              if (_credits.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.people_alt_outlined,
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Credits',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _credits
+                        .map((c) => ListTile(
+                              dense: true,
+                              title: Text(c.value),
+                              subtitle: c.role != null ? Text(c.role!) : null,
+                            ))
+                        .toList(),
                   ),
                 ),
               ],
