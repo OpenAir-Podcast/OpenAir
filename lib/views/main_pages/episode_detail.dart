@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:openair/model/alternate_enclosure_model.dart';
 import 'package:openair/model/person_model.dart';
+import 'package:openair/model/value_model.dart';
 import 'package:openair/model/podcast_namespace_model.dart';
 import 'package:openair/model/social_interact_model.dart';
 import 'package:openair/model/soundbite_model.dart';
@@ -44,6 +45,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
   List<Soundbite> _soundbites = [];
   List<SocialInteract> _socialInteracts = [];
   List<AlternateEnclosure> _alternateEnclosures = [];
+  List<Value> _values = [];
   List<Location> _locations = [];
   List<ContentLink> _contentLinks = [];
   License? _license;
@@ -83,6 +85,12 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
       if (rawAltEnc is List) {
         _alternateEnclosures = rawAltEnc
             .map((e) => AlternateEnclosure.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      final rawValue = item['value'];
+      if (rawValue is List) {
+        _values = rawValue
+            .map((e) => Value.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
       final rawLocations = item['locations'];
@@ -692,6 +700,31 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         backgroundColor: Theme.of(context)
                             .colorScheme
                             .secondaryContainer,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+              // Value badges
+              if (_values.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _values.map((v) {
+                      return Chip(
+                        avatar: const Icon(Icons.bolt, size: 16,
+                            color: Color(0xFFF7931A)),
+                        label: Text(v.displayName,
+                            style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize:
+                            MaterialTapTargetSize.shrinkWrap,
+                        side: BorderSide.none,
+                        backgroundColor: const Color(0xFFF7931A)
+                            .withValues(alpha: 0.1),
                       );
                     }).toList(),
                   ),

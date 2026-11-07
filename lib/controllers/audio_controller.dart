@@ -728,6 +728,7 @@ class AudioController extends ChangeNotifier {
       'episode': episode['episode'],
       'socialInteract': episode['socialInteract'],
       'alternateEnclosure': episode['alternateEnclosure'],
+      'value': episode['value'],
       'podcast': podcast!.toJson(),
       'pos': pos,
       'podcastCurrentPositionInMilliseconds': 0.0,

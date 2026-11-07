@@ -533,6 +533,7 @@ class HiveService {
                 episode['episode'] = episode['episode'];
                 episode['socialInteract'] = episode['socialInteract'];
                 episode['alternateEnclosure'] = episode['alternateEnclosure'];
+                episode['value'] = episode['value'];
 
                 await episodeBox.put(guid, episode);
 
