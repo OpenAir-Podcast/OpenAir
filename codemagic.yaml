@@ -1,6 +1,23 @@
 workflows:
-  flutter-android:
-    name: Flutter Android
+  flutter-android-debug:
+    name: Flutter Android (Debug)
+    max_build_duration: 120
+    environment:
+      flutter: stable
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Generate code
+        script: dart run build_runner build --delete-conflicting-outputs
+      - name: Run tests
+        script: flutter test
+      - name: Build Android APK (debug)
+        script: flutter build apk --debug
+    artifacts:
+      - build/app/outputs/**/*.apk
+
+  flutter-android-release:
+    name: Flutter Android (Release)
     max_build_duration: 120
     environment:
       flutter: stable
@@ -11,20 +28,11 @@ workflows:
         script: flutter pub get
       - name: Generate code
         script: dart run build_runner build --delete-conflicting-outputs
-      - name: Run tests
-        script: flutter test
-      - name: Build Android AAB
+      - name: Build Android AAB (release)
         script: flutter build appbundle --release
     artifacts:
       - build/app/outputs/**/*.aab
       - build/app/outputs/**/*.apk
-    publishing:
-      email:
-        recipients:
-          - your-email@example.com
-        notify:
-          success: true
-          failure: true
 
   flutter-ios:
     name: Flutter iOS
@@ -46,13 +54,6 @@ workflows:
         script: flutter build ipa --release
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      email:
-        recipients:
-          - your-email@example.com
-        notify:
-          success: true
-          failure: true
 
   flutter-web:
     name: Flutter Web
@@ -68,10 +69,3 @@ workflows:
         script: flutter build web --release
     artifacts:
       - build/web/**
-    publishing:
-      email:
-        recipients:
-          - your-email@example.com
-        notify:
-          success: true
-          failure: true
