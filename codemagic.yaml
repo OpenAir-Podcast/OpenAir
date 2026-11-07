@@ -21,8 +21,6 @@ workflows:
     max_build_duration: 120
     environment:
       flutter: stable
-      groups:
-        - keystore_credentials
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
@@ -41,8 +39,6 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      groups:
-        - app_store_credentials
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
