@@ -1,3 +1,13 @@
+What's New in v0.19.0+77
+
+📖 Podcasting 2.0 Namespace
+• Added support for chapters, transcripts, funding, persons, soundbites, season/episode numbers, social interact, alternate enclosures, value (Bitcoin/Lightning), podroll, trailers, medium, locked, locations, platform IDs, content links, remote items, live items, blocks, update frequency, license, podping, txt, and credits
+• Direct RSS namespace parsing for tags not exposed by Podcast Index
+• Episode-level value badges and propagation through storage/queue
+• Codemagic CI configuration
+
+---
+
 What's New in v0.18.26+76
 
 • Added an optional prompt asking you to rate OpenAir on Google Play
