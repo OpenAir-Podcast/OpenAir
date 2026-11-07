@@ -23,7 +23,10 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
-    if (keystorePropertiesFile.exists()) {
+    val hasReleaseKeystore = keystorePropertiesFile.exists() &&
+        (keystoreProperties["storeFile"] as String?)?.isNotBlank() == true
+
+    if (hasReleaseKeystore) {
         signingConfigs {
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String
@@ -55,7 +58,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
 
             isMinifyEnabled = true
             isShrinkResources = true

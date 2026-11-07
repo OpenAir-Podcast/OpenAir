@@ -60,10 +60,15 @@ workflows:
         script: dart run build_runner build
       - name: Set up Android signing
         script: |
-          echo "storeFile=$CM_KEYSTORE_PATH" > android/key.properties
-          echo "storePassword=$CM_KEYSTORE_PASSWORD" >> android/key.properties
-          echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
-          echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
+          if [ -n "$CM_KEYSTORE_PATH" ]; then
+            echo "storeFile=$CM_KEYSTORE_PATH" > android/key.properties
+            echo "storePassword=$CM_KEYSTORE_PASSWORD" >> android/key.properties
+            echo "keyAlias=$CM_KEY_ALIAS" >> android/key.properties
+            echo "keyPassword=$CM_KEY_PASSWORD" >> android/key.properties
+          else
+            echo "No keystore configured; building with debug signing"
+            rm -f android/key.properties
+          fi
       - name: Build Android AAB (release)
         script: flutter build appbundle --release
     artifacts:
