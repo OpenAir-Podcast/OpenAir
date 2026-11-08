@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -56,6 +57,15 @@ void main() async {
     ),
     androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
   ));
+  await session.setActive(true);
+
+  // Force loudspeaker routing on Android (avoid earpiece).
+  if (Platform.isAndroid) {
+    try {
+      const channel = MethodChannel('openair/audio');
+      await channel.invokeMethod('useLoudspeaker');
+    } catch (_) {}
+  }
 
   // Initialize audio service for background playback
   await AudioService.init(
