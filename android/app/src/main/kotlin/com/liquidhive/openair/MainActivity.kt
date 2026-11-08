@@ -16,8 +16,20 @@ class MainActivity : AudioServiceActivity() {
                 "useLoudspeaker" -> {
                     val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
                     audioManager.mode = AudioManager.MODE_NORMAL
-                    audioManager.isSpeakerphoneOn = true
-                    result.success(true)
+
+                    val hasHeadset = audioManager.isBluetoothA2dpOn ||
+                        audioManager.isBluetoothScoOn ||
+                        audioManager.isWiredHeadsetOn ||
+                        audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any {
+                            it.type == android.media.AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                                it.type == android.media.AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
+                                it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                                it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                        }
+
+                    // Only force the built-in speaker when no headset/Bluetooth is connected.
+                    audioManager.isSpeakerphoneOn = !hasHeadset
+                    result.success(!hasHeadset)
                 }
                 else -> result.notImplemented()
             }
