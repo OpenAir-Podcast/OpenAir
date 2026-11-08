@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
@@ -102,6 +104,66 @@ class _QueuePageState extends ConsumerState<QueuePage> {
     );
   }
 
+  Future<void> _exportQueue() async {
+    try {
+      final hive = ref.read(openAirProvider).hiveService;
+      final queue = await hive.getQueue();
+      final list = queue.values
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList()
+        ..sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(list);
+      final path = await FilePicker.saveFile(
+        dialogTitle: 'Export queue',
+        fileName: 'openair_queue.json',
+      );
+      if (path == null) return;
+      await File(path).writeAsString(jsonStr);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Queue exported')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _importQueue() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      if (result.files.isEmpty) return;
+      final str = await File(result.files.single.path!).readAsString();
+      final decoded = jsonDecode(str);
+      if (decoded is! List) return;
+      final hive = ref.read(openAirProvider).hiveService;
+      int pos = 1;
+      for (final item in decoded) {
+        if (item is Map) {
+          final m = Map<String, dynamic>.from(item);
+          m['pos'] = pos++;
+          await hive.addToQueue(m);
+        }
+      }
+      ref.invalidate(sortedProvider);
+      ref.invalidate(queueCountProvider);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Queue imported')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Import failed: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final queueStream = ref.watch(sortedProvider);
@@ -118,6 +180,22 @@ class _QueuePageState extends ConsumerState<QueuePage> {
               ),
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: IconButton(
+              onPressed: _exportQueue,
+              icon: const Icon(Icons.file_upload_outlined),
+              tooltip: 'Export queue',
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: IconButton(
+              onPressed: _importQueue,
+              icon: const Icon(Icons.file_download_outlined),
+              tooltip: 'Import queue',
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: IconButton(
