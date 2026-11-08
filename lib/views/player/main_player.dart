@@ -690,12 +690,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
             _buildControlButton(
                 context, Icons.replay_10_rounded, () => audioState.rewind()),
             // Play/Pause button
-            GestureDetector(
-              onTap: () {
-                audioState.audioState == 'Play'
-                    ? audioState.playerPauseButtonClicked()
-                    : audioState.playerResumeButtonClicked();
-              },
+            Semantics(
+              label: audioState.audioState == 'Play' ? 'Pause' : 'Play',
+              button: true,
+              child: GestureDetector(
+                onTap: () {
+                  audioState.audioState == 'Play'
+                      ? audioState.playerPauseButtonClicked()
+                      : audioState.playerResumeButtonClicked();
+                },
               child: Container(
                 height: 80,
                 width: 80,
@@ -717,6 +720,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   size: 48,
                   color: theme.colorScheme.onPrimary,
                 ),
+              ),
               ),
             ),
             _buildControlButton(context, Icons.forward_10_rounded,
@@ -906,10 +910,18 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
 
   Widget _buildControlButton(
       BuildContext context, IconData icon, VoidCallback onTap) {
-    return IconButton(
-      icon: Icon(icon, size: 32),
-      onPressed: onTap,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    final label = icon == Icons.replay_10_rounded
+        ? 'Rewind 10 seconds'
+        : 'Forward 10 seconds';
+    return Semantics(
+      label: label,
+      button: true,
+      child: IconButton(
+        icon: Icon(icon, size: 32),
+        tooltip: label,
+        onPressed: onTap,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }

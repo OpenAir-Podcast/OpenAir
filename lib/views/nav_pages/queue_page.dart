@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -113,13 +114,15 @@ class _QueuePageState extends ConsumerState<QueuePage> {
           .toList()
         ..sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
       final jsonStr = const JsonEncoder.withIndent('  ').convert(list);
-      final path = await FilePicker.saveFile(
+      final bytes = Uint8List.fromList(jsonStr.codeUnits);
+      final outputFile = await FilePicker.saveFile(
         dialogTitle: 'Export queue',
         fileName: 'openair_queue.json',
+        bytes: bytes,
+        type: FileType.custom,
+        allowedExtensions: ['json'],
       );
-      if (path == null) return;
-      await File(path).writeAsString(jsonStr);
-      if (!mounted) return;
+      if (outputFile == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Queue exported')),
       );
@@ -137,8 +140,10 @@ class _QueuePageState extends ConsumerState<QueuePage> {
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-      if (result.files.isEmpty) return;
-      final str = await File(result.files.single.path!).readAsString();
+      if (result.isEmpty) return;
+      final path = result.single.path;
+      if (path == null) return;
+      final str = await File(path).readAsString();
       final decoded = jsonDecode(str);
       if (decoded is! List) return;
       final hive = ref.read(openAirProvider).hiveService;
