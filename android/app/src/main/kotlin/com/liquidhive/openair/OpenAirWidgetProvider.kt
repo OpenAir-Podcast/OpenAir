@@ -23,8 +23,9 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
     ) {
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.openair_widget)
-            val title = HomeWidgetPlugin.getData(context, "title", "OpenAir") ?: "OpenAir"
-            val author = HomeWidgetPlugin.getData(context, "author", "Not playing") ?: "Not playing"
+            val prefs = HomeWidgetPlugin.getData(context)
+            val title = prefs.getString("title", "OpenAir") ?: "OpenAir"
+            val author = prefs.getString("author", "Not playing") ?: "Not playing"
             views.setTextViewText(R.id.widget_title, title)
             views.setTextViewText(R.id.widget_author, author)
 
