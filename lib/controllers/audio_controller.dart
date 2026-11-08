@@ -123,6 +123,21 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> playLiveStream(String url, String title) async {
+    currentEpisode = {
+      'guid': url,
+      'title': title,
+      'author': title,
+      'enclosureUrl': url,
+    };
+    isPodcastSelected = true;
+    await _audioHandler.playFromUrl(url, initialPosition: Duration.zero);
+    isPlaying = PlayingStatus.playing;
+    audioState = 'Play';
+    loadState = 'Play';
+    notifyListeners();
+  }
+
   bool _batteryExemptionRequested = false;
 
   /// Samsung and other OEMs put backgrounded apps to sleep a few minutes after

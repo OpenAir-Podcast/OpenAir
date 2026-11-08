@@ -240,6 +240,7 @@ class LiveItemInfo {
   final String? start;
   final String? end;
   final String? guid;
+  final String? enclosureUrl;
 
   const LiveItemInfo({
     this.title,
@@ -247,6 +248,7 @@ class LiveItemInfo {
     this.start,
     this.end,
     this.guid,
+    this.enclosureUrl,
   });
 
   factory LiveItemInfo.fromJson(Map<String, dynamic> json) => LiveItemInfo(
@@ -255,6 +257,7 @@ class LiveItemInfo {
         start: json['start'] as String?,
         end: json['end'] as String?,
         guid: json['guid'] as String?,
+        enclosureUrl: json['enclosureUrl'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -263,5 +266,6 @@ class LiveItemInfo {
         if (start != null) 'start': start,
         if (end != null) 'end': end,
         if (guid != null) 'guid': guid,
+        if (enclosureUrl != null) 'enclosureUrl': enclosureUrl,
       };
 }

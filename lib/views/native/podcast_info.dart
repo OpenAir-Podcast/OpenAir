@@ -9,6 +9,7 @@ import 'package:openair/model/trailer_model.dart';
 import 'package:openair/model/value_model.dart';
 import 'package:openair/model/podcast_namespace_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -543,6 +544,28 @@ class PodcastInfoPage extends ConsumerWidget {
                                 style: theme.textTheme.bodySmall
                                     ?.copyWith(color: Colors.grey))
                             : null,
+                        trailing: entry.feedUrl != null
+                            ? IconButton(
+                                icon: const Icon(Icons.download_outlined),
+                                tooltip: 'Import to OpenAir',
+                                onPressed: () async {
+                                  final success = await ref
+                                      .read(audioProvider)
+                                      .addPodcastByRssUrl(
+                                          entry.feedUrl!, context);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(
+                                        content: Text(success
+                                            ? 'Imported ${entry.title ?? 'podcast'}'
+                                            : 'Failed to import podcast'),
+                                      ),
+                                    );
+                                  }
+                                },
+                              )
+                            : null,
                         onTap: entry.feedUrl != null
                             ? () async {
                                 if (await canLaunchUrl(
@@ -903,7 +926,21 @@ class PodcastInfoPage extends ConsumerWidget {
                     children: _liveItems
                         .map((l) => ListTile(
                               title: Text(l.title ?? 'Live'),
-                              subtitle: Text(l.status ?? ''),
+                              subtitle: Text([
+                                if (l.status != null) l.status,
+                                if (l.start != null) 'Start: ${l.start}',
+                                if (l.end != null) 'End: ${l.end}',
+                              ].join(' • ')),
+                              trailing: l.enclosureUrl != null
+                                  ? IconButton(
+                                      icon: const Icon(Icons.play_arrow_rounded),
+                                      tooltip: 'Listen live',
+                                      onPressed: () {
+                                        ref.read(audioProvider).playLiveStream(
+                                            l.enclosureUrl!, l.title ?? 'Live');
+                                      },
+                                    )
+                                  : null,
                             ))
                         .toList(),
                   ),

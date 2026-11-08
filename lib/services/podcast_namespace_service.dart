@@ -184,6 +184,7 @@ class PodcastNamespaceParser {
           'start': el.getAttribute('start'),
           'end': el.getAttribute('end'),
           'guid': _childText(el, 'guid'),
+          'enclosureUrl': _liveEnclosureUrl(el),
         });
         break;
       case 'chat':
@@ -367,6 +368,26 @@ class PodcastNamespaceParser {
       'medium': el.getAttribute('medium'),
       'title': el.getAttribute('title') ?? el.innerText.trim(),
     };
+  }
+
+  String? _liveEnclosureUrl(XmlElement parent) {
+    for (final c in parent.children.whereType<XmlElement>()) {
+      if (c.name.local == 'enclosure') {
+        final url = c.getAttribute('url');
+        if (url != null && url.isNotEmpty) return url;
+      }
+      if (c.name.local == 'audio' || c.name.local == 'video') {
+        // Some feeds use media:content
+      }
+    }
+    // media:content
+    for (final c in parent.descendants.whereType<XmlElement>()) {
+      if (c.name.local == 'content') {
+        final url = c.getAttribute('url');
+        if (url != null && url.isNotEmpty) return url;
+      }
+    }
+    return null;
   }
 
   String? _childText(XmlElement parent, String name) {
