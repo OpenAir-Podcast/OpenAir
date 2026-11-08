@@ -6,6 +6,8 @@ import 'package:openair/model/chapters_model.dart';
 import 'package:openair/providers/chapters_provider.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:openair/views/player/transcript_viewer.dart';
+import 'package:openair/views/player/bookmark_sheet.dart';
+import 'package:openair/services/bookmark_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -824,6 +826,64 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       currentEpisode,
                       podcastTitle,
                     );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.bookmark_add_outlined),
+              tooltip: 'Bookmark',
+              onPressed: () async {
+                final noteController = TextEditingController();
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Add bookmark'),
+                    content: TextField(
+                      controller: noteController,
+                      decoration: const InputDecoration(
+                        hintText: 'Optional note',
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  await BookmarkService().addBookmark(
+                    episodeGuid: currentEpisode['guid'],
+                    episodeTitle: currentEpisode['title'] ?? 'Episode',
+                    position: audioState.playerPosition,
+                    note: noteController.text.trim().isEmpty
+                        ? null
+                        : noteController.text.trim(),
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Bookmark added')),
+                    );
+                  }
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.bookmarks_outlined),
+              tooltip: 'Bookmarks',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => BookmarkSheet(
+                    episodeGuid: currentEpisode['guid'],
+                    episodeTitle: currentEpisode['title'] ?? 'Episode',
+                  ),
+                );
               },
             ),
           ],
