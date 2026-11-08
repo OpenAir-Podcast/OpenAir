@@ -685,6 +685,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
           children: [
             IconButton(
               icon: const Icon(Icons.skip_previous_rounded, size: 36),
+              tooltip: 'Previous episode',
               onPressed: () => audioState.playPreviousEpisode(context),
             ),
             _buildControlButton(
@@ -727,6 +728,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 () => audioState.fastForward()),
             IconButton(
               icon: const Icon(Icons.skip_next_rounded, size: 36),
+              tooltip: 'Next episode',
               onPressed: () => audioState.playNextEpisode(context),
             ),
           ],
