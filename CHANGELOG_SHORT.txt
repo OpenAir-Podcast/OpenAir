@@ -1,3 +1,9 @@
+What's New in v0.20.1+81
+
+• Fixed audio routing to loudspeaker (avoid earpiece), with Bluetooth/headset priority
+
+---
+
 What's New in v0.20.0+79
 
 📖 Podcasting 2.0 & Platform Enhancements
