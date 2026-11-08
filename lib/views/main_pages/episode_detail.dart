@@ -900,8 +900,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                               dense: true,
                               title: Text(l.display),
                               subtitle: Text([
+                                if (l.rel != null) l.rel,
                                 if (l.country != null) l.country,
                                 if (l.geo != null) l.geo,
+                                if (l.osm != null) 'OSM: ${l.osm}',
                               ].join(' • ')),
                             ))
                         .toList(),
@@ -1099,7 +1101,10 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                         .map((c) => ListTile(
                               dense: true,
                               title: Text(c.value),
-                              subtitle: c.role != null ? Text(c.role!) : null,
+                              subtitle: Text([
+                                if (c.role != null) c.role,
+                                if (c.scheme != null) c.scheme,
+                              ].join(' • ')),
                             ))
                         .toList(),
                   ),

@@ -720,9 +720,24 @@ class PodcastInfoPage extends ConsumerWidget {
                         .map((l) => ListTile(
                               title: Text(l.display),
                               subtitle: Text([
+                                if (l.rel != null) l.rel,
                                 if (l.country != null) l.country,
                                 if (l.geo != null) l.geo,
+                                if (l.osm != null) 'OSM: ${l.osm}',
                               ].join(' • ')),
+                              trailing: l.geo != null
+                                  ? IconButton(
+                                      icon: const Icon(Icons.map_outlined),
+                                      onPressed: () async {
+                                        final uri = Uri.parse(
+                                            'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(l.geo!)}');
+                                        if (await canLaunchUrl(uri)) {
+                                          await launchUrl(uri,
+                                              mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                    )
+                                  : null,
                             ))
                         .toList(),
                   ),
@@ -1092,7 +1107,10 @@ class PodcastInfoPage extends ConsumerWidget {
                     children: _credits
                         .map((c) => ListTile(
                               title: Text(c.value),
-                              subtitle: c.role != null ? Text(c.role!) : null,
+                              subtitle: Text([
+                                if (c.role != null) c.role,
+                                if (c.scheme != null) c.scheme,
+                              ].join(' • ')),
                             ))
                         .toList(),
                   ),
