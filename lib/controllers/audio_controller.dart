@@ -672,6 +672,15 @@ class AudioController extends ChangeNotifier {
     ref.invalidate(getInboxProvider);
   }
 
+  Future<void> playNext(
+      Map<String, dynamic> episode, PodcastModel? podcast, BuildContext context,
+      {bool autoDownload = false}) async {
+    final previous = enqueuePositionConfig;
+    enqueuePositionConfig = 'First';
+    await addToQueue(episode, podcast, context, autoDownload: autoDownload);
+    enqueuePositionConfig = previous;
+  }
+
   Future<void> addToQueue(
       Map<String, dynamic> episode, PodcastModel? podcast, BuildContext context,
       {bool autoDownload = false}) async {

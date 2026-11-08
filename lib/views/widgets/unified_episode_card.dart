@@ -289,6 +289,26 @@ class _UnifiedEpisodeCardState extends ConsumerState<UnifiedEpisodeCard> {
         // Queue button
         _buildQueueButton(context, ref),
         const SizedBox(width: 4),
+        // Play next button
+        IconButton(
+          icon: const Icon(Icons.playlist_play, size: 18),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          visualDensity: VisualDensity.compact,
+          tooltip: 'Play next',
+          onPressed: () {
+            ref.read(audioProvider).playNext(
+                  widget.episodeItem,
+                  widget.podcast,
+                  context,
+                );
+            ref.invalidate(getQueueProvider);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Added to play next')),
+            );
+          },
+        ),
+        const SizedBox(width: 4),
         // Download button
         if (!kIsWeb) _buildDownloadButton(context, ref),
         const SizedBox(width: 4),
