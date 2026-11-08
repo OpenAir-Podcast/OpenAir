@@ -24,4 +24,29 @@
         android:textSize="12sp"
         android:maxLines="1"
         android:ellipsize="end" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <ImageButton
+            android:id="@+id/widget_play"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_media_play"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Play" />
+
+        <ImageButton
+            android:id="@+id/widget_next"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_media_next"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Next" />
+    </LinearLayout>
 </LinearLayout>
