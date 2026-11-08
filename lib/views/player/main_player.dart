@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:openair/model/chapters_model.dart';
 import 'package:openair/providers/chapters_provider.dart';
 import 'package:openair/views/widgets/podcast_image.dart';
+import 'package:openair/views/player/transcript_viewer.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
@@ -779,6 +780,21 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 onPressed: null,
               ),
             ),
+            if (currentEpisode['transcriptUrl'] != null &&
+                (currentEpisode['transcriptUrl'] as String).isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.description_outlined),
+                tooltip: 'Transcript',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => TranscriptViewer(
+                        transcriptUrl: currentEpisode['transcriptUrl'] as String,
+                      ),
+                    ),
+                  );
+                },
+              ),
             IconButton(
               icon: const Icon(Icons.share_rounded),
               tooltip: Translations.of(context).text('share'),
