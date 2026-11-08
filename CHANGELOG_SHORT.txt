@@ -1,3 +1,20 @@
+What's New in v0.20.0+79
+
+📖 Podcasting 2.0 & Platform Enhancements
+• Added in-app transcript viewer with synced cues
+• Chapter artwork in current chapter display
+• Live items UI and live stream playback
+• Enriched location and credit metadata with map links
+• Podroll import action
+• Bookmarks/clips with save, list, seek, share
+• Play next action on episode cards
+• Queue export/import (save queues)
+• Home screen widget with play/next buttons
+• Minimal Wear OS companion scaffold
+• Accessibility improvements (semantics/tooltips)
+
+---
+
 What's New in v0.19.0+77
 
 📖 Podcasting 2.0 Namespace
