@@ -8,6 +8,7 @@ import 'package:openair/model/podroll_model.dart';
 import 'package:openair/model/trailer_model.dart';
 import 'package:openair/model/value_model.dart';
 import 'package:openair/model/podcast_namespace_model.dart';
+import 'package:openair/model/social_interact_model.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/views/widgets/toggle_banner.dart';
@@ -170,6 +171,28 @@ class PodcastInfoPage extends ConsumerWidget {
     if (raw is List) {
       return raw
           .map((e) => Credit.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Map<String, dynamic>> get _funding {
+    final raw = podcastInfo['funding'];
+    if (raw is List) {
+      return raw.map((e) => Map<String, dynamic>.from(e)).toList();
+    }
+    if (raw is Map) {
+      return [Map<String, dynamic>.from(raw)];
+    }
+    return [];
+  }
+
+  List<SocialInteract> get _socialInteracts {
+    final raw = podcastInfo['socialInteract'] ?? podcastInfo['socialInteracts'];
+    if (raw is List) {
+      return raw
+          .map((e) => SocialInteract.fromJson(Map<String, dynamic>.from(e)))
+          .where((s) => s.isSupported)
           .toList();
     }
     return [];
@@ -1148,6 +1171,101 @@ class PodcastInfoPage extends ConsumerWidget {
                                 if (c.role != null) c.role,
                                 if (c.scheme != null) c.scheme,
                               ].join(' • ')),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Funding section
+              if (_funding.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.favorite_border_rounded,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Funding',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _funding.map((f) {
+                      final url = f['url']?.toString();
+                      return ListTile(
+                        title: Text(f['text']?.toString() ?? 'Support'),
+                        onTap: url != null
+                            ? () async {
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url),
+                                      mode: LaunchMode.externalApplication);
+                                }
+                              }
+                            : null,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Social Interact section
+              if (_socialInteracts.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.forum_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Social',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _socialInteracts
+                        .map((si) => ListTile(
+                              title: Text(si.displayLabel),
+                              trailing: si.isSupported
+                                  ? IconButton(
+                                      icon: const Icon(Icons.open_in_new),
+                                      onPressed: () async {
+                                        if (si.uri != null &&
+                                            await canLaunchUrl(
+                                                Uri.parse(si.uri!))) {
+                                          await launchUrl(Uri.parse(si.uri!),
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        }
+                                      },
+                                    )
+                                  : null,
                             ))
                         .toList(),
                   ),
