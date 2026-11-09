@@ -3,7 +3,6 @@ package com.liquidhive.openair
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.view.KeyEvent
@@ -14,6 +13,8 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
     companion object {
         const val ACTION_PLAY = "com.liquidhive.openair.widget.PLAY"
         const val ACTION_NEXT = "com.liquidhive.openair.widget.NEXT"
+        const val ACTION_PREV = "com.liquidhive.openair.widget.PREV"
+        const val ACTION_LIKE = "com.liquidhive.openair.widget.LIKE"
     }
 
     override fun onUpdate(
@@ -25,27 +26,27 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.openair_widget)
             val prefs = HomeWidgetPlugin.getData(context)
             val title = prefs.getString("title", "OpenAir") ?: "OpenAir"
-            val author = prefs.getString("author", "Not playing") ?: "Not playing"
             views.setTextViewText(R.id.widget_title, title)
-            views.setTextViewText(R.id.widget_author, author)
 
-            // Play button
-            val playIntent = Intent(context, OpenAirWidgetProvider::class.java).apply {
-                action = ACTION_PLAY
-            }
-            val playPending = PendingIntent.getBroadcast(
-                context, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            val isPlaying = prefs.getBoolean("isPlaying", false)
+            views.setImageViewResource(
+                R.id.widget_play,
+                if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
             )
-            views.setOnClickPendingIntent(R.id.widget_play, playPending)
 
-            // Next button
-            val nextIntent = Intent(context, OpenAirWidgetProvider::class.java).apply {
-                action = ACTION_NEXT
-            }
-            val nextPending = PendingIntent.getBroadcast(
-                context, 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            views.setOnClickPendingIntent(R.id.widget_next, nextPending)
+            // Prev
+            val prevIntent = Intent(context, OpenAirWidgetProvider::class.java).apply { action = ACTION_PREV }
+            views.setOnClickPendingIntent(R.id.widget_prev, PendingIntent.getBroadcast(context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            // Play
+            val playIntent = Intent(context, OpenAirWidgetProvider::class.java).apply { action = ACTION_PLAY }
+            views.setOnClickPendingIntent(R.id.widget_play, PendingIntent.getBroadcast(context, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            // Next
+            val nextIntent = Intent(context, OpenAirWidgetProvider::class.java).apply { action = ACTION_NEXT }
+            views.setOnClickPendingIntent(R.id.widget_next, PendingIntent.getBroadcast(context, 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            // Like -> open app
+            val likeIntent = Intent(context, MainActivity::class.java)
+            val likePending = PendingIntent.getActivity(context, 3, likeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            views.setOnClickPendingIntent(R.id.widget_like, likePending)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
@@ -54,6 +55,7 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         when (intent.action) {
+            ACTION_PREV -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_PREVIOUS)
             ACTION_PLAY -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
             ACTION_NEXT -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_NEXT)
         }

@@ -394,6 +394,7 @@ class AudioController extends ChangeNotifier {
       title: title,
       author: artist,
       imageUrl: imageUrl,
+      isPlaying: true,
     ));
     _startPositionAutoSave();
       await _savePlayerState();
@@ -458,6 +459,7 @@ class AudioController extends ChangeNotifier {
       title: currentEpisode?['title']?.toString() ?? 'Unknown',
       author: currentEpisode?['author']?.toString() ?? 'Unknown',
       imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
+      isPlaying: true,
     ));
     _startPositionAutoSave();
     audioState = 'Play';
@@ -485,6 +487,12 @@ class AudioController extends ChangeNotifier {
     audioState = 'Pause';
     loadState = 'Detail';
     isPlaying = PlayingStatus.paused;
+    unawaited(HomeWidgetService.updateNowPlaying(
+      title: currentEpisode?['title']?.toString() ?? 'Unknown',
+      author: currentEpisode?['author']?.toString() ?? 'Unknown',
+      imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
+      isPlaying: false,
+    ));
     notifyListeners();
   }
 
