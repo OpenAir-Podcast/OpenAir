@@ -276,66 +276,102 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
       context: context,
       builder: (context) {
         final theme = Theme.of(context);
-        return AlertDialog(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                episode['title'] ?? 'Episode Details',
-                style: theme.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                episode['podcastTitle'] ?? episode['author'] ?? 'Unknown',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+        final colorScheme = theme.colorScheme;
+        final imageUrl = episode['image'] ?? episode['feedImage'];
+
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (imageUrl != null && imageUrl.toString().isNotEmpty) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                          imageUrl.toString(),
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    Text(
+                      episode['title'] ?? 'Episode Details',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      episode['podcastTitle'] ?? episode['author'] ?? 'Unknown',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (episode['datePublished'] != null)
+                          Chip(
+                            avatar: const Icon(Icons.calendar_today_outlined, size: 16),
+                            label: Text(_formatDate(episode['datePublished'])),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        if (episode['duration'] != null)
+                          Chip(
+                            avatar: const Icon(Icons.schedule_outlined, size: 16),
+                            label: Text('${episode['duration']} min'),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        if (episode['season'] != null)
+                          Chip(
+                            avatar: const Icon(Icons.layers_outlined, size: 16),
+                            label: Text('S${episode['season']}'),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        if (episode['episode'] != null)
+                          Chip(
+                            avatar: const Icon(Icons.tag_outlined, size: 16),
+                            label: Text('E${episode['episode']}'),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                      ],
+                    ),
+                    if (episode['description'] != null &&
+                        episode['description'].toString().isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        _stripHtml(episode['description'].toString()),
+                        style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Close'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (episode['datePublished'] != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Text(
-                      'Published: ${_formatDate(episode['datePublished'])}',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ),
-                if (episode['duration'] != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Text(
-                      'Duration: ${episode['duration']} minutes',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ),
-                if (episode['description'] != null &&
-                    episode['description'].isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      _stripHtml(episode['description'] ?? ''),
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-              ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+          );
+        },
+      );
+    }
 
   String _formatDate(dynamic dateValue) {
     try {
