@@ -28,6 +28,20 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             val title = prefs.getString("title", "OpenAir") ?: "OpenAir"
             views.setTextViewText(R.id.widget_title, title)
 
+            val imageUrl = prefs.getString("imageUrl", null)
+            if (!imageUrl.isNullOrEmpty()) {
+                Thread {
+                    try {
+                        val bmp = android.graphics.BitmapFactory.decodeStream(java.net.URL(imageUrl).openStream())
+                        if (bmp != null) {
+                            views.setImageViewBitmap(R.id.widget_art, bmp)
+                            appWidgetManager.updateAppWidget(appWidgetId, views)
+                        }
+                    } catch (_: Exception) {
+                    }
+                }.start()
+            }
+
             val isPlaying = prefs.getBoolean("isPlaying", false)
             views.setImageViewResource(
                 R.id.widget_play,
