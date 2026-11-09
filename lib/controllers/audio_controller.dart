@@ -64,19 +64,19 @@ class AudioController extends ChangeNotifier {
   bool isCompleted = false;
   bool isBannerDismissed = false;
 
-  late String podcastTitle;
-  late String podcastSubtitle;
+  String podcastTitle = '';
+  String podcastSubtitle = '';
 
-  late String audioState;
-  late String loadState;
+  String audioState = 'Pause';
+  String loadState = 'Detail';
 
   Duration playerPosition = Duration.zero;
   Duration playerTotalDuration = Duration.zero;
 
-  late double podcastCurrentPositionInMilliseconds;
-  late String currentPlaybackPositionString;
-  late String currentPlaybackRemainingTimeString;
-  late String? currentPlaybackDurationString;
+  double podcastCurrentPositionInMilliseconds = 0.0;
+  String currentPlaybackPositionString = '00:00:00';
+  String currentPlaybackRemainingTimeString = '';
+  String? currentPlaybackDurationString;
 
   late PlayingStatus isPlaying = PlayingStatus.stop;
 
@@ -1271,6 +1271,10 @@ class AudioController extends ChangeNotifier {
     return int.tryParse(raw.toString()) ??
         DateTime.tryParse(raw.toString())?.millisecondsSinceEpoch ??
         0;
+  }
+
+  Future<void> restoreLastPlayedEpisode() async {
+    await _restoreLastPlayedEpisode();
   }
 
   Future<void> _restoreLastPlayedEpisode() async {

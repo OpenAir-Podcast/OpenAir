@@ -33,7 +33,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
   @override
   void initState() {
     super.initState();
-    ref.read(audioProvider).updateAppContext(context);
+    final audio = ref.read(audioProvider);
+    audio.updateAppContext(context);
+    if (audio.currentEpisode == null || audio.currentEpisode!.isEmpty) {
+      audio.restoreLastPlayedEpisode();
+    }
   }
 
   double _artworkSize(BuildContext context) {
