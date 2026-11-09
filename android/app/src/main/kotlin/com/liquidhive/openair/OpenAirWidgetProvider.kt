@@ -26,7 +26,9 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.openair_widget)
             val prefs = HomeWidgetPlugin.getData(context)
             val title = prefs.getString("title", "OpenAir") ?: "OpenAir"
+            val author = prefs.getString("author", "Not playing") ?: "Not playing"
             views.setTextViewText(R.id.widget_title, title)
+            views.setTextViewText(R.id.widget_author, author)
 
             val imageUrl = prefs.getString("imageUrl", null)
             if (!imageUrl.isNullOrEmpty()) {
