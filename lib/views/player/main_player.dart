@@ -368,6 +368,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -579,7 +580,6 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
         ),
         const SizedBox(height: 8),
         // Author with navigation
-        GestureDetector(
         GestureDetector(
           onTap: () {
             final podcast = ref

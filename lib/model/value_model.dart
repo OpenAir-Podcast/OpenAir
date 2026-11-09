@@ -40,45 +40,6 @@ class ValueRecipient {
       };
 }
 
-class Value {
-  final String type;
-  final String method;
-  final double? suggested;
-  final List<ValueRecipient> valueRecipients;
-  final List<ValueTimeSplit> valueTimeSplits;
-
-  Value({
-    required this.type,
-    required this.method,
-    this.suggested,
-    this.valueRecipients = const [],
-    this.valueTimeSplits = const [],
-  });
-
-  factory Value.fromJson(Map<String, dynamic> json) {
-    return Value(
-      type: json['type'] as String,
-      method: json['method'] as String,
-      suggested: (json['suggested'] as num?)?.toDouble(),
-      valueRecipients: (json['valueRecipients'] as List<dynamic>?)
-              ?.map((e) => ValueRecipient.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      valueTimeSplits: (json['valueTimeSplits'] as List<dynamic>?)
-              ?.map((e) => ValueTimeSplit.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'method': method,
-        if (suggested != null) 'suggested': suggested,
-        'valueRecipients': valueRecipients.map((e) => e.toJson()).toList(),
-        'valueTimeSplits': valueTimeSplits.map((e) => e.toJson()).toList(),
-      };
-
 class ValueTimeSplit {
   final int? startTime;
   final int? duration;
@@ -119,6 +80,45 @@ class ValueTimeSplit {
         if (remoteItem != null) 'remoteItem': remoteItem,
       };
 }
+
+class Value {
+  final String type;
+  final String method;
+  final double? suggested;
+  final List<ValueRecipient> valueRecipients;
+  final List<ValueTimeSplit> valueTimeSplits;
+
+  Value({
+    required this.type,
+    required this.method,
+    this.suggested,
+    this.valueRecipients = const [],
+    this.valueTimeSplits = const [],
+  });
+
+  factory Value.fromJson(Map<String, dynamic> json) {
+    return Value(
+      type: json['type'] as String,
+      method: json['method'] as String,
+      suggested: (json['suggested'] as num?)?.toDouble(),
+      valueRecipients: (json['valueRecipients'] as List<dynamic>?)
+              ?.map((e) => ValueRecipient.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      valueTimeSplits: (json['valueTimeSplits'] as List<dynamic>?)
+              ?.map((e) => ValueTimeSplit.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'type': type,
+        'method': method,
+        if (suggested != null) 'suggested': suggested,
+        'valueRecipients': valueRecipients.map((e) => e.toJson()).toList(),
+        'valueTimeSplits': valueTimeSplits.map((e) => e.toJson()).toList(),
+      };
 
   String get displayName {
     switch (type) {
