@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
@@ -227,6 +228,8 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   Future<void>? _initialization;
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _linkSub;
 
   @override
   void didChangeDependencies() {
@@ -238,6 +241,22 @@ class _MyAppState extends ConsumerState<MyApp> {
     if (mounted) await ref.read(openAirProvider).initial(context);
     if (mounted) await ref.read(audioProvider).initAudio(context);
     if (mounted) await ref.read(notificationProvider).init(context);
+
+    try {
+      final initial = await _appLinks.getInitialLink();
+      if (initial != null && mounted) {
+        ref.read(audioProvider).handleDeepLink(initial, context);
+      }
+    } catch (_) {}
+    _linkSub = _appLinks.uriLinkStream.listen((uri) {
+      if (mounted) ref.read(audioProvider).handleDeepLink(uri, context);
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
   }
 
   @override

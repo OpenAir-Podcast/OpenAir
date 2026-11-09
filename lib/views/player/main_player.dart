@@ -892,6 +892,7 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                   builder: (_) => BookmarkSheet(
                     episodeGuid: currentEpisode['guid'],
                     episodeTitle: currentEpisode['title'] ?? 'Episode',
+                    feedUrl: currentEpisode['feedUrl']?.toString(),
                   ),
                 );
               },

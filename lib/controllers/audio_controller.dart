@@ -124,6 +124,47 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> handleDeepLink(Uri uri, BuildContext context) async {
+    if (uri.scheme != 'openair') return;
+    final guid = uri.queryParameters['guid'];
+    if (guid == null || guid.isEmpty) return;
+    final seconds = int.tryParse(uri.queryParameters['t'] ?? '0') ?? 0;
+    final feedUrl = uri.queryParameters['feed'];
+
+    Map<String, dynamic>? episode;
+    try {
+      final hiveService = ref.read(hiveServiceProvider);
+      final episodeBox = await hiveService.episodeBox;
+      final stored = await episodeBox.get(guid);
+      if (stored is Map) {
+        episode = Map<String, dynamic>.from(stored);
+      }
+    } catch (_) {}
+
+    if (episode == null && feedUrl != null && feedUrl.isNotEmpty) {
+      try {
+        final svc = ref.read(podcastIndexProvider);
+        final data = await svc.getEpisodesByFeedUrl(feedUrl);
+        final items = data['items'];
+        if (items is List) {
+          for (final it in items) {
+            if (it is Map && it['guid']?.toString() == guid) {
+              episode = Map<String, dynamic>.from(it);
+              break;
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (episode == null) return;
+    await playEpisode(episode, context);
+    if (seconds > 0) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      seekToPosition(Duration(seconds: seconds));
+    }
+  }
+
   Future<void> playLiveStream(String url, String title) async {
     currentEpisode = {
       'guid': url,

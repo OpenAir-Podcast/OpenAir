@@ -9,10 +9,12 @@ class BookmarkSheet extends ConsumerStatefulWidget {
     super.key,
     required this.episodeGuid,
     required this.episodeTitle,
+    this.feedUrl,
   });
 
   final String episodeGuid;
   final String episodeTitle;
+  final String? feedUrl;
 
   @override
   ConsumerState<BookmarkSheet> createState() => _BookmarkSheetState();
@@ -87,8 +89,19 @@ class _BookmarkSheetState extends ConsumerState<BookmarkSheet> {
                           IconButton(
                             icon: const Icon(Icons.share_rounded),
                             onPressed: () {
+                              final seconds = posMs ~/ 1000;
+                              final uri = Uri(
+                                scheme: 'openair',
+                                host: 'play',
+                                queryParameters: {
+                                  'guid': widget.episodeGuid,
+                                  't': seconds.toString(),
+                                  if (widget.feedUrl != null) 'feed': widget.feedUrl!,
+                                  'title': widget.episodeTitle,
+                                },
+                              );
                               final shareText =
-                                  '${widget.episodeTitle} @ ${_format(posMs)}';
+                                  '${widget.episodeTitle} @ ${_format(posMs)}\n$uri';
                               SharePlus.instance.share(
                                 ShareParams(text: shareText),
                               );
