@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/services/bookmark_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 class BookmarkSheet extends ConsumerStatefulWidget {
   const BookmarkSheet({
@@ -88,9 +89,8 @@ class _BookmarkSheetState extends ConsumerState<BookmarkSheet> {
                             onPressed: () {
                               final shareText =
                                   '${widget.episodeTitle} @ ${_format(posMs)}';
-                              // Use url_launcher? Just copy to clipboard via ScaffoldMessenger
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Share: $shareText')),
+                              SharePlus.instance.share(
+                                ShareParams(text: shareText),
                               );
                             },
                           ),
