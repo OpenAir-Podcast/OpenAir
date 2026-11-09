@@ -126,7 +126,16 @@ class AudioController extends ChangeNotifier {
 
   Future<void> handleDeepLink(Uri uri, BuildContext context) async {
     if (uri.scheme != 'openair') return;
-    final guid = uri.queryParameters['guid'];
+    String? guid = uri.queryParameters['guid'];
+    if (guid == null || guid.isEmpty) {
+      // Support openair://episode/<guid>
+      final segments = uri.pathSegments;
+      if (segments.isNotEmpty && segments.first == 'episode' && segments.length > 1) {
+        guid = Uri.decodeComponent(segments[1]);
+      } else if (uri.host == 'episode' && uri.pathSegments.isNotEmpty) {
+        guid = Uri.decodeComponent(uri.pathSegments.first);
+      }
+    }
     if (guid == null || guid.isEmpty) return;
     final seconds = int.tryParse(uri.queryParameters['t'] ?? '0') ?? 0;
     final feedUrl = uri.queryParameters['feed'];
