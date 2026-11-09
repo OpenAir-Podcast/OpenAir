@@ -1956,6 +1956,40 @@ class AudioController extends ChangeNotifier {
     }
   }
 
+  PodcastModel? podcastForEpisode(Map<String, dynamic> episode) {
+    final podcast = episode['podcast'] is Map
+        ? Map<String, dynamic>.from(episode['podcast'])
+        : null;
+    final feedUrl = episode['feedUrl']?.toString() ?? podcast?['url']?.toString();
+    if (feedUrl == null || feedUrl.isEmpty) {
+      return currentPodcast;
+    }
+    final title = (episode['podcastTitle'] ??
+            podcast?['title'] ??
+            episode['author'] ??
+            'Podcast')
+        .toString();
+    return PodcastModel(
+      id: int.tryParse(
+              (episode['podcastId'] ?? podcast?['id'])?.toString() ?? '0') ??
+          0,
+      title: title,
+      author: (episode['author'] ?? podcast?['author'] ?? '').toString(),
+      feedUrl: feedUrl,
+      imageUrl: (episode['feedImage'] ??
+              episode['image'] ??
+              podcast?['image'] ??
+              '')
+          .toString(),
+      artwork: (episode['feedImage'] ??
+              episode['image'] ??
+              podcast?['artwork'] ??
+              '')
+          .toString(),
+      description: podcast?['description']?.toString() ?? '',
+    );
+  }
+
   Future<void> _resolvePodcastFromEpisode(Map<String, dynamic> episode) async {
     final podcast = episode['podcast'] is Map
         ? Map<String, dynamic>.from(episode['podcast'])

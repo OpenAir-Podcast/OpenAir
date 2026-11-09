@@ -580,12 +580,15 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
         const SizedBox(height: 8),
         // Author with navigation
         GestureDetector(
+        GestureDetector(
           onTap: () {
-            if (audioState.currentPodcast != null) {
+            final podcast = ref
+                .read(audioProvider)
+                .podcastForEpisode(currentEpisode);
+            if (podcast != null) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) =>
-                      EpisodesPage(podcast: audioState.currentPodcast!),
+                  builder: (context) => EpisodesPage(podcast: podcast),
                 ),
               );
             }
