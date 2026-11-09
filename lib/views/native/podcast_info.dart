@@ -116,6 +116,32 @@ class PodcastInfoPage extends ConsumerWidget {
     return [];
   }
 
+  Chat? get _chat {
+    final raw = podcastInfo['chat'];
+    if (raw is Map) {
+      return Chat.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+
+  RemoteItem? get _publisher {
+    final raw = podcastInfo['publisher'];
+    if (raw is Map) {
+      return RemoteItem.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+
+  List<PodcastImage> get _images {
+    final raw = podcastInfo['images'];
+    if (raw is List) {
+      return raw
+          .map((e) => PodcastImage.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    return [];
+  }
+
   List<ContentLink> get _contentLinks {
     final raw = podcastInfo['contentLinks'];
     if (raw is List) {
@@ -948,11 +974,26 @@ class PodcastInfoPage extends ConsumerWidget {
                   child: Column(
                     children: _liveItems
                         .map((l) => ListTile(
+                              leading: l.image != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: CachedNetworkImage(
+                                        imageUrl: l.image!,
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.cover,
+                                        errorWidget: (_, __, ___) =>
+                                            const Icon(Icons.live_tv_outlined),
+                                      ),
+                                    )
+                                  : null,
                               title: Text(l.title ?? 'Live'),
                               subtitle: Text([
+                                if (l.description != null) l.description,
                                 if (l.status != null) l.status,
                                 if (l.start != null) 'Start: ${l.start}',
                                 if (l.end != null) 'End: ${l.end}',
+                                if (l.link != null) l.link,
                               ].join(' • ')),
                               trailing: l.enclosureUrl != null
                                   ? IconButton(
@@ -1265,6 +1306,165 @@ class PodcastInfoPage extends ConsumerWidget {
                                         }
                                       },
                                     )
+                                  : null,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Chat section
+              if (_chat != null) ...[
+                Row(
+                  children: [
+                    Icon(Icons.chat_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Chat',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    '${_chat!.protocol ?? ''} ${_chat!.server ?? ''}'.trim(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Publisher section
+              if (_publisher != null) ...[
+                Row(
+                  children: [
+                    Icon(Icons.campaign_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Publisher',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: ListTile(
+                    title: Text(_publisher!.title ?? _publisher!.feedUrl ?? 'Publisher'),
+                    subtitle: _publisher!.medium != null ? Text(_publisher!.medium!) : null,
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Images section
+              if (_images.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.image_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Images',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _images.map((img) {
+                      return ListTile(
+                        leading: img.href.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: img.href,
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) =>
+                                    const Icon(Icons.image_outlined),
+                              )
+                            : null,
+                        title: Text(img.purpose ?? img.type ?? 'Image'),
+                        subtitle: Text([
+                          if (img.alt != null) img.alt,
+                          if (img.width != null && img.height != null)
+                            '${img.width}x${img.height}',
+                        ].join(' • ')),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Value Time Splits section
+              if (_values.any((v) => v.valueTimeSplits.isNotEmpty)) ...[
+                Row(
+                  children: [
+                    Icon(Icons.timeline_outlined,
+                        color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Value Time Splits',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Column(
+                    children: _values
+                        .expand((v) => v.valueTimeSplits)
+                        .map((ts) => ListTile(
+                              title: Text(
+                                  'Start ${ts.startTime ?? 0}s, ${ts.duration ?? 0}s'),
+                              subtitle: ts.remoteItem != null
+                                  ? Text(ts.remoteItem!['title']?.toString() ??
+                                      'Remote item')
                                   : null,
                             ))
                         .toList(),

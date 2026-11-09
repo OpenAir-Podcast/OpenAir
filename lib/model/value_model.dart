@@ -45,12 +45,14 @@ class Value {
   final String method;
   final double? suggested;
   final List<ValueRecipient> valueRecipients;
+  final List<ValueTimeSplit> valueTimeSplits;
 
   Value({
     required this.type,
     required this.method,
     this.suggested,
     this.valueRecipients = const [],
+    this.valueTimeSplits = const [],
   });
 
   factory Value.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,10 @@ class Value {
               ?.map((e) => ValueRecipient.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      valueTimeSplits: (json['valueTimeSplits'] as List<dynamic>?)
+              ?.map((e) => ValueTimeSplit.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -70,7 +76,49 @@ class Value {
         'method': method,
         if (suggested != null) 'suggested': suggested,
         'valueRecipients': valueRecipients.map((e) => e.toJson()).toList(),
+        'valueTimeSplits': valueTimeSplits.map((e) => e.toJson()).toList(),
       };
+
+class ValueTimeSplit {
+  final int? startTime;
+  final int? duration;
+  final int? remoteStartTime;
+  final int? remotePercentage;
+  final List<ValueRecipient> recipients;
+  final Map<String, dynamic>? remoteItem;
+
+  const ValueTimeSplit({
+    this.startTime,
+    this.duration,
+    this.remoteStartTime,
+    this.remotePercentage,
+    this.recipients = const [],
+    this.remoteItem,
+  });
+
+  factory ValueTimeSplit.fromJson(Map<String, dynamic> json) => ValueTimeSplit(
+        startTime: (json['startTime'] as num?)?.toInt(),
+        duration: (json['duration'] as num?)?.toInt(),
+        remoteStartTime: (json['remoteStartTime'] as num?)?.toInt(),
+        remotePercentage: (json['remotePercentage'] as num?)?.toInt(),
+        recipients: (json['recipients'] as List<dynamic>?)
+                ?.map((e) => ValueRecipient.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        remoteItem: json['remoteItem'] is Map
+            ? Map<String, dynamic>.from(json['remoteItem'])
+            : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        if (startTime != null) 'startTime': startTime,
+        if (duration != null) 'duration': duration,
+        if (remoteStartTime != null) 'remoteStartTime': remoteStartTime,
+        if (remotePercentage != null) 'remotePercentage': remotePercentage,
+        'recipients': recipients.map((e) => e.toJson()).toList(),
+        if (remoteItem != null) 'remoteItem': remoteItem,
+      };
+}
 
   String get displayName {
     switch (type) {

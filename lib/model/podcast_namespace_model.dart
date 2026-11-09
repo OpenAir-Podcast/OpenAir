@@ -234,8 +234,74 @@ class Txt {
       };
 }
 
+class Chat {
+  final String? server;
+  final String? protocol;
+  final String? accountId;
+  final String? space;
+
+  const Chat({this.server, this.protocol, this.accountId, this.space});
+
+  factory Chat.fromJson(Map<String, dynamic> json) => Chat(
+        server: json['server'] as String?,
+        protocol: json['protocol'] as String?,
+        accountId: json['accountId'] as String?,
+        space: json['space'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        if (server != null) 'server': server,
+        if (protocol != null) 'protocol': protocol,
+        if (accountId != null) 'accountId': accountId,
+        if (space != null) 'space': space,
+      };
+}
+
+class PodcastImage {
+  final String href;
+  final String? alt;
+  final String? aspectRatio;
+  final int? width;
+  final int? height;
+  final String? type;
+  final String? purpose;
+
+  const PodcastImage({
+    required this.href,
+    this.alt,
+    this.aspectRatio,
+    this.width,
+    this.height,
+    this.type,
+    this.purpose,
+  });
+
+  factory PodcastImage.fromJson(Map<String, dynamic> json) => PodcastImage(
+        href: json['href'] as String? ?? '',
+        alt: json['alt'] as String?,
+        aspectRatio: json['aspectRatio'] as String? ?? json['aspect-ratio'] as String?,
+        width: (json['width'] as num?)?.toInt(),
+        height: (json['height'] as num?)?.toInt(),
+        type: json['type'] as String?,
+        purpose: json['purpose'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'href': href,
+        if (alt != null) 'alt': alt,
+        if (aspectRatio != null) 'aspectRatio': aspectRatio,
+        if (width != null) 'width': width,
+        if (height != null) 'height': height,
+        if (type != null) 'type': type,
+        if (purpose != null) 'purpose': purpose,
+      };
+}
+
 class LiveItemInfo {
   final String? title;
+  final String? description;
+  final String? image;
+  final String? link;
   final String? status;
   final String? start;
   final String? end;
@@ -244,6 +310,9 @@ class LiveItemInfo {
 
   const LiveItemInfo({
     this.title,
+    this.description,
+    this.image,
+    this.link,
     this.status,
     this.start,
     this.end,
@@ -253,6 +322,9 @@ class LiveItemInfo {
 
   factory LiveItemInfo.fromJson(Map<String, dynamic> json) => LiveItemInfo(
         title: json['title'] as String?,
+        description: json['description'] as String?,
+        image: json['image'] as String?,
+        link: json['link'] as String?,
         status: json['status'] as String?,
         start: json['start'] as String?,
         end: json['end'] as String?,
@@ -262,6 +334,9 @@ class LiveItemInfo {
 
   Map<String, dynamic> toJson() => {
         if (title != null) 'title': title,
+        if (description != null) 'description': description,
+        if (image != null) 'image': image,
+        if (link != null) 'link': link,
         if (status != null) 'status': status,
         if (start != null) 'start': start,
         if (end != null) 'end': end,

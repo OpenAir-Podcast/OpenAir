@@ -114,6 +114,26 @@ class PodcastNamespaceParser {
         feed.putIfAbsent('value', () => <Map<String, dynamic>>[]);
         (feed['value'] as List).add(_parseValue(el));
         break;
+      case 'chat':
+        feed['chat'] = {
+          'server': el.getAttribute('server'),
+          'protocol': el.getAttribute('protocol'),
+          'accountId': el.getAttribute('accountId'),
+          'space': el.getAttribute('space'),
+        };
+        break;
+      case 'image':
+        feed.putIfAbsent('images', () => <Map<String, dynamic>>[]);
+        (feed['images'] as List).add({
+          'href': el.getAttribute('href'),
+          'alt': el.getAttribute('alt'),
+          'aspectRatio': el.getAttribute('aspect-ratio'),
+          'width': int.tryParse(el.getAttribute('width') ?? ''),
+          'height': int.tryParse(el.getAttribute('height') ?? ''),
+          'type': el.getAttribute('type'),
+          'purpose': el.getAttribute('purpose'),
+        });
+        break;
       case 'block':
         feed.putIfAbsent('blocks', () => <Map<String, dynamic>>[]);
         (feed['blocks'] as List).add({
@@ -180,20 +200,15 @@ class PodcastNamespaceParser {
         feed.putIfAbsent('liveItems', () => <Map<String, dynamic>>[]);
         (feed['liveItems'] as List).add({
           'title': _childText(el, 'title'),
+          'description': _childText(el, 'description'),
+          'image': _liveImage(el),
+          'link': _childText(el, 'link'),
           'status': el.getAttribute('status'),
           'start': el.getAttribute('start'),
           'end': el.getAttribute('end'),
           'guid': _childText(el, 'guid'),
           'enclosureUrl': _liveEnclosureUrl(el),
         });
-        break;
-      case 'chat':
-        feed['chat'] = {
-          'server': el.getAttribute('server'),
-          'protocol': el.getAttribute('protocol'),
-          'accountId': el.getAttribute('accountId'),
-          'space': el.getAttribute('space'),
-        };
         break;
       case 'publisher':
         final ri = el.children.whereType<XmlElement>().firstWhere(
@@ -339,7 +354,8 @@ class PodcastNamespaceParser {
 
   Map<String, dynamic> _parseValue(XmlElement el) {
     final recipients = <Map<String, dynamic>>[];
-    for (final r in el.descendants.whereType<XmlElement>()) {
+    final timeSplits = <Map<String, dynamic>>[];
+    for (final r in el.children.whereType<XmlElement>()) {
       if (r.name.local == 'valueRecipient') {
         recipients.add({
           'name': r.getAttribute('name'),
@@ -350,6 +366,57 @@ class PodcastNamespaceParser {
           'split': int.tryParse(r.getAttribute('split') ?? '') ?? 0,
           'fee': r.getAttribute('fee') == 'true',
         });
+      } else if (r.name.local == 'valueTimeSplit') {
+        final splitRecipients = <Map<String, dynamic>>[];
+        for (final rr in r.children.whereType<XmlElement>()) {
+          if (rr.name.local == 'valueRecipient') {
+            splitRecipients.add({
+              'name': rr.getAttribute('name'),
+              'customKey': rr.getAttribute('customKey'),
+              'customValue': rr.getAttribute('customValue'),
+              'type': rr.getAttribute('type'),
+              'address': rr.getAttribute('address'),
+              'split': int.tryParse(rr.getAttribute('split') ?? '') ?? 0,
+              'fee': rr.getAttribute('fee') == 'true',
+            });
+          }
+        }
+        Map<String, dynamic>? remoteItem;
+        for (final rr in r.children.whereType<XmlElement>()) {
+          if (rr.name.local == 'remoteItem') {
+            remoteItem = {
+              'feedGuid': rr.getAttribute('feedGuid'),
+              'feedUrl': rr.getAttribute('feedUrl'),
+              'itemGuid': rr.getAttribute('itemGuid'),
+              'medium': rr.getAttribute('medium'),
+              'title': rr.getAttribute('title') ?? rr.innerText.trim(),
+            };
+          }
+        }
+        timeSplits.add({
+          'startTime': int.tryParse(r.getAttribute('startTime') ?? ''),
+          'duration': int.tryParse(r.getAttribute('duration') ?? ''),
+          'remoteStartTime': int.tryParse(r.getAttribute('remoteStartTime') ?? ''),
+          'remotePercentage': int.tryParse(r.getAttribute('remotePercentage') ?? ''),
+          'recipients': splitRecipients,
+          if (remoteItem != null) 'remoteItem': remoteItem,
+        });
+      }
+    }
+    // fallback: descendants for recipients if none found
+    if (recipients.isEmpty) {
+      for (final r in el.descendants.whereType<XmlElement>()) {
+        if (r.name.local == 'valueRecipient') {
+          recipients.add({
+            'name': r.getAttribute('name'),
+            'customKey': r.getAttribute('customKey'),
+            'customValue': r.getAttribute('customValue'),
+            'type': r.getAttribute('type'),
+            'address': r.getAttribute('address'),
+            'split': int.tryParse(r.getAttribute('split') ?? '') ?? 0,
+            'fee': r.getAttribute('fee') == 'true',
+          });
+        }
       }
     }
     return {
@@ -357,6 +424,7 @@ class PodcastNamespaceParser {
       'method': el.getAttribute('method'),
       'suggested': double.tryParse(el.getAttribute('suggested') ?? ''),
       'valueRecipients': recipients,
+      'valueTimeSplits': timeSplits,
     };
   }
 
@@ -368,6 +436,15 @@ class PodcastNamespaceParser {
       'medium': el.getAttribute('medium'),
       'title': el.getAttribute('title') ?? el.innerText.trim(),
     };
+  }
+
+  String? _liveImage(XmlElement parent) {
+    final img = _childText(parent, 'image');
+    if (img != null && img.isNotEmpty) return img;
+    for (final c in parent.children.whereType<XmlElement>()) {
+      if (c.name.local == 'image') return c.getAttribute('href') ?? c.innerText.trim();
+    }
+    return null;
   }
 
   String? _liveEnclosureUrl(XmlElement parent) {
