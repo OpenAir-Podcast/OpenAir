@@ -4,5 +4,7 @@
     android:minHeight="48dp"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/openair_widget"
+    android:previewLayout="@layout/openair_widget"
+    android:description="@string/widget_description"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />
