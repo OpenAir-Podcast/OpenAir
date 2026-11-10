@@ -1093,11 +1093,13 @@ class AudioController extends ChangeNotifier {
             imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
             isPlaying: state.playing,
           ));
+          notifyListeners();
           break;
         case ProcessingState.buffering:
           isPlaying = PlayingStatus.buffering;
           audioState = 'Play';
           loadState = 'Detail';
+          notifyListeners();
           break;
         case ProcessingState.completed:
           if (_isAutoPlayingNext) break;
