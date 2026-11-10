@@ -66,6 +66,15 @@
             android:enabled="true"
             android:exported="false" />
 
+        <!-- Media button receiver for widget controls -->
+        <receiver
+            android:name="com.ryanheise.audioservice.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
         <!-- Home screen widget -->
         <receiver
             android:name=".OpenAirWidgetProvider"

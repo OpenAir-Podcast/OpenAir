@@ -78,12 +78,16 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
     }
 
     private fun sendMediaButton(context: Context, keyCode: Int) {
+        val component = android.content.ComponentName(
+            context.packageName,
+            "com.ryanheise.audioservice.MediaButtonReceiver"
+        )
         val down = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            setPackage(context.packageName)
+            component = component
             putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
         }
         val up = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            setPackage(context.packageName)
+            component = component
             putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
         }
         context.sendBroadcast(down)
