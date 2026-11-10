@@ -178,6 +178,14 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 }
                 Navigator.pop(dialogContext);
 
+                if (url.startsWith('openair://')) {
+                  final uri = Uri.tryParse(url);
+                  if (uri != null) {
+                    await ref.read(audioProvider).handleDeepLink(uri, context);
+                  }
+                  return;
+                }
+
                 final success = await ref
                     .read(audioProvider)
                     .addPodcastByRssUrl(url, context);
