@@ -1087,6 +1087,12 @@ class AudioController extends ChangeNotifier {
             audioState = 'Pause';
             loadState = 'Detail';
           }
+          unawaited(HomeWidgetService.updateNowPlaying(
+            title: currentEpisode?['title']?.toString() ?? 'Unknown',
+            author: currentEpisode?['author']?.toString() ?? 'Unknown',
+            imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
+            isPlaying: state.playing,
+          ));
           break;
         case ProcessingState.buffering:
           isPlaying = PlayingStatus.buffering;
@@ -1119,6 +1125,12 @@ class AudioController extends ChangeNotifier {
             audioState = 'Stop';
             loadState = 'Detail';
           }
+          unawaited(HomeWidgetService.updateNowPlaying(
+            title: currentEpisode?['title']?.toString() ?? 'Unknown',
+            author: currentEpisode?['author']?.toString() ?? 'Unknown',
+            imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
+            isPlaying: false,
+          ));
           break;
         default:
           break;
