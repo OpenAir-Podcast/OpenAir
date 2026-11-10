@@ -15,6 +15,7 @@ import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 import 'package:openair/views/main_pages/discovery_page.dart';
 import 'package:openair/views/main_pages/episodes_page.dart';
+import 'package:openair/views/player/main_player.dart';
 import 'package:openair/views/main_pages/fyyd_search_page.dart';
 import 'package:openair/views/main_pages/podcast_index_search_page.dart';
 import 'package:openair/views/settings_pages/notifications_page.dart';
@@ -181,7 +182,12 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                 if (url.startsWith('openair://')) {
                   final uri = Uri.tryParse(url);
                   if (uri != null) {
-                    await ref.read(audioProvider).handleDeepLink(uri, context);
+                    final played = await ref.read(audioProvider).handleDeepLink(uri, context);
+                    if (played && context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const MainPlayer()),
+                      );
+                    }
                   }
                   return;
                 }

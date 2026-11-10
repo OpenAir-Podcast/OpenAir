@@ -124,8 +124,8 @@ class AudioController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleDeepLink(Uri uri, BuildContext context) async {
-    if (uri.scheme != 'openair') return;
+  Future<bool> handleDeepLink(Uri uri, BuildContext context) async {
+    if (uri.scheme != 'openair') return false;
     String? guid = uri.queryParameters['guid'];
     if (guid == null || guid.isEmpty) {
       // Support openair://episode/<guid>
@@ -136,7 +136,7 @@ class AudioController extends ChangeNotifier {
         guid = Uri.decodeComponent(uri.pathSegments.first);
       }
     }
-    if (guid == null || guid.isEmpty) return;
+    if (guid == null || guid.isEmpty) return false;
     final seconds = int.tryParse(uri.queryParameters['t'] ?? '0') ?? 0;
     final feedUrl = uri.queryParameters['feed'];
 
@@ -166,12 +166,13 @@ class AudioController extends ChangeNotifier {
       } catch (_) {}
     }
 
-    if (episode == null) return;
+    if (episode == null) return false;
     await playEpisode(episode, context);
     if (seconds > 0) {
       await Future.delayed(const Duration(milliseconds: 800));
       seekToPosition(Duration(seconds: seconds));
     }
+    return true;
   }
 
   Future<void> playLiveStream(String url, String title) async {

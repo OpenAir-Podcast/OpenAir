@@ -12,6 +12,7 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/settings_pages/playback_page.dart';
 import 'package:openair/views/settings_pages/synchronization_page.dart';
 import 'package:openair/views/settings_pages/user_interface_page.dart';
+import 'package:openair/views/player/main_player.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/config/firebase_config.dart';
 import 'package:home_widget/home_widget.dart';
@@ -227,7 +228,14 @@ class _SettingsState extends ConsumerState<Settings> {
     if (confirmed == true && context.mounted) {
       final uri = Uri.tryParse(controller.text.trim());
       if (uri != null) {
-        await ref.read(audioProvider).handleDeepLink(uri, context);
+        final played = await ref.read(audioProvider).handleDeepLink(uri, context);
+        if (played && context.mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const MainPlayer(),
+            ),
+          );
+        }
       }
     }
   }

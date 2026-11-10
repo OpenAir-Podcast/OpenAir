@@ -6,6 +6,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:app_links/app_links.dart';
+import 'package:openair/views/player/main_player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
@@ -245,11 +246,22 @@ class _MyAppState extends ConsumerState<MyApp> {
     try {
       final initial = await _appLinks.getInitialLink();
       if (initial != null && mounted) {
-        ref.read(audioProvider).handleDeepLink(initial, context);
+        final played = await ref.read(audioProvider).handleDeepLink(initial, context);
+        if (played && mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const MainPlayer()),
+          );
+        }
       }
     } catch (_) {}
-    _linkSub = _appLinks.uriLinkStream.listen((uri) {
-      if (mounted) ref.read(audioProvider).handleDeepLink(uri, context);
+    _linkSub = _appLinks.uriLinkStream.listen((uri) async {
+      if (!mounted) return;
+      final played = await ref.read(audioProvider).handleDeepLink(uri, context);
+      if (played && mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const MainPlayer()),
+        );
+      }
     });
   }
 
