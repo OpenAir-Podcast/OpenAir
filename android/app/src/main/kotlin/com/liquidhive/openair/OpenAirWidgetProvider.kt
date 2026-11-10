@@ -30,6 +30,17 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_title, title)
             views.setTextViewText(R.id.widget_author, author)
 
+            // Theme/opacity
+            val systemDark = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            val dark = if (prefs.contains("widgetDarkMode")) prefs.getBoolean("widgetDarkMode", false) else systemDark
+            val opacity = prefs.getInt("widgetOpacity", 100).coerceIn(0, 100)
+            val alpha = (opacity * 255 / 100).toInt()
+            val bgColor = if (dark) android.graphics.Color.argb(alpha, 30, 30, 30) else android.graphics.Color.argb(alpha, 255, 255, 255)
+            val textColor = if (dark) android.graphics.Color.WHITE else android.graphics.Color.BLACK
+            views.setInt(R.id.widget_root, "setBackgroundColor", bgColor)
+            views.setTextColor(R.id.widget_title, textColor)
+            views.setTextColor(R.id.widget_author, textColor)
+
             val imageUrl = prefs.getString("imageUrl", null)
             if (!imageUrl.isNullOrEmpty()) {
                 Thread {
