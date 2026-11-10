@@ -147,7 +147,7 @@ class _AddPodcastPageState extends ConsumerState<AddPodcastPage> {
                     Icons.link_rounded,
                     color: colorScheme.primary,
                   ),
-                  hintText: Translations.of(dialogContext).text('rssUrl'),
+                  hintText: '${Translations.of(dialogContext).text('rssUrl')} or openair:// link',
                   filled: true,
                   fillColor: colorScheme.surfaceContainerHighest,
                   border: OutlineInputBorder(
