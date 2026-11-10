@@ -12,6 +12,7 @@ import 'package:openair/views/settings_pages/notifications_page.dart';
 import 'package:openair/views/settings_pages/playback_page.dart';
 import 'package:openair/views/settings_pages/synchronization_page.dart';
 import 'package:openair/views/settings_pages/user_interface_page.dart';
+import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/config/firebase_config.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -198,6 +199,39 @@ class _SettingsState extends ConsumerState<Settings> {
     );
   }
 
+
+  Future<void> _showOpenLinkDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Open shared link'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Paste openair://... link',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Open'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      final uri = Uri.tryParse(controller.text.trim());
+      if (uri != null) {
+        await ref.read(audioProvider).handleDeepLink(uri, context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -359,6 +393,17 @@ class _SettingsState extends ConsumerState<Settings> {
                   onTap: () => _showWidgetAppearanceDialog(context),
                   context: context,
                 ),
+                 Divider(
+                     height: 1,
+                     color:
+                         Theme.of(context).dividerColor.withValues(alpha: 0.15)),
+                 _buildTile(
+                   icon: Icons.link_rounded,
+                   title: 'Open shared link',
+                   subtitle: 'Paste an OpenAir episode link',
+                   onTap: () => _showOpenLinkDialog(context),
+                   context: context,
+                 ),
                 Divider(
                     height: 1,
                     color:
