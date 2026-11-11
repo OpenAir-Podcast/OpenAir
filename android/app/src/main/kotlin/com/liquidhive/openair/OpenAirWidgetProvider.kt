@@ -30,6 +30,16 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_title, title)
             views.setTextViewText(R.id.widget_author, author)
 
+            // Tap anywhere on the widget opens the app
+            val openAppIntent = Intent(context, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            val openAppPending = PendingIntent.getActivity(
+                context, 4, openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_root, openAppPending)
+
             // Theme/opacity
             val systemDark = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
             val dark = if (prefs.contains("widgetDarkMode")) prefs.getBoolean("widgetDarkMode", false) else systemDark
