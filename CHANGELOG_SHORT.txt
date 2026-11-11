@@ -1,3 +1,10 @@
+What's New in v0.20.6+84
+
+• Fixed widget controls responsiveness
+• Improved widget layout and appearance settings
+
+---
+
 What's New in v0.20.5+83
 
 • Widget appearance settings (dark mode + opacity)
