@@ -5,83 +5,78 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:padding="8dp"
+    android:padding="10dp"
     android:background="@android:color/white">
 
     <ImageView
         android:id="@+id/widget_art"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/launcher_icon" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:orientation="vertical"
         android:gravity="center_vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/widget_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text="OpenAir"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/widget_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="OpenAir"
-                android:textStyle="bold"
-                android:textSize="13sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/widget_author"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Not playing"
-                android:textSize="11sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/widget_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not playing"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="6dp">
 
             <ImageButton
                 android:id="@+id/widget_prev"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@android:drawable/ic_media_previous"
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="Previous" />
 
             <ImageButton
                 android:id="@+id/widget_play"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@android:drawable/ic_media_play"
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="Play" />
 
             <ImageButton
                 android:id="@+id/widget_next"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@android:drawable/ic_media_next"
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="Next" />
 
             <ImageButton
                 android:id="@+id/widget_like"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@android:drawable/btn_star_big_off"
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="Like" />

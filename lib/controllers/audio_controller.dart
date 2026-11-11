@@ -194,6 +194,12 @@ class AudioController extends ChangeNotifier {
     isPlaying = PlayingStatus.playing;
     audioState = 'Play';
     loadState = 'Play';
+    unawaited(HomeWidgetService.updateNowPlaying(
+      title: title,
+      author: title,
+      imageUrl: '',
+      isPlaying: true,
+    ));
     notifyListeners();
   }
 
@@ -1695,6 +1701,13 @@ class AudioController extends ChangeNotifier {
     audioState = 'Play';
     loadState = 'Play';
     nextEpisode = currentEpisode;
+
+    unawaited(HomeWidgetService.updateNowPlaying(
+      title: currentEpisode!['title']?.toString() ?? 'Unknown',
+      author: currentEpisode!['author']?.toString() ?? 'Unknown',
+      imageUrl: (currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '').toString(),
+      isPlaying: true,
+    ));
 
     await addToHistory(currentEpisode!, currentPodcast,
         author: currentEpisode!['author'] ?? currentPodcast?.author);
