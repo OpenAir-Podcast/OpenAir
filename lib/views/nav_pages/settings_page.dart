@@ -182,13 +182,17 @@ class _SettingsState extends ConsumerState<Settings> {
                 ),
                 FilledButton(
                   onPressed: () async {
-                    await HomeWidget.saveWidgetData<bool>('widgetDarkMode', darkMode);
-                    await HomeWidget.saveWidgetData<int>('widgetOpacity', opacity.round());
-                    await HomeWidget.updateWidget(
-                      name: 'OpenAirWidgetProvider',
-                      iOSName: 'OpenAirWidgetProvider',
-                    );
-                    if (ctx.mounted) Navigator.pop(ctx);
+                    try {
+                      await HomeWidget.saveWidgetData<bool>('widgetDarkMode', darkMode);
+                      await HomeWidget.saveWidgetData<int>('widgetOpacity', opacity.round());
+                      await HomeWidget.updateWidget(
+                        name: 'OpenAirWidgetProvider',
+                        iOSName: 'OpenAirWidgetProvider',
+                      );
+                    } catch (_) {}
+                    if (ctx.mounted) {
+                      Navigator.of(ctx, rootNavigator: true).pop();
+                    }
                   },
                   child: const Text('Save'),
                 ),
