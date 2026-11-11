@@ -96,21 +96,28 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
     }
 
     private fun sendMediaButton(context: Context, keyCode: Int) {
-        val component = android.content.ComponentName(
-            context.packageName,
-            "com.ryanheise.audioservice.MediaButtonReceiver"
-        )
-        val down = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            setComponent(component)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
-            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+        try {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+            audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
+        } catch (_: Exception) {
+            // Fallback to broadcast
+            val component = android.content.ComponentName(
+                context.packageName,
+                "com.ryanheise.audioservice.MediaButtonReceiver"
+            )
+            val down = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+                setComponent(component)
+                addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
+                putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+            }
+            val up = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+                setComponent(component)
+                addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
+                putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
+            }
+            context.sendBroadcast(down)
+            context.sendBroadcast(up)
         }
-        val up = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            setComponent(component)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
-            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
-        }
-        context.sendBroadcast(down)
-        context.sendBroadcast(up)
     }
 }
