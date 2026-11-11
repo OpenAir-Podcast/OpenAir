@@ -95,10 +95,12 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
         )
         val down = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             setComponent(component)
+            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
             putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
         }
         val up = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             setComponent(component)
+            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES or Intent.FLAG_RECEIVER_FOREGROUND)
             putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
         }
         context.sendBroadcast(down)
