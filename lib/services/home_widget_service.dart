@@ -1,8 +1,8 @@
 import 'package:home_widget/home_widget.dart';
 
 class HomeWidgetService {
-  static const String _androidWidgetName = 'OpenAirWidget';
-  static const String _iOSWidgetName = 'OpenAirWidget';
+  static const String _androidWidgetName = 'OpenAirWidgetProvider';
+  static const String _iOSWidgetName = 'OpenAirWidgetProvider';
 
   static Future<void> updateNowPlaying({
     required String title,

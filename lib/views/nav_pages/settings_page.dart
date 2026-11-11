@@ -185,8 +185,8 @@ class _SettingsState extends ConsumerState<Settings> {
                     await HomeWidget.saveWidgetData<bool>('widgetDarkMode', darkMode);
                     await HomeWidget.saveWidgetData<int>('widgetOpacity', opacity.round());
                     await HomeWidget.updateWidget(
-                      name: 'OpenAirWidget',
-                      iOSName: 'OpenAirWidget',
+                      name: 'OpenAirWidgetProvider',
+                      iOSName: 'OpenAirWidgetProvider',
                     );
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
