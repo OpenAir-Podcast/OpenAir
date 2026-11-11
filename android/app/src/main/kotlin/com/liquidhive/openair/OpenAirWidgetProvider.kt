@@ -70,9 +70,9 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             // Next
             val nextIntent = Intent(context, OpenAirWidgetProvider::class.java).apply { action = ACTION_NEXT }
             views.setOnClickPendingIntent(R.id.widget_next, PendingIntent.getBroadcast(context, 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-            // Like -> open app
-            val likeIntent = Intent(context, MainActivity::class.java)
-            val likePending = PendingIntent.getActivity(context, 3, likeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            // Like -> toggle favorite
+            val likeIntent = Intent(context, OpenAirWidgetProvider::class.java).apply { action = ACTION_LIKE }
+            val likePending = PendingIntent.getBroadcast(context, 3, likeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_like, likePending)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -85,6 +85,13 @@ class OpenAirWidgetProvider : AppWidgetProvider() {
             ACTION_PREV -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_PREVIOUS)
             ACTION_PLAY -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
             ACTION_NEXT -> sendMediaButton(context, KeyEvent.KEYCODE_MEDIA_NEXT)
+            ACTION_LIKE -> {
+                val likeIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("openair://like")).apply {
+                    setPackage(context.packageName)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
+                context.startActivity(likeIntent)
+            }
         }
     }
 

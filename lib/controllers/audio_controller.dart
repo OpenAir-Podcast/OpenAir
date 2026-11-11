@@ -126,6 +126,13 @@ class AudioController extends ChangeNotifier {
 
   Future<bool> handleDeepLink(Uri uri, BuildContext context) async {
     if (uri.scheme != 'openair') return false;
+
+    // Handle openair://like (widget favorite toggle)
+    if (uri.host == 'like' || uri.pathSegments.contains('like')) {
+      await toggleFavoriteCurrent();
+      return false;
+    }
+
     String? guid = uri.queryParameters['guid'];
     if (guid == null || guid.isEmpty) {
       // Support openair://episode/<guid>
@@ -1026,6 +1033,23 @@ class AudioController extends ChangeNotifier {
   Future<void> removeEpisodeFromFavorite(String guid) async {
     final hiveService = ref.read(hiveServiceProvider);
     hiveService.removeEpisodeFromFavorite(guid);
+    ref.invalidate(getFavoriteProvider);
+  }
+
+  Future<void> toggleFavoriteCurrent() async {
+    if (currentEpisode == null) return;
+    final guid = currentEpisode!['guid']?.toString();
+    if (guid == null) return;
+    final favs = await ref.read(hiveServiceProvider).getFavorite();
+    if (favs.containsKey(guid)) {
+      removeEpisodeFromFavorite(guid);
+    } else {
+      final podcast = currentPodcast ?? podcastForEpisode(currentEpisode!);
+      if (podcast != null) {
+        addEpisodeToFavorite(currentEpisode!, podcast,
+            author: currentEpisode!['author']?.toString());
+      }
+    }
     ref.invalidate(getFavoriteProvider);
   }
 
