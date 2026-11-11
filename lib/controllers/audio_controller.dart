@@ -1040,7 +1040,7 @@ class AudioController extends ChangeNotifier {
     if (currentEpisode == null) return;
     final guid = currentEpisode!['guid']?.toString();
     if (guid == null) return;
-    final favs = await ref.read(hiveServiceProvider).getFavorite();
+    final favs = await ref.read(hiveServiceProvider).getFavoriteEpisodes();
     if (favs.containsKey(guid)) {
       removeEpisodeFromFavorite(guid);
     } else {
