@@ -79,3 +79,4 @@ appimage-build/
 *.log
 
 lib/env.g.dart
+*.salive
