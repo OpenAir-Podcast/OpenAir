@@ -291,7 +291,8 @@ class AudioController extends ChangeNotifier {
     return downloadsDir.path;
   }
 
-  Future<String?> downloadPodcastImage(String? imageUrl, {Dio? dio}) async {
+  Future<String?> downloadPodcastImage(String? imageUrl,
+      {Dio? dio, String? cacheKey}) async {
     try {
       if (kIsWeb || imageUrl == null || imageUrl.isEmpty) return null;
       if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
@@ -304,7 +305,10 @@ class AudioController extends ChangeNotifier {
         await imagesDir.create(recursive: true);
       }
 
-      final hash = sha256.convert(utf8.encode(imageUrl)).toString();
+      // Reuse a single cached image per podcast when a cacheKey is provided,
+      // so multiple episodes from the same podcast share one image file.
+      final key = (cacheKey != null && cacheKey.isNotEmpty) ? cacheKey : imageUrl;
+      final hash = sha256.convert(utf8.encode(key)).toString();
       final imagePath = join(imagesDir.path, '$hash.jpg');
 
       if (await File(imagePath).exists()) {
@@ -599,7 +603,11 @@ class AudioController extends ChangeNotifier {
       await dio.download(url, savePath);
 
       final imageUrl = item['image'] ?? item['feedImage'] ?? podcast.imageUrl;
-      final localImagePath = await downloadPodcastImage(imageUrl, dio: dio);
+      final localImagePath = await downloadPodcastImage(
+        imageUrl,
+        dio: dio,
+        cacheKey: podcast.id.toString(),
+      );
 
       final downloadModel = DownloadModel(
         guid: guid,
