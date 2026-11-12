@@ -44,13 +44,11 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    defaultConfig {
-        applicationId = "com.liquidhive.openair"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
+    applicationId = "com.liquidhive.openair"
+    minSdk = flutter.minSdkVersion
+    targetSdk = flutter.targetSdkVersion
+    versionCode = flutter.versionCode
+    versionName = flutter.versionName
 
     buildTypes {
         release {
