@@ -312,7 +312,19 @@ class AudioController extends ChangeNotifier {
       }
 
       final downloader = dio ?? Dio();
-      await downloader.download(imageUrl, imagePath);
+      try {
+        await downloader.download(imageUrl, imagePath);
+      } catch (_) {
+        // Retry once with a fresh Dio instance.
+        await Dio().download(imageUrl, imagePath);
+      }
+      final f = File(imagePath);
+      if (!await f.exists() || await f.length() == 0) {
+        try {
+          await f.delete();
+        } catch (_) {}
+        return null;
+      }
       return imagePath;
     } catch (e) {
       debugPrint('Error downloading podcast image: $e');
@@ -586,7 +598,7 @@ class AudioController extends ChangeNotifier {
       final savePath = join(downloadsDir, filename);
       await dio.download(url, savePath);
 
-      final imageUrl = item['image'] ?? item['feedImage'];
+      final imageUrl = item['image'] ?? item['feedImage'] ?? podcast.imageUrl;
       final localImagePath = await downloadPodcastImage(imageUrl, dio: dio);
 
       final downloadModel = DownloadModel(
