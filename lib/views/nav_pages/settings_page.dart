@@ -15,7 +15,7 @@ import 'package:openair/views/settings_pages/user_interface_page.dart';
 import 'package:openair/views/player/main_player.dart';
 import 'package:openair/providers/audio_provider.dart';
 import 'package:openair/config/firebase_config.dart';
-import 'package:home_widget/home_widget.dart';
+
 
 class Settings extends ConsumerStatefulWidget {
   final Function() functionBuild;
@@ -137,70 +137,6 @@ class _SettingsState extends ConsumerState<Settings> {
           ),
         ),
       ),
-    );
-  }
-
-
-  Future<void> _showWidgetAppearanceDialog(BuildContext context) async {
-    bool darkMode = false;
-    double opacity = 100;
-    try {
-      darkMode = await HomeWidget.getWidgetData<bool>('widgetDarkMode') ?? false;
-      opacity = (await HomeWidget.getWidgetData<int>('widgetOpacity') ?? 100).toDouble();
-    } catch (_) {}
-
-    if (!context.mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setState) {
-            return AlertDialog(
-              title: const Text('Widget appearance'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SwitchListTile(
-                    title: const Text('Dark mode'),
-                    value: darkMode,
-                    onChanged: (v) => setState(() => darkMode = v),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Opacity: ${opacity.round()}%'),
-                  Slider(
-                    value: opacity,
-                    min: 20,
-                    max: 100,
-                    onChanged: (v) => setState(() => opacity = v),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
-                ),
-                FilledButton(
-                  onPressed: () async {
-                    try {
-                      await HomeWidget.saveWidgetData<bool>('widgetDarkMode', darkMode);
-                      await HomeWidget.saveWidgetData<int>('widgetOpacity', opacity.round());
-                      await HomeWidget.updateWidget(
-                        name: 'OpenAirWidgetProvider',
-                        iOSName: 'OpenAirWidgetProvider',
-                      );
-                    } catch (_) {}
-                    if (ctx.mounted) {
-                      Navigator.of(ctx, rootNavigator: true).pop();
-                    }
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 
@@ -398,17 +334,6 @@ class _SettingsState extends ConsumerState<Settings> {
           _buildCard(
             Column(
               children: [
-                _buildTile(
-                  icon: Icons.widgets_outlined,
-                  title: 'Widget appearance',
-                  subtitle: 'Dark mode and opacity for home widget',
-                  onTap: () => _showWidgetAppearanceDialog(context),
-                  context: context,
-                ),
-                 Divider(
-                     height: 1,
-                     color:
-                         Theme.of(context).dividerColor.withValues(alpha: 0.15)),
                  _buildTile(
                    icon: Icons.link_rounded,
                    title: 'Open shared link',

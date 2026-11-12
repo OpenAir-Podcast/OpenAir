@@ -21,7 +21,6 @@ import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/model/hive_models/subscription_model.dart';
 import 'package:openair/providers/hive_provider.dart';
 import 'package:openair/services/audio_handler.dart';
-import 'package:openair/services/home_widget_service.dart';
 import 'package:openair/services/fyyd_provider.dart';
 import 'package:openair/services/podcast_index_service.dart';
 
@@ -194,12 +193,6 @@ class AudioController extends ChangeNotifier {
     isPlaying = PlayingStatus.playing;
     audioState = 'Play';
     loadState = 'Play';
-    unawaited(HomeWidgetService.updateNowPlaying(
-      title: title,
-      author: title,
-      imageUrl: '',
-      isPlaying: true,
-    ));
     notifyListeners();
   }
 
@@ -404,12 +397,6 @@ class AudioController extends ChangeNotifier {
 
       await addToHistory(currentEpisode!, currentPodcast,
           author: currentEpisode!['author']);
-      unawaited(HomeWidgetService.updateNowPlaying(
-      title: title,
-      author: artist,
-      imageUrl: imageUrl,
-      isPlaying: true,
-    ));
     _startPositionAutoSave();
       await _savePlayerState();
       notifyListeners();
@@ -469,12 +456,6 @@ class AudioController extends ChangeNotifier {
     } else {
       await _audioHandler.play();
     }
-    unawaited(HomeWidgetService.updateNowPlaying(
-      title: currentEpisode?['title']?.toString() ?? 'Unknown',
-      author: currentEpisode?['author']?.toString() ?? 'Unknown',
-      imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
-      isPlaying: true,
-    ));
     _startPositionAutoSave();
     audioState = 'Play';
     loadState = 'Play';
@@ -501,12 +482,6 @@ class AudioController extends ChangeNotifier {
     audioState = 'Pause';
     loadState = 'Detail';
     isPlaying = PlayingStatus.paused;
-    unawaited(HomeWidgetService.updateNowPlaying(
-      title: currentEpisode?['title']?.toString() ?? 'Unknown',
-      author: currentEpisode?['author']?.toString() ?? 'Unknown',
-      imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
-      isPlaying: false,
-    ));
     notifyListeners();
   }
 
@@ -1118,12 +1093,6 @@ class AudioController extends ChangeNotifier {
             audioState = 'Pause';
             loadState = 'Detail';
           }
-          unawaited(HomeWidgetService.updateNowPlaying(
-            title: currentEpisode?['title']?.toString() ?? 'Unknown',
-            author: currentEpisode?['author']?.toString() ?? 'Unknown',
-            imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
-            isPlaying: state.playing,
-          ));
           notifyListeners();
           break;
         case ProcessingState.buffering:
@@ -1158,12 +1127,6 @@ class AudioController extends ChangeNotifier {
             audioState = 'Stop';
             loadState = 'Detail';
           }
-          unawaited(HomeWidgetService.updateNowPlaying(
-            title: currentEpisode?['title']?.toString() ?? 'Unknown',
-            author: currentEpisode?['author']?.toString() ?? 'Unknown',
-            imageUrl: (currentEpisode?['image'] ?? currentEpisode?['feedImage'] ?? '').toString(),
-            isPlaying: false,
-          ));
           break;
         default:
           break;
@@ -1714,13 +1677,6 @@ class AudioController extends ChangeNotifier {
     audioState = 'Play';
     loadState = 'Play';
     nextEpisode = currentEpisode;
-
-    unawaited(HomeWidgetService.updateNowPlaying(
-      title: currentEpisode!['title']?.toString() ?? 'Unknown',
-      author: currentEpisode!['author']?.toString() ?? 'Unknown',
-      imageUrl: (currentEpisode!['image'] ?? currentEpisode!['feedImage'] ?? '').toString(),
-      isPlaying: true,
-    ));
 
     await addToHistory(currentEpisode!, currentPodcast,
         author: currentEpisode!['author'] ?? currentPodcast?.author);
