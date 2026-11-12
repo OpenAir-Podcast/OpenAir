@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 import 'package:audio_service/audio_service.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1483,15 +1483,27 @@ class AudioController extends ChangeNotifier {
 
     if (!context.mounted) return false;
 
-    final result = await FilePicker.pickFile(
-      dialogTitle: 'Import OPML',
-      type: FileType.custom,
-      allowedExtensions: ['opml'],
-      initialDirectory: defaultFilePath,
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Import OPML'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'File path'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Import')),
+        ],
+      ),
     );
+    if (confirmed != true || !context.mounted) return false;
+    final path = controller.text.trim();
+    if (path.isEmpty) return false;
 
-    if (result != null) {
-      File file = File(result.path!);
+    try {
+      File file = File(path);
       final xml = file.readAsStringSync();
       final doc = OpmlDocument.parse(xml);
 
@@ -1499,8 +1511,9 @@ class AudioController extends ChangeNotifier {
         if (context.mounted) await addPodcastByRssUrl(feed.xmlUrl!, context);
       }
       return true;
+    } catch (_) {
+      return false;
     }
-    return false;
   }
 
   Future<void> removeAllDownloadedPodcasts(BuildContext context) async {

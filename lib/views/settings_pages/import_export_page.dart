@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -188,16 +188,27 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
     final failedMsg =
         Translations.of(context).text('databaseImportFailed');
 
-    final result = await FilePicker.pickFile(
-      dialogTitle: dialogTitle,
-      type: FileType.custom,
-      allowedExtensions: ['db'],
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(dialogTitle),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'File path'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Import')),
+        ],
+      ),
     );
-
-    if (result == null || !mounted) return;
+    if (confirmed != true || !mounted) return;
+    final path = controller.text.trim();
+    if (path.isEmpty) return;
 
     try {
-      File file = File(result.path!);
+      File file = File(path);
       await ref.read(openAirProvider).importFromDb(file);
       if (mounted) _showNotification(successMsg);
     } catch (e) {
@@ -207,30 +218,24 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
   Future<void> _exportDatabase() async {
     if (!mounted) return;
-    final dialogTitle = Translations.of(context).text('exportDatabase');
     final exportSuccessMsg = Translations.of(context).text('databaseExported');
     final exportFailedMsg = Translations.of(context).text('databaseExportFailed');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.db';
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    String getOpenAirPath = '${appDocDir.path}/OpenAir';
     final tempFile = File('${appDocDir.path}/temp_export_$date.db');
 
     try {
       await ref.read(openAirProvider).exportToDb(tempFile.path);
-      final bytes = await tempFile.readAsBytes();
-
-      Uri? outputFile = await FilePicker.saveFile(
-        dialogTitle: dialogTitle,
-        fileName: fileName,
-        bytes: bytes,
-        type: FileType.custom,
-        allowedExtensions: ['db'],
-        initialDirectory: getOpenAirPath,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(tempFile.path)],
+          subject: fileName,
+        ),
       );
 
-      if (outputFile == null || !mounted) return;
+      if (!mounted) return;
       if (mounted) _showNotification(exportSuccessMsg);
     } catch (e) {
       if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);
@@ -240,15 +245,26 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
   }
 
   Future<void> _importOpml() async {
-    final result = await FilePicker.pickFile(
-      dialogTitle: Translations.of(context).text('importOpml'),
-      type: FileType.custom,
-      allowedExtensions: ['opml', 'xml'],
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(Translations.of(context).text('importOpml')),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'File path'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Import')),
+        ],
+      ),
     );
+    if (confirmed != true || !mounted) return;
+    final path = controller.text.trim();
+    if (path.isEmpty) return;
 
-    if (result == null || !mounted) return;
-
-    File file = File(result.path!);
+    File file = File(path);
     final hiveService = ref.read(openAirProvider).hiveService;
     await hiveService.importOpml(file);
 
@@ -260,31 +276,25 @@ class ImportExportPageState extends ConsumerState<ImportExportPage> {
 
   Future<void> _exportOpml() async {
     if (!mounted) return;
-    final dialogTitle = Translations.of(context).text('exportOpml');
     final exportSuccessMsg = Translations.of(context).text('opmlExported');
     final exportFailedMsg = Translations.of(context).text('opmlExportFailed');
     final String date = DateTime.now().toIso8601String().split('T')[0];
     String fileName = 'openair-backup-$date.opml';
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    String getOpenAirPath = '${appDocDir.path}/OpenAir';
     final tempFile = File('${appDocDir.path}/temp_export_$date.opml');
 
     try {
       final hiveService = ref.read(openAirProvider).hiveService;
       await hiveService.exportOpml(tempFile.path);
-      final bytes = await tempFile.readAsBytes();
-
-      Uri? outputFile = await FilePicker.saveFile(
-        dialogTitle: dialogTitle,
-        fileName: fileName,
-        bytes: bytes,
-        type: FileType.custom,
-        allowedExtensions: ['opml', 'xml'],
-        initialDirectory: getOpenAirPath,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(tempFile.path)],
+          subject: fileName,
+        ),
       );
 
-      if (outputFile == null || !mounted) return;
+      if (!mounted) return;
       if (mounted) _showNotification(exportSuccessMsg);
     } catch (e) {
       if (mounted) _showNotification('$exportFailedMsg: $e', isError: true);

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/components/no_queue.dart';
@@ -114,17 +114,12 @@ class _QueuePageState extends ConsumerState<QueuePage> {
           .toList()
         ..sort((a, b) => (a['pos'] as int).compareTo(b['pos'] as int));
       final jsonStr = const JsonEncoder.withIndent('  ').convert(list);
-      final bytes = Uint8List.fromList(jsonStr.codeUnits);
-      final outputFile = await FilePicker.saveFile(
-        dialogTitle: 'Export queue',
-        fileName: 'openair_queue.json',
-        bytes: bytes,
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+      await SharePlus.instance.share(
+        ShareParams(text: jsonStr, subject: 'OpenAir queue'),
       );
-      if (outputFile == null || !mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Queue exported')),
+        const SnackBar(content: Text('Queue shared')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -135,16 +130,33 @@ class _QueuePageState extends ConsumerState<QueuePage> {
   }
 
   Future<void> _importQueue() async {
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Import queue'),
+        content: TextField(
+          controller: controller,
+          maxLines: 6,
+          decoration: const InputDecoration(
+            hintText: 'Paste exported queue JSON',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-      if (result.isEmpty) return;
-      final path = result.single.path;
-      if (path == null) return;
-      final str = await File(path).readAsString();
-      final decoded = jsonDecode(str);
+      final decoded = jsonDecode(controller.text.trim());
       if (decoded is! List) return;
       final hive = ref.read(openAirProvider).hiveService;
       int pos = 1;

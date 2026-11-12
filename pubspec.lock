@@ -25,14 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "12.1.0"
-  android_file_picker:
-    dependency: transitive
-    description:
-      name: android_file_picker
-      sha256: "3384b62685e04ce7afeaf57e94bf29bc167e32240be6c6cb382a94632aec0241"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   app_links:
     dependency: "direct main"
     description:
@@ -449,46 +441,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
-  file_picker:
-    dependency: "direct main"
-    description:
-      name: file_picker
-      sha256: "70e04f5ef83360433ea0099dc18154126536d85ef3cb4f63c2573725e49f608c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "12.1.1"
-  file_picker_darwin:
-    dependency: transitive
-    description:
-      name: file_picker_darwin
-      sha256: bdcba9c830f90ecba26020159e6bb90bce862ec58fabf1c41edb9db43e2f0eae
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
-  file_picker_linux:
-    dependency: transitive
-    description:
-      name: file_picker_linux
-      sha256: "93d3f62f97c657053e7b184fe0f5e22347d85067c053640a30b1ac8ad7844e3b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  file_picker_platform_interface:
-    dependency: transitive
-    description:
-      name: file_picker_platform_interface
-      sha256: b1ddd7909853c9df0eb4dbc5b388837ff313e28d6d5a9a71a83794b70c4c86bd
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  file_picker_web:
-    dependency: transitive
-    description:
-      name: file_picker_web
-      sha256: "067051c42bb6ceb7650f2771206ca4c4908855a786cc03a0cb7240da441106f3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.2"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -1986,14 +1938,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.4"
-  windows_file_picker:
-    dependency: transitive
-    description:
-      name: windows_file_picker
-      sha256: "1659127cb9e9e31a136352bfcb50fa4bb9e242dd7e0b71f99c3943b142e3026a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   workmanager:
     dependency: "direct main"
     description:
