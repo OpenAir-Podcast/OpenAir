@@ -1,5 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/material.dart';
+import 'package:openair/views/widgets/podcast_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:openair/model/hive_models/podcast_model.dart';
 import 'package:openair/providers/audio_provider.dart';
@@ -104,16 +105,11 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                     width: 56,
                     height: 56,
                     color: colorScheme.surfaceContainerHighest,
-                    child: CachedNetworkImage(
-                      memCacheHeight: 56,
-                      memCacheWidth: 56,
-                      imageUrl: widget.episodeItem['image'] ?? '',
+                    child: podcastImage(
+                      widget.episodeItem['image'] ?? '',
+                      width: 56,
+                      height: 56,
                       fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => Icon(
-                        Icons.podcasts_rounded,
-                        size: 28,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
                     ),
                   ),
                 ),

@@ -293,12 +293,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                     if (imageUrl != null && imageUrl.toString().isNotEmpty) ...[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
+                        child: podcastImage(
                           imageUrl.toString(),
                           width: double.infinity,
                           height: 200,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -667,12 +666,11 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                       if (current.image != null) ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
-                          child: Image.network(
+                          child: podcastImage(
                             current.image!,
                             width: 28,
                             height: 28,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -1145,12 +1143,11 @@ class _ChapterList extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 4),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
+                        child: podcastImage(
                           ch.image!,
                           width: 24,
                           height: 24,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                         ),
                       ),
                     ),
