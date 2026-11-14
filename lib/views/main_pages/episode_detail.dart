@@ -507,7 +507,7 @@ class EpisodeDetailState extends ConsumerState<EpisodeDetail> {
                                 Translations.of(context).text('deleteDownload');
 
                             onPressed = () {
-                              ref.read(audioProvider.notifier).downloadEpisode(
+                              ref.read(audioProvider).downloadEpisode(
                                     widget.episodeItem!,
                                     widget.podcast!,
                                     context,

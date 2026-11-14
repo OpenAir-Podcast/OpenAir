@@ -330,7 +330,18 @@ class PodcastIndexProvider {
     final cached = await hiveService.getSearchCache(title);
 
     if (cached != null && !cached.isExpired) {
-      return cached.results['feeds'][0];
+      final feed = Map<String, dynamic>.from(cached.results['feeds'][0]);
+      try {
+        final feedUrl = feed['url']?.toString() ?? '';
+        if (feedUrl.isNotEmpty) {
+          final parsed = await PodcastNamespaceParser().parseFeed(feedUrl);
+          final ns = parsed['feed'] as Map<String, dynamic>? ?? {};
+          ns.forEach((k, v) {
+            feed.putIfAbsent(k, () => v);
+          });
+        }
+      } catch (_) {}
+      return feed;
     }
 
     final response = await _retry(() => _dio.get(fullUrl));
