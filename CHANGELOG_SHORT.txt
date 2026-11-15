@@ -1,3 +1,10 @@
+What's New in v0.20.10+88
+
+• Fixed download button not working
+• Download progress spinner shown during download
+
+---
+
 What's New in v0.20.9+87
 
 • Improved offline image handling
