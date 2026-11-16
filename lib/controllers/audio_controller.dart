@@ -596,6 +596,7 @@ class AudioController extends ChangeNotifier {
     if (downloadingPodcasts.contains(guid)) return;
     downloadingPodcasts.add(guid);
     notifyListeners();
+    debugPrint('Starting download for: $guid');
 
     try {
       final filename = '${item['guid']}.mp3';
@@ -637,6 +638,11 @@ class AudioController extends ChangeNotifier {
       final filePath = await getDownloadsDirectory();
       final file = File('$filePath/$filename');
       if (await file.exists()) await file.delete();
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: $e')),
+        );
+      }
     } finally {
       downloadingPodcasts.remove(guid);
       notifyListeners();
