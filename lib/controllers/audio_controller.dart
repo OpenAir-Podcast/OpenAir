@@ -588,10 +588,11 @@ class AudioController extends ChangeNotifier {
             'OpenAir/1.0.0 (Podcast App; +https://github.com/OpenAir-Podcast/OpenAir)',
       },
     ));
-    final guid = item['guid'] as String;
-    final url = item['enclosureUrl'] as String;
-    final size = getEpisodeSize(item['enclosureLength']);
+    final guid = item['guid']?.toString() ?? '';
+    final url = item['enclosureUrl']?.toString() ?? '';
+    final size = getEpisodeSize(item['enclosureLength'] ?? 0);
 
+    if (guid.isEmpty || url.isEmpty) return;
     if (downloadingPodcasts.contains(guid)) return;
     downloadingPodcasts.add(guid);
     notifyListeners();
@@ -613,8 +614,7 @@ class AudioController extends ChangeNotifier {
         guid: guid,
         image: localImagePath ?? imageUrl,
         title: item['title'],
-        author: podcast.author!,
-        datePublished: item['datePublished'],
+        author: podcast.author ?? 'Unknown',        datePublished: item['datePublished'],
         description: item['description'],
         feedUrl: item['feedUrl'],
         duration: item['duration'],
