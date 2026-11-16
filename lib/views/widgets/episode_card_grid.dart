@@ -423,7 +423,7 @@ class _EpisodeCardGridState extends ConsumerState<EpisodeCardGrid> {
                                     }
                                   } else {
                                     ref
-                                        .read(audioProvider.notifier)
+                                        .read(audioProvider)
                                         .downloadEpisode(
                                           widget.episodeItem,
                                           widget.podcast,

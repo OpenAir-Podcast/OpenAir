@@ -409,7 +409,7 @@ class _SubscriptionEpisodeCardGridState
 
                                   onPressed = () {
                                     ref
-                                        .read(audioProvider.notifier)
+                                        .read(audioProvider)
                                         .downloadEpisode(
                                           widget.episodeItem,
                                           widget.podcast,
