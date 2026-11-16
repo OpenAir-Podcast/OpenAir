@@ -1,3 +1,11 @@
+What's New in v0.20.11+89
+
+• Fixed download button not working
+• Robust image download and caching
+• Safe handling of missing episode metadata
+
+---
+
 What's New in v0.20.10+88
 
 • Fixed download button not working
