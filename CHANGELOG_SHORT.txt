@@ -1,3 +1,10 @@
+What's New in v0.20.12+90
+
+• Stability and build fixes
+• Kotlin and Gradle compatibility updates
+
+---
+
 What's New in v0.20.11+89
 
 • Fixed download button not working
