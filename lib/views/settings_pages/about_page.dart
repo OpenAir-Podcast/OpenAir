@@ -18,6 +18,7 @@ class AboutPage extends ConsumerStatefulWidget {
 }
 
 class AboutPageState extends ConsumerState<AboutPage> {
+  int _versionTapCount = 0;
   Widget _buildCard(Widget child, BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
@@ -175,15 +176,24 @@ class AboutPageState extends ConsumerState<AboutPage> {
               const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: Text(
-                  'v${data.version}',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5),
-                      ),
+                child: GestureDetector(
+                  onTap: () {
+                    _versionTapCount++;
+                    if (_versionTapCount >= 5) {
+                      _versionTapCount = 0;
+                      throw Exception('Test crash from About page');
+                    }
+                  },
+                  child: Text(
+                    'v${data.version}',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                        ),
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
