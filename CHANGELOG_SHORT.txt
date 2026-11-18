@@ -1,3 +1,10 @@
+What's New in v0.20.13+91
+
+• Firebase Crashlytics integration
+• Hidden test crash trigger (tap version 5x)
+
+---
+
 What's New in v0.20.12+90
 
 • Stability and build fixes
