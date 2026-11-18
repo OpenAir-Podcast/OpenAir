@@ -43,7 +43,7 @@ enum DownloadStatus { downloaded, downloading, notDownloaded }
 
 enum PlayingStatus { detail, buffering, playing, paused, stop }
 
-class AudioController extends ChangeNotifier {
+class AudioController extends ChangeNotifier with WidgetsBindingObserver {
   AudioController(this.ref);
 
   final Ref ref;
@@ -81,6 +81,8 @@ class AudioController extends ChangeNotifier {
 
   BuildContext? _appContext;
   bool _isAutoPlayingNext = false;
+  bool _appInForeground = true;
+  DateTime _lastPositionNotify = DateTime.now();
 
   String? currentPodcastTimeRemaining;
 
@@ -1070,8 +1072,17 @@ class AudioController extends ChangeNotifier {
     }
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appInForeground = state == AppLifecycleState.resumed;
+    if (_appInForeground) {
+      notifyListeners();
+    }
+  }
+
   Future<void> initializeAudio(BuildContext context) async {
     _appContext = context;
+    WidgetsBinding.instance.addObserver(this);
 
     _audioHandler.onSkipToNext = () => playNextEpisode(_appContext);
     _audioHandler.onSkipToPrevious = () => playPreviousEpisode(_appContext);
@@ -1094,7 +1105,13 @@ class AudioController extends ChangeNotifier {
         podcastCurrentPositionInMilliseconds = 0.0;
       }
 
-      notifyListeners();
+      if (_appInForeground) {
+        final now = DateTime.now();
+        if (now.difference(_lastPositionNotify).inMilliseconds >= 1000) {
+          _lastPositionNotify = now;
+          notifyListeners();
+        }
+      }
     });
 
     // Set up duration listener
