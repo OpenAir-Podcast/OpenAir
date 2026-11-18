@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
