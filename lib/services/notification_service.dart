@@ -60,6 +60,7 @@ class NotificationService extends ChangeNotifier {
         AndroidNotificationDetails(
       'openair_notifications_channel',
       'OpenAir Notification',
+      icon: 'ic_notification',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
