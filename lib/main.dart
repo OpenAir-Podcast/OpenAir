@@ -7,6 +7,8 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:app_links/app_links.dart';
 import 'package:openair/views/player/main_player.dart';
+import 'package:openair/services/update_service.dart';
+import 'package:openair/views/widgets/update_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations_plus/flutter_localizations_plus.dart';
 import 'package:flutter_localizations_plus/localization.dart';
@@ -250,6 +252,33 @@ class _MyAppState extends ConsumerState<MyApp> {
     if (mounted) await ref.read(openAirProvider).initial(context);
     if (mounted) await ref.read(audioProvider).initAudio(context);
     if (mounted) await ref.read(notificationProvider).init(context);
+
+    // Check for app updates
+    if (mounted) {
+      unawaited(UpdateService.checkForUpdate(
+        context,
+        latestVersion: '0.21.0',
+        updateUrl:
+            'https://play.google.com/store/apps/details?id=com.liquidhive.openair',
+        highlights: const [
+          UpdateHighlight(
+            icon: Icons.bug_report_outlined,
+            title: 'Bug fixes',
+            description: 'Resolved crashes and stability issues',
+          ),
+          UpdateHighlight(
+            icon: Icons.speed_rounded,
+            title: 'Performance',
+            description: 'Faster startup and smoother playback',
+          ),
+          UpdateHighlight(
+            icon: Icons.new_releases_outlined,
+            title: 'New features',
+            description: 'Added Podcasting 2.0 enhancements',
+          ),
+        ],
+      ));
+    }
 
     try {
       final initial = await _appLinks.getInitialLink();
