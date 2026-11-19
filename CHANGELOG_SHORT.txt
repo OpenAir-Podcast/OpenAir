@@ -1,3 +1,10 @@
+What's New in v0.20.17+95
+
+• Fixed queue card tap crash (int to Duration)
+• Notification icon fix
+
+---
+
 What's New in v0.20.16+94
 
 • Fixed notification small icon crash
