@@ -1,3 +1,10 @@
+What's New in v0.20.18+96
+
+• Fixed firebase_auth dependency conflict
+• Fixed queue card tap crash
+
+---
+
 What's New in v0.20.17+95
 
 • Fixed queue card tap crash (int to Duration)
