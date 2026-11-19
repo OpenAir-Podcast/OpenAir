@@ -1,3 +1,10 @@
+What's New in v0.20.16+94
+
+• Fixed notification small icon crash
+• Guarded notification show calls
+
+---
+
 What's New in v0.20.15+93
 
 • In-app update dialog on launch
