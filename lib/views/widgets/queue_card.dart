@@ -233,8 +233,8 @@ class _QueueCardState extends ConsumerState<QueueCard> {
                         );
                       }
 
-                      openAir.playerPosition =
-                          widget.episodeItem['playerPosition'] ?? 0;
+                      openAir.playerPosition = Duration(
+                          milliseconds: widget.episodeItem['playerPosition'] ?? 0);
                       openAir.currentPodcast =
                           PodcastModel.fromJson(widget.episodeItem);
                       openAir.currentEpisode = widget.episodeItem;
