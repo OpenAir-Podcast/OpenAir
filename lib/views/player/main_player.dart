@@ -295,7 +295,6 @@ class MainPlayerState extends ConsumerState<MainPlayer> {
                         borderRadius: BorderRadius.circular(16),
                         child: podcastImage(
                           imageUrl.toString(),
-                          width: double.infinity,
                           height: 200,
                           fit: BoxFit.cover,
                         ),
