@@ -25,7 +25,7 @@ class NotificationService extends ChangeNotifier {
     // tinted with a single colour and only the alpha channel survives, so the
     // full-colour launcher artwork renders as a blank blob.
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_notification');
+        AndroidInitializationSettings('notification_icon');
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings();
@@ -60,7 +60,7 @@ class NotificationService extends ChangeNotifier {
         AndroidNotificationDetails(
       'openair_notifications_channel',
       'OpenAir Notification',
-      icon: 'ic_notification',
+      icon: 'notification_icon',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,
@@ -79,11 +79,15 @@ class NotificationService extends ChangeNotifier {
       macOS: iOSPlatformChannelSpecifics,
     );
 
-    await flutterLocalNotificationsPlugin.show(
-      id: 0,
-      title: title,
-      body: body,
-      notificationDetails: platformChannelSpecifics,
-    );
+    try {
+      await flutterLocalNotificationsPlugin.show(
+        id: 0,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
+      );
+    } catch (e) {
+      debugPrint('Failed to show notification: $e');
+    }
   }
 }
