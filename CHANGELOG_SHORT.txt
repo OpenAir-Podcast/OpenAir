@@ -1,3 +1,10 @@
+What's New in v0.20.14+92
+
+• Fixed notification small icon crash
+• Episode details dialog artwork fix
+
+---
+
 What's New in v0.20.13+91
 
 • Firebase Crashlytics integration
