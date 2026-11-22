@@ -1,3 +1,10 @@
+What's New in v0.20.19+97
+
+• Fixed database schema mismatch (feedImage column)
+• Download sync stability
+
+---
+
 What's New in v0.20.18+96
 
 • Fixed firebase_auth dependency conflict
