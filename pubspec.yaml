@@ -78,6 +78,7 @@ dev_dependencies:
   hive_ce_generator: ^1.9.2
   rename: ^3.1.0
   flutter_launcher_icons: ^0.14.4
+  msix: ^3.16.0
 
 dependency_overrides:
   intl: ^0.20.2
@@ -87,6 +88,14 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   image_path: "assets/icons/icon.png"
+
+msix_config:
+  display_name: OpenAir
+  publisher_display_name: OpenAir
+  identity_name: com.liquidhive.openair
+  msix_version: 0.20.19.0
+  logo_path: assets/icons/icon.png
+  capabilities: internetClient
 
 flutter:
   uses-material-design: true
