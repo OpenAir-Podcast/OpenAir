@@ -257,7 +257,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     if (mounted) {
       unawaited(UpdateService.checkForUpdate(
         context,
-        latestVersion: '0.20.15',
+        latestVersion: '0.20.19',
         updateUrl:
             'https://play.google.com/store/apps/details?id=com.liquidhive.openair',
         highlights: const [
