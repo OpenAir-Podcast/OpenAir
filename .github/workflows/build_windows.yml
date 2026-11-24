@@ -22,6 +22,23 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Create .env
+        run: |
+          @"
+          PODCAST_INDEX_API_KEY=dummy
+          PODCAST_INDEX_API_SECRET=dummy
+          PODCAST_USER_AGENT=OpenAir/1.0
+          FYYD_ACCESS_TOKEN=dummy
+          PAYPAL_URL=https://example.com
+          DONATE_WITH_KOFI_URL=https://example.com
+          DISCORD_URL=https://example.com
+          URL_GITHUB_ISSUES=https://example.com
+          URL_GITHUB_DISCUSSION=https://example.com
+          URL_GITHUB=https://example.com
+          PRIVACY_POLICY=https://example.com
+          TERMS_OF_SERVICE=https://example.com
+          "@ | Out-File -FilePath .env -Encoding utf8
+
       - name: Generate code
         run: dart run build_runner build
 
