@@ -43,9 +43,13 @@ jobs:
         run: dart run build_runner build
 
       - name: Build Windows EXE
+        env:
+          CMAKE_POLICY_VERSION_MINIMUM: '3.5'
         run: flutter build windows --release
 
       - name: Build MSIX
+        env:
+          CMAKE_POLICY_VERSION_MINIMUM: '3.5'
         run: flutter pub run msix:create
 
       - name: Upload artifacts
