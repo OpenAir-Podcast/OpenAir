@@ -92,9 +92,11 @@ flutter_launcher_icons:
 msix_config:
   display_name: OpenAir
   publisher_display_name: OpenAir
+  publisher: CN=LiquidHive
   identity_name: com.liquidhive.openair
   msix_version: 0.20.19.0
   logo_path: assets/icons/icon.png
+  description: "OpenAir is a free and open-source cross-platform podcast app that empowers you to explore and enjoy the vast world of podcasts."
   capabilities: internetClient
 
 flutter:
