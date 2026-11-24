@@ -98,6 +98,7 @@ msix_config:
   logo_path: assets/icons/icon.png
   description: "OpenAir is a free and open-source cross-platform podcast app that empowers you to explore and enjoy the vast world of podcasts."
   capabilities: internetClient
+  install_certificate: false
 
 flutter:
   uses-material-design: true
