@@ -52,6 +52,13 @@ jobs:
           CMAKE_POLICY_VERSION_MINIMUM: '3.5'
         run: flutter pub run msix:create
 
+      - name: Build MSI (flutter_distributor)
+        env:
+          CMAKE_POLICY_VERSION_MINIMUM: '3.5'
+        run: |
+          dart pub global activate flutter_distributor
+          flutter_distributor package --platform windows --targets msi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -59,6 +66,7 @@ jobs:
           path: |
             build/windows/x64/runner/Release/
             build/windows/*.msix
+            dist/*.msi
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -67,5 +75,6 @@ jobs:
           files: |
             build/windows/x64/runner/Release/openair.exe
             build/windows/*.msix
+            dist/*.msi
           draft: false
           prerelease: false
