@@ -58,7 +58,7 @@ jobs:
           name: windows-build
           path: |
             build/windows/x64/runner/Release/
-            build/windows/*.msix
+            build/windows/x64/runner/Release/*.msix
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -66,6 +66,6 @@ jobs:
         with:
           files: |
             build/windows/x64/runner/Release/openair.exe
-            build/windows/*.msix
+            build/windows/x64/runner/Release/*.msix
           draft: false
           prerelease: false
