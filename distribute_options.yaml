@@ -62,6 +62,19 @@ releases:
             dart-define:
               APP_ENV: dev
 
+      - name: release-dev-windows-msi
+        package:
+          platform: windows
+          target: msi
+          make_args:
+            app_name: OpenAir
+            executable_name: OpenAir
+            icon: assets/icons/icon.png
+            license: LICENSE.rtf
+          build_args:
+            dart-define:
+              APP_ENV: dev
+
       - name: release-dev-linux-appimage
         package:
           platform: linux
