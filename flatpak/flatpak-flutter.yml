@@ -53,7 +53,22 @@ modules:
         PUB_CACHE: /run/build/OpenAir/.pub-cache
     build-commands:
       - flutter pub get --offline
-      - flutter pub run build_runner build --delete-conflicting-outputs
+      - |
+        cat > .env <<EOF
+        PODCAST_INDEX_API_KEY=dummy
+        PODCAST_INDEX_API_SECRET=dummy
+        PODCAST_USER_AGENT=OpenAir/1.0
+        FYYD_ACCESS_TOKEN=dummy
+        PAYPAL_URL=https://example.com
+        DONATE_WITH_KOFI_URL=https://example.com
+        DISCORD_URL=https://example.com
+        URL_GITHUB_ISSUES=https://example.com
+        URL_GITHUB_DISCUSSION=https://example.com
+        URL_GITHUB=https://example.com
+        PRIVACY_POLICY=https://example.com
+        TERMS_OF_SERVICE=https://example.com
+        EOF
+      - flutter pub run build_runner build
       - flutter build linux --release --no-pub
       - install -Dm755 build/linux/x64/release/bundle/OpenAir /app/bin/OpenAir
       - cp -r build/linux/x64/release/bundle/data /app/bin/data

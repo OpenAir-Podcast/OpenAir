@@ -53,9 +53,9 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
-    <release version="0.18.21" date="2026-09-16">
+    <release version="0.20.19" date="2026-11-27">
       <description>
-        <p>Desktop support (Linux, Windows, macOS), listening stats and a long-press context menu.</p>
+        <p>Podcasting 2.0 support, in-app updates, transcript viewer, bookmarks, queue improvements, and stability fixes.</p>
       </description>
     </release>
   </releases>
